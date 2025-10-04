@@ -39,6 +39,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
 import org.checkerframework.checker.pico.qual.Assignable;
 import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.LazyFinal;
 import org.checkerframework.checker.pico.qual.Mutable;
 import org.checkerframework.checker.pico.qual.PolyMutable;
 import org.checkerframework.checker.pico.qual.Readonly;
@@ -416,7 +417,7 @@ import jdk.internal.access.SharedSecrets;
      * Holds cached entrySet(). Note that AbstractMap fields are used
      * for keySet() and values().
      */
-    transient @Assignable Set<Map.@ReceiverDependentMutable Entry<K,V>> entrySet;
+    transient @LazyFinal Set<Map.@ReceiverDependentMutable Entry<K,V>> entrySet;
 
     /**
      * The number of key-value mappings contained in this map.
