@@ -1,4 +1,4 @@
-package src.java.base.share.classes.org.checkerframework.checker.pico.qual;
+package org.checkerframework.checker.pico.qual;
 
 import org.checkerframework.checker.initialization.qual.HoldsForDefaultValue;
 
