@@ -37,6 +37,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
 import org.checkerframework.checker.pico.qual.Assignable;
 import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.LazyFinal;
 import org.checkerframework.checker.pico.qual.Mutable;
 import org.checkerframework.checker.pico.qual.PolyMutable;
 import org.checkerframework.checker.pico.qual.Readonly;
@@ -963,7 +964,7 @@ import jdk.internal.access.SharedSecrets;
      * view the first time this view is requested.  The view is stateless,
      * so there's no reason to create more than one.
      */
-    private transient @Assignable Set<Map.@ReceiverDependentMutable Entry<K,V>> entrySet;
+    private transient @LazyFinal Set<Map.@ReceiverDependentMutable Entry<K,V>> entrySet;
 
     /**
      * Returns an identity-based set view of the keys contained in this map.

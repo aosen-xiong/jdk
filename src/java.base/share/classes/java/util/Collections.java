@@ -40,6 +40,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
 import org.checkerframework.checker.pico.qual.Assignable;
 import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.LazyFinal;
 import org.checkerframework.checker.pico.qual.Mutable;
 import org.checkerframework.checker.pico.qual.PolyMutable;
 import org.checkerframework.checker.pico.qual.Readonly;
@@ -1585,9 +1586,9 @@ public class Collections {
             throw new UnsupportedOperationException();
         }
 
-        private transient @Assignable Set<K> keySet;
-        private transient @Assignable Set<Map.@Immutable Entry<K,V>> entrySet;
-        private transient @Assignable Collection<V> values;
+        private transient @LazyFinal Set<K> keySet;
+        private transient @LazyFinal Set<Map.@Immutable Entry<K,V>> entrySet;
+        private transient @LazyFinal Collection<V> values;
 
         public @Immutable Set<K> keySet() {
             if (keySet==null)
@@ -2793,9 +2794,9 @@ public class Collections {
             synchronized (mutex) {m.clear();}
         }
 
-        private transient @Assignable Set<K> keySet;
-        private transient @Assignable Set<Map.@ReceiverDependentMutable Entry<K,V>> entrySet;
-        private transient @Assignable Collection<V> values;
+        private transient @LazyFinal Set<K> keySet;
+        private transient @LazyFinal Set<Map.@ReceiverDependentMutable Entry<K,V>> entrySet;
+        private transient @LazyFinal Collection<V> values;
 
         public @PolyMutable Set<K> keySet(@PolyMutable SynchronizedMap<K,V> this) {
             synchronized (mutex) {
@@ -3911,7 +3912,7 @@ public class Collections {
                 m.put(e.getKey(), e.getValue());
         }
 
-        private transient @Assignable Set<Map.@ReceiverDependentMutable Entry<K,V>> entrySet;
+        private transient @LazyFinal Set<Map.@ReceiverDependentMutable Entry<K,V>> entrySet;
 
         @SideEffectFree
         @SuppressWarnings("pico:assignment.type.incompatible") // polyq on supertype's type argument
@@ -5264,10 +5265,10 @@ public class Collections {
         @Pure
         public boolean containsValue(@UnknownSignedness @Readonly Object value)       {return eq(value, v);}
         public V get(@Readonly Object key)              {return (eq(key, k) ? v : null);}
-        // PICO: initial only once
-        private transient @Assignable Set<K> keySet;
-        private transient @Assignable Set<Map.@Immutable Entry<K,V>> entrySet;
-        private transient @Assignable Collection<V> values;
+
+        private transient @LazyFinal Set<K> keySet;
+        private transient @LazyFinal Set<Map.@Immutable Entry<K,V>> entrySet;
+        private transient @LazyFinal Collection<V> values;
 
         public @Immutable Set<K> keySet() {
             if (keySet==null)
