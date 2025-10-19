@@ -30,6 +30,8 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.invoke.VarHandle.VarHandleDesc;
 
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
+
 /**
  * A <a href="package-summary.html#nominal">nominal descriptor</a> for a loadable
  * constant value, as defined in JVMS 4.4. Such a descriptor can be resolved via
@@ -75,6 +77,7 @@ import java.lang.invoke.VarHandle.VarHandleDesc;
  *
  * @since 12
  */
+@ReceiverDependentMutable
 public sealed interface ConstantDesc
         permits ClassDesc,
                 MethodHandleDesc,

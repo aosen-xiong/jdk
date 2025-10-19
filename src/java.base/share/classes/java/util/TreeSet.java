@@ -110,7 +110,8 @@ import org.checkerframework.framework.qual.CFComment;
 
 @CFComment({"lock/nullness: Subclasses of this interface/class may opt to prohibit null elements"})
 @AnnotatedFor({"lock", "nullness"})
-@ReceiverDependentMutable public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
+@ReceiverDependentMutable
+public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
     implements NavigableSet<E>, Cloneable, java.io.Serializable
 {
     /**

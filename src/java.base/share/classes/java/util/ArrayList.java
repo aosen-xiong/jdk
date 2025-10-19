@@ -996,7 +996,8 @@ import jdk.internal.util.ArraysSupport;
     /**
      * An optimized version of AbstractList.Itr
      */
-    @ReceiverDependentMutable private class Itr implements Iterator<E> {
+    @ReceiverDependentMutable
+    private class Itr implements Iterator<E> {
         int cursor;       // index of next element to return
         int lastRet = -1; // index of last element returned; -1 if no such
         int expectedModCount = modCount;
@@ -1066,7 +1067,8 @@ import jdk.internal.util.ArraysSupport;
     /**
      * An optimized version of AbstractList.ListItr
      */
-    @ReceiverDependentMutable private class ListItr extends Itr implements ListIterator<E> {
+    @ReceiverDependentMutable
+    private class ListItr extends Itr implements ListIterator<E> {
         ListItr(int index) {
             super();
             cursor = index;
@@ -1158,7 +1160,8 @@ import jdk.internal.util.ArraysSupport;
         return new @PolyMutable SubList<>(this, fromIndex, toIndex);
     }
 
-    @ReceiverDependentMutable private static class SubList<E> extends AbstractList<E> implements RandomAccess {
+    @ReceiverDependentMutable
+    private static class SubList<E> extends AbstractList<E> implements RandomAccess {
         private final ArrayList<E> root;
         private final SubList<E> parent;
         private final int offset;

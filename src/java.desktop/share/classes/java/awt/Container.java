@@ -103,7 +103,8 @@ import sun.util.logging.PlatformLogger;
  * @since     1.0
  */
 @AnnotatedFor({"guieffect", "nullness"})
-@ReceiverDependentMutable public @UIType class Container extends Component {
+@ReceiverDependentMutable
+public @UIType class Container extends Component {
 
     private static final PlatformLogger log = PlatformLogger.getLogger("java.awt.Container");
     private static final PlatformLogger eventLog = PlatformLogger.getLogger("java.awt.event.Container");

@@ -705,7 +705,8 @@ import jdk.internal.access.SharedSecrets;
         return keySet;
     }
 
-    @ReceiverDependentMutable private class KeySet extends AbstractSet<K> {
+    @ReceiverDependentMutable
+    private class KeySet extends AbstractSet<K> {
         @SideEffectFree
         public Iterator<K> iterator(@Readonly KeySet this) {
             return getIterator(KEYS);
@@ -751,7 +752,8 @@ import jdk.internal.access.SharedSecrets;
         return entrySet;
     }
 
-    @ReceiverDependentMutable private class EntrySet extends AbstractSet<Map.@Readonly Entry<K,V>> {
+    @ReceiverDependentMutable
+    private class EntrySet extends AbstractSet<Map.@Readonly Entry<K,V>> {
         @SideEffectFree
         public Iterator<Map.@Readonly Entry<K,V>> iterator(@Readonly EntrySet this) {
             return getIterator(ENTRIES);
@@ -837,7 +839,8 @@ import jdk.internal.access.SharedSecrets;
         return values;
     }
 
-    @ReceiverDependentMutable private class ValueCollection extends AbstractCollection<V> {
+    @ReceiverDependentMutable
+    private class ValueCollection extends AbstractCollection<V> {
         @SideEffectFree
         public Iterator<V> iterator(@Readonly ValueCollection this) {
             return getIterator(VALUES);
@@ -1412,7 +1415,8 @@ import jdk.internal.access.SharedSecrets;
     /**
      * Hashtable bucket collision list entry
      */
-    @ReceiverDependentMutable private static class Entry<K extends @Immutable Object,V> implements Map.Entry<K,V> {
+    @ReceiverDependentMutable
+    private static class Entry<K extends @Immutable Object,V> implements Map.Entry<K,V> {
         final int hash;
         final K key;
         V value;
@@ -1480,7 +1484,8 @@ import jdk.internal.access.SharedSecrets;
      * to avoid unintentionally increasing the capabilities granted a user
      * by passing an Enumeration.
      */
-    @ReceiverDependentMutable private class Enumerator<T> implements Enumeration<T>, Iterator<T> {
+    @ReceiverDependentMutable
+    private class Enumerator<T> implements Enumeration<T>, Iterator<T> {
         @SuppressWarnings("pico:assignment.type.incompatible") // PICO field use
         final @Readonly Entry<?,?>[] table = Hashtable.this.table;
         @Assignable int index = table.length;

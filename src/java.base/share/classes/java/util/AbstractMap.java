@@ -90,7 +90,8 @@ import java.util.Map.Entry;
 
 @CFComment("lock: Subclasses of this interface/class may opt to prohibit null elements")
 @AnnotatedFor({"lock", "nullness", "index"})
-@ReceiverDependentMutable public abstract class AbstractMap<K extends @Immutable Object,V> implements Map<K,V> {
+@ReceiverDependentMutable
+public abstract class AbstractMap<K extends @Immutable Object,V> implements Map<K,V> {
     /**
      * Sole constructor.  (For invocation by subclass constructors, typically
      * implicit.)

@@ -40,7 +40,8 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @since 1.0
  */
 @AnnotatedFor({"nullness"})
-public @ReceiverDependentMutable class IndexOutOfBoundsException extends RuntimeException {
+@ReceiverDependentMutable
+public class IndexOutOfBoundsException extends RuntimeException {
     @java.io.Serial
     private static final long serialVersionUID = 234122996006267687L;
 

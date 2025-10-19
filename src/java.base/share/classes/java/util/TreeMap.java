@@ -135,7 +135,8 @@ import java.util.function.Function;
 
 @CFComment({"lock/nullness: This permits null element when using a custom comparator that allows null"})
 @AnnotatedFor({"lock", "nullness", "index"})
-@ReceiverDependentMutable public class TreeMap<K extends @Immutable Object,V>
+@ReceiverDependentMutable
+public class TreeMap<K extends @Immutable Object,V>
     extends AbstractMap<K,V>
     implements NavigableMap<K,V>, Cloneable, java.io.Serializable
 {
@@ -1347,7 +1348,8 @@ import java.util.function.Function;
 
     // View class support
 
-    @ReceiverDependentMutable class Values extends AbstractCollection<V> {
+    @ReceiverDependentMutable
+    class Values extends AbstractCollection<V> {
         @SideEffectFree
         public Iterator<V> iterator(@Readonly Values this) {
             return new ValueIterator(getFirstEntry());
@@ -1384,7 +1386,8 @@ import java.util.function.Function;
         }
     }
 
-    @ReceiverDependentMutable class EntrySet extends AbstractSet<Map.@Readonly Entry<K,V>> {
+    @ReceiverDependentMutable
+    class EntrySet extends AbstractSet<Map.@Readonly Entry<K,V>> {
         @SideEffectFree
         public Iterator<Map.Entry<K,V>> iterator() {
             return new EntryIterator(getFirstEntry());
@@ -1443,7 +1446,8 @@ import java.util.function.Function;
         return new DescendingKeyIterator(getLastEntry());
     }
 
-    @ReceiverDependentMutable static final class KeySet<E extends @Immutable Object> extends AbstractSet<E> implements NavigableSet<E> {
+    @ReceiverDependentMutable
+    static final class KeySet<E extends @Immutable Object> extends AbstractSet<E> implements NavigableSet<E> {
         private final NavigableMap<E, ?> m;
         KeySet(@ReceiverDependentMutable NavigableMap<E,?> map) { m = map; }
 
@@ -1524,7 +1528,8 @@ import java.util.function.Function;
     /**
      * Base class for TreeMap Iterators
      */
-    @ReceiverDependentMutable abstract class PrivateEntryIterator<T> implements Iterator<T> {
+    @ReceiverDependentMutable
+    abstract class PrivateEntryIterator<T> implements Iterator<T> {
         @Readonly Entry<K,V> next;
         @Readonly Entry<K,V> lastReturned;
         int expectedModCount;
@@ -1577,7 +1582,8 @@ import java.util.function.Function;
         }
     }
 
-    @ReceiverDependentMutable final class EntryIterator extends PrivateEntryIterator<Map.Entry<K,V>> {
+    @ReceiverDependentMutable
+    final class EntryIterator extends PrivateEntryIterator<Map.Entry<K,V>> {
         EntryIterator(@Readonly Entry<K,V> first) {
             super(first);
         }
@@ -1586,7 +1592,8 @@ import java.util.function.Function;
         }
     }
 
-    @ReceiverDependentMutable final class ValueIterator extends PrivateEntryIterator<V> {
+    @ReceiverDependentMutable
+    final class ValueIterator extends PrivateEntryIterator<V> {
         ValueIterator(@Readonly Entry<K,V> first) {
             super(first);
         }
@@ -1595,7 +1602,8 @@ import java.util.function.Function;
         }
     }
 
-    @ReceiverDependentMutable final class KeyIterator extends PrivateEntryIterator<K> {
+    @ReceiverDependentMutable
+    final class KeyIterator extends PrivateEntryIterator<K> {
         KeyIterator(@Readonly Entry<K,V> first) {
             super(first);
         }
@@ -1604,7 +1612,8 @@ import java.util.function.Function;
         }
     }
 
-    @ReceiverDependentMutable final class DescendingKeyIterator extends PrivateEntryIterator<K> {
+    @ReceiverDependentMutable
+    final class DescendingKeyIterator extends PrivateEntryIterator<K> {
         DescendingKeyIterator(@Readonly Entry<K,V> first) {
             super(first);
         }
@@ -1679,7 +1688,8 @@ import java.util.function.Function;
     /**
      * @serial include
      */
-    @ReceiverDependentMutable abstract static class NavigableSubMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
+    @ReceiverDependentMutable
+    abstract static class NavigableSubMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
         implements NavigableMap<K,V>, java.io.Serializable {
         @java.io.Serial
         private static final long serialVersionUID = -2102997345730753016L;
@@ -2012,7 +2022,8 @@ import java.util.function.Function;
 
         // View classes
 
-        @ReceiverDependentMutable abstract class EntrySetView extends AbstractSet<Map.@Readonly Entry<K,V>> {
+        @ReceiverDependentMutable
+        abstract class EntrySetView extends AbstractSet<Map.@Readonly Entry<K,V>> {
             private transient @Assignable int size = -1, sizeModCount;
 
             @Pure
@@ -2070,7 +2081,8 @@ import java.util.function.Function;
         /**
          * Iterators for SubMaps
          */
-        @ReceiverDependentMutable abstract class SubMapIterator<T> implements Iterator<T> {
+        @ReceiverDependentMutable
+        abstract class SubMapIterator<T> implements Iterator<T> {
             TreeMap.@Readonly Entry<K,V> lastReturned;
             TreeMap.@Readonly Entry<K,V> next;
             final @Readonly Object fenceKey;
@@ -2138,7 +2150,8 @@ import java.util.function.Function;
 
         }
 
-        @ReceiverDependentMutable final class SubMapEntryIterator extends SubMapIterator<Map.Entry<K,V>> {
+        @ReceiverDependentMutable
+        final class SubMapEntryIterator extends SubMapIterator<Map.Entry<K,V>> {
             SubMapEntryIterator(TreeMap.@Readonly Entry<K,V> first,
                                 TreeMap.@Readonly Entry<K,V> fence) {
                 super(first, fence);
@@ -2151,7 +2164,8 @@ import java.util.function.Function;
             }
         }
 
-        @ReceiverDependentMutable final class DescendingSubMapEntryIterator extends SubMapIterator<Map.Entry<K,V>> {
+        @ReceiverDependentMutable
+        final class DescendingSubMapEntryIterator extends SubMapIterator<Map.Entry<K,V>> {
             DescendingSubMapEntryIterator(TreeMap.Entry<K,V> last,
                                           TreeMap.Entry<K,V> fence) {
                 super(last, fence);
@@ -2166,7 +2180,8 @@ import java.util.function.Function;
         }
 
         // Implement minimal Spliterator as KeySpliterator backup
-        @ReceiverDependentMutable final class SubMapKeyIterator extends SubMapIterator<K>
+        @ReceiverDependentMutable
+        final class SubMapKeyIterator extends SubMapIterator<K>
             implements Spliterator<K> {
             SubMapKeyIterator(TreeMap.@Readonly Entry<K,V> first,
                               TreeMap.@Readonly Entry<K,V> fence) {
@@ -2204,7 +2219,8 @@ import java.util.function.Function;
             }
         }
 
-        @ReceiverDependentMutable final class DescendingSubMapKeyIterator extends SubMapIterator<K>
+        @ReceiverDependentMutable
+        final class DescendingSubMapKeyIterator extends SubMapIterator<K>
             implements Spliterator<K> {
             DescendingSubMapKeyIterator(TreeMap.@Readonly Entry<K,V> last,
                                         TreeMap.@Readonly Entry<K,V> fence) {
@@ -2242,7 +2258,8 @@ import java.util.function.Function;
     /**
      * @serial include
      */
-    @ReceiverDependentMutable static final class AscendingSubMap<K extends @Immutable Object,V> extends NavigableSubMap<K,V> {
+    @ReceiverDependentMutable
+    static final class AscendingSubMap<K extends @Immutable Object,V> extends NavigableSubMap<K,V> {
         @java.io.Serial
         private static final long serialVersionUID = 912986545866124060L;
 
@@ -2309,7 +2326,8 @@ import java.util.function.Function;
             return new DescendingSubMapKeyIterator(absHighest(), absLowFence());
         }
 
-        @ReceiverDependentMutable final class AscendingEntrySetView extends EntrySetView {
+        @ReceiverDependentMutable
+        final class AscendingEntrySetView extends EntrySetView {
             public Iterator<Map.Entry<K,V>> iterator(@Readonly AscendingEntrySetView this) {
                 return new SubMapEntryIterator(absLowest(), absHighFence());
             }
@@ -2333,7 +2351,8 @@ import java.util.function.Function;
     /**
      * @serial include
      */
-    @ReceiverDependentMutable static final class DescendingSubMap<K extends @Immutable Object,V>  extends NavigableSubMap<K,V> {
+    @ReceiverDependentMutable
+    static final class DescendingSubMap<K extends @Immutable Object,V>  extends NavigableSubMap<K,V> {
         @java.io.Serial
         private static final long serialVersionUID = 912986545866120460L;
         DescendingSubMap(@ReceiverDependentMutable TreeMap<K,V> m,
@@ -2403,7 +2422,8 @@ import java.util.function.Function;
             return new SubMapKeyIterator(absLowest(), absHighFence());
         }
 
-        @ReceiverDependentMutable final class DescendingEntrySetView extends EntrySetView {
+        @ReceiverDependentMutable
+        final class DescendingEntrySetView extends EntrySetView {
             public Iterator<Map.Entry<K,V>> iterator(@Readonly DescendingEntrySetView this) {
                 return new DescendingSubMapEntryIterator(absHighest(), absLowFence());
             }
@@ -2433,7 +2453,8 @@ import java.util.function.Function;
      *
      * @serial include
      */
-    @ReceiverDependentMutable private class SubMap extends AbstractMap<K,V>
+    @ReceiverDependentMutable
+    private class SubMap extends AbstractMap<K,V>
         implements SortedMap<K,V>, java.io.Serializable {
         @java.io.Serial
         private static final long serialVersionUID = -6520786458950516097L;
@@ -2472,7 +2493,8 @@ import java.util.function.Function;
      * user (see Map.Entry).
      */
 
-    @ReceiverDependentMutable static final class Entry<K extends @Immutable Object,V> implements Map.Entry<K,V> {
+    @ReceiverDependentMutable
+    static final class Entry<K extends @Immutable Object,V> implements Map.Entry<K,V> {
         K key;
         V value;
         @Assignable Entry<K,V> left;

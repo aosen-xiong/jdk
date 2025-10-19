@@ -108,7 +108,8 @@ import jdk.internal.access.SharedSecrets;
  */
 
  @AnnotatedFor({"index", "initialization", "lock", "nullness"})
- @ReceiverDependentMutable public class HashSet<E extends @Immutable Object>
+ @ReceiverDependentMutable
+ public class HashSet<E extends @Immutable Object>
     extends AbstractSet<E>
     implements Set<E>, Cloneable, java.io.Serializable
 {

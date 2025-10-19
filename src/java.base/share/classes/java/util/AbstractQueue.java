@@ -70,7 +70,8 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @param <E> the type of elements held in this queue
  */
 @AnnotatedFor({"lock", "nullness"})
-@ReceiverDependentMutable public abstract class AbstractQueue<E>
+@ReceiverDependentMutable
+public abstract class AbstractQueue<E>
     extends AbstractCollection<E>
     implements Queue<E> {
 

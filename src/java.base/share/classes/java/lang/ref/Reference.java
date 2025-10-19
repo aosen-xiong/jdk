@@ -27,6 +27,7 @@ package java.lang.ref;
 
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.framework.qual.AnnotatedFor;
@@ -619,7 +620,7 @@ public abstract class Reference<T> {
      */
     @ForceInline
     @CFComment("nullness: Docs say the parameter can be null, but in practice, calls pass `this`")
-    public static void reachabilityFence(Object ref) {
+    public static void reachabilityFence(@Readonly Object ref) {
         // Does nothing. This method is annotated with @ForceInline to eliminate
         // most of the overhead that using @DontInline would cause with the
         // HotSpot JVM, when this fence is used in a wide variety of situations.

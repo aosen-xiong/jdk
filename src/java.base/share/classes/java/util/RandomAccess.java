@@ -68,5 +68,6 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @since 1.4
  */
 @AnnotatedFor({"lock", "nullness"})
-@ReceiverDependentMutable public interface RandomAccess {
+@ReceiverDependentMutable
+public interface RandomAccess {
 }

@@ -79,7 +79,8 @@ import jdk.internal.util.ArraysSupport;
 
 @CFComment("lock/nullness: Subclasses of this interface/class may opt to prohibit null elements")
 @AnnotatedFor({"lock", "nullness", "index"})
-@ReceiverDependentMutable public abstract class AbstractCollection<E> implements Collection<E> {
+@ReceiverDependentMutable
+public abstract class AbstractCollection<E> implements Collection<E> {
     /**
      * Sole constructor.  (For invocation by subclass constructors, typically
      * implicit.)

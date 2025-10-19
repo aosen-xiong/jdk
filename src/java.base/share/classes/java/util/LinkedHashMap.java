@@ -180,7 +180,8 @@ import java.io.IOException;
  * @since   1.4
  */
 @AnnotatedFor({"lock", "nullness", "index"})
-@ReceiverDependentMutable public class LinkedHashMap<K extends @Immutable Object,V>
+@ReceiverDependentMutable
+public class LinkedHashMap<K extends @Immutable Object,V>
     extends HashMap<K,V>
     implements Map<K,V>
 {
@@ -209,7 +210,8 @@ import java.io.IOException;
     /**
      * HashMap.Node subclass for normal LinkedHashMap entries.
      */
-    @ReceiverDependentMutable static class Entry<K extends @Immutable Object,V> extends HashMap.Node<K,V> {
+    @ReceiverDependentMutable
+    static class Entry<K extends @Immutable Object,V> extends HashMap.Node<K,V> {
         @Assignable Entry<K,V> before, after;
         Entry(int hash, K key, V value, @ReceiverDependentMutable Node<K,V> next) {
             super(hash, key, value, next);
@@ -584,7 +586,8 @@ import java.io.IOException;
         return a;
     }
 
-    @ReceiverDependentMutable final class LinkedKeySet extends AbstractSet<K> {
+    @ReceiverDependentMutable
+    final class LinkedKeySet extends AbstractSet<K> {
         @Pure
         public final int size(@Readonly LinkedKeySet this)                 { return size; }
         public final void clear(@Mutable LinkedHashMap<K,V>. @Mutable LinkedKeySet this)               { LinkedHashMap.this.clear(); }
@@ -651,7 +654,8 @@ import java.io.IOException;
         return vs;
     }
 
-    @ReceiverDependentMutable final class LinkedValues extends AbstractCollection<V> {
+    @ReceiverDependentMutable
+    final class LinkedValues extends AbstractCollection<V> {
         @Pure
         public final int size(@Readonly LinkedValues this)                 { return size; }
         public final void clear(@Mutable LinkedHashMap<K,V>. @Mutable LinkedValues this)               { LinkedHashMap.this.clear(); }
@@ -713,7 +717,8 @@ import java.io.IOException;
         return (es = entrySet) == null ? (entrySet = new @PolyMutable LinkedEntrySet()) : es;
     }
 
-    @ReceiverDependentMutable final class LinkedEntrySet extends AbstractSet<Map.@Readonly Entry<K,V>> {
+    @ReceiverDependentMutable
+    final class LinkedEntrySet extends AbstractSet<Map.@Readonly Entry<K,V>> {
         @Pure
         public final int size(@Readonly LinkedEntrySet this)                 { return size; }
         public final void clear(@Mutable LinkedHashMap<K,V>. @Mutable LinkedEntrySet this)               { LinkedHashMap.this.clear(); }
@@ -779,7 +784,8 @@ import java.io.IOException;
 
     // Iterators
 
-    @ReceiverDependentMutable abstract class LinkedHashIterator {
+    @ReceiverDependentMutable
+    abstract class LinkedHashIterator {
         LinkedHashMap.@Readonly Entry<K,V> next;
         LinkedHashMap.@Readonly Entry<K,V> current;
         int expectedModCount;
@@ -819,17 +825,20 @@ import java.io.IOException;
         }
     }
 
-    @ReceiverDependentMutable final class LinkedKeyIterator extends LinkedHashIterator
+    @ReceiverDependentMutable
+    final class LinkedKeyIterator extends LinkedHashIterator
         implements Iterator<K> {
         public final K next(@NonEmpty @Mutable LinkedKeyIterator this) { return nextNode().getKey(); }
     }
 
-    @ReceiverDependentMutable final class LinkedValueIterator extends LinkedHashIterator
+    @ReceiverDependentMutable
+    final class LinkedValueIterator extends LinkedHashIterator
         implements Iterator<V> {
         public final V next(@NonEmpty @Mutable LinkedValueIterator this) { return nextNode().value; }
     }
 
-    @ReceiverDependentMutable final class LinkedEntryIterator extends LinkedHashIterator
+    @ReceiverDependentMutable
+    final class LinkedEntryIterator extends LinkedHashIterator
         implements Iterator<Map.Entry<K,V>> {
         public final Map.@Readonly Entry<K,V> next(@NonEmpty @Mutable LinkedEntryIterator this) { return nextNode(); }
     }

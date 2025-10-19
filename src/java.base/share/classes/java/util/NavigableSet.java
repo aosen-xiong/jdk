@@ -99,7 +99,8 @@ import org.checkerframework.framework.qual.CFComment;
  */
 @CFComment({"lock/nullness: Subclasses of this interface/class may opt to prohibit null elements"})
 @AnnotatedFor({"lock", "nullness"})
-@ReceiverDependentMutable public interface NavigableSet<E> extends SortedSet<E> {
+@ReceiverDependentMutable
+public interface NavigableSet<E> extends SortedSet<E> {
     /**
      * Returns the greatest element in this set strictly less than the
      * given element, or {@code null} if there is no such element.

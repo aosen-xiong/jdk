@@ -47,7 +47,8 @@ import java.util.function.Consumer;
  * @jls 14.14.2 The enhanced {@code for} statement
  */
 @AnnotatedFor({"aliasing", "lock", "nullness"})
-@ReceiverDependentMutable public interface Iterable<T> {
+@ReceiverDependentMutable
+public interface Iterable<T> {
     /**
      * Returns an iterator over elements of type {@code T}.
      *

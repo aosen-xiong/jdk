@@ -71,7 +71,8 @@ import java.nio.charset.UnsupportedCharsetException;
  */
 
 @AnnotatedFor({"formatter", "index", "initialization", "lock", "mustcall", "nullness"})
-public @ReceiverDependentMutable class PrintWriter extends Writer {
+@ReceiverDependentMutable
+public class PrintWriter extends Writer {
 
     /**
      * The underlying character-output stream of this

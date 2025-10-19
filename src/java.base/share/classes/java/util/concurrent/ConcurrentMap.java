@@ -40,7 +40,9 @@ import org.checkerframework.checker.nullness.qual.EnsuresKeyFor;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
+import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.checker.pico.qual.Mutable;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.framework.qual.AnnotatedFor;
@@ -79,7 +81,8 @@ import java.util.function.Function;
  * @param <V> the type of mapped values
  */
 @AnnotatedFor({"nullness"})
-public @ReceiverDependentMutable interface ConcurrentMap<K extends @NonNull Object,V extends @NonNull Object> extends Map<K,V> {
+@ReceiverDependentMutable
+public interface ConcurrentMap<K extends @NonNull @Immutable Object,V extends @NonNull @Readonly Object> extends Map<K,V> {
 
     /**
      * {@inheritDoc}
@@ -95,7 +98,7 @@ public @ReceiverDependentMutable interface ConcurrentMap<K extends @NonNull Obje
      */
     @Override
     @Pure
-    default @PolyNull V getOrDefault(Object key, @PolyNull V defaultValue) {
+    default @PolyNull V getOrDefault(@Readonly Object key, @PolyNull V defaultValue) {
         V v;
         return ((v = get(key)) != null) ? v : defaultValue;
     }
@@ -198,7 +201,7 @@ public @ReceiverDependentMutable interface ConcurrentMap<K extends @NonNull Obje
      *         and this map does not permit null keys or values
      * (<a href="{@docRoot}/java.base/java/util/Collection.html#optional-restrictions">optional</a>)
      */
-    boolean remove(@Mutable ConcurrentMap<K,V> this, @UnknownSignedness Object key, @UnknownSignedness Object value);
+    boolean remove(@Mutable ConcurrentMap<K,V> this, @UnknownSignedness @Readonly Object key, @UnknownSignedness @Readonly Object value);
 
     /**
      * Replaces the entry for a key only if currently mapped to a given value.

@@ -30,7 +30,7 @@ import org.checkerframework.checker.nonempty.qual.EnsuresNonEmptyIf;
 import org.checkerframework.checker.nullness.qual.KeyFor;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
-import org.checkerframework.checker.pico.qual.Mutable;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.checker.propkey.qual.PropertyKey;
 import org.checkerframework.checker.signedness.qual.UnknownSignedness;
 import org.checkerframework.dataflow.qual.Pure;
@@ -1320,7 +1320,7 @@ public class Properties extends Hashtable<Object,Object> {
     }
 
     @Override
-    public synchronized @Nullable Object put(Object key, Object value) {
+    public synchronized @Nullable Object put(@Readonly Object key, @Readonly Object value) {
         return map.put(key, value);
     }
 

@@ -119,7 +119,8 @@ import org.checkerframework.framework.qual.CFComment;
 
 @CFComment({"lock/nullness: Subclasses of this interface/class may opt to prohibit null elements"})
 @AnnotatedFor({"lock", "nullness"})
-@ReceiverDependentMutable public interface SortedSet<E> extends Set<E> {
+@ReceiverDependentMutable
+public interface SortedSet<E> extends Set<E> {
     /**
      * Returns the comparator used to order the elements in this set,
      * or {@code null} if this set uses the {@linkplain Comparable

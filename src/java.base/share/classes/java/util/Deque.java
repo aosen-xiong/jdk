@@ -218,7 +218,8 @@ import org.checkerframework.framework.qual.CFComment;
  */
 @CFComment({"lock/nullness: Subclasses of this interface/class may opt to prohibit null elements"})
 @AnnotatedFor({"lock", "nullness", "index"})
-@ReceiverDependentMutable public interface Deque<E> extends Queue<E> {
+@ReceiverDependentMutable
+public interface Deque<E> extends Queue<E> {
     /**
      * Inserts the specified element at the front of this deque if it is
      * possible to do so immediately without violating capacity restrictions,

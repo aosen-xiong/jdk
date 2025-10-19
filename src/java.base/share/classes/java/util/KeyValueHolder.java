@@ -61,7 +61,8 @@ import jdk.internal.vm.annotation.Stable;
  * @since 9
  */
 @jdk.internal.ValueBased
-@ReceiverDependentMutable final class KeyValueHolder<K extends @Immutable Object,V> implements Map.Entry<K,V> {
+@ReceiverDependentMutable
+final class KeyValueHolder<K extends @Immutable Object,V> implements Map.Entry<K,V> {
     @Stable
     final K key;
     @Stable

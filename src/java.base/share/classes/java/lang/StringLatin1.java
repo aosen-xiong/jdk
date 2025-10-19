@@ -37,6 +37,8 @@ import java.util.stream.StreamSupport;
 import jdk.internal.util.ArraysSupport;
 import jdk.internal.vm.annotation.IntrinsicCandidate;
 
+import org.checkerframework.checker.pico.qual.Readonly;
+
 import static java.lang.String.LATIN1;
 import static java.lang.String.UTF16;
 import static java.lang.String.checkOffset;
@@ -54,7 +56,7 @@ final class StringLatin1 {
         return cp >>> 8 == 0;
     }
 
-    public static int length(byte[] value) {
+    public static int length(byte @Readonly [] value) {
         return value.length;
     }
 
@@ -104,13 +106,13 @@ final class StringLatin1 {
     }
 
     @IntrinsicCandidate
-    public static int compareTo(byte[] value, byte[] other) {
+    public static int compareTo(byte @Readonly [] value, byte @Readonly [] other) {
         int len1 = value.length;
         int len2 = other.length;
         return compareTo(value, other, len1, len2);
     }
 
-    public static int compareTo(byte[] value, byte[] other, int len1, int len2) {
+    public static int compareTo(byte @Readonly [] value, byte @Readonly [] other, int len1, int len2) {
         int lim = Math.min(len1, len2);
         for (int k = 0; k < lim; k++) {
             if (value[k] != other[k]) {
@@ -121,7 +123,7 @@ final class StringLatin1 {
     }
 
     @IntrinsicCandidate
-    public static int compareToUTF16(byte[] value, byte[] other) {
+    public static int compareToUTF16(byte @Readonly [] value, byte @Readonly [] other) {
         int len1 = length(value);
         int len2 = StringUTF16.length(other);
         return compareToUTF16Values(value, other, len1, len2);
@@ -130,14 +132,14 @@ final class StringLatin1 {
     /*
      * Checks the boundary and then compares the byte arrays.
      */
-    public static int compareToUTF16(byte[] value, byte[] other, int len1, int len2) {
+    public static int compareToUTF16(byte @Readonly [] value, byte @Readonly [] other, int len1, int len2) {
         checkOffset(len1, length(value));
         checkOffset(len2, StringUTF16.length(other));
 
         return compareToUTF16Values(value, other, len1, len2);
     }
 
-    private static int compareToUTF16Values(byte[] value, byte[] other, int len1, int len2) {
+    private static int compareToUTF16Values(byte @Readonly [] value, byte @Readonly [] other, int len1, int len2) {
         int lim = Math.min(len1, len2);
         for (int k = 0; k < lim; k++) {
             char c1 = getChar(value, k);
@@ -149,7 +151,7 @@ final class StringLatin1 {
         return len1 - len2;
     }
 
-    public static int compareToCI(byte[] value, byte[] other) {
+    public static int compareToCI(byte @Readonly [] value, byte @Readonly [] other) {
         int len1 = value.length;
         int len2 = other.length;
         int lim = Math.min(len1, len2);
@@ -169,7 +171,7 @@ final class StringLatin1 {
         return len1 - len2;
     }
 
-    public static int compareToCI_UTF16(byte[] value, byte[] other) {
+    public static int compareToCI_UTF16(byte @Readonly [] value, byte @Readonly [] other) {
         int len1 = length(value);
         int len2 = StringUTF16.length(other);
         int lim = Math.min(len1, len2);
@@ -191,7 +193,7 @@ final class StringLatin1 {
         return len1 - len2;
     }
 
-    public static int hashCode(byte[] value) {
+    public static int hashCode(byte @Readonly [] value) {
         int h = 0;
         for (byte v : value) {
             h = 31 * h + (v & 0xff);

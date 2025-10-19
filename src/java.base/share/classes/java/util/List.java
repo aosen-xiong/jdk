@@ -166,7 +166,8 @@ import java.util.function.UnaryOperator;
 @CFComment({"lock/nullness: Subclasses of this interface/class may opt to prohibit null elements"})
 @AnnotatedFor({"index", "initialization", "lock", "nullness"})
 @SuppressWarnings("pico:varargs.type.incompatible") // how to annotated varargs use.
-@ReceiverDependentMutable public interface List<E> extends Collection<E> {
+@ReceiverDependentMutable
+public interface List<E> extends Collection<E> {
     // Query Operations
 
     /**

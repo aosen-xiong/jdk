@@ -47,7 +47,8 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @since   1.0
  */
 @AnnotatedFor({"nullness"})
-public @ReceiverDependentMutable class RuntimeException extends Exception {
+@ReceiverDependentMutable
+public class RuntimeException extends Exception {
     @java.io.Serial
     static final long serialVersionUID = -7034897190745766939L;
 

@@ -91,7 +91,8 @@ import java.util.function.Consumer;
 
 @CFComment("lock/nullness: Subclasses of this interface/class may opt to prohibit null elements")
 @AnnotatedFor({"lock", "nullness", "index"})
-@ReceiverDependentMutable public abstract class AbstractList<E> extends AbstractCollection<E> implements List<E> {
+@ReceiverDependentMutable
+public abstract class AbstractList<E> extends AbstractCollection<E> implements List<E> {
     /**
      * Sole constructor.  (For invocation by subclass constructors, typically
      * implicit.)
@@ -367,7 +368,8 @@ import java.util.function.Consumer;
         return new ListItr(index);
     }
 
-    @ReceiverDependentMutable private class Itr implements Iterator<E> {
+    @ReceiverDependentMutable
+    private class Itr implements Iterator<E> {
         /**
          * Index of element to be returned by subsequent call to next.
          */
@@ -429,7 +431,8 @@ import java.util.function.Consumer;
         }
     }
 
-    @ReceiverDependentMutable private class ListItr extends Itr implements ListIterator<E> {
+    @ReceiverDependentMutable
+    private class ListItr extends Itr implements ListIterator<E> {
         ListItr(int index) {
             cursor = index;
         }
@@ -777,7 +780,8 @@ import java.util.function.Consumer;
         }
     }
 
-    @ReceiverDependentMutable private static class SubList<E> extends AbstractList<E> {
+    @ReceiverDependentMutable
+    private static class SubList<E> extends AbstractList<E> {
         private final AbstractList<E> root;
         private final SubList<E> parent;
         private final int offset;

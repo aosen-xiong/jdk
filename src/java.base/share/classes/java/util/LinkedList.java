@@ -104,7 +104,8 @@ import java.util.function.Consumer;
 
 @CFComment({"lock/nullness: This class permits null elements"})
 @AnnotatedFor({"lock", "nullness", "index"})
-@ReceiverDependentMutable public class LinkedList<E>
+@ReceiverDependentMutable
+public class LinkedList<E>
     extends AbstractSequentialList<E>
     implements List<E>, Deque<E>, Cloneable, java.io.Serializable
 {
@@ -910,7 +911,8 @@ import java.util.function.Consumer;
         return new ListItr(index);
     }
 
-    @ReceiverDependentMutable private class ListItr implements ListIterator<E> {
+    @ReceiverDependentMutable
+    private class ListItr implements ListIterator<E> {
         private @Readonly Node<E> lastReturned;
         private @Readonly Node<E> next;
         private int nextIndex;
@@ -1015,7 +1017,8 @@ import java.util.function.Consumer;
         }
     }
 
-    @ReceiverDependentMutable private static class Node<E> {
+    @ReceiverDependentMutable
+    private static class Node<E> {
         E item;
         Node<E> next;
         Node<E> prev;
@@ -1037,7 +1040,8 @@ import java.util.function.Consumer;
     /**
      * Adapter to provide descending iterators via ListItr.previous
      */
-    @ReceiverDependentMutable private class DescendingIterator implements Iterator<E> {
+    @ReceiverDependentMutable
+    private class DescendingIterator implements Iterator<E> {
         private final ListItr itr = new @ReceiverDependentMutable ListItr(size());
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")

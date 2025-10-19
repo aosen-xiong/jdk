@@ -77,7 +77,8 @@ import java.nio.charset.UnsupportedCharsetException;
 
 @CFComment({"lock: TODO: Should parameters be @GuardSatisfied, or is the default of @GuardedBy({}) appropriate? (@GuardedBy({}) is more conservative.)"})
 @AnnotatedFor({"formatter", "i18n", "index", "initialization", "lock", "mustcall", "nullness", "signedness"})
-public @ReceiverDependentMutable class PrintStream extends FilterOutputStream
+@ReceiverDependentMutable
+public class PrintStream extends FilterOutputStream
     implements Appendable, Closeable
 {
 
@@ -1219,7 +1220,7 @@ public @ReceiverDependentMutable class PrintStream extends FilterOutputStream
      * @since  1.5
      */
     @FormatMethod
-    public @NotOwning PrintStream format(@GuardSatisfied PrintStream this, String format, @Nullable Object ... args) {
+    public @NotOwning PrintStream format(@GuardSatisfied PrintStream this, String format, @Nullable @Readonly Object ... args) {
         try {
             synchronized (this) {
                 ensureOpen();

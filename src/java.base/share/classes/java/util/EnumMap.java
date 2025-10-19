@@ -99,7 +99,8 @@ import jdk.internal.access.SharedSecrets;
  * @since 1.5
  */
 @AnnotatedFor({"nullness", "index"})
-@ReceiverDependentMutable public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
+@ReceiverDependentMutable
+public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
     implements java.io.Serializable, Cloneable
 {
     /**
@@ -421,7 +422,8 @@ import jdk.internal.access.SharedSecrets;
         return ks;
     }
 
-    @ReceiverDependentMutable private class KeySet extends AbstractSet<K> {
+    @ReceiverDependentMutable
+    private class KeySet extends AbstractSet<K> {
         @SideEffectFree
         public Iterator<K> iterator(@Readonly KeySet this) {
             return new KeyIterator();
@@ -464,7 +466,8 @@ import jdk.internal.access.SharedSecrets;
         return vs;
     }
 
-    @ReceiverDependentMutable private class Values extends AbstractCollection<V> {
+    @ReceiverDependentMutable
+    private class Values extends AbstractCollection<V> {
         @SideEffectFree
         public Iterator<V> iterator(@Readonly Values this) {
             return new ValueIterator();
@@ -514,7 +517,8 @@ import jdk.internal.access.SharedSecrets;
             return entrySet = new @PolyMutable EntrySet();
     }
 
-    @ReceiverDependentMutable private class EntrySet extends AbstractSet<Map.@Readonly Entry<K,V>> {
+    @ReceiverDependentMutable
+    private class EntrySet extends AbstractSet<Map.@Readonly Entry<K,V>> {
         @SideEffectFree
         public Iterator<Map.Entry<K,V>> iterator(@Readonly EntrySet this) {
             return new EntryIterator();
@@ -571,7 +575,8 @@ import jdk.internal.access.SharedSecrets;
         }
     }
 
-    @ReceiverDependentMutable private abstract class EnumMapIterator<T> implements Iterator<T> {
+    @ReceiverDependentMutable
+    private abstract class EnumMapIterator<T> implements Iterator<T> {
         // Lower bound on index of next element to return
         @Assignable int index = 0;
 
@@ -602,7 +607,8 @@ import jdk.internal.access.SharedSecrets;
         }
     }
 
-    @ReceiverDependentMutable private class KeyIterator extends EnumMapIterator<K> {
+    @ReceiverDependentMutable
+    private class KeyIterator extends EnumMapIterator<K> {
         public K next(@NonEmpty @Readonly KeyIterator this) {
             if (!hasNext())
                 throw new NoSuchElementException();
@@ -611,7 +617,8 @@ import jdk.internal.access.SharedSecrets;
         }
     }
 
-    @ReceiverDependentMutable private class ValueIterator extends EnumMapIterator<V> {
+    @ReceiverDependentMutable
+    private class ValueIterator extends EnumMapIterator<V> {
         @CFComment({"nullness: Value returned by unmaskNull",
                     "will be of type V (not @Nullable V) for mapped value"})
         @SuppressWarnings({"nullness:return"})
@@ -623,7 +630,8 @@ import jdk.internal.access.SharedSecrets;
         }
     }
 
-    @ReceiverDependentMutable private class EntryIterator extends EnumMapIterator<Map.Entry<K,V>> {
+    @ReceiverDependentMutable
+    private class EntryIterator extends EnumMapIterator<Map.Entry<K,V>> {
         private @Assignable Entry lastReturnedEntry;
 
         public Map.Entry<K,V> next(@Mutable @NonEmpty EntryIterator this) {
@@ -641,7 +649,8 @@ import jdk.internal.access.SharedSecrets;
             lastReturnedEntry = null;
         }
 
-        @ReceiverDependentMutable private class Entry implements Map.Entry<K,V> {
+        @ReceiverDependentMutable
+        private class Entry implements Map.Entry<K,V> {
             private int index;
 
             private Entry(int index) {

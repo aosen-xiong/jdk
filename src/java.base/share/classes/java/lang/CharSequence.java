@@ -71,7 +71,8 @@ import java.util.stream.StreamSupport;
  */
 
 @AnnotatedFor({"lock", "nullness", "index"})
-@ReceiverDependentMutable public interface CharSequence {
+@ReceiverDependentMutable
+public interface CharSequence {
 
     /**
      * Returns the length of this character sequence.  The length is the number

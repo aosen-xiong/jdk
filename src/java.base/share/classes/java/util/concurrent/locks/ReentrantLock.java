@@ -113,7 +113,8 @@ import jdk.internal.vm.annotation.ReservedStackAccess;
  * @author Doug Lea
  */
 @AnnotatedFor("lock")
-public @ReceiverDependentMutable class ReentrantLock implements Lock, java.io.Serializable {
+@ReceiverDependentMutable
+public class ReentrantLock implements Lock, java.io.Serializable {
     private static final long serialVersionUID = 7373984872572414699L;
     /** Synchronizer providing all implementation mechanics */
     private final Sync sync;

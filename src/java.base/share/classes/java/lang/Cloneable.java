@@ -53,5 +53,6 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @since   1.0
  */
 @AnnotatedFor({"nullness"})
-public @ReceiverDependentMutable interface Cloneable {
+@ReceiverDependentMutable
+public interface Cloneable {
 }

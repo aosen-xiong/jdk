@@ -191,5 +191,6 @@ import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
  *      <cite>Java Object Serialization Specification</cite></a>
  * @since   1.1
  */
-public @ReceiverDependentMutable interface Serializable {
+@ReceiverDependentMutable
+public interface Serializable {
 }

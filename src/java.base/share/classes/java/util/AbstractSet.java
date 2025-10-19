@@ -68,7 +68,8 @@ import org.checkerframework.framework.qual.DefaultQualifierForUse;
 
 @CFComment("lock/nullness: Subclasses of this interface/class may opt to prohibit null elements")
 @AnnotatedFor({"lock", "nullness"})
-@ReceiverDependentMutable public abstract class AbstractSet<E> extends AbstractCollection<E> implements Set<E> {
+@ReceiverDependentMutable
+public abstract class AbstractSet<E> extends AbstractCollection<E> implements Set<E> {
     /**
      * Sole constructor.  (For invocation by subclass constructors, typically
      * implicit.)

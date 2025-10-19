@@ -160,7 +160,8 @@ import jdk.internal.access.SharedSecrets;
  * @since   1.2
  */
 @AnnotatedFor({"lock", "nullness", "index"})
-@ReceiverDependentMutable public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
+@ReceiverDependentMutable
+public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
     implements Map<K,V>, Cloneable, Serializable {
 
     @java.io.Serial
@@ -302,7 +303,8 @@ import jdk.internal.access.SharedSecrets;
      * Basic hash bin node, used for most entries.  (See below for
      * TreeNode subclass, and in LinkedHashMap for its Entry subclass.)
      */
-    @ReceiverDependentMutable static class Node<K extends @Immutable Object,V> implements Map.Entry<K,V> {
+    @ReceiverDependentMutable
+    static class Node<K extends @Immutable Object,V> implements Map.Entry<K,V> {
         final int hash;
         final K key;
         V value;
@@ -1014,7 +1016,8 @@ import jdk.internal.access.SharedSecrets;
         return a;
     }
 
-    @ReceiverDependentMutable final class KeySet extends AbstractSet<K> {
+    @ReceiverDependentMutable
+    final class KeySet extends AbstractSet<K> {
         @Pure
         public final @NonNegative int size(@Readonly KeySet this)                 { return size; }
         public final void clear(@Mutable KeySet this)               { HashMap.this.clear(); }
@@ -1080,7 +1083,8 @@ import jdk.internal.access.SharedSecrets;
         return vs;
     }
 
-    @ReceiverDependentMutable final class Values extends AbstractCollection<V> {
+    @ReceiverDependentMutable
+    final class Values extends AbstractCollection<V> {
         @Pure
         public final @NonNegative int size(@Readonly Values this)                 { return size; }
         public final void clear(@Mutable HashMap<K, V>. @Mutable Values this)               { HashMap.this.clear(); }
@@ -1141,7 +1145,8 @@ import jdk.internal.access.SharedSecrets;
         return (es = entrySet) == null ? (entrySet = new @PolyMutable EntrySet()) : es;
     }
 
-    @ReceiverDependentMutable final class EntrySet extends AbstractSet<Map.@ReceiverDependentMutable Entry<K,V>> {
+    @ReceiverDependentMutable
+    final class EntrySet extends AbstractSet<Map.@ReceiverDependentMutable Entry<K,V>> {
         @Pure
         public final @NonNegative int size(@Readonly EntrySet this)                 { return size; }
         public final void clear(@Mutable HashMap<K,V>.@Mutable EntrySet this)               { HashMap.this.clear(); }
@@ -1611,7 +1616,8 @@ import jdk.internal.access.SharedSecrets;
     /* ------------------------------------------------------------ */
     // iterators
 
-    @ReceiverDependentMutable abstract class HashIterator {
+    @ReceiverDependentMutable
+    abstract class HashIterator {
         @Readonly Node<K,V> next;        // next entry to return
         @Readonly Node<K,V> current;     // current entry
         int expectedModCount;  // for fast-fail
@@ -1659,17 +1665,20 @@ import jdk.internal.access.SharedSecrets;
         }
     }
 
-    @ReceiverDependentMutable final class KeyIterator extends HashIterator
+    @ReceiverDependentMutable
+    final class KeyIterator extends HashIterator
         implements Iterator<K> {
         public final K next(@NonEmpty @Mutable KeyIterator this) { return nextNode().key; }
     }
 
-    @ReceiverDependentMutable final class ValueIterator extends HashIterator
+    @ReceiverDependentMutable
+    final class ValueIterator extends HashIterator
         implements Iterator<V> {
         public final V next(@NonEmpty @Mutable ValueIterator this) { return nextNode().value; }
     }
 
-    @ReceiverDependentMutable final class EntryIterator extends HashIterator
+    @ReceiverDependentMutable
+    final class EntryIterator extends HashIterator
         implements Iterator<Map.Entry<K,V>> {
         public final Map.Entry<K,V> next(@NonEmpty @Mutable EntryIterator this) { return nextNode(); }
     }
@@ -1999,7 +2008,8 @@ import jdk.internal.access.SharedSecrets;
      * extends Node) so can be used as extension of either regular or
      * linked node.
      */
-    @ReceiverDependentMutable static final class TreeNode<K extends @Immutable Object,V> extends LinkedHashMap.Entry<K,V> {
+    @ReceiverDependentMutable
+    static final class TreeNode<K extends @Immutable Object,V> extends LinkedHashMap.Entry<K,V> {
         @Assignable TreeNode<K,V> parent;  // red-black tree links
         @Assignable TreeNode<K,V> left;
         @Assignable TreeNode<K,V> right;

@@ -29,6 +29,8 @@ import java.lang.invoke.MethodType;
 import java.lang.invoke.VarHandle;
 import java.util.Optional;
 
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
+
 /**
  * Represents a type which is <em>constable</em>.  A constable type is one whose
  * values are constants that can be represented in the constant pool of a Java
@@ -63,6 +65,7 @@ import java.util.Optional;
  *
  * @since 12
  */
+@ReceiverDependentMutable
 public interface Constable {
     /**
      * Returns an {@link Optional} containing the nominal descriptor for this

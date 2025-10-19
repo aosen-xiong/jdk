@@ -37,6 +37,9 @@ import jdk.internal.vm.annotation.DontInline;
 import jdk.internal.vm.annotation.ForceInline;
 import jdk.internal.vm.annotation.IntrinsicCandidate;
 
+import org.checkerframework.checker.pico.qual.Mutable;
+import org.checkerframework.checker.pico.qual.Readonly;
+
 import static java.lang.String.UTF16;
 import static java.lang.String.LATIN1;
 
@@ -71,7 +74,7 @@ final class StringUTF16 {
                       ((val[index]   & 0xff) << LO_BYTE_SHIFT));
     }
 
-    public static int length(byte[] value) {
+    public static int length(byte @Readonly [] value) {
         return value.length >> 1;
     }
 
@@ -267,7 +270,7 @@ final class StringUTF16 {
     }
 
     @IntrinsicCandidate
-    public static boolean equals(byte[] value, byte[] other) {
+    public static boolean equals(byte @Readonly [] value, byte @Readonly [] other) {
         if (value.length == other.length) {
             int len = value.length >> 1;
             for (int i = 0; i < len; i++) {
@@ -281,7 +284,7 @@ final class StringUTF16 {
     }
 
     @IntrinsicCandidate
-    public static int compareTo(byte[] value, byte[] other) {
+    public static int compareTo(byte @Readonly [] value, byte @Readonly [] other) {
         int len1 = length(value);
         int len2 = length(other);
         return compareValues(value, other, len1, len2);
@@ -290,14 +293,14 @@ final class StringUTF16 {
     /*
      * Checks the boundary and then compares the byte arrays.
      */
-    public static int compareTo(byte[] value, byte[] other, int len1, int len2) {
+    public static int compareTo(byte @Readonly [] value, byte @Readonly [] other, int len1, int len2) {
         checkOffset(len1, value);
         checkOffset(len2, other);
 
         return compareValues(value, other, len1, len2);
     }
 
-    private static int compareValues(byte[] value, byte[] other, int len1, int len2) {
+    private static int compareValues(byte @Readonly [] value, byte @Readonly [] other, int len1, int len2) {
         int lim = Math.min(len1, len2);
         for (int k = 0; k < lim; k++) {
             char c1 = getChar(value, k);
@@ -310,20 +313,20 @@ final class StringUTF16 {
     }
 
     @IntrinsicCandidate
-    public static int compareToLatin1(byte[] value, byte[] other) {
+    public static int compareToLatin1(byte @Readonly [] value, byte @Readonly [] other) {
         return -StringLatin1.compareToUTF16(other, value);
     }
 
-    public static int compareToLatin1(byte[] value, byte[] other, int len1, int len2) {
+    public static int compareToLatin1(byte @Readonly [] value, byte @Readonly [] other, int len1, int len2) {
         return -StringLatin1.compareToUTF16(other, value, len2, len1);
     }
 
-    public static int compareToCI(byte[] value, byte[] other) {
+    public static int compareToCI(byte @Readonly [] value, byte @Readonly [] other) {
         return compareToCIImpl(value, 0, length(value), other, 0, length(other));
     }
 
-    private static int compareToCIImpl(byte[] value, int toffset, int tlen,
-                                      byte[] other, int ooffset, int olen) {
+    private static int compareToCIImpl(byte @Readonly [] value, int toffset, int tlen,
+                                      byte @Readonly [] other, int ooffset, int olen) {
         int tlast = toffset + tlen;
         int olast = ooffset + olen;
         assert toffset >= 0 && ooffset >= 0;
@@ -385,7 +388,7 @@ final class StringUTF16 {
     // or after, depending on the type of the surrogate at index, to make a
     // supplementary code point. The return value will be negated if the code
     // unit pointed by index is a high surrogate, and index + 1 is a low surrogate.
-    private static int codePointIncluding(byte[] ba, int cp, int index, int start, int end) {
+    private static int codePointIncluding(byte @Readonly [] ba, int cp, int index, int start, int end) {
         // fast check
         if (!Character.isSurrogate((char)cp)) {
             return cp;
@@ -407,11 +410,11 @@ final class StringUTF16 {
         return cp;
     }
 
-    public static int compareToCI_Latin1(byte[] value, byte[] other) {
+    public static int compareToCI_Latin1(byte @Readonly [] value, byte @Readonly [] other) {
         return -StringLatin1.compareToCI_UTF16(other, value);
     }
 
-    public static int hashCode(byte[] value) {
+    public static int hashCode(byte @Readonly [] value) {
         int h = 0;
         int length = value.length >> 1;
         for (int i = 0; i < length; i++) {
@@ -633,7 +636,7 @@ final class StringUTF16 {
         return -1;
     }
 
-    public static String replace(byte[] value, char oldChar, char newChar) {
+    public static String replace(byte @Mutable [] value, char oldChar, char newChar) {
         int len = value.length >> 1;
         int i = -1;
         while (++i < len) {

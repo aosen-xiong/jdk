@@ -29,7 +29,7 @@ import org.checkerframework.checker.initialization.qual.PolyInitialized;
 import org.checkerframework.checker.interning.qual.UsesObjectEquals;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.checkerframework.checker.pico.qual.Mutable;
+import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.dataflow.qual.Pure;
@@ -122,8 +122,9 @@ import java.util.*;
  * @jls 11.2 Compile-Time Checking of Exceptions
  * @since 1.0
  */
-@AnnotatedFor({"interning", "lock", "nullness"})
-@ReceiverDependentMutable public @UsesObjectEquals class Throwable implements Serializable {
+@AnnotatedFor({"interning", "lock", "nullness", "pico"})
+@ReceiverDependentMutable
+public @UsesObjectEquals class Throwable implements Serializable {
     /** use serialVersionUID from JDK 1.0.2 for interoperability */
     @java.io.Serial
     private static final long serialVersionUID = -3042686055658047285L;
@@ -229,7 +230,7 @@ import java.util.*;
 
     // Setting this static field introduces an acceptable
     // initialization dependency on a few java.util classes.
-    private static final List<Throwable> SUPPRESSED_SENTINEL = Collections.emptyList();
+    private static final @Immutable List<Throwable> SUPPRESSED_SENTINEL = Collections.emptyList();
 
     /**
      * The list of suppressed exceptions, as returned by {@link
@@ -304,7 +305,7 @@ import java.util.*;
      * @since  1.4
      */
     @SideEffectFree
-    public Throwable(@Nullable String message, @Nullable Throwable cause) {
+    public Throwable(@Nullable String message, @Nullable @ReceiverDependentMutable Throwable cause) {
         fillInStackTrace();
         detailMessage = message;
         this.cause = cause;
@@ -328,7 +329,7 @@ import java.util.*;
      * @since  1.4
      */
     @SideEffectFree
-    public Throwable(@Nullable Throwable cause) {
+    public Throwable(@Nullable @ReceiverDependentMutable Throwable cause) {
         fillInStackTrace();
         detailMessage = (cause==null ? null : cause.toString());
         this.cause = cause;
@@ -376,7 +377,7 @@ import java.util.*;
      * @since 1.7
      */
     @SideEffectFree
-    protected Throwable(@Nullable String message, @Nullable Throwable cause,
+    protected Throwable(@Nullable String message, @Nullable @ReceiverDependentMutable Throwable cause,
                         boolean enableSuppression,
                         boolean writableStackTrace) {
         if (writableStackTrace) {
@@ -437,7 +438,7 @@ import java.util.*;
      * @since 1.4
      */
     @Pure
-    public synchronized @Nullable Throwable getCause(@ReceiverDependentMutable @GuardSatisfied Throwable this) {
+    public synchronized @Nullable @ReceiverDependentMutable Throwable getCause(@GuardSatisfied Throwable this) {
         return (cause==this ? null : cause);
     }
 

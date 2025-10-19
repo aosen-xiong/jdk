@@ -1276,7 +1276,8 @@ public class Vector<E>
     /**
      * An optimized version of AbstractList.Itr
      */
-    @ReceiverDependentMutable private class Itr implements Iterator<E> {
+    @ReceiverDependentMutable
+    private class Itr implements Iterator<E> {
         @Assignable int cursor;       // index of next element to return
         int lastRet = -1; // index of last element returned; -1 if no such
         int expectedModCount = modCount;
@@ -1342,7 +1343,8 @@ public class Vector<E>
     /**
      * An optimized version of AbstractList.ListItr
      */
-    @ReceiverDependentMutable final class ListItr extends Itr implements ListIterator<E> {
+    @ReceiverDependentMutable
+    final class ListItr extends Itr implements ListIterator<E> {
         ListItr(int index) {
             super();
             cursor = index;

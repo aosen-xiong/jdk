@@ -302,7 +302,8 @@ import java.util.function.LongConsumer;
  */
 @AnnotatedFor({"lock", "nullness"})
 @Covariant(0)
-@ReceiverDependentMutable public interface Spliterator<T> {
+@ReceiverDependentMutable
+public interface Spliterator<T> {
     /**
      * If a remaining element exists, performs the given action on it,
      * returning {@code true}; else returns {@code false}.  If this

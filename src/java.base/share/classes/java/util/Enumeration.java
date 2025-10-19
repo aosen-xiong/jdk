@@ -69,7 +69,8 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @since   1.0
  */
 @AnnotatedFor({"lock", "nullness"})
-@ReceiverDependentMutable public interface Enumeration<E> {
+@ReceiverDependentMutable
+public interface Enumeration<E> {
     /**
      * Tests if this enumeration contains more elements.
      *

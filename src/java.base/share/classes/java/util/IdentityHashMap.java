@@ -163,7 +163,8 @@ import jdk.internal.access.SharedSecrets;
 
 @CFComment({"lock/nullness: This collection can only contain null values"})
 @AnnotatedFor({"lock", "nullness", "index"})
-@ReceiverDependentMutable public class IdentityHashMap<K extends @Immutable Object,V>
+@ReceiverDependentMutable
+public class IdentityHashMap<K extends @Immutable Object,V>
     extends AbstractMap<K,V>
     implements Map<K,V>, java.io.Serializable, Cloneable
 {
@@ -749,7 +750,8 @@ import jdk.internal.access.SharedSecrets;
         }
     }
 
-    @ReceiverDependentMutable private abstract class IdentityHashMapIterator<T> implements Iterator<T> {
+    @ReceiverDependentMutable
+    private abstract class IdentityHashMapIterator<T> implements Iterator<T> {
         @Assignable int index = (size != 0 ? 0 : table.length); // current slot.
         int expectedModCount = modCount; // to support fast-fail
         int lastReturnedIndex = -1;      // to allow remove()
@@ -862,21 +864,24 @@ import jdk.internal.access.SharedSecrets;
         }
     }
 
-    @ReceiverDependentMutable private class KeyIterator extends IdentityHashMapIterator<K> {
+    @ReceiverDependentMutable
+    private class KeyIterator extends IdentityHashMapIterator<K> {
         @SuppressWarnings("unchecked")
         public K next(@NonEmpty @Mutable KeyIterator this) {
             return (K) unmaskNull(traversalTable[nextIndex()]);
         }
     }
 
-    @ReceiverDependentMutable private class ValueIterator extends IdentityHashMapIterator<V> {
+    @ReceiverDependentMutable
+    private class ValueIterator extends IdentityHashMapIterator<V> {
         @SuppressWarnings("unchecked")
         public V next(@NonEmpty @Mutable ValueIterator this) {
             return (V) traversalTable[nextIndex() + 1];
         }
     }
 
-    @ReceiverDependentMutable private class EntryIterator
+    @ReceiverDependentMutable
+    private class EntryIterator
         extends IdentityHashMapIterator<Map.@Readonly Entry<K,V>>
     {
         @SuppressWarnings("pico:initialization.field.uninitialized") // lazy
@@ -895,7 +900,8 @@ import jdk.internal.access.SharedSecrets;
             lastReturnedEntry = null;
         }
 
-        @ReceiverDependentMutable private class Entry implements Map.Entry<K,V> {
+        @ReceiverDependentMutable
+        private class Entry implements Map.Entry<K,V> {
             private @Assignable int index;
 
             private Entry(int index) {
@@ -1014,7 +1020,8 @@ import jdk.internal.access.SharedSecrets;
         return ks;
     }
 
-    @ReceiverDependentMutable private class KeySet extends AbstractSet<K> {
+    @ReceiverDependentMutable
+    private class KeySet extends AbstractSet<K> {
         @SideEffectFree
         public Iterator<K> iterator(@Readonly KeySet this) {
             return new KeyIterator();
@@ -1128,7 +1135,8 @@ import jdk.internal.access.SharedSecrets;
         return vs;
     }
 
-    @ReceiverDependentMutable private class Values extends AbstractCollection<V> {
+    @ReceiverDependentMutable
+    private class Values extends AbstractCollection<V> {
         @SideEffectFree
         public Iterator<V> iterator(@Readonly Values this) {
             return new ValueIterator();
@@ -1241,7 +1249,8 @@ import jdk.internal.access.SharedSecrets;
             return entrySet = new @PolyMutable EntrySet();
     }
 
-    @ReceiverDependentMutable private class EntrySet extends AbstractSet<Map.@Readonly Entry<K,V>> {
+    @ReceiverDependentMutable
+    private class EntrySet extends AbstractSet<Map.@Readonly Entry<K,V>> {
         @SideEffectFree
         public Iterator<Map.@Readonly Entry<K,V>> iterator(@Readonly EntrySet this) {
             return new EntryIterator();

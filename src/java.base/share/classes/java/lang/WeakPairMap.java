@@ -26,6 +26,8 @@ package java.lang;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
+import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.Readonly;
 
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
@@ -45,7 +47,7 @@ import java.util.function.BiFunction;
  * @param <V>  the type of value
  * @author Peter Levart
  */
-final class WeakPairMap<K1, K2, V> {
+final class WeakPairMap<K1 extends @Immutable Object, K2 extends @Immutable Object, V> {
 
     private final ConcurrentHashMap<Pair<K1, K2>, V> map = new ConcurrentHashMap<>();
     private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
@@ -220,7 +222,7 @@ final class WeakPairMap<K1, K2, V> {
          */
         K2 second();
 
-        static int hashCode(Object first, Object second) {
+        static int hashCode(@Readonly Object first, @Readonly Object second) {
             // assert first != null && second != null;
             return System.identityHashCode(first) ^
                    System.identityHashCode(second);

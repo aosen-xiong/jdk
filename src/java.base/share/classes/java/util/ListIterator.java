@@ -69,7 +69,8 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @since   1.2
  */
 @AnnotatedFor({"lock", "nullness", "index"})
-@ReceiverDependentMutable public interface ListIterator<E> extends Iterator<E> {
+@ReceiverDependentMutable
+public interface ListIterator<E> extends Iterator<E> {
     // Query Operations
 
     /**

@@ -2148,7 +2148,8 @@ public class Collections {
     /**
      * @serial include
      */
-    @ReceiverDependentMutable static class SynchronizedCollection<E> implements Collection<E>, Serializable {
+    @ReceiverDependentMutable
+    static class SynchronizedCollection<E> implements Collection<E>, Serializable {
         @java.io.Serial
         private static final long serialVersionUID = 3053995032091335093L;
 
@@ -2361,7 +2362,8 @@ public class Collections {
     /**
      * @serial include
      */
-    @ReceiverDependentMutable static class SynchronizedSortedSet<E>
+    @ReceiverDependentMutable
+    static class SynchronizedSortedSet<E>
         extends SynchronizedSet<E>
         implements SortedSet<E>
     {
@@ -2457,7 +2459,8 @@ public class Collections {
     /**
      * @serial include
      */
-    @ReceiverDependentMutable static class SynchronizedNavigableSet<E>
+    @ReceiverDependentMutable
+    static class SynchronizedNavigableSet<E>
         extends SynchronizedSortedSet<E>
         implements NavigableSet<E>
     {
@@ -2569,7 +2572,8 @@ public class Collections {
     /**
      * @serial include
      */
-    @ReceiverDependentMutable static class SynchronizedList<E>
+    @ReceiverDependentMutable
+    static class SynchronizedList<E>
         extends SynchronizedCollection<E>
         implements List<E> {
         @java.io.Serial
@@ -2667,7 +2671,8 @@ public class Collections {
     /**
      * @serial include
      */
-    @ReceiverDependentMutable static class SynchronizedRandomAccessList<E>
+    @ReceiverDependentMutable
+    static class SynchronizedRandomAccessList<E>
         extends SynchronizedList<E>
         implements RandomAccess {
 
@@ -3999,7 +4004,8 @@ public class Collections {
          *
          * @serial exclude
          */
-        @ReceiverDependentMutable static class CheckedEntrySet<K extends @Immutable Object,V> implements Set<Map.@Readonly Entry<K,V>> {
+        @ReceiverDependentMutable
+        static class CheckedEntrySet<K extends @Immutable Object,V> implements Set<Map.@Readonly Entry<K,V>> {
             private final Set<Map.@ReceiverDependentMutable Entry<K,V>> s;
             private final @Mutable Class<V> valueType;
 

@@ -356,7 +356,8 @@ import jdk.internal.vm.annotation.Stable;
         }
     }
 
-    @ReceiverDependentMutable static final class ListItr<E> implements ListIterator<E> {
+    @ReceiverDependentMutable
+    static final class ListItr<E> implements ListIterator<E> {
 
         @Stable
         private final @Readonly List<E> list;
