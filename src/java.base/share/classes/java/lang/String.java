@@ -42,6 +42,7 @@ import org.checkerframework.checker.lock.qual.NewObject;
 import org.checkerframework.checker.nonempty.qual.EnsuresNonEmptyIf;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.checker.regex.qual.PolyRegex;
 import org.checkerframework.checker.regex.qual.Regex;
@@ -172,7 +173,8 @@ import sun.nio.cs.UTF_8;
  * @jls     15.18.1 String Concatenation Operator +
  */
 
-@AnnotatedFor({"aliasing", "formatter", "index", "initialization", "interning", "lock", "nullness", "regex", "signature", "signedness"})
+@AnnotatedFor({"aliasing", "formatter", "index", "initialization", "interning", "lock", "nullness", "pico", "regex", "signature", "signedness"})
+@Immutable
 public final class String
     implements java.io.Serializable, Comparable<String>, CharSequence,
                Constable, ConstantDesc {
@@ -379,6 +381,8 @@ public final class String
      */
     @SideEffectFree
     @StaticallyExecutable
+    @SuppressWarnings("pico:assignment.type.incompatible")
+    @CFComment("this.value = val need to be casted from @Unique @Mutable to @Immutable")
     public @Unique String(int @GuardSatisfied [] codePoints, @IndexOrHigh({"#1"}) int offset, @LTLengthOf(value={"#1"}, offset={"#2 - 1"}) @NonNegative int count) {
         checkBoundsOffCount(offset, count, codePoints.length);
         if (count == 0) {
@@ -4708,7 +4712,7 @@ public final class String
      * contains only latin1 character. Or a byte[] that stores all
      * characters in their byte sequences defined by the {@code StringUTF16}.
      */
-    String(char[] value, int off, int len, Void sig) {
+    String(char @Immutable [] value, int off, int len, Void sig) {
         if (len == 0) {
             this.value = "".value;
             this.coder = "".coder;
@@ -4753,7 +4757,7 @@ public final class String
    /*
     * Package private constructor which shares value array for speed.
     */
-    String(byte[] value, byte coder) {
+    String(byte @Immutable [] value, byte coder) {
         this.value = value;
         this.coder = coder;
     }

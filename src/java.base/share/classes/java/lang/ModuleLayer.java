@@ -52,6 +52,7 @@ import jdk.internal.misc.CDS;
 import jdk.internal.vm.annotation.Stable;
 import sun.security.util.SecurityConstants;
 
+import org.checkerframework.checker.pico.qual.Readonly;
 
 /**
  * A layer of modules in the Java virtual machine.
@@ -492,7 +493,7 @@ public final class ModuleLayer {
      * @see #findLoader
      */
     public static Controller defineModulesWithOneLoader(Configuration cf,
-                                                        List<ModuleLayer> parentLayers,
+                                                        @Readonly List<ModuleLayer> parentLayers,
                                                         ClassLoader parentLoader)
     {
         List<ModuleLayer> parents = List.copyOf(parentLayers);

@@ -55,7 +55,7 @@ import jdk.internal.vm.annotation.IntrinsicCandidate;
  * @see     java.lang.Class
  * @since   1.0
  */
-@AnnotatedFor({"aliasing", "guieffect", "index", "lock", "nullness"})
+@AnnotatedFor({"aliasing", "guieffect", "index", "lock", "nullness", "pico"})
 @PolyUIType
 @ReceiverDependentMutable
 public class Object {
@@ -256,7 +256,7 @@ public class Object {
      */
     @SideEffectFree
     @IntrinsicCandidate
-    protected native @ReceiverDependentMutable Object clone(@ReceiverDependentMutable @GuardSatisfied Object this) throws CloneNotSupportedException;
+    protected native @ReceiverDependentMutable Object clone(@GuardSatisfied Object this) throws CloneNotSupportedException;
 
     /**
      * Returns a string representation of the object.
@@ -369,7 +369,7 @@ public class Object {
      * @see    #wait(long)
      * @see    #wait(long, int)
      */
-    public final void wait(@UnknownInitialization Object this) throws InterruptedException {
+    public final void wait(@UnknownInitialization @Readonly Object this) throws InterruptedException {
         wait(0L);
     }
 
@@ -394,7 +394,7 @@ public class Object {
      * @see    #wait()
      * @see    #wait(long, int)
      */
-    public final native void wait(@UnknownInitialization Object this, @NonNegative long timeoutMillis) throws InterruptedException;
+    public final native void wait(@UnknownInitialization @Readonly Object this, @NonNegative long timeoutMillis) throws InterruptedException;
 
     /**
      * Causes the current thread to wait until it is awakened, typically
@@ -490,7 +490,7 @@ public class Object {
      * @see    #wait()
      * @see    #wait(long)
      */
-    public final void wait(@UnknownInitialization Object this, long timeoutMillis, @NonNegative int nanos) throws InterruptedException {
+    public final void wait(@UnknownInitialization @Readonly Object this, long timeoutMillis, @NonNegative int nanos) throws InterruptedException {
         if (timeoutMillis < 0) {
             throw new IllegalArgumentException("timeoutMillis value is negative");
         }

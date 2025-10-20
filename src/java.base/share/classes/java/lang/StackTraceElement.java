@@ -27,10 +27,12 @@ package java.lang;
 
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.checker.signature.qual.FullyQualifiedName;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.framework.qual.AnnotatedFor;
+import org.checkerframework.framework.qual.CFComment;
 
 import jdk.internal.loader.BuiltinClassLoader;
 import jdk.internal.misc.VM;
@@ -57,7 +59,7 @@ import java.util.Set;
  * @since  1.4
  * @author Josh Bloch
  */
-@AnnotatedFor({"lock", "nullness", "signature"})
+@AnnotatedFor({"lock", "nullness", "pico", "signature"})
 public final class StackTraceElement implements java.io.Serializable {
 
     // For Throwables and StackWalker, the VM initially sets this field to a
@@ -512,10 +514,12 @@ public final class StackTraceElement implements java.io.Serializable {
      * Finds JDK non-upgradeable modules, i.e. the modules that are
      * included in the hashes in java.base.
      */
+    @SuppressWarnings("pico:return.type.incompatible")
+    @CFComment("return names be casted from @Unique @Mutable to @Immutable")
     private static class HashedModules {
-        static Set<String> HASHED_MODULES = hashedModules();
+        static @Immutable Set<String> HASHED_MODULES = hashedModules();
 
-        static Set<String> hashedModules() {
+        static @Immutable Set<String> hashedModules() {
 
             Optional<ResolvedModule> resolvedModule = ModuleLayer.boot()
                     .configuration()

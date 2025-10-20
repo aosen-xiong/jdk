@@ -27,7 +27,9 @@ package java.lang;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
 import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.Mutable;
 import org.checkerframework.checker.pico.qual.Readonly;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
@@ -47,9 +49,10 @@ import java.util.function.BiFunction;
  * @param <V>  the type of value
  * @author Peter Levart
  */
+@ReceiverDependentMutable
 final class WeakPairMap<K1 extends @Immutable Object, K2 extends @Immutable Object, V> {
 
-    private final ConcurrentHashMap<Pair<K1, K2>, V> map = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<@Immutable Pair<K1, K2>, V> map = new ConcurrentHashMap<>();
     private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
 
     /**
@@ -62,7 +65,7 @@ final class WeakPairMap<K1 extends @Immutable Object, K2 extends @Immutable Obje
      * as determined by the identity comparison; false otherwise
      * @throws NullPointerException if any of the specified keys is null
      */
-    public boolean containsKeyPair(K1 k1, K2 k2) {
+    public boolean containsKeyPair(@Readonly WeakPairMap<K1, K2, V> this, K1 k1, K2 k2) {
         expungeStaleAssociations();
         return map.containsKey(Pair.lookup(k1, k2));
     }
@@ -104,7 +107,7 @@ final class WeakPairMap<K1 extends @Immutable Object, K2 extends @Immutable Obje
      * there was no mapping for key pair
      * @throws NullPointerException if any of the specified keys or value is null
      */
-    public V put(K1 k1, K2 k2, V v) {
+    public V put(@Mutable WeakPairMap<K1, K2, V> this, K1 k1, K2 k2, V v) {
         expungeStaleAssociations();
         return map.put(Pair.weak(k1, k2, queue), v);
     }
@@ -123,7 +126,7 @@ final class WeakPairMap<K1 extends @Immutable Object, K2 extends @Immutable Obje
      * there was no mapping for key pair
      * @throws NullPointerException if any of the specified keys or value is null
      */
-    public V putIfAbsent(K1 k1, K2 k2, V v) {
+    public V putIfAbsent(@Mutable WeakPairMap<K1, K2, V> this, K1 k1, K2 k2, V v) {
         expungeStaleAssociations();
         return map.putIfAbsent(Pair.weak(k1, k2, queue), v);
     }
@@ -228,7 +231,7 @@ final class WeakPairMap<K1 extends @Immutable Object, K2 extends @Immutable Obje
                    System.identityHashCode(second);
         }
 
-        static boolean equals(Object first, Object second, Pair<?, ?> p) {
+        static boolean equals(@Readonly Object first, @Readonly Object second, @Readonly Pair<?, ?> p) {
             return first != null && second != null &&
                    first == p.first() && second == p.second();
         }
@@ -294,7 +297,7 @@ final class WeakPairMap<K1 extends @Immutable Object, K2 extends @Immutable Obje
             }
 
             @Override
-            public boolean equals(Object obj) {
+            public boolean equals(@Readonly Object obj) {
                 return this == obj ||
                        (obj instanceof Pair &&
                         Pair.equals(first(), second(), (Pair<?, ?>) obj));
@@ -335,7 +338,7 @@ final class WeakPairMap<K1 extends @Immutable Object, K2 extends @Immutable Obje
             }
 
             @Override
-            public boolean equals(Object obj) {
+            public boolean equals(@Readonly Object obj) {
                 return obj instanceof Pair &&
                        Pair.equals(k1, k2, (Pair<?, ?>) obj);
             }

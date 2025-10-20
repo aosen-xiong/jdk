@@ -29,6 +29,7 @@ import org.checkerframework.checker.interning.qual.Interned;
 import org.checkerframework.checker.lock.qual.NewObject;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.common.value.qual.PolyValue;
 import org.checkerframework.common.value.qual.StaticallyExecutable;
 import org.checkerframework.common.value.qual.StringVal;
@@ -68,8 +69,9 @@ import static java.lang.constant.ConstantDescs.CD_Boolean;
  * @author  Arthur van Hoff
  * @since   1.0
  */
-@AnnotatedFor({"interning", "nullness", "value"})
+@AnnotatedFor({"interning", "nullness", "pico", "value"})
 @jdk.internal.ValueBased
+@Immutable
 public final class Boolean implements java.io.Serializable,
                                       Comparable<Boolean>, Constable
 {

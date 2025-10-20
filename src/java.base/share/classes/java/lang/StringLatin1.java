@@ -37,15 +37,19 @@ import java.util.stream.StreamSupport;
 import jdk.internal.util.ArraysSupport;
 import jdk.internal.vm.annotation.IntrinsicCandidate;
 
+import org.checkerframework.checker.pico.qual.Mutable;
 import org.checkerframework.checker.pico.qual.Readonly;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
+import org.checkerframework.framework.qual.AnnotatedFor;
 
 import static java.lang.String.LATIN1;
 import static java.lang.String.UTF16;
 import static java.lang.String.checkOffset;
 
+@AnnotatedFor("pico")
 final class StringLatin1 {
 
-    public static char charAt(byte[] value, int index) {
+    public static char charAt(byte @Readonly [] value, int index) {
         if (index < 0 || index >= value.length) {
             throw new StringIndexOutOfBoundsException(index);
         }
@@ -60,40 +64,40 @@ final class StringLatin1 {
         return value.length;
     }
 
-    public static int codePointAt(byte[] value, int index, int end) {
+    public static int codePointAt(byte @Readonly [] value, int index, int end) {
         return value[index] & 0xff;
     }
 
-    public static int codePointBefore(byte[] value, int index) {
+    public static int codePointBefore(byte @Readonly [] value, int index) {
         return value[index - 1] & 0xff;
     }
 
-    public static int codePointCount(byte[] value, int beginIndex, int endIndex) {
+    public static int codePointCount(byte @Readonly [] value, int beginIndex, int endIndex) {
         return endIndex - beginIndex;
     }
 
-    public static char[] toChars(byte[] value) {
+    public static char[] toChars(byte @Readonly [] value) {
         char[] dst = new char[value.length];
         inflate(value, 0, dst, 0, value.length);
         return dst;
     }
 
-    public static byte[] inflate(byte[] value, int off, int len) {
+    public static byte[] inflate(byte @Readonly [] value, int off, int len) {
         byte[] ret = StringUTF16.newBytesFor(len);
         inflate(value, off, ret, 0, len);
         return ret;
     }
 
-    public static void getChars(byte[] value, int srcBegin, int srcEnd, char dst[], int dstBegin) {
+    public static void getChars(byte @Readonly [] value, int srcBegin, int srcEnd, char dst @Readonly [], int dstBegin) {
         inflate(value, srcBegin, dst, dstBegin, srcEnd - srcBegin);
     }
 
-    public static void getBytes(byte[] value, int srcBegin, int srcEnd, byte dst[], int dstBegin) {
+    public static void getBytes(byte @Readonly [] value, int srcBegin, int srcEnd, byte dst @Readonly [], int dstBegin) {
         System.arraycopy(value, srcBegin, dst, dstBegin, srcEnd - srcBegin);
     }
 
     @IntrinsicCandidate
-    public static boolean equals(byte[] value, byte[] other) {
+    public static boolean equals(byte @Readonly [] value, byte @Readonly [] other) {
         if (value.length == other.length) {
             for (int i = 0; i < value.length; i++) {
                 if (value[i] != other[i]) {
@@ -201,7 +205,7 @@ final class StringLatin1 {
         return h;
     }
 
-    public static int indexOf(byte[] value, int ch, int fromIndex) {
+    public static int indexOf(byte @Readonly [] value, int ch, int fromIndex) {
         if (!canEncode(ch)) {
             return -1;
         }
@@ -216,7 +220,7 @@ final class StringLatin1 {
     }
 
     @IntrinsicCandidate
-    private static int indexOfChar(byte[] value, int ch, int fromIndex, int max) {
+    private static int indexOfChar(byte @Readonly [] value, int ch, int fromIndex, int max) {
         byte c = (byte)ch;
         for (int i = fromIndex; i < max; i++) {
             if (value[i] == c) {
@@ -227,7 +231,7 @@ final class StringLatin1 {
     }
 
     @IntrinsicCandidate
-    public static int indexOf(byte[] value, byte[] str) {
+    public static int indexOf(byte @Readonly [] value, byte[] str) {
         if (str.length == 0) {
             return 0;
         }
@@ -238,7 +242,7 @@ final class StringLatin1 {
     }
 
     @IntrinsicCandidate
-    public static int indexOf(byte[] value, int valueCount, byte[] str, int strCount, int fromIndex) {
+    public static int indexOf(byte @Readonly [] value, int valueCount, byte @Readonly [] str, int strCount, int fromIndex) {
         byte first = str[0];
         int max = (valueCount - strCount);
         for (int i = fromIndex; i <= max; i++) {
@@ -260,8 +264,8 @@ final class StringLatin1 {
         return -1;
     }
 
-    public static int lastIndexOf(byte[] src, int srcCount,
-                                  byte[] tgt, int tgtCount, int fromIndex) {
+    public static int lastIndexOf(byte @Readonly [] src, int srcCount,
+                                  byte @Readonly [] tgt, int tgtCount, int fromIndex) {
         int min = tgtCount - 1;
         int i = min + fromIndex;
         int strLastIndex = tgtCount - 1;
@@ -288,7 +292,7 @@ final class StringLatin1 {
         }
     }
 
-    public static int lastIndexOf(final byte[] value, int ch, int fromIndex) {
+    public static int lastIndexOf(final byte @Readonly [] value, int ch, int fromIndex) {
         if (!canEncode(ch)) {
             return -1;
         }
@@ -338,8 +342,8 @@ final class StringLatin1 {
         return null; // for string to return this;
     }
 
-    public static String replace(byte[] value, int valLen, byte[] targ,
-                                 int targLen, byte[] repl, int replLen)
+    public static String replace(byte @Readonly [] value, int valLen, byte @Readonly [] targ,
+                                 int targLen, byte @Readonly [] repl, int replLen)
     {
         assert targLen > 0;
         int i, j, p = 0;
@@ -389,8 +393,8 @@ final class StringLatin1 {
     }
 
     // case insensitive
-    public static boolean regionMatchesCI(byte[] value, int toffset,
-                                          byte[] other, int ooffset, int len) {
+    public static boolean regionMatchesCI(byte @Readonly [] value, int toffset,
+                                          byte @Readonly [] other, int ooffset, int len) {
         int last = toffset + len;
         while (toffset < last) {
             char c1 = (char)(value[toffset++] & 0xff);
@@ -411,8 +415,8 @@ final class StringLatin1 {
         return true;
     }
 
-    public static boolean regionMatchesCI_UTF16(byte[] value, int toffset,
-                                                byte[] other, int ooffset, int len) {
+    public static boolean regionMatchesCI_UTF16(byte @Readonly [] value, int toffset,
+                                                byte @Readonly [] other, int ooffset, int len) {
         int last = toffset + len;
         while (toffset < last) {
             char c1 = (char)(value[toffset++] & 0xff);
@@ -433,7 +437,7 @@ final class StringLatin1 {
         return true;
     }
 
-    public static String toLowerCase(String str, byte[] value, Locale locale) {
+    public static String toLowerCase(String str, byte @Readonly [] value, Locale locale) {
         if (locale == null) {
             throw new NullPointerException();
         }
@@ -466,7 +470,7 @@ final class StringLatin1 {
         return new String(result, LATIN1);
     }
 
-    private static String toLowerCaseEx(String str, byte[] value,
+    private static String toLowerCaseEx(String str, byte @Readonly [] value,
                                         int first, Locale locale, boolean localeDependent)
     {
         byte[] result = StringUTF16.newBytesFor(value.length);
@@ -506,7 +510,7 @@ final class StringLatin1 {
         return StringUTF16.newString(result, 0, resultOffset);
     }
 
-    public static String toUpperCase(String str, byte[] value, Locale locale) {
+    public static String toUpperCase(String str, byte @Readonly [] value, Locale locale) {
         if (locale == null) {
             throw new NullPointerException();
         }
@@ -541,7 +545,7 @@ final class StringLatin1 {
         return new String(result, LATIN1);
     }
 
-    private static String toUpperCaseEx(String str, byte[] value,
+    private static String toUpperCaseEx(String str, byte @Readonly [] value,
                                         int first, Locale locale, boolean localeDependent)
     {
         byte[] result = StringUTF16.newBytesFor(value.length);
@@ -586,7 +590,7 @@ final class StringLatin1 {
         return StringUTF16.newString(result, 0, resultOffset);
     }
 
-    public static String trim(byte[] value) {
+    public static String trim(byte @Readonly [] value) {
         int len = value.length;
         int st = 0;
         while ((st < len) && ((value[st] & 0xff) <= ' ')) {
@@ -599,7 +603,7 @@ final class StringLatin1 {
             newString(value, st, len - st) : null;
     }
 
-    public static int indexOfNonWhitespace(byte[] value) {
+    public static int indexOfNonWhitespace(byte @Readonly [] value) {
         int length = value.length;
         int left = 0;
         while (left < length) {
@@ -612,7 +616,7 @@ final class StringLatin1 {
         return left;
     }
 
-    public static int lastIndexOfNonWhitespace(byte[] value) {
+    public static int lastIndexOfNonWhitespace(byte @Readonly [] value) {
         int length = value.length;
         int right = length;
         while (0 < right) {
@@ -625,7 +629,7 @@ final class StringLatin1 {
         return right;
     }
 
-    public static String strip(byte[] value) {
+    public static String strip(byte @Readonly [] value) {
         int left = indexOfNonWhitespace(value);
         if (left == value.length) {
             return "";
@@ -635,28 +639,29 @@ final class StringLatin1 {
         return ifChanged ? newString(value, left, right - left) : null;
     }
 
-    public static String stripLeading(byte[] value) {
+    public static String stripLeading(byte @Readonly [] value) {
         int left = indexOfNonWhitespace(value);
         return (left != 0) ? newString(value, left, value.length - left) : null;
     }
 
-    public static String stripTrailing(byte[] value) {
+    public static String stripTrailing(byte @Readonly [] value) {
         int right = lastIndexOfNonWhitespace(value);
         return (right != value.length) ? newString(value, 0, right) : null;
     }
 
+    @ReceiverDependentMutable
     private static final class LinesSpliterator implements Spliterator<String> {
-        private byte[] value;
+        private byte @Readonly [] value;
         private int index;        // current index, modified on advance/split
         private final int fence;  // one past last index
 
-        private LinesSpliterator(byte[] value, int start, int length) {
+        private LinesSpliterator(byte @Readonly [] value, int start, int length) {
             this.value = value;
             this.index = start;
             this.fence = start + length;
         }
 
-        private int indexOfLineSeparator(int start) {
+        private int indexOfLineSeparator(@Readonly LinesSpliterator this, int start) {
             for (int current = start; current < fence; current++) {
                 char ch = getChar(value, current);
                 if (ch == '\n' || ch == '\r') {
@@ -666,7 +671,7 @@ final class StringLatin1 {
             return fence;
         }
 
-        private int skipLineSeparator(int start) {
+        private int skipLineSeparator(@Readonly LinesSpliterator this, int start) {
             if (start < fence) {
                 if (getChar(value, start) == '\r') {
                     int next = start + 1;
@@ -679,7 +684,7 @@ final class StringLatin1 {
             return fence;
         }
 
-        private String next() {
+        private String next(@Mutable LinesSpliterator this) {
             int start = index;
             int end = indexOfLineSeparator(start);
             index = skipLineSeparator(end);
@@ -687,7 +692,7 @@ final class StringLatin1 {
         }
 
         @Override
-        public boolean tryAdvance(Consumer<? super String> action) {
+        public boolean tryAdvance(@Mutable LinesSpliterator this, Consumer<? super String> action) {
             if (action == null) {
                 throw new NullPointerException("tryAdvance action missing");
             }
@@ -699,7 +704,7 @@ final class StringLatin1 {
         }
 
         @Override
-        public void forEachRemaining(Consumer<? super String> action) {
+        public void forEachRemaining(@Mutable LinesSpliterator this, Consumer<? super String> action) {
             if (action == null) {
                 throw new NullPointerException("forEachRemaining action missing");
             }
@@ -709,7 +714,7 @@ final class StringLatin1 {
         }
 
         @Override
-        public Spliterator<String> trySplit() {
+        public Spliterator<String> trySplit(@Mutable LinesSpliterator this) {
             int half = (fence + index) >>> 1;
             int mid = skipLineSeparator(indexOfLineSeparator(half));
             if (mid < fence) {
@@ -721,21 +726,21 @@ final class StringLatin1 {
         }
 
         @Override
-        public long estimateSize() {
+        public long estimateSize(@Readonly LinesSpliterator this) {
             return fence - index + 1;
         }
 
         @Override
-        public int characteristics() {
+        public int characteristics(@Readonly LinesSpliterator this) {
             return Spliterator.ORDERED | Spliterator.IMMUTABLE | Spliterator.NONNULL;
         }
 
-        static LinesSpliterator spliterator(byte[] value) {
+        static LinesSpliterator spliterator(byte @Readonly [] value) {
             return new LinesSpliterator(value, 0, value.length);
         }
     }
 
-    static Stream<String> lines(byte[] value) {
+    static Stream<String> lines(byte @Readonly [] value) {
         return StreamSupport.stream(LinesSpliterator.spliterator(value), false);
     }
 
@@ -744,11 +749,11 @@ final class StringLatin1 {
         val[index] = (byte)(c);
     }
 
-    public static char getChar(byte[] val, int index) {
+    public static char getChar(byte @Readonly [] val, int index) {
         return (char)(val[index] & 0xff);
     }
 
-    public static byte[] toBytes(int[] val, int off, int len) {
+    public static byte[] toBytes(int @Readonly [] val, int off, int len) {
         byte[] ret = new byte[len];
         for (int i = 0; i < len; i++) {
             int cp = val[off++];
@@ -764,7 +769,7 @@ final class StringLatin1 {
         return new byte[] { (byte)c };
     }
 
-    public static String newString(byte[] val, int index, int len) {
+    public static String newString(byte @Readonly [] val, int index, int len) {
         if (len == 0) {
             return "";
         }
@@ -786,21 +791,22 @@ final class StringLatin1 {
 
     // inflatedCopy byte[] -> byte[]
     @IntrinsicCandidate
-    public static void inflate(byte[] src, int srcOff, byte[] dst, int dstOff, int len) {
+    public static void inflate(byte @Readonly [] src, int srcOff, byte[] dst, int dstOff, int len) {
         StringUTF16.inflate(src, srcOff, dst, dstOff, len);
     }
 
+    @ReceiverDependentMutable
     static class CharsSpliterator implements Spliterator.OfInt {
-        private final byte[] array;
+        private final byte @Readonly [] array;
         private int index;        // current index, modified on advance/split
         private final int fence;  // one past last index
         private final int cs;
 
-        CharsSpliterator(byte[] array, int acs) {
+        CharsSpliterator(byte @Readonly [] array, int acs) {
             this(array, 0, array.length, acs);
         }
 
-        CharsSpliterator(byte[] array, int origin, int fence, int acs) {
+        CharsSpliterator(byte @Readonly [] array, int origin, int fence, int acs) {
             this.array = array;
             this.index = origin;
             this.fence = fence;
@@ -809,7 +815,7 @@ final class StringLatin1 {
         }
 
         @Override
-        public OfInt trySplit() {
+        public OfInt trySplit(@Mutable CharsSpliterator this) {
             int lo = index, mid = (lo + fence) >>> 1;
             return (lo >= mid)
                    ? null
@@ -817,7 +823,7 @@ final class StringLatin1 {
         }
 
         @Override
-        public void forEachRemaining(IntConsumer action) {
+        public void forEachRemaining(@Mutable CharsSpliterator this, IntConsumer action) {
             byte[] a; int i, hi; // hoist accesses and checks from loop
             if (action == null)
                 throw new NullPointerException();
@@ -828,7 +834,7 @@ final class StringLatin1 {
         }
 
         @Override
-        public boolean tryAdvance(IntConsumer action) {
+        public boolean tryAdvance(@Mutable CharsSpliterator this, IntConsumer action) {
             if (action == null)
                 throw new NullPointerException();
             if (index >= 0 && index < fence) {
@@ -839,10 +845,10 @@ final class StringLatin1 {
         }
 
         @Override
-        public long estimateSize() { return (long)(fence - index); }
+        public long estimateSize(@Readonly CharsSpliterator this) { return (long)(fence - index); }
 
         @Override
-        public int characteristics() {
+        public int characteristics(@Readonly CharsSpliterator this) {
             return cs;
         }
     }

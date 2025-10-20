@@ -81,7 +81,7 @@ public interface CharSequence {
      * @return  the number of {@code char}s in this sequence
      */
     @Pure
-    @LengthOf({"this"}) int length(@GuardSatisfied CharSequence this);
+    @LengthOf({"this"}) int length(@GuardSatisfied @Readonly CharSequence this);
 
     /**
      * Returns the {@code char} value at the specified index.  An index ranges from zero
@@ -117,7 +117,7 @@ public interface CharSequence {
      */
     @Pure
     @EnsuresNonEmptyIf(result = false, expression = "this")
-    default boolean isEmpty() {
+    default boolean isEmpty(@Readonly CharSequence this) {
         return this.length() == 0;
     }
 
@@ -150,7 +150,7 @@ public interface CharSequence {
      * @return  a string consisting of exactly this sequence of characters
      */
     @SideEffectFree
-    public @SameLen({"this"}) String toString(@GuardSatisfied CharSequence this);
+    public @SameLen({"this"}) String toString(@GuardSatisfied @Readonly CharSequence this);
 
     /**
      * Returns a stream of {@code int} zero-extending the {@code char} values
@@ -309,7 +309,7 @@ public interface CharSequence {
      */
     @SuppressWarnings("unchecked")
     @Pure
-    public static int compare(CharSequence cs1, CharSequence cs2) {
+    public static int compare(@Readonly CharSequence cs1, @Readonly CharSequence cs2) {
         if (Objects.requireNonNull(cs1) == Objects.requireNonNull(cs2)) {
             return 0;
         }

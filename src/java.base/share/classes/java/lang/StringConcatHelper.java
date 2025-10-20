@@ -32,11 +32,15 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 
+import org.checkerframework.checker.pico.qual.Readonly;
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 /**
  * Helper for string concatenation. These methods are mostly looked up with private lookups
  * from {@link java.lang.invoke.StringConcatFactory}, and used in {@link java.lang.invoke.MethodHandle}
  * combinators there.
  */
+@AnnotatedFor("pico")
 final class StringConcatHelper {
 
     private StringConcatHelper() {
@@ -381,7 +385,7 @@ final class StringConcatHelper {
      * @param indexCoder    remaining index (should be zero) and coder
      * @return String       resulting string
      */
-    static String newString(byte[] buf, long indexCoder) {
+    static String newString(byte @Readonly [] buf, long indexCoder) {
         // Use the private, non-copying constructor (unsafe!)
         if (indexCoder == LATIN1) {
             return new String(buf, String.LATIN1);
@@ -403,7 +407,7 @@ final class StringConcatHelper {
      * @return String       resulting string
      */
     @ForceInline
-    static String simpleConcat(Object first, Object second) {
+    static String simpleConcat(@Readonly Object first, @Readonly Object second) {
         String s1 = stringOf(first);
         String s2 = stringOf(second);
         if (s1.isEmpty()) {
@@ -438,7 +442,7 @@ final class StringConcatHelper {
      * @return String       resulting string
      */
     @ForceInline
-    static String newStringOf(Object arg) {
+    static String newStringOf(@Readonly Object arg) {
         return new String(stringOf(arg));
     }
 
@@ -448,7 +452,7 @@ final class StringConcatHelper {
      * in Java state we need to produce "null" String in this case, so we
      * provide a customized version that deals with this problematic corner case.
      */
-    static String stringOf(Object value) {
+    static String stringOf(@Readonly Object value) {
         String s;
         return (value == null || (s = value.toString()) == null) ? "null" : s;
     }

@@ -27,6 +27,7 @@ package java.lang;
 
 import org.checkerframework.checker.lock.qual.NewObject;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.common.value.qual.DoubleVal;
 import org.checkerframework.common.value.qual.IntVal;
 import org.checkerframework.common.value.qual.PolyValue;
@@ -162,8 +163,9 @@ import jdk.internal.vm.annotation.IntrinsicCandidate;
  * @author  Joseph D. Darcy
  * @since 1.0
  */
-@AnnotatedFor({"nullness", "index", "value"})
+@AnnotatedFor({"nullness", "index", "value", "pico"})
 @jdk.internal.ValueBased
+@Immutable
 public final class Double extends Number
         implements Comparable<Double>, Constable, ConstantDesc {
     /**

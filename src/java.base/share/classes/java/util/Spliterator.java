@@ -25,6 +25,8 @@
 package java.util;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Mutable;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.checker.signedness.qual.SignedPositive;
 import org.checkerframework.dataflow.qual.Pure;
@@ -300,7 +302,7 @@ import java.util.function.LongConsumer;
  * @see Collection
  * @since 1.8
  */
-@AnnotatedFor({"lock", "nullness"})
+@AnnotatedFor({"lock", "nullness", "pico"})
 @Covariant(0)
 @ReceiverDependentMutable
 public interface Spliterator<T> {
@@ -319,7 +321,7 @@ public interface Spliterator<T> {
      * upon entry to this method, else {@code true}.
      * @throws NullPointerException if the specified action is null
      */
-    boolean tryAdvance(Consumer<? super T> action);
+    boolean tryAdvance(@Mutable Spliterator<T> this, Consumer<? super T> action);
 
     /**
      * Performs the given action for each remaining element, sequentially in
@@ -338,7 +340,7 @@ public interface Spliterator<T> {
      * @param action The action
      * @throws NullPointerException if the specified action is null
      */
-    default void forEachRemaining(Consumer<? super T> action) {
+    default void forEachRemaining(@Mutable Spliterator<T> this, Consumer<? super T> action) {
         do { } while (tryAdvance(action));
     }
 
@@ -383,7 +385,7 @@ public interface Spliterator<T> {
      * @return a {@code Spliterator} covering some portion of the
      * elements, or {@code null} if this spliterator cannot be split
      */
-    @Nullable Spliterator<T> trySplit();
+    @Nullable Spliterator<T> trySplit(@Readonly Spliterator<T> this);
 
     /**
      * Returns an estimate of the number of elements that would be
@@ -408,7 +410,7 @@ public interface Spliterator<T> {
      * @return the estimated size, or {@code Long.MAX_VALUE} if infinite,
      *         unknown, or too expensive to compute.
      */
-    long estimateSize();
+    long estimateSize(@Readonly Spliterator<T> this);
 
     /**
      * Convenience method that returns {@link #estimateSize()} if this
@@ -420,7 +422,7 @@ public interface Spliterator<T> {
      *
      * @return the exact size, if known, else {@code -1}.
      */
-    default long getExactSizeIfKnown() {
+    default long getExactSizeIfKnown(@Readonly Spliterator<T> this) {
         return (characteristics() & SIZED) == 0 ? -1L : estimateSize();
     }
 
@@ -445,7 +447,7 @@ public interface Spliterator<T> {
      *
      * @return a representation of characteristics
      */
-    int characteristics();
+    int characteristics(@Readonly Spliterator<T> this);
 
     /**
      * Returns {@code true} if this Spliterator's {@link
@@ -459,7 +461,7 @@ public interface Spliterator<T> {
      * @return {@code true} if all the specified characteristics are present,
      * else {@code false}
      */
-    default boolean hasCharacteristics(int characteristics) {
+    default boolean hasCharacteristics(@Readonly Spliterator<T> this, int characteristics) {
         return (characteristics() & characteristics) == characteristics;
     }
 
@@ -478,7 +480,7 @@ public interface Spliterator<T> {
      *         a characteristic of {@code SORTED}.
      */
     @Pure
-    default @Nullable Comparator<? super T> getComparator() {
+    default @Nullable Comparator<? super T> getComparator(@Readonly Spliterator<T> this) {
         throw new IllegalStateException();
     }
 
@@ -619,10 +621,11 @@ public interface Spliterator<T> {
      * @see Spliterator.OfDouble
      * @since 1.8
      */
+    @ReceiverDependentMutable
     public interface OfPrimitive<T, T_CONS, T_SPLITR extends Spliterator.OfPrimitive<T, T_CONS, T_SPLITR>>
             extends Spliterator<T> {
         @Override
-        @Nullable T_SPLITR trySplit();
+        @Nullable T_SPLITR trySplit(@Mutable OfPrimitive<T, T_CONS, T_SPLITR> this);
 
         /**
          * If a remaining element exists, performs the given action on it,
@@ -640,7 +643,7 @@ public interface Spliterator<T> {
          * @throws NullPointerException if the specified action is null
          */
         @SuppressWarnings("overloads")
-        boolean tryAdvance(T_CONS action);
+        boolean tryAdvance(@Mutable OfPrimitive<T, T_CONS, T_SPLITR> this, T_CONS action);
 
         /**
          * Performs the given action for each remaining element, sequentially in
@@ -661,7 +664,7 @@ public interface Spliterator<T> {
          * @throws NullPointerException if the specified action is null
          */
         @SuppressWarnings("overloads")
-        default void forEachRemaining(T_CONS action) {
+        default void forEachRemaining(@Mutable OfPrimitive<T, T_CONS, T_SPLITR> this, T_CONS action) {
             do { } while (tryAdvance(action));
         }
     }
@@ -670,16 +673,17 @@ public interface Spliterator<T> {
      * A Spliterator specialized for {@code int} values.
      * @since 1.8
      */
+    @ReceiverDependentMutable
     public interface OfInt extends OfPrimitive<Integer, IntConsumer, OfInt> {
 
         @Override
-        @Nullable OfInt trySplit();
+        @Nullable OfInt trySplit(@Mutable OfInt this);
 
         @Override
-        boolean tryAdvance(IntConsumer action);
+        boolean tryAdvance(@Mutable OfInt this, IntConsumer action);
 
         @Override
-        default void forEachRemaining(IntConsumer action) {
+        default void forEachRemaining(@Mutable OfInt this, IntConsumer action) {
             do { } while (tryAdvance(action));
         }
 
@@ -694,7 +698,7 @@ public interface Spliterator<T> {
          * {@link #tryAdvance(java.util.function.IntConsumer)}.
          */
         @Override
-        default boolean tryAdvance(Consumer<? super Integer> action) {
+        default boolean tryAdvance(@Mutable OfInt this, Consumer<? super Integer> action) {
             if (action instanceof IntConsumer) {
                 return tryAdvance((IntConsumer) action);
             }
@@ -717,7 +721,7 @@ public interface Spliterator<T> {
          * {@link #forEachRemaining(java.util.function.IntConsumer)}.
          */
         @Override
-        default void forEachRemaining(Consumer<? super Integer> action) {
+        default void forEachRemaining(@Mutable OfInt this, Consumer<? super Integer> action) {
             if (action instanceof IntConsumer) {
                 forEachRemaining((IntConsumer) action);
             }
@@ -734,16 +738,17 @@ public interface Spliterator<T> {
      * A Spliterator specialized for {@code long} values.
      * @since 1.8
      */
+    @ReceiverDependentMutable
     public interface OfLong extends OfPrimitive<Long, LongConsumer, OfLong> {
 
         @Override
-        @Nullable OfLong trySplit();
+        @Nullable OfLong trySplit(@Mutable OfLong this);
 
         @Override
-        boolean tryAdvance(LongConsumer action);
+        boolean tryAdvance(@Mutable OfLong this, LongConsumer action);
 
         @Override
-        default void forEachRemaining(LongConsumer action) {
+        default void forEachRemaining(@Mutable OfLong this, LongConsumer action) {
             do { } while (tryAdvance(action));
         }
 
@@ -758,7 +763,7 @@ public interface Spliterator<T> {
          * {@link #tryAdvance(java.util.function.LongConsumer)}.
          */
         @Override
-        default boolean tryAdvance(Consumer<? super Long> action) {
+        default boolean tryAdvance(@Mutable OfLong this, Consumer<? super Long> action) {
             if (action instanceof LongConsumer) {
                 return tryAdvance((LongConsumer) action);
             }
@@ -781,7 +786,7 @@ public interface Spliterator<T> {
          * {@link #forEachRemaining(java.util.function.LongConsumer)}.
          */
         @Override
-        default void forEachRemaining(Consumer<? super Long> action) {
+        default void forEachRemaining(@Mutable OfLong this, Consumer<? super Long> action) {
             if (action instanceof LongConsumer) {
                 forEachRemaining((LongConsumer) action);
             }
@@ -798,16 +803,17 @@ public interface Spliterator<T> {
      * A Spliterator specialized for {@code double} values.
      * @since 1.8
      */
+    @ReceiverDependentMutable
     public interface OfDouble extends OfPrimitive<Double, DoubleConsumer, OfDouble> {
 
         @Override
-        @Nullable OfDouble trySplit();
+        @Nullable OfDouble trySplit(@Mutable OfDouble this);
 
         @Override
-        boolean tryAdvance(DoubleConsumer action);
+        boolean tryAdvance(@Mutable OfDouble this, DoubleConsumer action);
 
         @Override
-        default void forEachRemaining(DoubleConsumer action) {
+        default void forEachRemaining(@Mutable OfDouble this, DoubleConsumer action) {
             do { } while (tryAdvance(action));
         }
 
@@ -822,7 +828,7 @@ public interface Spliterator<T> {
          * {@link #tryAdvance(java.util.function.DoubleConsumer)}.
          */
         @Override
-        default boolean tryAdvance(Consumer<? super Double> action) {
+        default boolean tryAdvance(@Mutable OfDouble this, Consumer<? super Double> action) {
             if (action instanceof DoubleConsumer) {
                 return tryAdvance((DoubleConsumer) action);
             }
@@ -846,7 +852,7 @@ public interface Spliterator<T> {
          * {@link #forEachRemaining(java.util.function.DoubleConsumer)}.
          */
         @Override
-        default void forEachRemaining(Consumer<? super Double> action) {
+        default void forEachRemaining(@Mutable OfDouble this, Consumer<? super Double> action) {
             if (action instanceof DoubleConsumer) {
                 forEachRemaining((DoubleConsumer) action);
             }

@@ -27,6 +27,7 @@ package java.lang;
 
 import org.checkerframework.checker.lock.qual.NewObject;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.common.value.qual.IntVal;
 import org.checkerframework.common.value.qual.PolyValue;
 import org.checkerframework.common.value.qual.StaticallyExecutable;
@@ -73,8 +74,9 @@ import jdk.internal.vm.annotation.IntrinsicCandidate;
  * @author  Joseph D. Darcy
  * @since 1.0
  */
-@AnnotatedFor({"nullness", "value"})
+@AnnotatedFor({"nullness", "pico", "value"})
 @jdk.internal.ValueBased
+@Immutable
 public final class Float extends Number
         implements Comparable<Float>, Constable, ConstantDesc {
     /**

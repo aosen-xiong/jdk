@@ -32,6 +32,7 @@ import org.checkerframework.framework.qual.CFComment;
 import jdk.internal.misc.TerminatingThreadLocal;
 
 import org.checkerframework.checker.interning.qual.UsesObjectEquals;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
 import java.lang.ref.WeakReference;
@@ -331,6 +332,7 @@ public @UsesObjectEquals class ThreadLocal<@Nullable T> {
      * used, stale entries are guaranteed to be removed only when
      * the table starts running out of space.
      */
+    @ReceiverDependentMutable
     static class ThreadLocalMap {
 
         /**
@@ -341,6 +343,7 @@ public @UsesObjectEquals class ThreadLocal<@Nullable T> {
          * entry can be expunged from table.  Such entries are referred to
          * as "stale entries" in the code that follows.
          */
+        @ReceiverDependentMutable
         static class Entry extends WeakReference<ThreadLocal<?>> {
             /** The value associated with this ThreadLocal. */
             Object value;

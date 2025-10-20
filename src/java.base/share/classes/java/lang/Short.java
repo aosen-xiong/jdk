@@ -30,6 +30,7 @@ import org.checkerframework.checker.index.qual.PolyIndex;
 import org.checkerframework.checker.index.qual.Positive;
 import org.checkerframework.checker.lock.qual.NewObject;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.checker.signedness.qual.PolySigned;
 import org.checkerframework.checker.signedness.qual.SignedPositive;
 import org.checkerframework.checker.signedness.qual.UnknownSignedness;
@@ -76,8 +77,9 @@ import static java.lang.constant.ConstantDescs.DEFAULT_NAME;
  * @see     java.lang.Number
  * @since   1.1
  */
-@AnnotatedFor({"nullness", "index", "signedness", "value"})
+@AnnotatedFor({"nullness", "index", "pico", "signedness", "value"})
 @jdk.internal.ValueBased
+@Immutable
 public final class Short extends Number implements Comparable<Short>, Constable {
 
     /**

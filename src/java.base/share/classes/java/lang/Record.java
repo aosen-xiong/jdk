@@ -27,6 +27,7 @@ package java.lang;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.signedness.qual.UnknownSignedness;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
 /**
@@ -91,7 +92,8 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @jls 8.10 Record Types
  * @since 16
  */
-@AnnotatedFor({"initialization", "nullness"})
+@AnnotatedFor({"initialization", "nullness", "pico"})
+@Immutable
 public abstract class Record {
     /**
      * Constructor for record classes to call.

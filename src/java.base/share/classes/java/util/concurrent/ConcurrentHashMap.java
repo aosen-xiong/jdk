@@ -281,7 +281,7 @@ import jdk.internal.misc.Unsafe;
  * @param <V> the type of mapped values
  */
 @AnnotatedFor({"nullness"})
-public class ConcurrentHashMap<K extends @NonNull @Immutable Object,V extends @NonNull Object> extends AbstractMap<K,V>
+public class ConcurrentHashMap<K extends @NonNull @Immutable Object,V extends @NonNull @Readonly Object> extends AbstractMap<K,V>
     implements ConcurrentMap<K,V>, Serializable {
     private static final long serialVersionUID = 7249069246763182397L;
 
