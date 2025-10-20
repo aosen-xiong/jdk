@@ -141,7 +141,8 @@ import sun.util.calendar.ZoneInfo;
  */
 @AnnotatedFor({"lock", "nullness", "index"})
 @SuppressWarnings("pico") // Not interesting class, fix later
-@ReceiverDependentMutable public class Date
+@ReceiverDependentMutable
+public class Date
     implements java.io.Serializable, Cloneable, Comparable<Date>
 {
     private static final BaseCalendar gcal =

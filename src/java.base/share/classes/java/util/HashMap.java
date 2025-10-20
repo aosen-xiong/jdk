@@ -159,7 +159,7 @@ import jdk.internal.access.SharedSecrets;
  * @see     Hashtable
  * @since   1.2
  */
-@AnnotatedFor({"lock", "nullness", "index"})
+@AnnotatedFor({"lock", "nullness", "index", "pico"})
 @ReceiverDependentMutable
 public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
     implements Map<K,V>, Cloneable, Serializable {

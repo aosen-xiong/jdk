@@ -103,7 +103,7 @@ import java.util.function.Consumer;
  */
 
 @CFComment({"lock/nullness: This class permits null elements"})
-@AnnotatedFor({"lock", "nullness", "index"})
+@AnnotatedFor({"lock", "nullness", "index", "pico"})
 @ReceiverDependentMutable
 public class LinkedList<E>
     extends AbstractSequentialList<E>
@@ -1233,6 +1233,7 @@ public class LinkedList<E>
     }
 
     /** A customized variant of Spliterators.IteratorSpliterator */
+    @ReceiverDependentMutable
     static final class LLSpliterator<E> implements Spliterator<E> {
         static final int BATCH_UNIT = 1 << 10;  // batch array size increment
         static final int MAX_BATCH = 1 << 25;  // max batch array size;
@@ -1248,7 +1249,7 @@ public class LinkedList<E>
             this.expectedModCount = expectedModCount;
         }
 
-        final int getEst() {
+        final int getEst(@Readonly LLSpliterator<E> this) {
             int s; // force initialization
             final LinkedList<E> lst;
             if ((s = est) < 0) {
@@ -1263,9 +1264,9 @@ public class LinkedList<E>
             return s;
         }
 
-        public long estimateSize() { return (long) getEst(); }
+        public long estimateSize(@Readonly LLSpliterator<E> this) { return (long) getEst(); }
         @SuppressWarnings("pico:return.type.incompatible") // covariant return
-        public Spliterator<E> trySplit() {
+        public Spliterator<E> trySplit(@Mutable LLSpliterator<E> this) {
             Node<E> p;
             int s = getEst();
             if (s > 1 && (p = current) != null) {
@@ -1285,7 +1286,7 @@ public class LinkedList<E>
             return null;
         }
 
-        public void forEachRemaining(Consumer<? super E> action) {
+        public void forEachRemaining(@Mutable LLSpliterator<E> this, Consumer<? super E> action) {
             Node<E> p; int n;
             if (action == null) throw new NullPointerException();
             if ((n = getEst()) > 0 && (p = current) != null) {
@@ -1301,7 +1302,7 @@ public class LinkedList<E>
                 throw new ConcurrentModificationException();
         }
 
-        public boolean tryAdvance(Consumer<? super E> action) {
+        public boolean tryAdvance(@Mutable LLSpliterator<E> this, Consumer<? super E> action) {
             Node<E> p;
             if (action == null) throw new NullPointerException();
             if (getEst() > 0 && (p = current) != null) {
@@ -1316,7 +1317,7 @@ public class LinkedList<E>
             return false;
         }
 
-        public int characteristics() {
+        public int characteristics(@Readonly LLSpliterator<E> this) {
             return Spliterator.ORDERED | Spliterator.SIZED | Spliterator.SUBSIZED;
         }
     }

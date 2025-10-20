@@ -381,8 +381,7 @@ public final class String
      */
     @SideEffectFree
     @StaticallyExecutable
-    @SuppressWarnings("pico:assignment.type.incompatible")
-    @CFComment("this.value = val need to be casted from @Unique @Mutable to @Immutable")
+    @SuppressWarnings("pico:assignment.type.incompatible") // cast from @Unique @Mutable to @Immutable
     public @Unique String(int @GuardSatisfied [] codePoints, @IndexOrHigh({"#1"}) int offset, @LTLengthOf(value={"#1"}, offset={"#2 - 1"}) @NonNegative int count) {
         checkBoundsOffCount(offset, count, codePoints.length);
         if (count == 0) {

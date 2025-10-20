@@ -514,8 +514,7 @@ public final class StackTraceElement implements java.io.Serializable {
      * Finds JDK non-upgradeable modules, i.e. the modules that are
      * included in the hashes in java.base.
      */
-    @SuppressWarnings("pico:return.type.incompatible")
-    @CFComment("return names be casted from @Unique @Mutable to @Immutable")
+    @SuppressWarnings("pico:return.type.incompatible") // cast from @Unique @Mutable to @Immutable
     private static class HashedModules {
         static @Immutable Set<String> HASHED_MODULES = hashedModules();
 

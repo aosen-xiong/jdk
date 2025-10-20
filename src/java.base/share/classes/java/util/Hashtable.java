@@ -157,8 +157,9 @@ import jdk.internal.access.SharedSecrets;
  * @since 1.0
  */
 @CFComment({"lock: This collection can only contain nonnull values"})
-@AnnotatedFor({"lock", "nullness", "index"})
-@ReceiverDependentMutable  public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull Object>
+@AnnotatedFor({"lock", "nullness", "index", "pico"})
+@ReceiverDependentMutable
+public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull Object>
     extends Dictionary<K,V>
     implements Map<K,V>, Cloneable, java.io.Serializable {
 

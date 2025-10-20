@@ -90,7 +90,7 @@ import java.util.function.Consumer;
  */
 
 @CFComment("lock/nullness: Subclasses of this interface/class may opt to prohibit null elements")
-@AnnotatedFor({"lock", "nullness", "index"})
+@AnnotatedFor({"lock", "nullness", "index", "pico"})
 @ReceiverDependentMutable
 public abstract class AbstractList<E> extends AbstractCollection<E> implements List<E> {
     /**

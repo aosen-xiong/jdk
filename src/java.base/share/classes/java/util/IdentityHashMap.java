@@ -1456,6 +1456,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
      * Similar form as array-based Spliterators, but skips blank elements,
      * and guestimates size as decreasing by half per split.
      */
+    @ReceiverDependentMutable
     static class IdentityHashMapSpliterator<K extends @Immutable Object,V> {
         final @Readonly IdentityHashMap<K,V> map;
         int index;             // current index, modified on advance/split
@@ -1472,7 +1473,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
             this.expectedModCount = expectedModCount;
         }
 
-        final int getFence() { // initialize fence and size on first use
+        final int getFence(@Readonly IdentityHashMapSpliterator<K,V> this) { // initialize fence and size on first use
             int hi;
             if ((hi = fence) < 0) {
                 est = map.size;
@@ -1482,12 +1483,13 @@ public class IdentityHashMap<K extends @Immutable Object,V>
             return hi;
         }
 
-        public final long estimateSize() {
+        public final long estimateSize(@Readonly IdentityHashMapSpliterator<K,V> this) {
             getFence(); // force init
             return (long) est;
         }
     }
 
+    @ReceiverDependentMutable
     static final class KeySpliterator<K extends @Immutable Object,V>
         extends IdentityHashMapSpliterator<K,V>
         implements Spliterator<K> {
@@ -1496,7 +1498,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
             super(map, origin, fence, est, expectedModCount);
         }
 
-        public KeySpliterator<K,V> trySplit() {
+        public KeySpliterator<K,V> trySplit(@Mutable KeySpliterator<K,V> this) {
             int hi = getFence(), lo = index, mid = ((lo + hi) >>> 1) & ~1;
             return (lo >= mid) ? null :
                 new KeySpliterator<>(map, lo, index = mid, est >>>= 1,
@@ -1504,7 +1506,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
         }
 
         @SuppressWarnings("unchecked")
-        public void forEachRemaining(Consumer<? super K> action) {
+        public void forEachRemaining(@Mutable KeySpliterator<K,V> this, Consumer<? super K> action) {
             if (action == null)
                 throw new NullPointerException();
             int i, hi, mc; Object key;
@@ -1522,7 +1524,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
         }
 
         @SuppressWarnings("unchecked")
-        public boolean tryAdvance(Consumer<? super K> action) {
+        public boolean tryAdvance(@Mutable KeySpliterator<K,V> this, Consumer<? super K> action) {
             if (action == null)
                 throw new NullPointerException();
             @Readonly Object[] a = map.table;
@@ -1540,11 +1542,12 @@ public class IdentityHashMap<K extends @Immutable Object,V>
             return false;
         }
 
-        public int characteristics() {
+        public int characteristics(@Readonly KeySpliterator<K,V> this) {
             return (fence < 0 || est == map.size ? SIZED : 0) | Spliterator.DISTINCT;
         }
     }
 
+    @ReceiverDependentMutable
     static final class ValueSpliterator<K extends @Immutable Object,V>
         extends IdentityHashMapSpliterator<K,V>
         implements Spliterator<V> {
@@ -1553,14 +1556,14 @@ public class IdentityHashMap<K extends @Immutable Object,V>
             super(m, origin, fence, est, expectedModCount);
         }
 
-        public ValueSpliterator<K,V> trySplit() {
+        public ValueSpliterator<K,V> trySplit(@Mutable ValueSpliterator<K,V> this) {
             int hi = getFence(), lo = index, mid = ((lo + hi) >>> 1) & ~1;
             return (lo >= mid) ? null :
                 new ValueSpliterator<>(map, lo, index = mid, est >>>= 1,
                                        expectedModCount);
         }
 
-        public void forEachRemaining(Consumer<? super V> action) {
+        public void forEachRemaining(@Mutable ValueSpliterator<K,V> this, Consumer<? super V> action) {
             if (action == null)
                 throw new NullPointerException();
             int i, hi, mc;
@@ -1579,7 +1582,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
             throw new ConcurrentModificationException();
         }
 
-        public boolean tryAdvance(Consumer<? super V> action) {
+        public boolean tryAdvance(@Mutable ValueSpliterator<K,V> this, Consumer<? super V> action) {
             if (action == null)
                 throw new NullPointerException();
             @Readonly Object[] a = map.table;
@@ -1598,12 +1601,13 @@ public class IdentityHashMap<K extends @Immutable Object,V>
             return false;
         }
 
-        public int characteristics() {
+        public int characteristics(@Readonly ValueSpliterator<K,V> this) {
             return (fence < 0 || est == map.size ? SIZED : 0);
         }
 
     }
 
+    @ReceiverDependentMutable
     static final class EntrySpliterator<K extends @Immutable Object,V>
         extends IdentityHashMapSpliterator<K,V>
         implements Spliterator<Map.Entry<K,V>> {
@@ -1612,14 +1616,14 @@ public class IdentityHashMap<K extends @Immutable Object,V>
             super(m, origin, fence, est, expectedModCount);
         }
 
-        public EntrySpliterator<K,V> trySplit() {
+        public EntrySpliterator<K,V> trySplit(@Mutable EntrySpliterator<K,V> this) {
             int hi = getFence(), lo = index, mid = ((lo + hi) >>> 1) & ~1;
             return (lo >= mid) ? null :
                 new EntrySpliterator<>(map, lo, index = mid, est >>>= 1,
                                        expectedModCount);
         }
 
-        public void forEachRemaining(Consumer<? super Map.@Immutable Entry<K, V>> action) {
+        public void forEachRemaining(@Mutable EntrySpliterator<K,V> this, Consumer<? super Map.@Immutable Entry<K, V>> action) {
             if (action == null)
                 throw new NullPointerException();
             int i, hi, mc;
@@ -1643,7 +1647,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
             throw new ConcurrentModificationException();
         }
 
-        public boolean tryAdvance(Consumer<? super Map.@Immutable Entry<K,V>> action) {
+        public boolean tryAdvance(@Mutable EntrySpliterator<K,V> this, Consumer<? super Map.@Immutable Entry<K,V>> action) {
             if (action == null)
                 throw new NullPointerException();
             @Readonly Object[] a = map.table;
@@ -1665,7 +1669,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
             return false;
         }
 
-        public int characteristics() {
+        public int characteristics(@Readonly EntrySpliterator<K,V> this) {
             return (fence < 0 || est == map.size ? SIZED : 0) | Spliterator.DISTINCT;
         }
     }

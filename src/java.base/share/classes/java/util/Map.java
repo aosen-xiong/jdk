@@ -186,7 +186,7 @@ import java.io.Serializable;
  * @since 1.2
  */
 @CFComment({"lock/nullness: Subclasses of this interface/class may opt to prohibit null elements"})
-@AnnotatedFor({"lock", "nullness", "index", "aliasing", "nonempty"})
+@AnnotatedFor({"lock", "nullness", "index", "aliasing", "nonempty", "pico"})
 @ReceiverDependentMutable
 public interface Map<K extends @Immutable Object, V> {
     // Query Operations

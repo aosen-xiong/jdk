@@ -78,8 +78,9 @@ import java.util.stream.StreamSupport;
  * @author  Martin Buchholz
  * @since   1.0
  */
-@AnnotatedFor({"lock", "nullness", "index"})
-@ReceiverDependentMutable public class BitSet implements Cloneable, java.io.Serializable {
+@AnnotatedFor({"lock", "nullness", "index", "pico"})
+@ReceiverDependentMutable
+public class BitSet implements Cloneable, java.io.Serializable {
     /*
      * BitSets are packed into arrays of "words."  Currently a word is
      * a long, which consists of 64 bits, requiring 6 address bits.
