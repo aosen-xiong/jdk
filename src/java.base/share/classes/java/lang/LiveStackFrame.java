@@ -30,6 +30,8 @@ import java.util.Set;
 
 import static java.lang.StackWalker.ExtendedOption.LOCALS_AND_OPERANDS;
 
+import org.checkerframework.checker.pico.qual.Immutable;
+
 /**
  * <em>UNSUPPORTED</em> This interface is intended to be package-private
  * or move to an internal package.<p>
@@ -176,7 +178,7 @@ interface LiveStackFrame extends StackFrame {
      * {@link StackWalker.Option#RETAIN_CLASS_REFERENCE Option.RETAIN_CLASS_REFERENCE}
      * and it denies access to {@code RuntimePermission("getStackWalkerWithClassReference")}.
      */
-    public static StackWalker getStackWalker(Set<StackWalker.Option> options) {
+    public static StackWalker getStackWalker(@Immutable Set<StackWalker.Option> options) {
         @SuppressWarnings("removal")
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {

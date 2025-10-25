@@ -30,7 +30,11 @@ import org.checkerframework.checker.nonempty.qual.EnsuresNonEmptyIf;
 import org.checkerframework.checker.nullness.qual.KeyFor;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
+import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.Mutable;
+import org.checkerframework.checker.pico.qual.PolyMutable;
 import org.checkerframework.checker.pico.qual.Readonly;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.checker.propkey.qual.PropertyKey;
 import org.checkerframework.checker.signedness.qual.UnknownSignedness;
 import org.checkerframework.dataflow.qual.Pure;
@@ -211,11 +215,11 @@ public class Properties extends Hashtable<Object,Object> {
      *
      * @param   defaults   the defaults.
      */
-    public Properties(@Nullable Properties defaults) {
+    public Properties(@Nullable @ReceiverDependentMutable Properties defaults) {
         this(defaults, 8);
     }
 
-    private Properties(Properties defaults, int initialCapacity) {
+    private Properties(@ReceiverDependentMutable Properties defaults, int initialCapacity) {
         // use package-private constructor to
         // initialize unused fields with dummy values
         super((Void) null);
@@ -239,7 +243,7 @@ public class Properties extends Hashtable<Object,Object> {
      * @see #getProperty
      * @since    1.2
      */
-    public synchronized @Nullable Object setProperty(@GuardSatisfied Properties this, @PropertyKey String key, String value) {
+    public synchronized @Nullable @Immutable Object setProperty(@GuardSatisfied @Mutable Properties this, @PropertyKey String key, String value) {
         return put(key, value);
     }
 
@@ -1272,14 +1276,14 @@ public class Properties extends Hashtable<Object,Object> {
 
     @Override
     @Pure
-    public int size() {
+    public int size(@Readonly Properties this) {
         return map.size();
     }
 
     @Override
     @Pure
     @EnsuresNonEmptyIf(result = false, expression = "this")
-    public boolean isEmpty() {
+    public boolean isEmpty(@Readonly Properties this) {
         return map.isEmpty();
     }
 
@@ -1298,49 +1302,50 @@ public class Properties extends Hashtable<Object,Object> {
     @Override
     @Pure
     @EnsuresNonEmptyIf(result = true, expression = "this")
-    public boolean contains(@GuardSatisfied @Nullable @UnknownSignedness Object value) {
+    public boolean contains(@Readonly Properties this, @GuardSatisfied @Nullable @UnknownSignedness @Readonly Object value) {
         return map.contains(value);
     }
 
     @Override
     @Pure
-    public boolean containsValue(@GuardSatisfied @Nullable @UnknownSignedness Object value) {
+    public boolean containsValue(@Readonly Properties this, @GuardSatisfied @Nullable @UnknownSignedness @Readonly Object value) {
         return map.containsValue(value);
     }
 
     @Override
     @Pure
-    public boolean containsKey(@GuardSatisfied @Nullable @UnknownSignedness Object key) {
+    public boolean containsKey(@Readonly Properties this, @GuardSatisfied @Nullable @UnknownSignedness @Readonly Object key) {
         return map.containsKey(key);
     }
 
+    //Aosen: To be more precise, we need to connect with the return type with the value from the map.
     @Override
-    public @Nullable Object get(Object key) {
+    public @Nullable Object get(@Readonly Properties this, @Readonly Object key) {
         return map.get(key);
     }
 
     @Override
-    public synchronized @Nullable Object put(@Readonly Object key, @Readonly Object value) {
+    public synchronized @Nullable @PolyMutable Object put(@Mutable Properties this, @Readonly Object key, @PolyMutable Object value) {
         return map.put(key, value);
     }
 
     @Override
-    public synchronized @Nullable Object remove(@GuardSatisfied @UnknownSignedness Object key) {
+    public synchronized @Nullable Object remove(@Mutable Properties this, @GuardSatisfied @UnknownSignedness @Readonly Object key) {
         return map.remove(key);
     }
 
     @Override
-    public synchronized void putAll(Map<? extends Object, ? extends Object> t) {
+    public synchronized void putAll(@Mutable Properties this, @Readonly Map<? extends Object, ? extends Object> t) {
         map.putAll(t);
     }
 
     @Override
-    public synchronized void clear() {
+    public synchronized void clear(@Mutable Properties this) {
         map.clear();
     }
 
     @Override
-    public synchronized String toString() {
+    public synchronized String toString(@Readonly Properties this) {
         return map.toString();
     }
 
@@ -1365,6 +1370,7 @@ public class Properties extends Hashtable<Object,Object> {
      * ConcurrentHashMap.entrySet() provides add/addAll.  This class wraps the
      * Set returned from CHM, changing add/addAll to throw UOE.
      */
+    @ReceiverDependentMutable
     private static class EntrySet implements Set<Map.Entry<Object, Object>> {
         private Set<Map.Entry<Object,Object>> entrySet;
 
@@ -1432,7 +1438,7 @@ public class Properties extends Hashtable<Object,Object> {
     }
 
     @Override
-    public synchronized boolean equals(Object o) {
+    public synchronized boolean equals(@Readonly Object o) {
         return map.equals(o);
     }
 
@@ -1458,27 +1464,27 @@ public class Properties extends Hashtable<Object,Object> {
     }
 
     @Override
-    public synchronized @Nullable Object putIfAbsent(Object key, Object value) {
+    public synchronized @Nullable @PolyMutable Object putIfAbsent(@Readonly Object key, @PolyMutable Object value) {
         return map.putIfAbsent(key, value);
     }
 
     @Override
-    public synchronized boolean remove(@GuardSatisfied @Nullable @UnknownSignedness Object key, @GuardSatisfied @Nullable @UnknownSignedness Object value) {
+    public synchronized boolean remove(@GuardSatisfied @Nullable @UnknownSignedness @Readonly Object key, @GuardSatisfied @Nullable @UnknownSignedness @Readonly Object value) {
         return map.remove(key, value);
     }
 
     @Override
-    public synchronized boolean replace(Object key, Object oldValue, Object newValue) {
+    public synchronized boolean replace(@Readonly Object key, @Readonly Object oldValue, @Readonly Object newValue) {
         return map.replace(key, oldValue, newValue);
     }
 
     @Override
-    public synchronized @Nullable Object replace(Object key, Object value) {
+    public synchronized @Nullable @PolyMutable Object replace(@Readonly Object key, @PolyMutable Object value) {
         return map.replace(key, value);
     }
 
     @Override
-    public synchronized @PolyNull Object computeIfAbsent(Object key,
+    public synchronized @PolyNull Object computeIfAbsent(@Readonly Object key,
             Function<? super Object, ? extends @PolyNull Object> mappingFunction) {
         return map.computeIfAbsent(key, mappingFunction);
     }

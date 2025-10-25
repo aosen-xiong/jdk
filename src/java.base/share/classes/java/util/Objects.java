@@ -166,7 +166,7 @@ public final @UsesObjectEquals class Objects {
      * @see String#valueOf(Object)
      */
     @SideEffectFree
-    public static String toString(@Readonly @GuardSatisfied @Nullable @UnknownSignedness Object o) {
+    public static String toString(@GuardSatisfied @Nullable @UnknownSignedness @Readonly Object o) {
         return String.valueOf(o);
     }
 
@@ -184,7 +184,7 @@ public final @UsesObjectEquals class Objects {
      * @see Objects#toString(Object)
      */
     @SideEffectFree
-    public static @PolyNull String toString(@Readonly @GuardSatisfied @Nullable @UnknownSignedness Object o, @PolyNull String nullDefault) {
+    public static @PolyNull String toString(@GuardSatisfied @Nullable @UnknownSignedness @Readonly Object o, @PolyNull String nullDefault) {
         return (o != null) ? o.toString() : nullDefault;
     }
 

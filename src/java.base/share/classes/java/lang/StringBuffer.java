@@ -118,7 +118,7 @@ import jdk.internal.vm.annotation.IntrinsicCandidate;
  * @since   1.0
  */
 @AnnotatedFor({"aliasing", "lock", "nullness", "index"})
- public final class StringBuffer
+public final class StringBuffer
     extends AbstractStringBuilder
     implements java.io.Serializable, Comparable<StringBuffer>, CharSequence
 {

@@ -70,6 +70,11 @@ import jdk.internal.reflect.CallerSensitive;
 import jdk.internal.reflect.Reflection;
 import sun.security.util.SecurityConstants;
 
+import org.checkerframework.checker.initialization.qual.UnderInitialization;
+import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.Mutable;
+import org.checkerframework.checker.pico.qual.Readonly;
+
 /**
  * Represents a run-time module, either {@link #isNamed() named} or unnamed.
  *
@@ -97,6 +102,7 @@ import sun.security.util.SecurityConstants;
  * @jls 7.7 Module Declarations
  */
 
+@Immutable
 public final class Module implements AnnotatedElement {
 
     // the layer that contains this module, can be null
@@ -104,7 +110,7 @@ public final class Module implements AnnotatedElement {
 
     // module name and loader, these fields are read by VM
     private final String name;
-    private final ClassLoader loader;
+    private final @Mutable ClassLoader loader;
 
     // the module descriptor
     private final ModuleDescriptor descriptor;
@@ -279,18 +285,18 @@ public final class Module implements AnnotatedElement {
 
     // special Module to mean "all unnamed modules"
     private static final Module ALL_UNNAMED_MODULE;
-    private static final Set<Module> ALL_UNNAMED_MODULE_SET;
+    private static final @Immutable Set<Module> ALL_UNNAMED_MODULE_SET;
 
     // special Module to mean "everyone"
     private static final Module EVERYONE_MODULE;
-    private static final Set<Module> EVERYONE_SET;
+    private static final @Immutable Set<Module> EVERYONE_SET;
 
     private static class ArchivedData {
         private static ArchivedData archivedData;
         private final Module allUnnamedModule;
-        private final Set<Module> allUnnamedModules;
+        private final @Immutable Set<Module> allUnnamedModules;
         private final Module everyoneModule;
-        private final Set<Module> everyoneSet;
+        private final @Immutable Set<Module> everyoneSet;
 
         private ArchivedData() {
             this.allUnnamedModule = ALL_UNNAMED_MODULE;
@@ -969,6 +975,7 @@ public final class Module implements AnnotatedElement {
      *
      * @apiNote Used during startup to open packages for illegal access.
      */
+    @SuppressWarnings("pico:assignment.type.incompatible") // cast from @Unique @Mutable to @Immutable
     void implAddOpensToAllUnnamed(Set<String> concealedPkgs, Set<String> exportedPkgs) {
         if (jdk.internal.misc.VM.isModuleSystemInited()) {
             throw new IllegalStateException("Module system already initialized");
@@ -987,7 +994,7 @@ public final class Module implements AnnotatedElement {
         this.openPackages = openPackages;
     }
 
-    private void implAddOpensToAllUnnamed(Set<String> pkgs, Map<String, Set<Module>> openPackages) {
+    private void implAddOpensToAllUnnamed(@Readonly Set<String> pkgs, Map<String, @Mutable Set<Module>> openPackages) {
         for (String pn : pkgs) {
             Set<Module> prev = openPackages.putIfAbsent(pn, ALL_UNNAMED_MODULE_SET);
             if (prev != null) {
@@ -1125,7 +1132,7 @@ public final class Module implements AnnotatedElement {
      *         with another module mapped to the same class loader
      */
     static Map<String, Module> defineModules(Configuration cf,
-                                             Function<String, ClassLoader> clf,
+                                             Function<String, @Immutable ClassLoader> clf,
                                              ModuleLayer layer)
     {
         boolean isBootLayer = (ModuleLayer.boot() == null);
@@ -1144,7 +1151,7 @@ public final class Module implements AnnotatedElement {
 
         // record that we want to bind the layer to non-boot and non-platform
         // module loaders as a final step
-        HashSet<ClassLoader> toBindLoaders = new HashSet<>(4);
+        HashSet<@Immutable ClassLoader> toBindLoaders = new HashSet<>(4);
         boolean hasPlatformModules = false;
 
         // map each module to a class loader
@@ -1296,7 +1303,8 @@ public final class Module implements AnnotatedElement {
      * @param m the module
      * @param nameToModule map of module name to Module (for qualified exports)
      */
-    private static void initExports(Module m, Map<String, Module> nameToModule) {
+    @SuppressWarnings("pico:assignment.type.incompatible") // cast from @Unique @Mutable to @Immutable
+    private static void initExports(@UnderInitialization Module m, Map<String, Module> nameToModule) {
         Map<String, Set<Module>> exportedPackages = new HashMap<>();
 
         for (Exports exports : m.getDescriptor().exports()) {
@@ -1334,7 +1342,8 @@ public final class Module implements AnnotatedElement {
      *                     under construction
      * @param parents the parent layers
      */
-    private static void initExportsAndOpens(Module m,
+    @SuppressWarnings("pico:assignment.type.incompatible") // cast from @Unique @Mutable to @Immutable
+    private static void initExportsAndOpens(@UnderInitialization Module m,
                                             Map<String, Module> nameToSource,
                                             Map<String, Module> nameToModule,
                                             List<ModuleLayer> parents) {

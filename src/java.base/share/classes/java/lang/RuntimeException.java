@@ -88,7 +88,7 @@ public class RuntimeException extends Exception {
      * @since  1.4
      */
     @SideEffectFree
-    public RuntimeException(@Nullable String message, @Nullable Throwable cause) {
+    public RuntimeException(@Nullable String message, @Nullable @ReceiverDependentMutable Throwable cause) {
         super(message, cause);
     }
 
@@ -105,7 +105,7 @@ public class RuntimeException extends Exception {
      * @since  1.4
      */
     @SideEffectFree
-    public @ReceiverDependentMutable RuntimeException(@Readonly @Nullable Throwable cause) {
+    public @ReceiverDependentMutable RuntimeException(@Readonly @Nullable @ReceiverDependentMutable Throwable cause) {
         super(cause);
     }
 
@@ -124,7 +124,7 @@ public class RuntimeException extends Exception {
      *
      * @since 1.7
      */
-    protected @ReceiverDependentMutable RuntimeException(@Nullable String message, @Readonly @Nullable Throwable cause,
+    protected @ReceiverDependentMutable RuntimeException(@Nullable String message, @ReceiverDependentMutable @Nullable Throwable cause,
                                boolean enableSuppression,
                                boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);

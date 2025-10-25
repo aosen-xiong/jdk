@@ -30,6 +30,7 @@ import org.checkerframework.checker.interning.qual.Interned;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.framework.qual.AnnotatedFor;
@@ -80,6 +81,7 @@ import sun.reflect.annotation.TypeAnnotationParser;
 	    "initialization: using fully-initialized types should make the typical use case easier.",
 	    "lock: require @GuardSatisfied to ensure type system soundness."})
 @AnnotatedFor({"interning", "lock", "nullness"})
+@Immutable
 public final
 class Field extends AccessibleObject implements Member {
 

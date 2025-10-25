@@ -32,6 +32,7 @@ import org.checkerframework.checker.nonempty.qual.NonEmpty;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.RequiresNonNull;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.checker.signature.qual.BinaryName;
 import org.checkerframework.checker.signature.qual.FullyQualifiedName;
 import org.checkerframework.common.reflection.qual.ForName;
@@ -2317,7 +2318,7 @@ public abstract @UsesObjectEquals class ClassLoader {
      * @revised 9
      */
     @Deprecated(since="9")
-    protected @Nullable Package getPackage(String name) {
+    protected @Nullable Package getPackage(@Readonly ClassLoader this, String name) {
         Package pkg = getDefinedPackage(name);
         if (pkg == null) {
             if (parent != null) {
@@ -2354,7 +2355,7 @@ public abstract @UsesObjectEquals class ClassLoader {
     @CFComment({"nullness: The size of array passed to toArray",
      "method is of exact same size as of the map for which toArray method is invoked"})
     @SuppressWarnings({"nullness:return"})
-    protected Package[] getPackages() {
+    protected Package[] getPackages(@Readonly ClassLoader this) {
         Stream<Package> pkgs = packages();
         ClassLoader ld = parent;
         while (ld != null) {

@@ -159,7 +159,8 @@ import jdk.internal.vm.annotation.Stable;
     static UnsupportedOperationException uoe() { return new UnsupportedOperationException(); }
 
     @jdk.internal.ValueBased
-    @Immutable static abstract class AbstractImmutableCollection<E> extends AbstractCollection<E> {
+    @Immutable
+    static abstract class AbstractImmutableCollection<E> extends AbstractCollection<E> {
         // all mutating methods throw UnsupportedOperationException
         @Override
         @EnsuresNonEmpty("this")
@@ -269,7 +270,8 @@ import jdk.internal.vm.annotation.Stable;
     // ---------- List Implementations ----------
 
     @jdk.internal.ValueBased
-    @Immutable static abstract class AbstractImmutableList<E> extends AbstractImmutableCollection<E>
+    @Immutable
+    static abstract class AbstractImmutableList<E> extends AbstractImmutableCollection<E>
             implements List<E>, RandomAccess {
 
         // all mutating methods throw UnsupportedOperationException
@@ -569,7 +571,8 @@ import jdk.internal.vm.annotation.Stable;
     }
 
     @jdk.internal.ValueBased
-    @Immutable static final class List12<E> extends AbstractImmutableList<E>
+    @Immutable
+    static final class List12<E> extends AbstractImmutableList<E>
             implements Serializable {
 
         @Stable
@@ -680,7 +683,8 @@ import jdk.internal.vm.annotation.Stable;
     }
 
     @jdk.internal.ValueBased
-    @Immutable static final class ListN<E> extends AbstractImmutableList<E>
+    @Immutable
+    static final class ListN<E> extends AbstractImmutableList<E>
             implements Serializable {
 
         @Stable
@@ -775,7 +779,8 @@ import jdk.internal.vm.annotation.Stable;
     // ---------- Set Implementations ----------
 
     @jdk.internal.ValueBased
-    @Immutable static abstract class AbstractImmutableSet<E> extends AbstractImmutableCollection<E>
+    @Immutable
+    static abstract class AbstractImmutableSet<E> extends AbstractImmutableCollection<E>
             implements Set<E> {
 
         @Override
@@ -803,7 +808,8 @@ import jdk.internal.vm.annotation.Stable;
     }
 
     @jdk.internal.ValueBased
-    @Immutable static final class Set12<E> extends AbstractImmutableSet<E>
+    @Immutable
+    static final class Set12<E> extends AbstractImmutableSet<E>
             implements Serializable {
 
         @Stable
@@ -935,7 +941,8 @@ import jdk.internal.vm.annotation.Stable;
      * @param <E> the element type
      */
     @jdk.internal.ValueBased
-    @Immutable static final class SetN<E> extends AbstractImmutableSet<E>
+    @Immutable
+    static final class SetN<E> extends AbstractImmutableSet<E>
             implements Serializable {
 
         @Stable
@@ -1108,7 +1115,8 @@ import jdk.internal.vm.annotation.Stable;
     // ---------- Map Implementations ----------
 
     @jdk.internal.ValueBased
-    @Immutable abstract static class AbstractImmutableMap<K extends @Immutable Object,V> extends AbstractMap<K,V> implements Serializable {
+    @Immutable
+    abstract static class AbstractImmutableMap<K extends @Immutable Object,V> extends AbstractMap<K,V> implements Serializable {
         @Override public void clear() { throw uoe(); }
         @Override public @PolyNull V compute(K key, BiFunction<? super K,? super V,? extends @PolyNull V> rf) { throw uoe(); }
         @Override public @PolyNull V computeIfAbsent(K key, Function<? super K,? extends @PolyNull V> mf) { throw uoe(); }
@@ -1139,7 +1147,8 @@ import jdk.internal.vm.annotation.Stable;
     }
 
     @jdk.internal.ValueBased
-    @Immutable static final class Map1<K extends @Immutable Object,V> extends AbstractImmutableMap<K,V> {
+    @Immutable
+    static final class Map1<K extends @Immutable Object,V> extends AbstractImmutableMap<K,V> {
         @Stable
         private final K k0;
         @Stable
@@ -1210,7 +1219,8 @@ import jdk.internal.vm.annotation.Stable;
      * @param <V> the value type
      */
     @jdk.internal.ValueBased
-    @Immutable static final class MapN<K extends @Immutable Object,V> extends AbstractImmutableMap<K,V> {
+    @Immutable
+    static final class MapN<K extends @Immutable Object,V> extends AbstractImmutableMap<K,V> {
 
         @Stable
         final @Readonly Object[] table; // pairs of key, value

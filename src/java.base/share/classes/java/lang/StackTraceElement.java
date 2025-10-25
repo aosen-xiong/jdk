@@ -28,6 +28,7 @@ package java.lang;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.checker.signature.qual.FullyQualifiedName;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
@@ -60,6 +61,7 @@ import java.util.Set;
  * @author Josh Bloch
  */
 @AnnotatedFor({"lock", "nullness", "pico", "signature"})
+@Immutable
 public final class StackTraceElement implements java.io.Serializable {
 
     // For Throwables and StackWalker, the VM initially sets this field to a
@@ -416,7 +418,7 @@ public final class StackTraceElement implements java.io.Serializable {
      * @revised 9
      */
     @Pure
-    public boolean equals(@GuardSatisfied StackTraceElement this, @GuardSatisfied @Nullable Object obj) {
+    public boolean equals(@GuardSatisfied StackTraceElement this, @GuardSatisfied @Nullable @Readonly Object obj) {
         if (obj==this)
             return true;
         return (obj instanceof StackTraceElement e)

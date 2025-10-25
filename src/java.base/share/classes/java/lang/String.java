@@ -43,6 +43,7 @@ import org.checkerframework.checker.nonempty.qual.EnsuresNonEmptyIf;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.LazyFinal;
 import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.checker.regex.qual.PolyRegex;
 import org.checkerframework.checker.regex.qual.Regex;
@@ -207,13 +208,13 @@ public final class String
     private final byte coder;
 
     /** Cache the hash code for the string */
-    private int hash; // Default to 0
+    private @LazyFinal  int hash; // Default to 0
 
     /**
      * Cache if the hash has been calculated as actually being zero, enabling
      * us to avoid recalculating this.
      */
-    private boolean hashIsZero; // Default to false;
+    private @LazyFinal boolean hashIsZero; // Default to false;
 
     /** use serialVersionUID from JDK 1.0.2 for interoperability */
     @java.io.Serial
@@ -315,7 +316,7 @@ public final class String
      */
     @SideEffectFree
     @StaticallyExecutable
-    public @PolyValue @Unique String(char value @GuardSatisfied @PolyValue []) {
+    public @PolyValue @Unique String(char value @GuardSatisfied @PolyValue @Immutable []) {
         this(value, 0, value.length, null);
     }
 
@@ -342,11 +343,11 @@ public final class String
      */
     @SideEffectFree
     @StaticallyExecutable
-    public @Unique String(char value @GuardSatisfied [], @IndexOrHigh({"#1"}) int offset, @LTLengthOf(value={"#1"}, offset={"#2 - 1"}) @NonNegative int count) {
+    public @Unique String(char value @GuardSatisfied @Immutable [], @IndexOrHigh({"#1"}) int offset, @LTLengthOf(value={"#1"}, offset={"#2 - 1"}) @NonNegative int count) {
         this(value, offset, count, rangeCheck(value, offset, count));
     }
 
-    private static Void rangeCheck(char[] value, int offset, int count) {
+    private static Void rangeCheck(char @Readonly [] value, int offset, int count) {
         checkBoundsOffCount(offset, count, value.length);
         return null;
     }
@@ -444,6 +445,7 @@ public final class String
     @SideEffectFree
     @StaticallyExecutable
     @Deprecated(since="1.1")
+    @SuppressWarnings("pico:assignment.type.incompatible") // cast from @Unique @Mutable to @Immutable
     public @Unique String(byte ascii @GuardSatisfied [], int hibyte, @IndexOrHigh({"#1"}) int offset, @LTLengthOf(value={"#1"}, offset={"#2 - 1"}) @NonNegative int count) {
         checkBoundsOffCount(offset, count, ascii.length);
         if (count == 0) {
@@ -537,7 +539,7 @@ public final class String
      */
     @SideEffectFree
     @StaticallyExecutable
-    public @Unique String(@PolySigned byte @GuardSatisfied [] bytes, @IndexOrHigh({"#1"}) int offset, @LTLengthOf(value={"#1"}, offset={"#2 - 1"}) @NonNegative int length, String charsetName)
+    public @Unique String(@PolySigned byte @GuardSatisfied @Immutable [] bytes, @IndexOrHigh({"#1"}) int offset, @LTLengthOf(value={"#1"}, offset={"#2 - 1"}) @NonNegative int length, String charsetName)
             throws UnsupportedEncodingException {
         this(bytes, offset, length, lookupCharset(charsetName));
     }
@@ -574,8 +576,8 @@ public final class String
      */
     @SideEffectFree
     @StaticallyExecutable
-    @SuppressWarnings("removal")
-    public @Unique String(@PolySigned byte @GuardSatisfied [] bytes, @IndexOrHigh({"#1"}) int offset, @LTLengthOf(value={"#1"}, offset={"#2 - 1"}) @NonNegative int length, Charset charset) {
+    @SuppressWarnings({"removal", "pico"}) // cast from @Unique @Mutable to @Immutable
+    public @Unique String(@PolySigned byte @GuardSatisfied @Immutable [] bytes, @IndexOrHigh({"#1"}) int offset, @LTLengthOf(value={"#1"}, offset={"#2 - 1"}) @NonNegative int length, Charset charset) {
         Objects.requireNonNull(charset);
         checkBoundsOffCount(offset, length, bytes.length);
         if (length == 0) {
@@ -735,6 +737,7 @@ public final class String
     /*
      * Throws iae, instead of replacing, if malformed or unmappable.
      */
+    @SuppressWarnings("pico") // cast from @Unique @Mutable to @Immutable
     static String newStringUTF8NoRepl(byte[] bytes, int offset, int length) {
         checkBoundsOffCount(offset, length, bytes.length);
         if (length == 0) {
@@ -803,7 +806,7 @@ public final class String
         }
     }
 
-    @SuppressWarnings("removal")
+    @SuppressWarnings({"removal", "pico"}) // cast from @Unique @Mutable to @Immutable
     private static String newStringNoRepl1(byte[] src, Charset cs) {
         int len = src.length;
         if (len == 0) {
@@ -877,7 +880,7 @@ public final class String
         }
     }
 
-    private static byte[] encode(Charset cs, byte coder, byte[] val) {
+    private static byte[] encode(Charset cs, byte coder, byte @Readonly [] val) {
         if (cs == UTF_8.INSTANCE) {
             return encodeUTF8(coder, val, true);
         }
@@ -890,7 +893,7 @@ public final class String
         return encodeWithEncoder(cs, coder, val, true);
     }
 
-    private static byte[] encodeWithEncoder(Charset cs, byte coder, byte[] val, boolean doReplace) {
+    private static byte[] encodeWithEncoder(Charset cs, byte coder, byte @Readonly [] val, boolean doReplace) {
         CharsetEncoder ce = cs.newEncoder();
         int len = val.length >> coder;  // assume LATIN1=0/UTF16=1;
         int en = scale(len, ce.maxBytesPerChar());
@@ -1000,7 +1003,7 @@ public final class String
         return encodeWithEncoder(cs, coder, val, false);
     }
 
-    private static byte[] encodeASCII(byte coder, byte[] val) {
+    private static byte[] encodeASCII(byte coder, byte @Readonly [] val) {
         if (coder == LATIN1) {
             byte[] dst = Arrays.copyOf(val, val.length);
             for (int i = 0; i < dst.length; i++) {
@@ -1146,7 +1149,7 @@ public final class String
                                 ((byte) 0x80 <<  0))));
     }
 
-    private static int decodeUTF8_UTF16(byte[] src, int sp, int sl, byte[] dst, int dp, boolean doReplace) {
+    private static int decodeUTF8_UTF16(byte @Readonly [] src, int sp, int sl, byte[] dst, int dp, boolean doReplace) {
         while (sp < sl) {
             int b1 = src[sp++];
             if (b1 >= 0) {
@@ -1253,7 +1256,7 @@ public final class String
         return dp;
     }
 
-    private static int decodeWithDecoder(CharsetDecoder cd, char[] dst, byte[] src, int offset, int length) {
+    private static int decodeWithDecoder(CharsetDecoder cd, char[] dst, byte @Readonly [] src, int offset, int length) {
         ByteBuffer bb = ByteBuffer.wrap(src, offset, length);
         CharBuffer cb = CharBuffer.wrap(dst, 0, dst.length);
         try {
@@ -1271,14 +1274,14 @@ public final class String
         return cb.position();
     }
 
-    private static int malformed3(byte[] src, int sp) {
+    private static int malformed3(byte @Readonly [] src, int sp) {
         int b1 = src[sp++];
         int b2 = src[sp];    // no need to lookup b3
         return ((b1 == (byte)0xe0 && (b2 & 0xe0) == 0x80) ||
                 isNotContinuation(b2)) ? 1 : 2;
     }
 
-    private static int malformed4(byte[] src, int sp) {
+    private static int malformed4(byte @Readonly [] src, int sp) {
         // we don't care the speed here
         int b1 = src[sp++] & 0xff;
         int b2 = src[sp++] & 0xff;
@@ -1314,7 +1317,7 @@ public final class String
         throwUnmappable(dp);
     }
 
-    private static byte[] encodeUTF8(byte coder, byte[] val, boolean doReplace) {
+    private static byte[] encodeUTF8(byte coder, byte @Readonly [] val, boolean doReplace) {
         if (coder == UTF16)
             return encodeUTF8_UTF16(val, doReplace);
 
@@ -1336,7 +1339,7 @@ public final class String
         return Arrays.copyOf(dst, dp);
     }
 
-    private static byte[] encodeUTF8_UTF16(byte[] val, boolean doReplace) {
+    private static byte[] encodeUTF8_UTF16(byte @Readonly [] val, boolean doReplace) {
         int dp = 0;
         int sp = 0;
         int sl = val.length >> 1;
@@ -1412,7 +1415,7 @@ public final class String
      */
     @SideEffectFree
     @StaticallyExecutable
-    public @Unique String(@PolySigned byte bytes @GuardSatisfied [], String charsetName)
+    public @Unique String(@PolySigned byte bytes @GuardSatisfied @Immutable [], String charsetName)
             throws UnsupportedEncodingException {
         this(bytes, 0, bytes.length, charsetName);
     }
@@ -1439,7 +1442,7 @@ public final class String
      */
     @SideEffectFree
     @StaticallyExecutable
-    public @Unique String(@PolySigned byte bytes @GuardSatisfied [], Charset charset) {
+    public @Unique String(@PolySigned byte bytes @GuardSatisfied @Immutable [], Charset charset) {
         this(bytes, 0, bytes.length, charset);
     }
 
@@ -1471,7 +1474,7 @@ public final class String
      */
     @SideEffectFree
     @StaticallyExecutable
-    public @Unique String(@PolySigned byte @GuardSatisfied [] bytes, @IndexOrHigh({"#1"}) int offset, @LTLengthOf(value={"#1"}, offset={"#2 - 1"}) @NonNegative int length) {
+    public @Unique String(@PolySigned byte @GuardSatisfied @Immutable [] bytes, @IndexOrHigh({"#1"}) int offset, @LTLengthOf(value={"#1"}, offset={"#2 - 1"}) @NonNegative int length) {
         this(bytes, offset, length, Charset.defaultCharset());
     }
 
@@ -2759,7 +2762,7 @@ public final class String
      * @param   tgtStr      the characters being searched for.
      * @param   fromIndex   the index to begin searching from.
      */
-    static int lastIndexOf(byte[] src, byte srcCoder, int srcCount,
+    static int lastIndexOf(byte @Readonly [] src, byte srcCoder, int srcCount,
                            String tgtStr, int fromIndex) {
         byte[] tgt = tgtStr.value;
         byte tgtCoder = tgtStr.coder();
@@ -3383,7 +3386,7 @@ public final class String
      */
     @SideEffectFree
     @StaticallyExecutable
-    public static String join(CharSequence delimiter, @Nullable CharSequence... elements) {
+    public static String join(@Readonly CharSequence delimiter, @Nullable @Readonly CharSequence... elements) {
         var delim = delimiter.toString();
         var elems = new String[elements.length];
         for (int i = 0; i < elements.length; i++) {
@@ -4428,7 +4431,7 @@ public final class String
      */
     @SideEffectFree
     @StaticallyExecutable
-    public static @NewObject @SameLen({"#1"}) @PolyValue String valueOf(char data @GuardSatisfied @PolyValue []) {
+    public static @NewObject @SameLen({"#1"}) @PolyValue String valueOf(char data @GuardSatisfied @PolyValue @Immutable []) {
         return new String(data);
     }
 
@@ -4454,7 +4457,7 @@ public final class String
      */
     @SideEffectFree
     @StaticallyExecutable
-    public static @NewObject String valueOf(char data @GuardSatisfied [], @IndexOrHigh({"#1"}) int offset, @LTLengthOf(value={"#1"}, offset={"#2 - 1"}) @NonNegative int count) {
+    public static @NewObject String valueOf(char data @GuardSatisfied @Immutable [], @IndexOrHigh({"#1"}) int offset, @LTLengthOf(value={"#1"}, offset={"#2 - 1"}) @NonNegative int count) {
         return new String(data, offset, count);
     }
 
@@ -4473,7 +4476,7 @@ public final class String
      */
     @SideEffectFree
     @StaticallyExecutable
-    public static String copyValueOf(char data @GuardSatisfied [], @IndexOrHigh({"#1"}) int offset, @LTLengthOf(value={"#1"}, offset={"#2 - 1"}) @NonNegative int count) {
+    public static String copyValueOf(char data @GuardSatisfied @Immutable [], @IndexOrHigh({"#1"}) int offset, @LTLengthOf(value={"#1"}, offset={"#2 - 1"}) @NonNegative int count) {
         return new String(data, offset, count);
     }
 
@@ -4486,7 +4489,7 @@ public final class String
      */
     @SideEffectFree
     @StaticallyExecutable
-    public static @SameLen({"#1"}) @PolyValue String copyValueOf(char data @GuardSatisfied @PolyValue []) {
+    public static @SameLen({"#1"}) @PolyValue String copyValueOf(char data @GuardSatisfied @PolyValue @Immutable []) {
         return new String(data);
     }
 
@@ -4632,6 +4635,7 @@ public final class String
      */
     @SideEffectFree
     @StaticallyExecutable
+    @SuppressWarnings("pico:argument.type.incompatible") // cast from @Unique @Mutable to @Immutable
     public String repeat(int count) {
         if (count < 0) {
             throw new IllegalArgumentException("count is negative: " + count);
@@ -4711,6 +4715,7 @@ public final class String
      * contains only latin1 character. Or a byte[] that stores all
      * characters in their byte sequences defined by the {@code StringUTF16}.
      */
+    @SuppressWarnings("pico:assignment.type.incompatible") // cast from @Unique @Mutable to @Immutable
     String(char @Immutable [] value, int off, int len, Void sig) {
         if (len == 0) {
             this.value = "".value;
@@ -4733,6 +4738,7 @@ public final class String
      * Package private constructor. Trailing Void argument is there for
      * disambiguating it against other (public) constructors.
      */
+    @SuppressWarnings("pico:assignment.type.incompatible") // cast from @Unique @Mutable to @Immutable
     String(AbstractStringBuilder asb, Void sig) {
         byte[] val = asb.getValue();
         int length = asb.length();
@@ -4765,7 +4771,7 @@ public final class String
         return COMPACT_STRINGS ? coder : UTF16;
     }
 
-    byte[] value() {
+    byte @Immutable [] value() {
         return value;
     }
 

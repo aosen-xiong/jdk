@@ -102,7 +102,7 @@ public interface CharSequence {
      *          {@code length()}
      */
     @Pure
-    char charAt(@IndexFor({"this"}) int index);
+    char charAt(@Readonly CharSequence this, @IndexFor({"this"}) int index);
 
     /**
      * Returns {@code true} if this character sequence is empty.

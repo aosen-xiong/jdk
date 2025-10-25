@@ -31,7 +31,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.checker.pico.qual.Mutable;
 import org.checkerframework.checker.pico.qual.Readonly;
-import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 
@@ -61,7 +60,7 @@ import jdk.internal.vm.annotation.Stable;
  * @since 9
  */
 @jdk.internal.ValueBased
-@ReceiverDependentMutable
+@Immutable
 final class KeyValueHolder<K extends @Immutable Object,V> implements Map.Entry<K,V> {
     @Stable
     final K key;

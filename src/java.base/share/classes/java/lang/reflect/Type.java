@@ -25,6 +25,8 @@
 
 package java.lang.reflect;
 
+import org.checkerframework.checker.pico.qual.Immutable;
+
 /**
  * Type is the common superinterface for all types in the Java
  * programming language. These include raw types, parameterized types,
@@ -40,6 +42,7 @@ package java.lang.reflect;
  * @jls 10.1 Array Types
  * @since 1.5
  */
+@Immutable
 public interface Type {
     /**
      * Returns a string describing this type, including information

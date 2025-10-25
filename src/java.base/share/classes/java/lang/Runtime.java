@@ -28,6 +28,7 @@ package java.lang;
 
 import org.checkerframework.checker.interning.qual.UsesObjectEquals;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.checker.tainting.qual.Untainted;
 import org.checkerframework.dataflow.qual.TerminatesExecution;
 import org.checkerframework.framework.qual.AnnotatedFor;
@@ -833,6 +834,7 @@ public @UsesObjectEquals class Runtime {
      *
      * @since  9
      */
+    @SuppressWarnings("pico:argument.type.incompatible") //AOSEN: there is no VersionProps in our JDK?
     public static Version version() {
         var v = version;
         if (v == null) {
@@ -970,6 +972,7 @@ public @UsesObjectEquals class Runtime {
      * @since  9
      */
     @jdk.internal.ValueBased
+    @Immutable
     public static final class Version
         implements Comparable<Version>
     {
@@ -984,7 +987,7 @@ public @UsesObjectEquals class Runtime {
          * unmodifiable list, the caller MUST hand the list over to this
          * constructor and never change the underlying list.
          */
-        private Version(List<Integer> unmodifiableListOfVersions,
+        private Version(@Immutable List<Integer> unmodifiableListOfVersions,
                         Optional<String> pre,
                         Optional<Integer> build,
                         Optional<String> optional)
@@ -1195,7 +1198,7 @@ public @UsesObjectEquals class Runtime {
          * @return  An unmodifiable list of the integers
          *          represented in the version number
          */
-        public List<Integer> version() {
+        public @Immutable List<Integer> version() {
             return version;
         }
 

@@ -25,6 +25,7 @@
 
 package java.lang.reflect;
 
+import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
 /**
@@ -33,6 +34,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @since 1.5
  */
 @AnnotatedFor({"nullness"})
+@Immutable
 public interface GenericDeclaration extends AnnotatedElement {
     /**
      * Returns an array of {@code TypeVariable} objects that

@@ -36,6 +36,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import org.checkerframework.checker.pico.qual.Immutable;
+
 /**
  * A stack walker.
  *
@@ -88,6 +90,8 @@ import java.util.stream.Stream;
  *
  * @since 9
  */
+
+@Immutable
 public final class StackWalker {
     /**
      * A {@code StackFrame} object represents a method invocation returned by
@@ -290,7 +294,7 @@ public final class StackWalker {
         LOCALS_AND_OPERANDS
     };
 
-    static final EnumSet<Option> DEFAULT_EMPTY_OPTION = EnumSet.noneOf(Option.class);
+    static final @Immutable EnumSet<Option> DEFAULT_EMPTY_OPTION = EnumSet.noneOf(Option.class);
 
     private static final StackWalker DEFAULT_WALKER =
         new StackWalker(DEFAULT_EMPTY_OPTION);
@@ -358,7 +362,7 @@ public final class StackWalker {
      * @throws SecurityException if a security manager exists and its
      *         {@code checkPermission} method denies access.
      */
-    public static StackWalker getInstance(Set<Option> options) {
+    public static StackWalker getInstance(@Immutable Set<Option> options) {
         if (options.isEmpty()) {
             return DEFAULT_WALKER;
         }
@@ -395,7 +399,7 @@ public final class StackWalker {
      * @throws SecurityException if a security manager exists and its
      *         {@code checkPermission} method denies access.
      */
-    public static StackWalker getInstance(Set<Option> options, int estimateDepth) {
+    public static StackWalker getInstance(@Immutable Set<Option> options, int estimateDepth) {
         if (estimateDepth <= 0) {
             throw new IllegalArgumentException("estimateDepth must be > 0");
         }
@@ -405,20 +409,20 @@ public final class StackWalker {
     }
 
     // ----- private constructors ------
-    private StackWalker(EnumSet<Option> options) {
+    private StackWalker(@Immutable EnumSet<Option> options) {
         this(options, 0, null);
     }
-    private StackWalker(EnumSet<Option> options, int estimateDepth) {
+    private StackWalker(@Immutable EnumSet<Option> options, int estimateDepth) {
         this(options, estimateDepth, null);
     }
-    private StackWalker(EnumSet<Option> options, int estimateDepth, ExtendedOption extendedOption) {
+    private StackWalker(@Immutable EnumSet<Option> options, int estimateDepth, ExtendedOption extendedOption) {
         this.options = options;
         this.estimateDepth = estimateDepth;
         this.extendedOption = extendedOption;
         this.retainClassRef = hasOption(Option.RETAIN_CLASS_REFERENCE);
     }
 
-    private static void checkPermission(Set<Option> options) {
+    private static void checkPermission(@Immutable Set<Option> options) {
         Objects.requireNonNull(options);
         @SuppressWarnings("removal")
         SecurityManager sm = System.getSecurityManager();
@@ -432,7 +436,8 @@ public final class StackWalker {
     /*
      * Returns a defensive copy
      */
-    private static EnumSet<Option> toEnumSet(Set<Option> options) {
+    @SuppressWarnings("pico:return.type.incompatible") // cast from @Unique @Mutable to @Immutable
+    private static @Immutable EnumSet<Option> toEnumSet(@Immutable Set<Option> options) {
         Objects.requireNonNull(options);
         if (options.isEmpty()) {
             return DEFAULT_EMPTY_OPTION;
@@ -605,7 +610,7 @@ public final class StackWalker {
 
     // ---- package access ----
 
-    static StackWalker newInstance(Set<Option> options, ExtendedOption extendedOption) {
+    static StackWalker newInstance(@Immutable Set<Option> options, ExtendedOption extendedOption) {
         EnumSet<Option> optionSet = toEnumSet(options);
         checkPermission(optionSet);
         return new StackWalker(optionSet, 0, extendedOption);

@@ -639,7 +639,8 @@ final class StringUTF16 {
         return -1;
     }
 
-    public static String replace(byte[] value, char oldChar, char newChar) {
+    @SuppressWarnings("pico:argument.type.incompatible") // cast from @Unique @Mutable to @Immutable
+    public static String replace(byte @Readonly [] value, char oldChar, char newChar) {
         int len = value.length >> 1;
         int i = -1;
         while (++i < len) {
@@ -671,7 +672,8 @@ final class StringUTF16 {
         return null;
     }
 
-    public static String replace(byte[] value, int valLen, boolean valLat1,
+    @SuppressWarnings("pico:argument.type.incompatible") // cast from @Unique @Mutable to @Immutable
+    public static String replace(byte @Readonly [] value, int valLen, boolean valLat1,
                                  byte[] targ, int targLen, boolean targLat1,
                                  byte[] repl, int replLen, boolean replLat1)
     {
@@ -798,6 +800,7 @@ final class StringUTF16 {
         return StringLatin1.regionMatchesCI_UTF16(other, ooffset, value, toffset, len);
     }
 
+    @SuppressWarnings("pico:argument.type.incompatible") // cast from @Unique @Mutable to @Immutable
     public static String toLowerCase(String str, byte @Readonly [] value, Locale locale) {
         if (locale == null) {
             throw new NullPointerException();
@@ -902,6 +905,7 @@ final class StringUTF16 {
         return newString(result, 0, resultOffset);
     }
 
+    @SuppressWarnings("pico:argument.type.incompatible") // cast from @Unique @Mutable to @Immutable
     public static String toUpperCase(String str, byte @Readonly [] value, Locale locale) {
         if (locale == null) {
             throw new NullPointerException();
@@ -1172,6 +1176,7 @@ final class StringUTF16 {
         }
     }
 
+    @SuppressWarnings("pico:argument.type.incompatible") // cast from @Unique @Mutable to @Immutable
     public static String newString(byte @Readonly [] val, int index, int len) {
         if (len == 0) {
             return "";
@@ -1350,7 +1355,7 @@ final class StringUTF16 {
         putChars(val, index, ca, off, end);
     }
 
-    public static void putCharsSB(byte[] val, int index, CharSequence s, int off, int end) {
+    public static void putCharsSB(byte[] val, int index, @Readonly CharSequence s, int off, int end) {
         checkBoundsBeginEnd(index, index + end - off, val);
         for (int i = off; i < end; i++) {
             putChar(val, index++, s.charAt(i));
@@ -1369,14 +1374,15 @@ final class StringUTF16 {
         return codePointCount(val, beginIndex, endIndex, true /* checked */);
     }
 
-    public static int getChars(int i, int begin, int end, byte @Readonly [] value) {
+    public static int getChars(int i, int begin, int end, byte[] value) {
         checkBoundsBeginEnd(begin, end, value);
         int pos = getChars(i, end, value);
         assert begin == pos;
         return pos;
     }
 
-    public static int getChars(long l, int begin, int end, byte @Readonly [] value) {
+    // AOSEN: value array need to mutable
+    public static int getChars(long l, int begin, int end, byte[] value) {
         checkBoundsBeginEnd(begin, end, value);
         int pos = getChars(l, end, value);
         assert begin == pos;

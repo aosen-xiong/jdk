@@ -31,6 +31,8 @@ import org.checkerframework.checker.nullness.qual.UnknownKeyFor;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.lock.qual.GuardedByUnknown;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.checker.tainting.qual.Tainted;
 import org.checkerframework.common.value.qual.PolyValue;
 import org.checkerframework.dataflow.qual.Pure;
@@ -87,6 +89,7 @@ import static java.util.Objects.requireNonNull;
 @Covariant(0)
 @SuppressWarnings("serial") // No serialVersionUID needed due to
                             // special-casing of enum classes.
+@ReceiverDependentMutable
 public abstract class Enum<E extends Enum<E>>
         implements Constable, Comparable<E>, Serializable {
     /**
@@ -322,6 +325,7 @@ public abstract class Enum<E extends Enum<E>>
      *
      * @since 12
      */
+    @Immutable
     public static final class EnumDesc<E extends Enum<E>>
             extends DynamicConstantDesc<E> {
 

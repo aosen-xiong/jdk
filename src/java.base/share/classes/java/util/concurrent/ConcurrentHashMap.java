@@ -48,6 +48,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
 import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.checker.pico.qual.Readonly;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.checker.signedness.qual.PolySigned;
 import org.checkerframework.checker.signedness.qual.UnknownSignedness;
 import org.checkerframework.dataflow.qual.Pure;
@@ -281,6 +282,7 @@ import jdk.internal.misc.Unsafe;
  * @param <V> the type of mapped values
  */
 @AnnotatedFor({"nullness"})
+@ReceiverDependentMutable
 public class ConcurrentHashMap<K extends @NonNull @Immutable Object,V extends @NonNull @Readonly Object> extends AbstractMap<K,V>
     implements ConcurrentMap<K,V>, Serializable {
     private static final long serialVersionUID = 7249069246763182397L;
@@ -1380,7 +1382,7 @@ public class ConcurrentHashMap<K extends @NonNull @Immutable Object,V extends @N
      */
     @Pure
     @EnsuresNonNullIf(expression="#1", result=true)
-    public boolean equals(@Nullable Object o) {
+    public boolean equals(@Nullable @Readonly Object o) {
         if (o != this) {
             if (!(o instanceof Map))
                 return false;
@@ -1580,7 +1582,7 @@ public class ConcurrentHashMap<K extends @NonNull @Immutable Object,V extends @N
      *
      * @throws NullPointerException if the specified key is null
      */
-    public boolean remove(@GuardSatisfied @UnknownSignedness Object key, @GuardSatisfied @UnknownSignedness Object value) {
+    public boolean remove(@GuardSatisfied @UnknownSignedness @Readonly Object key, @GuardSatisfied @UnknownSignedness @Readonly Object value) {
         if (key == null)
             throw new NullPointerException();
         return value != null && replaceNode(key, null, value) != null;

@@ -26,6 +26,7 @@ package java.util;
 
 import org.checkerframework.checker.lock.qual.ReleasesNoLocks;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.framework.qual.AnnotatedFor;
@@ -110,7 +111,7 @@ public final class StringJoiner {
      * @throws NullPointerException if {@code delimiter} is {@code null}
      */
     @SideEffectFree
-    public StringJoiner(CharSequence delimiter) {
+    public StringJoiner(@Readonly CharSequence delimiter) {
         this(delimiter, "", "");
     }
 

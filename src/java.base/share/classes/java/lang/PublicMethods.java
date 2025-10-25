@@ -33,6 +33,9 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.checkerframework.checker.pico.qual.Immutable;
+
+
 /**
  * A collection of most specific public methods. Methods are added to it using
  * {@link #merge(Method)} method. Only the most specific methods for a
@@ -87,6 +90,7 @@ final class PublicMethods {
     /**
      * Method (name, parameter types) tuple.
      */
+    @Immutable
     private static final class Key {
         @SuppressWarnings("removal")
         private static final ReflectionFactory reflectionFactory =

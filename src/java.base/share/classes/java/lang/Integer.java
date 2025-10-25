@@ -32,6 +32,7 @@ import org.checkerframework.checker.index.qual.Positive;
 import org.checkerframework.checker.lock.qual.NewObject;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
+import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.checker.signedness.qual.PolySigned;
 import org.checkerframework.checker.signedness.qual.SignedPositive;
 import org.checkerframework.checker.signedness.qual.SignednessGlb;
@@ -90,8 +91,9 @@ import static java.lang.String.UTF16;
  * @author  Joseph D. Darcy
  * @since 1.0
  */
-@AnnotatedFor({"index", "initialization", "nullness", "lock", "signedness", "value"})
+@AnnotatedFor({"index", "initialization", "nullness", "lock", "pico", "signedness", "value"})
 @jdk.internal.ValueBased
+@Immutable
 public final class Integer extends Number
         implements Comparable<Integer>, Constable, ConstantDesc {
     /**
@@ -394,6 +396,7 @@ public final class Integer extends Number
     /**
      * Convert the integer to an unsigned number.
      */
+    @SuppressWarnings("pico:argument.type.incompatible") // cast from @Unique @Mutable to @Immutable
     private static String toUnsignedString0(@Unsigned int val, @IntVal({1, 2, 3, 4}) int shift) {
         // assert shift > 0 && shift <=5 : "Illegal shift value";
         int mag = Integer.SIZE - Integer.numberOfLeadingZeros(val);
@@ -489,6 +492,7 @@ public final class Integer extends Number
     @SideEffectFree
     @StaticallyExecutable
     @IntrinsicCandidate
+    @SuppressWarnings("pico:argument.type.incompatible") // cast from @Unique @Mutable to @Immutable
     public static @ArrayLenRange(from = 1, to = 11) String toString(int i) {
         int size = stringSize(i);
         if (COMPACT_STRINGS) {

@@ -33,7 +33,8 @@ import org.checkerframework.checker.index.qual.Positive;
 import org.checkerframework.checker.interning.qual.UsesObjectEquals;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.checkerframework.checker.pico.qual.Mutable;
+import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.framework.qual.AnnotatedFor;
@@ -192,7 +193,7 @@ abstract @UsesObjectEquals class AbstractStringBuilder implements Appendable, Ch
      */
     @Pure
     @Override
-    public @NonNegative int length(@GuardSatisfied AbstractStringBuilder this) {
+    public @NonNegative int length(@GuardSatisfied @Readonly AbstractStringBuilder this) {
         return count;
     }
 
@@ -203,7 +204,7 @@ abstract @UsesObjectEquals class AbstractStringBuilder implements Appendable, Ch
      *
      * @return  the current capacity
      */
-    public @NonNegative int capacity() {
+    public @NonNegative int capacity(@Readonly AbstractStringBuilder this) {
         return value.length >> coder;
     }
 
@@ -223,7 +224,7 @@ abstract @UsesObjectEquals class AbstractStringBuilder implements Appendable, Ch
      *
      * @param   minimumCapacity   the minimum desired capacity.
      */
-    public void ensureCapacity(@NonNegative int minimumCapacity) {
+    public void ensureCapacity(@Readonly AbstractStringBuilder this, @NonNegative int minimumCapacity) {
         if (minimumCapacity > 0) {
             ensureCapacityInternal(minimumCapacity);
         }
@@ -236,7 +237,7 @@ abstract @UsesObjectEquals class AbstractStringBuilder implements Appendable, Ch
      * If {@code minimumCapacity} is non positive due to numeric
      * overflow, this method throws {@code OutOfMemoryError}.
      */
-    private void ensureCapacityInternal(@NonNegative int minimumCapacity) {
+    private void ensureCapacityInternal(@Readonly AbstractStringBuilder this, @NonNegative int minimumCapacity) {
         // overflow-conscious code
         int oldCapacity = value.length >> coder;
         if (minimumCapacity - oldCapacity > 0) {
@@ -567,7 +568,7 @@ abstract @UsesObjectEquals class AbstractStringBuilder implements Appendable, Ch
      * @param   obj   an {@code Object}.
      * @return  a reference to this object.
      */
-    public AbstractStringBuilder append(@GuardSatisfied @Nullable Object obj) {
+    public AbstractStringBuilder append(@GuardSatisfied @Nullable @Readonly Object obj) {
         return append(String.valueOf(obj));
     }
 
@@ -1063,7 +1064,7 @@ abstract @UsesObjectEquals class AbstractStringBuilder implements Appendable, Ch
      *          or if {@code start} is greater than {@code end}
      */
     @Override
-    public CharSequence subSequence(@NonNegative int start, @NonNegative int end) {
+    public @Immutable CharSequence subSequence(@NonNegative int start, @NonNegative int end) {
         return substring(start, end);
     }
 
@@ -1146,7 +1147,7 @@ abstract @UsesObjectEquals class AbstractStringBuilder implements Appendable, Ch
      * @return     a reference to this object.
      * @throws     StringIndexOutOfBoundsException  if the offset is invalid.
      */
-    public AbstractStringBuilder insert(@NonNegative int offset, @GuardSatisfied @Nullable Object obj) {
+    public AbstractStringBuilder insert(@NonNegative int offset, @GuardSatisfied @Nullable @Readonly Object obj) {
         return insert(offset, String.valueOf(obj));
     }
 
@@ -1249,7 +1250,7 @@ abstract @UsesObjectEquals class AbstractStringBuilder implements Appendable, Ch
      * @return     a reference to this object.
      * @throws     IndexOutOfBoundsException  if the offset is invalid.
      */
-    public AbstractStringBuilder insert(@NonNegative int dstOffset, @Nullable CharSequence s) {
+    public AbstractStringBuilder insert(@NonNegative int dstOffset, @Nullable @Immutable CharSequence s) {
         if (s == null) {
             s = "null";
         }
@@ -1300,7 +1301,7 @@ abstract @UsesObjectEquals class AbstractStringBuilder implements Appendable, Ch
      *              {@code start} is greater than {@code end} or
      *              {@code end} is greater than {@code s.length()}
      */
-    public AbstractStringBuilder insert(@NonNegative int dstOffset, @Nullable CharSequence s,
+    public AbstractStringBuilder insert(@NonNegative int dstOffset, @Nullable @Immutable CharSequence s,
                                         @IndexOrHigh({"#2"}) int start, @IndexOrHigh({"#2"}) int end)
     {
         if (s == null) {

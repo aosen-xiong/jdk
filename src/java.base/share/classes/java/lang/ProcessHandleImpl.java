@@ -27,6 +27,8 @@ package java.lang;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 
@@ -54,6 +56,7 @@ import java.util.stream.Stream;
  * @since 9
  */
 @jdk.internal.ValueBased
+@Immutable
 final class ProcessHandleImpl implements ProcessHandle {
     /**
      * Default size of stack for reaper processes.
@@ -528,7 +531,7 @@ final class ProcessHandleImpl implements ProcessHandle {
     @Override
     @Pure
     @EnsuresNonNullIf(expression="#1", result=true)
-    public boolean equals(@Nullable Object obj) {
+    public boolean equals(@Nullable @Readonly Object obj) {
         if (this == obj) {
             return true;
         }

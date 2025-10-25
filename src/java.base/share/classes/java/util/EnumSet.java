@@ -27,6 +27,7 @@ package java.util;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.pico.qual.Mutable;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
@@ -82,6 +83,7 @@ import jdk.internal.access.SharedSecrets;
  * @see EnumMap
  */
 @AnnotatedFor({"index", "initialization", "nullness"})
+@ReceiverDependentMutable
 public abstract class EnumSet<E extends Enum<E>> extends AbstractSet<E>
     implements Cloneable, java.io.Serializable
 {
@@ -155,7 +157,7 @@ public abstract class EnumSet<E extends Enum<E>> extends AbstractSet<E>
      * @return A copy of the specified enum set.
      * @throws NullPointerException if {@code s} is null
      */
-    public static <E extends Enum<E>> EnumSet<E> copyOf(EnumSet<E> s) {
+    public static <E extends Enum<E>> EnumSet<E> copyOf(@Readonly EnumSet<E> s) {
         return s.clone();
     }
 
@@ -173,7 +175,7 @@ public abstract class EnumSet<E extends Enum<E>> extends AbstractSet<E>
      *     {@code EnumSet} instance and contains no elements
      * @throws NullPointerException if {@code c} is null
      */
-    public static <E extends Enum<E>> EnumSet<E> copyOf(Collection<E> c) {
+    public static <E extends Enum<E>> EnumSet<E> copyOf(@Readonly Collection<E> c) {
         if (c instanceof EnumSet) {
             return ((EnumSet<E>)c).clone();
         } else {

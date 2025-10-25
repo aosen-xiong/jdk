@@ -231,7 +231,7 @@ final class StringLatin1 {
     }
 
     @IntrinsicCandidate
-    public static int indexOf(byte @Readonly [] value, byte[] str) {
+    public static int indexOf(byte @Readonly [] value, byte @Readonly [] str) {
         if (str.length == 0) {
             return 0;
         }
@@ -305,7 +305,8 @@ final class StringLatin1 {
         return -1;
     }
 
-    public static String replace(byte[] value, char oldChar, char newChar) {
+    @SuppressWarnings("pico:argument.type.incompatible") // cast from @Unique @Mutable to @Immutable
+    public static String replace(byte @Readonly [] value, char oldChar, char newChar) {
         if (canEncode(oldChar)) {
             int len = value.length;
             int i = -1;
@@ -342,6 +343,7 @@ final class StringLatin1 {
         return null; // for string to return this;
     }
 
+    @SuppressWarnings("pico:argument.type.incompatible") // cast from @Unique @Mutable to @Immutable
     public static String replace(byte @Readonly [] value, int valLen, byte @Readonly [] targ,
                                  int targLen, byte @Readonly [] repl, int replLen)
     {
@@ -470,6 +472,7 @@ final class StringLatin1 {
         return new String(result, LATIN1);
     }
 
+    @SuppressWarnings("pico:argument.type.incompatible") // cast from @Unique @Mutable to @Immutable
     private static String toLowerCaseEx(String str, byte @Readonly [] value,
                                         int first, Locale locale, boolean localeDependent)
     {
@@ -769,6 +772,7 @@ final class StringLatin1 {
         return new byte[] { (byte)c };
     }
 
+    @SuppressWarnings("pico:argument.type.incompatible") // cast from @Unique @Mutable to @Immutable
     public static String newString(byte @Readonly [] val, int index, int len) {
         if (len == 0) {
             return "";

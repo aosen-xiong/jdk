@@ -34,6 +34,7 @@ import org.checkerframework.checker.index.qual.Positive;
 import org.checkerframework.checker.interning.qual.Interned;
 import org.checkerframework.checker.lock.qual.NewObject;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.checker.signedness.qual.SignedPositive;
 import org.checkerframework.checker.signedness.qual.SignednessGlb;
 import org.checkerframework.common.value.qual.ArrayLen;
@@ -193,6 +194,7 @@ import static java.lang.constant.ConstantDescs.DEFAULT_NAME;
  */
 @AnnotatedFor({"index", "initialization", "interning", "nullness", "value"})
 @jdk.internal.ValueBased
+@Immutable
 public final
 class Character implements java.io.Serializable, Comparable<Character>, Constable {
     /**

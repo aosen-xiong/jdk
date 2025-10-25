@@ -26,6 +26,8 @@
 package java.lang.reflect;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Readonly;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
@@ -38,6 +40,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @since 1.1
  */
 @AnnotatedFor({"nullness"})
+@ReceiverDependentMutable
 public class InvocationTargetException extends ReflectiveOperationException {
     /**
      * Use serialVersionUID from JDK 1.1.X for interoperability
@@ -69,7 +72,7 @@ public class InvocationTargetException extends ReflectiveOperationException {
      * @param target the target exception
      */
     @SideEffectFree
-    public InvocationTargetException(@Nullable Throwable target) {
+    public InvocationTargetException(@Nullable @ReceiverDependentMutable Throwable target) {
         super((Throwable)null);  // Disallow initCause
         this.target = target;
     }
@@ -82,7 +85,7 @@ public class InvocationTargetException extends ReflectiveOperationException {
      * @param s      the detail message
      */
     @SideEffectFree
-    public InvocationTargetException(@Nullable Throwable target, @Nullable String s) {
+    public InvocationTargetException(@Nullable @ReceiverDependentMutable Throwable target, @Nullable String s) {
         super(s, null);  // Disallow initCause
         this.target = target;
     }
@@ -97,7 +100,7 @@ public class InvocationTargetException extends ReflectiveOperationException {
      *
      * @return the thrown target exception (cause of this exception).
      */
-    public @Nullable Throwable getTargetException() {
+    public @Nullable Throwable getTargetException(@Readonly InvocationTargetException this) {
         return target;
     }
 
@@ -109,7 +112,7 @@ public class InvocationTargetException extends ReflectiveOperationException {
      * @since   1.4
      */
     @Override
-    public @Nullable Throwable getCause() {
+    public @Nullable Throwable getCause(@Readonly InvocationTargetException this) {
         return target;
     }
 }

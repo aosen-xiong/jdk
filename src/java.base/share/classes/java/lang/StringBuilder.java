@@ -31,7 +31,7 @@ import org.checkerframework.checker.index.qual.LTLengthOf;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.checkerframework.checker.pico.qual.Mutable;
+import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.checker.regex.qual.PolyRegex;
 import org.checkerframework.dataflow.qual.Pure;
@@ -360,7 +360,7 @@ public final class StringBuilder
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
     @Override
-    public StringBuilder insert(@NonNegative int dstOffset, @Nullable CharSequence s) {
+    public StringBuilder insert(@NonNegative int dstOffset, @Nullable @Immutable CharSequence s) {
             super.insert(dstOffset, s);
             return this;
     }
@@ -369,7 +369,7 @@ public final class StringBuilder
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
     @Override
-    public StringBuilder insert(@NonNegative int dstOffset, @Nullable CharSequence s,
+    public StringBuilder insert(@NonNegative int dstOffset, @Nullable @Immutable CharSequence s,
                                 @NonNegative int start, @NonNegative int end)
     {
         super.insert(dstOffset, s, start, end);

@@ -26,10 +26,14 @@
 package java.lang;
 
 import org.checkerframework.checker.initialization.qual.PolyInitialized;
+import org.checkerframework.checker.initialization.qual.UnderInitialization;
 import org.checkerframework.checker.interning.qual.UsesObjectEquals;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.Mutable;
+import org.checkerframework.checker.pico.qual.LazyFinal;
+import org.checkerframework.checker.pico.qual.PolyMutable;
 import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.dataflow.qual.Pure;
@@ -221,6 +225,7 @@ public @UsesObjectEquals class Throwable implements Serializable {
      * @serial
      * @since 1.4
      */
+    @SuppressWarnings("pico:assignment.type.incompatible") // initialize field with static variable
     private StackTraceElement[] stackTrace = UNASSIGNED_STACK;
 
     /**
@@ -242,7 +247,8 @@ public @UsesObjectEquals class Throwable implements Serializable {
      * @serial
      * @since 1.7
      */
-    @SuppressWarnings("serial") // Not statically typed as Serializable
+    // PICO: sentinel list is immutable.
+    @SuppressWarnings({"serial", "pico:assignment.type.incompatible"}) // Not statically typed as Serializable
     private List<Throwable> suppressedExceptions = SUPPRESSED_SENTINEL;
 
     /** Message for trying to suppress a null exception. */
@@ -266,6 +272,7 @@ public @UsesObjectEquals class Throwable implements Serializable {
      * the stack trace data in the newly created throwable.
      */
     @SideEffectFree
+    @SuppressWarnings("pico:method.invocation.invalid") // Underinitialization or mutable
     public Throwable() {
         fillInStackTrace();
     }
@@ -282,6 +289,7 @@ public @UsesObjectEquals class Throwable implements Serializable {
      *          later retrieval by the {@link #getMessage()} method.
      */
     @SideEffectFree
+    @SuppressWarnings("pico:method.invocation.invalid") // Underinitialization or mutable
     public Throwable(@Nullable String message) {
         fillInStackTrace();
         detailMessage = message;
@@ -305,6 +313,7 @@ public @UsesObjectEquals class Throwable implements Serializable {
      * @since  1.4
      */
     @SideEffectFree
+    @SuppressWarnings("pico:method.invocation.invalid") // Underinitialization or mutable
     public Throwable(@Nullable String message, @Nullable @ReceiverDependentMutable Throwable cause) {
         fillInStackTrace();
         detailMessage = message;
@@ -329,6 +338,7 @@ public @UsesObjectEquals class Throwable implements Serializable {
      * @since  1.4
      */
     @SideEffectFree
+    @SuppressWarnings("pico:method.invocation.invalid") // Underinitialization or mutable
     public Throwable(@Nullable @ReceiverDependentMutable Throwable cause) {
         fillInStackTrace();
         detailMessage = (cause==null ? null : cause.toString());
@@ -377,6 +387,7 @@ public @UsesObjectEquals class Throwable implements Serializable {
      * @since 1.7
      */
     @SideEffectFree
+    @SuppressWarnings("pico:method.invocation.invalid") // Underinitialization or mutable
     protected Throwable(@Nullable String message, @Nullable @ReceiverDependentMutable Throwable cause,
                         boolean enableSuppression,
                         boolean writableStackTrace) {
@@ -398,7 +409,7 @@ public @UsesObjectEquals class Throwable implements Serializable {
      *          (which may be {@code null}).
      */
     @Pure
-    public @Nullable String getMessage(@ReceiverDependentMutable @GuardSatisfied Throwable this) {
+    public @Nullable String getMessage(@GuardSatisfied @Readonly Throwable this) {
         return detailMessage;
     }
 
@@ -413,7 +424,7 @@ public @UsesObjectEquals class Throwable implements Serializable {
      * @since   1.1
      */
     @SideEffectFree
-    public @Nullable String getLocalizedMessage(@ReceiverDependentMutable @GuardSatisfied Throwable this) {
+    public @Nullable String getLocalizedMessage(@GuardSatisfied @Readonly Throwable this) {
         return getMessage();
     }
 
@@ -438,7 +449,7 @@ public @UsesObjectEquals class Throwable implements Serializable {
      * @since 1.4
      */
     @Pure
-    public synchronized @Nullable @ReceiverDependentMutable Throwable getCause(@GuardSatisfied Throwable this) {
+    public synchronized @Nullable @PolyMutable Throwable getCause(@GuardSatisfied @PolyMutable Throwable this) {
         return (cause==this ? null : cause);
     }
 
@@ -478,7 +489,8 @@ public @UsesObjectEquals class Throwable implements Serializable {
      *         been called on this throwable.
      * @since  1.4
      */
-    public synchronized @PolyInitialized Throwable initCause(@PolyInitialized Throwable this, @Nullable @ReceiverDependentMutable Throwable cause) {
+    @SuppressWarnings("pico:illegal.field.write") // should the receiver be underinitialization then?
+    public synchronized @PolyInitialized @ReceiverDependentMutable Throwable initCause(@PolyInitialized Throwable this, @Nullable @ReceiverDependentMutable Throwable cause) {
         if (this.cause != this)
             throw new IllegalStateException("Can't overwrite cause with " +
                                             Objects.toString(cause, "a null"), this);
@@ -494,7 +506,7 @@ public @UsesObjectEquals class Throwable implements Serializable {
      * a stream output from an older runtime version where the cause may
      * have set to null.
      */
-    final void setCause(Throwable t) {
+    final void setCause(@Mutable Throwable this, @Mutable Throwable t) {
         this.cause = t;
     }
 
@@ -513,7 +525,7 @@ public @UsesObjectEquals class Throwable implements Serializable {
      * @return a string representation of this throwable.
      */
     @SideEffectFree
-    public String toString(@GuardSatisfied Throwable this) {
+    public String toString(@GuardSatisfied @Readonly Throwable this) {
         String s = getClass().getName();
         String message = getLocalizedMessage();
         return (message != null) ? (s + ": " + message) : s;
@@ -668,7 +680,7 @@ public @UsesObjectEquals class Throwable implements Serializable {
      *          ... 2 more
      * </pre>
      */
-    public void printStackTrace(@ReceiverDependentMutable Throwable this) {
+    public void printStackTrace(@Readonly Throwable this) {
         printStackTrace(System.err);
     }
 
@@ -677,14 +689,16 @@ public @UsesObjectEquals class Throwable implements Serializable {
      *
      * @param s {@code PrintStream} to use for output
      */
-    public void printStackTrace(@ReceiverDependentMutable Throwable this, PrintStream s) {
+    public void printStackTrace(@Readonly Throwable this, PrintStream s) {
         printStackTrace(new WrappedPrintStream(s));
     }
 
-    private void printStackTrace(@ReceiverDependentMutable Throwable this, PrintStreamOrWriter s) {
+    // AOSEN: this is annoying that I have to make the receiver type as immutable to make sure the method type check
+    @SuppressWarnings("pico:argument.type.incompatible") // Add readonly this to dejaVu set
+    private void printStackTrace(@Readonly Throwable this, PrintStreamOrWriter s) {
         // Guard against malicious overrides of Throwable.equals by
         // using a Set with identity equality semantics.
-        Set<Throwable> dejaVu = Collections.newSetFromMap(new IdentityHashMap<>());
+        Set<@Immutable Throwable> dejaVu = Collections.newSetFromMap(new IdentityHashMap<>());
         dejaVu.add(this);
 
         synchronized (s.lock()) {
@@ -767,7 +781,7 @@ public @UsesObjectEquals class Throwable implements Serializable {
         abstract Object lock();
 
         /** Prints the specified string as a line on this StreamOrWriter */
-        abstract void println(Object o);
+        abstract void println(@Readonly Object o);
     }
 
     private static class WrappedPrintStream extends PrintStreamOrWriter {
@@ -781,7 +795,7 @@ public @UsesObjectEquals class Throwable implements Serializable {
             return printStream;
         }
 
-        void println(Object o) {
+        void println(@Readonly Object o) {
             printStream.println(o);
         }
     }
@@ -797,7 +811,7 @@ public @UsesObjectEquals class Throwable implements Serializable {
             return printWriter;
         }
 
-        void println(Object o) {
+        void println(@Readonly Object o) {
             printWriter.println(o);
         }
     }
@@ -814,7 +828,7 @@ public @UsesObjectEquals class Throwable implements Serializable {
      * @return  a reference to this {@code Throwable} instance.
      * @see     java.lang.Throwable#printStackTrace()
      */
-    public synchronized Throwable fillInStackTrace() {
+    public synchronized Throwable fillInStackTrace(@UnderInitialization @Mutable Throwable this) {
         if (stackTrace != null ||
             backtrace != null /* Out of protocol state */ ) {
             fillInStackTrace(0);
@@ -893,7 +907,7 @@ public @UsesObjectEquals class Throwable implements Serializable {
      *
      * @since  1.4
      */
-    public void setStackTrace(StackTraceElement[] stackTrace) {
+    public void setStackTrace(@Mutable Throwable this, StackTraceElement[] stackTrace) {
         // Validate argument
         StackTraceElement[] defensiveCopy = stackTrace.clone();
         for (int i = 0; i < defensiveCopy.length; i++) {
@@ -929,7 +943,7 @@ public @UsesObjectEquals class Throwable implements Serializable {
      * @throws ClassNotFoundException if a serialized class cannot be loaded
      */
     @java.io.Serial
-    private void readObject(ObjectInputStream s)
+    private void readObject(@Mutable Throwable this, ObjectInputStream s)
         throws IOException, ClassNotFoundException {
         s.defaultReadObject();     // read in all fields
 
@@ -1021,7 +1035,7 @@ public @UsesObjectEquals class Throwable implements Serializable {
      * @throws IOException if an I/O error occurs
      */
     @java.io.Serial
-    private synchronized void writeObject(ObjectOutputStream s)
+    private synchronized void writeObject(@Mutable Throwable this, ObjectOutputStream s)
         throws IOException {
         // Ensure that the stackTrace field is initialized to a
         // non-null value, if appropriate.  As of JDK 7, a null stack
@@ -1089,7 +1103,7 @@ public @UsesObjectEquals class Throwable implements Serializable {
      * @throws NullPointerException if {@code exception} is {@code null}
      * @since 1.7
      */
-    public final synchronized void addSuppressed(Throwable exception) {
+    public final synchronized void addSuppressed(@Mutable Throwable this, Throwable exception) {
         if (exception == this)
             throw new IllegalArgumentException(SELF_SUPPRESSION_MESSAGE, exception);
 

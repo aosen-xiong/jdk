@@ -32,6 +32,7 @@ import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.lock.qual.ReleasesNoLocks;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
+import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.framework.qual.AnnotatedFor;
@@ -1679,7 +1680,7 @@ public
         // Get a snapshot of the list of all threads
         Thread[] threads = getThreads();
         StackTraceElement[][] traces = dumpThreads(threads);
-        Map<Thread, StackTraceElement[]> m = new HashMap<>(threads.length);
+        Map<@Immutable Thread, StackTraceElement[]> m = new HashMap<>(threads.length);
         for (int i = 0; i < threads.length; i++) {
             StackTraceElement[] stackTrace = traces[i];
             if (stackTrace != null) {
@@ -2044,6 +2045,7 @@ public
     /**
      *  Weak key for Class objects.
      **/
+    @Immutable
     static class WeakClassKey extends WeakReference<Class<?>> {
         /**
          * saved value of the referent's identity hash code, to maintain

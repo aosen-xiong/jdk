@@ -385,6 +385,7 @@ final class StringConcatHelper {
      * @param indexCoder    remaining index (should be zero) and coder
      * @return String       resulting string
      */
+    @SuppressWarnings("pico:argument.type.incompatible") // cast from @Unique @Mutable to @Immutable
     static String newString(byte @Readonly [] buf, long indexCoder) {
         // Use the private, non-copying constructor (unsafe!)
         if (indexCoder == LATIN1) {
