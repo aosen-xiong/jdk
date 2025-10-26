@@ -33,6 +33,7 @@ import org.checkerframework.checker.lock.qual.NewObject;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
 import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.checker.signedness.qual.PolySigned;
 import org.checkerframework.checker.signedness.qual.SignedPositive;
 import org.checkerframework.checker.signedness.qual.SignednessGlb;
@@ -755,7 +756,7 @@ public final class Integer extends Number
      */
     @Pure
     @StaticallyExecutable
-    public static int parseInt(CharSequence s, int beginIndex, int endIndex, @IntRange(from = 2, to = 36) int radix)
+    public static int parseInt(@Readonly CharSequence s, int beginIndex, int endIndex, @IntRange(from = 2, to = 36) int radix)
                 throws NumberFormatException {
         Objects.requireNonNull(s);
 
@@ -944,7 +945,7 @@ public final class Integer extends Number
      */
     @Pure
     @StaticallyExecutable
-    public static @Unsigned int parseUnsignedInt(CharSequence s, int beginIndex, int endIndex, @IntRange(from = 2, to = 36) int radix)
+    public static @Unsigned int parseUnsignedInt(@Readonly CharSequence s, int beginIndex, int endIndex, @IntRange(from = 2, to = 36) int radix)
                 throws NumberFormatException {
         Objects.requireNonNull(s);
 
@@ -1318,7 +1319,7 @@ public final class Integer extends Number
      */
     @Pure
     @StaticallyExecutable
-    public boolean equals(@Nullable Object obj) {
+    public boolean equals(@Nullable @Readonly Object obj) {
         if (obj instanceof Integer) {
             return value == ((Integer)obj).intValue();
         }

@@ -105,7 +105,7 @@ public class RuntimeException extends Exception {
      * @since  1.4
      */
     @SideEffectFree
-    public @ReceiverDependentMutable RuntimeException(@Readonly @Nullable @ReceiverDependentMutable Throwable cause) {
+    public RuntimeException(@Nullable @ReceiverDependentMutable Throwable cause) {
         super(cause);
     }
 

@@ -975,7 +975,7 @@ public final class Module implements AnnotatedElement {
      *
      * @apiNote Used during startup to open packages for illegal access.
      */
-    @SuppressWarnings("pico:assignment.type.incompatible") // cast from @Unique @Mutable to @Immutable
+    @SuppressWarnings("pico") // cast from @Unique @Mutable to @Immutable
     void implAddOpensToAllUnnamed(Set<String> concealedPkgs, Set<String> exportedPkgs) {
         if (jdk.internal.misc.VM.isModuleSystemInited()) {
             throw new IllegalStateException("Module system already initialized");
@@ -1132,7 +1132,7 @@ public final class Module implements AnnotatedElement {
      *         with another module mapped to the same class loader
      */
     static Map<String, Module> defineModules(Configuration cf,
-                                             Function<String, @Immutable ClassLoader> clf,
+                                             Function<String, ClassLoader> clf,
                                              ModuleLayer layer)
     {
         boolean isBootLayer = (ModuleLayer.boot() == null);
@@ -1346,7 +1346,7 @@ public final class Module implements AnnotatedElement {
     private static void initExportsAndOpens(@UnderInitialization Module m,
                                             Map<String, Module> nameToSource,
                                             Map<String, Module> nameToModule,
-                                            List<ModuleLayer> parents) {
+                                            @Readonly List<ModuleLayer> parents) {
         ModuleDescriptor descriptor = m.getDescriptor();
         Map<String, Set<Module>> openPackages = new HashMap<>();
         Map<String, Set<Module>> exportedPackages = new HashMap<>();
@@ -1425,7 +1425,7 @@ public final class Module implements AnnotatedElement {
     private static Module findModule(String target,
                                      Map<String, Module> nameToSource,
                                      Map<String, Module> nameToModule,
-                                     List<ModuleLayer> parents) {
+                                     @Readonly List<ModuleLayer> parents) {
         Module m = nameToSource.get(target);
         if (m == null) {
             m = nameToModule.get(target);

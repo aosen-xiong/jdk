@@ -28,6 +28,7 @@ package java.lang;
 import org.checkerframework.checker.index.qual.IndexOrHigh;
 import org.checkerframework.checker.index.qual.LessThan;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
 import java.io.IOException;
@@ -54,6 +55,7 @@ import java.io.IOException;
  * @since 1.5
  */
 @AnnotatedFor({"nullness", "index"})
+@ReceiverDependentMutable
 public interface Appendable {
 
     /**

@@ -31,7 +31,6 @@ import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.lock.qual.ReleasesNoLocks;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
-import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.checker.regex.qual.Regex;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;

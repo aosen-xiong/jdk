@@ -26,6 +26,7 @@
 package java.lang.ref;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.framework.qual.AnnotatedFor;
 import org.checkerframework.framework.qual.CFComment;
 
@@ -49,7 +50,8 @@ import org.checkerframework.framework.qual.CFComment;
  * @since    1.2
  */
 
-@AnnotatedFor({"nullness"})
+@AnnotatedFor({"nullness", "pico"})
+@ReceiverDependentMutable
 public class WeakReference<T> extends Reference<T> {
 
     /**
@@ -72,7 +74,7 @@ public class WeakReference<T> extends Reference<T> {
      */
     @CFComment({"Nullness: q is @NonNull because it is sometimes required to be non-null.",
                 "To treat it as @Nullable, see https://checkerframework.org/manual/#nullness-jdk-conservative ."})
-    public WeakReference(@Nullable T referent, ReferenceQueue<? super T> q) {
+    public WeakReference(@Nullable T referent, @ReceiverDependentMutable ReferenceQueue<? super T> q) {
         super(referent, q);
     }
 

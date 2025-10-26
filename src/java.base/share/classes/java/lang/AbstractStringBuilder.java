@@ -224,7 +224,7 @@ abstract @UsesObjectEquals class AbstractStringBuilder implements Appendable, Ch
      *
      * @param   minimumCapacity   the minimum desired capacity.
      */
-    public void ensureCapacity(@Readonly AbstractStringBuilder this, @NonNegative int minimumCapacity) {
+    public void ensureCapacity(@NonNegative int minimumCapacity) {
         if (minimumCapacity > 0) {
             ensureCapacityInternal(minimumCapacity);
         }
@@ -237,7 +237,7 @@ abstract @UsesObjectEquals class AbstractStringBuilder implements Appendable, Ch
      * If {@code minimumCapacity} is non positive due to numeric
      * overflow, this method throws {@code OutOfMemoryError}.
      */
-    private void ensureCapacityInternal(@Readonly AbstractStringBuilder this, @NonNegative int minimumCapacity) {
+    private void ensureCapacityInternal(@NonNegative int minimumCapacity) {
         // overflow-conscious code
         int oldCapacity = value.length >> coder;
         if (minimumCapacity - oldCapacity > 0) {
@@ -689,7 +689,7 @@ abstract @UsesObjectEquals class AbstractStringBuilder implements Appendable, Ch
      *             {@code end} is greater than {@code s.length()}
      */
     @Override
-    public AbstractStringBuilder append(@Nullable CharSequence s, @IndexOrHigh({"#1"}) int start, @IndexOrHigh({"#1"}) int end) {
+    public AbstractStringBuilder append(@Nullable @Readonly CharSequence s, @IndexOrHigh({"#1"}) int start, @IndexOrHigh({"#1"}) int end) {
         if (s == null) {
             s = "null";
         }
@@ -1250,7 +1250,7 @@ abstract @UsesObjectEquals class AbstractStringBuilder implements Appendable, Ch
      * @return     a reference to this object.
      * @throws     IndexOutOfBoundsException  if the offset is invalid.
      */
-    public AbstractStringBuilder insert(@NonNegative int dstOffset, @Nullable @Immutable CharSequence s) {
+    public AbstractStringBuilder insert(@NonNegative int dstOffset, @Nullable @Readonly CharSequence s) {
         if (s == null) {
             s = "null";
         }
@@ -1301,7 +1301,7 @@ abstract @UsesObjectEquals class AbstractStringBuilder implements Appendable, Ch
      *              {@code start} is greater than {@code end} or
      *              {@code end} is greater than {@code s.length()}
      */
-    public AbstractStringBuilder insert(@NonNegative int dstOffset, @Nullable @Immutable CharSequence s,
+    public AbstractStringBuilder insert(@NonNegative int dstOffset, @Nullable @Readonly CharSequence s,
                                         @IndexOrHigh({"#2"}) int start, @IndexOrHigh({"#2"}) int end)
     {
         if (s == null) {
@@ -1716,7 +1716,7 @@ abstract @UsesObjectEquals class AbstractStringBuilder implements Appendable, Ch
         }
     }
 
-    private final void putCharsAt(int index, CharSequence s, int off, int end) {
+    private final void putCharsAt(int index, @Readonly CharSequence s, int off, int end) {
         if (isLatin1()) {
             byte[] val = this.value;
             for (int i = off, j = index; i < end; i++) {
@@ -1745,7 +1745,7 @@ abstract @UsesObjectEquals class AbstractStringBuilder implements Appendable, Ch
         putStringAt(index, str, 0, str.length());
     }
 
-    private final void appendChars(char[] s, int off, int end) {
+    private final void appendChars(char @Readonly [] s, int off, int end) {
         int count = this.count;
         if (isLatin1()) {
             byte[] val = this.value;
@@ -1796,7 +1796,7 @@ abstract @UsesObjectEquals class AbstractStringBuilder implements Appendable, Ch
         count += end - off;
     }
 
-    private final void appendChars(CharSequence s, int off, int end) {
+    private final void appendChars(@Readonly CharSequence s, int off, int end) {
         if (isLatin1()) {
             byte[] val = this.value;
             for (int i = off, j = count; i < end; i++) {

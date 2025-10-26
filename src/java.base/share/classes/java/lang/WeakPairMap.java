@@ -28,6 +28,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
 import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.checker.pico.qual.Mutable;
+import org.checkerframework.checker.pico.qual.PolyMutable;
 import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 
@@ -53,7 +54,7 @@ import java.util.function.BiFunction;
 final class WeakPairMap<K1 extends @Immutable Object, K2 extends @Immutable Object, V> {
 
     private final ConcurrentHashMap<@Immutable Pair<K1, K2>, V> map = new ConcurrentHashMap<>();
-    private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
+    private final ReferenceQueue<@Readonly Object> queue = new ReferenceQueue<>();
 
     /**
      * Tests if the specified pair of keys are associated with a value
@@ -87,7 +88,7 @@ final class WeakPairMap<K1 extends @Immutable Object, K2 extends @Immutable Obje
      * this map contains no mapping for the key pair
      * @throws NullPointerException if any of the specified keys is null
      */
-    public V get(K1 k1, K2 k2) {
+    public V get(@Readonly WeakPairMap<K1, K2, V> this, K1 k1, K2 k2) {
         expungeStaleAssociations();
         return map.get(Pair.lookup(k1, k2));
     }
@@ -156,7 +157,7 @@ final class WeakPairMap<K1 extends @Immutable Object, K2 extends @Immutable Obje
      * @throws RuntimeException      or Error if the mappingFunction does so, in
      *                               which case the mapping is left unestablished
      */
-    public @PolyNull V computeIfAbsent(K1 k1, K2 k2,
+    public @PolyNull V computeIfAbsent(@Mutable WeakPairMap<K1, K2, V> this, K1 k1, K2 k2,
                              BiFunction<? super K1, ? super K2, ? extends @PolyNull V>
                                  mappingFunction) {
         expungeStaleAssociations();
@@ -182,7 +183,7 @@ final class WeakPairMap<K1 extends @Immutable Object, K2 extends @Immutable Obje
      *
      * @return the collection view
      */
-    public Collection<V> values() {
+    public @PolyMutable Collection<V> values(@PolyMutable WeakPairMap<K1, K2, V> this) {
         expungeStaleAssociations();
         return map.values();
     }
@@ -192,7 +193,8 @@ final class WeakPairMap<K1 extends @Immutable Object, K2 extends @Immutable Obje
      * keys in key pair has been found weakly-reachable and corresponding
      * WeakRefPeer(s) enqueued. Called as part of each public operation.
      */
-    private void expungeStaleAssociations() {
+    @SuppressWarnings("pico:method.invocation.invalid") // remove stale entry method
+    private void expungeStaleAssociations(@Readonly WeakPairMap<K1, K2, V> this) {
         WeakRefPeer<?> peer;
         while ((peer = (WeakRefPeer<?>) queue.poll()) != null) {
             map.remove(peer.weakPair());
@@ -202,28 +204,29 @@ final class WeakPairMap<K1 extends @Immutable Object, K2 extends @Immutable Obje
     /**
      * Common interface of both {@link Weak} and {@link Lookup} key pairs.
      */
+    @ReceiverDependentMutable
     private interface Pair<K1, K2> {
 
-        static <K1, K2> Pair<K1, K2> weak(K1 k1, K2 k2,
-                                          ReferenceQueue<Object> queue) {
-            return new Weak<>(k1, k2, queue);
+        static <K1, K2> @Immutable Pair<K1, K2> weak(K1 k1, K2 k2,
+                                                     @Immutable ReferenceQueue<@Readonly Object> queue) {
+            return new @Immutable Weak<>(k1, k2, queue);
         }
 
-        static <K1, K2> Pair<K1, K2> lookup(K1 k1, K2 k2) {
-            return new Lookup<>(k1, k2);
+        static <K1, K2> @Immutable Pair<K1, K2> lookup(K1 k1, K2 k2) {
+            return new @Immutable Lookup<>(k1, k2);
         }
 
         /**
          * @return The 1st of the pair of keys (may be null for {@link Weak}
          * when it gets cleared)
          */
-        K1 first();
+        K1 first(@Readonly Pair<K1, K2> this);
 
         /**
          * @return The 2nd of the pair of keys (may be null for {@link Weak}
          * when it gets cleared)
          */
-        K2 second();
+        K2 second(@Readonly Pair<K1, K2> this);
 
         static int hashCode(@Readonly Object first, @Readonly Object second) {
             // assert first != null && second != null;
@@ -259,6 +262,7 @@ final class WeakPairMap<K1 extends @Immutable Object, K2 extends @Immutable Obje
          * becomes weakly-reachable, the corresponding entries can be
          * {@link #expungeStaleAssociations() expunged} from the map.
          */
+        @ReceiverDependentMutable
         final class Weak<K1, K2> extends WeakRefPeer<K1> implements Pair<K1, K2> {
 
             // saved hash so it can be retrieved after the reference is cleared
@@ -266,7 +270,7 @@ final class WeakPairMap<K1 extends @Immutable Object, K2 extends @Immutable Obje
             // link to <K2> peer
             private final WeakRefPeer<K2> peer;
 
-            Weak(K1 k1, K2 k2, ReferenceQueue<Object> queue) {
+            @Mutable Weak(K1 k1, K2 k2, ReferenceQueue<@Readonly Object> queue) {
                 super(k1, queue);
                 hash = Pair.hashCode(k1, k2);
                 peer = new WeakRefPeer<>(k2, queue) {
@@ -277,27 +281,27 @@ final class WeakPairMap<K1 extends @Immutable Object, K2 extends @Immutable Obje
             }
 
             @Override
-            Weak<?, ?> weakPair() {
+            @Readonly Weak<?, ?> weakPair(@Readonly Weak<K1, K2> this) {
                 return this;
             }
 
             @Override
-            public K1 first() {
+            public K1 first(@Readonly Weak<K1, K2> this) {
                 return get();
             }
 
             @Override
-            public K2 second() {
+            public K2 second(@Readonly Weak<K1, K2> this) {
                 return peer.get();
             }
 
             @Override
-            public int hashCode() {
+            public int hashCode(@Readonly Weak<K1, K2> this) {
                 return hash;
             }
 
             @Override
-            public boolean equals(@Readonly Object obj) {
+            public boolean equals(@Readonly Weak<K1, K2> this, @Readonly Object obj) {
                 return this == obj ||
                        (obj instanceof Pair &&
                         Pair.equals(first(), second(), (Pair<?, ?>) obj));
@@ -313,6 +317,7 @@ final class WeakPairMap<K1 extends @Immutable Object, K2 extends @Immutable Obje
          * All its methods are purposely designed so that 'this' is never
          * passed to any other method or used as identity.
          */
+        @ReceiverDependentMutable
         final class Lookup<K1, K2> implements Pair<K1, K2> {
             private final K1 k1;
             private final K2 k2;
@@ -323,22 +328,22 @@ final class WeakPairMap<K1 extends @Immutable Object, K2 extends @Immutable Obje
             }
 
             @Override
-            public K1 first() {
+            public K1 first(@Readonly Lookup<K1, K2> this) {
                 return k1;
             }
 
             @Override
-            public K2 second() {
+            public K2 second(@Readonly Lookup<K1, K2> this) {
                 return k2;
             }
 
             @Override
-            public int hashCode() {
+            public int hashCode(@Readonly Lookup<K1, K2> this) {
                 return Pair.hashCode(k1, k2);
             }
 
             @Override
-            public boolean equals(@Readonly Object obj) {
+            public boolean equals(@Readonly Lookup<K1, K2> this, @Readonly Object obj) {
                 return obj instanceof Pair &&
                        Pair.equals(k1, k2, (Pair<?, ?>) obj);
             }
@@ -348,9 +353,10 @@ final class WeakPairMap<K1 extends @Immutable Object, K2 extends @Immutable Obje
     /**
      * Common abstract supertype of a pair of WeakReference peers.
      */
+    @ReceiverDependentMutable
     private static abstract class WeakRefPeer<K> extends WeakReference<K> {
 
-        WeakRefPeer(K k, ReferenceQueue<Object> queue) {
+        WeakRefPeer(K k, @ReceiverDependentMutable ReferenceQueue<@Readonly Object> queue) {
             super(Objects.requireNonNull(k), queue);
         }
 

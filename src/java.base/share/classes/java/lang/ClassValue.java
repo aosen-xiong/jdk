@@ -26,6 +26,7 @@
 package java.lang;
 
 import org.checkerframework.checker.interning.qual.UsesObjectEquals;
+import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
 import java.util.WeakHashMap;
@@ -265,6 +266,7 @@ public abstract @UsesObjectEquals class ClassValue<T> {
     /**
      * Private key for retrieval of this object from ClassValueMap.
      */
+    @Immutable
     static class Identity {
     }
     /**

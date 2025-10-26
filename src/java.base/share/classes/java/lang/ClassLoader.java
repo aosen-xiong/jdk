@@ -2246,7 +2246,7 @@ public abstract @UsesObjectEquals class ClassLoader {
      *
      * @since  9
      */
-    public final Package getDefinedPackage(String name) {
+    public final Package getDefinedPackage(@Readonly ClassLoader this, String name) {
         Objects.requireNonNull(name, "name cannot be null");
 
         NamedPackage p = packages.get(name);
@@ -2373,7 +2373,7 @@ public abstract @UsesObjectEquals class ClassLoader {
     /**
      * Returns a stream of Packages defined in this class loader
      */
-    Stream<Package> packages() {
+    Stream<Package> packages(@Readonly ClassLoader this) {
         return packages.values().stream()
                        .map(p -> definePackage(p.packageName(), p.module()));
     }

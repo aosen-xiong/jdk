@@ -131,9 +131,9 @@ public final class StringJoiner {
      *         {@code suffix} is {@code null}
      */
     @SideEffectFree
-    public StringJoiner(CharSequence delimiter,
-                        CharSequence prefix,
-                        CharSequence suffix) {
+    public StringJoiner(@Readonly CharSequence delimiter,
+                        @Readonly CharSequence prefix,
+                        @Readonly CharSequence suffix) {
         Objects.requireNonNull(prefix, "The prefix must not be null");
         Objects.requireNonNull(delimiter, "The delimiter must not be null");
         Objects.requireNonNull(suffix, "The suffix must not be null");
@@ -158,7 +158,7 @@ public final class StringJoiner {
      * @throws NullPointerException when the {@code emptyValue} parameter is
      *         {@code null}
      */
-    public StringJoiner setEmptyValue(CharSequence emptyValue) {
+    public StringJoiner setEmptyValue(@Readonly CharSequence emptyValue) {
         this.emptyValue = Objects.requireNonNull(emptyValue,
             "The empty value must not be null").toString();
         return this;
@@ -195,7 +195,7 @@ public final class StringJoiner {
      * @return a reference to this {@code StringJoiner}
      */
     @ReleasesNoLocks
-    public StringJoiner add(@Nullable CharSequence newElement) {
+    public StringJoiner add(@Nullable @Readonly CharSequence newElement) {
         final String elt = String.valueOf(newElement);
         if (elts == null) {
             elts = new String[8];

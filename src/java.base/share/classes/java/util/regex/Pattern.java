@@ -1280,7 +1280,7 @@ public final @UsesObjectEquals class Pattern
      *          around matches of this pattern
      */
     @Pure
-    public String @MinLen(1) [] split(CharSequence input, int limit) {
+    public String @MinLen(1) [] split(@Readonly CharSequence input, int limit) {
         int index = 0;
         boolean matchLimited = limit > 0;
         ArrayList<String> matchList = new ArrayList<>();
@@ -1357,7 +1357,7 @@ public final @UsesObjectEquals class Pattern
      *          around matches of this pattern
      */
     @Pure
-    public String @MinLen(1) [] split(CharSequence input) {
+    public String @MinLen(1) [] split(@Readonly CharSequence input) {
         return split(input, 0);
     }
 

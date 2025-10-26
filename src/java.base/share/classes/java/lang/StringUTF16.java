@@ -163,7 +163,7 @@ final class StringUTF16 {
         return val;
     }
 
-    public static byte[] compress(char[] val, int off, int len) {
+    public static byte[] compress(char @Readonly [] val, int off, int len) {
         byte[] ret = new byte[len];
         if (compress(val, off, ret, 0, len) == len) {
             return ret;
@@ -181,7 +181,7 @@ final class StringUTF16 {
 
     // compressedCopy char[] -> byte[]
     @IntrinsicCandidate
-    public static int compress(char[] src, int srcOff, byte[] dst, int dstOff, int len) {
+    public static int compress(char @Readonly [] src, int srcOff, byte[] dst, int dstOff, int len) {
         for (int i = 0; i < len; i++) {
             char c = src[srcOff];
             if (c > 0xFF) {
@@ -444,7 +444,7 @@ final class StringUTF16 {
     }
 
     @IntrinsicCandidate
-    public static int indexOf(byte @Readonly [] value, byte[] str) {
+    public static int indexOf(byte @Readonly [] value, byte @Readonly [] str) {
         if (str.length == 0) {
             return 0;
         }
@@ -455,7 +455,7 @@ final class StringUTF16 {
     }
 
     @IntrinsicCandidate
-    public static int indexOf(byte @Readonly [] value, int valueCount, byte[] str, int strCount, int fromIndex) {
+    public static int indexOf(byte @Readonly [] value, int valueCount, byte @Readonly [] str, int strCount, int fromIndex) {
         checkBoundsBeginEnd(fromIndex, valueCount, value);
         checkBoundsBeginEnd(0, strCount, str);
         return indexOfUnsafe(value, valueCount, str, strCount, fromIndex);

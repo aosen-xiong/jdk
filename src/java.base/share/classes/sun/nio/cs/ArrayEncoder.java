@@ -25,6 +25,8 @@
 
 package sun.nio.cs;
 
+import org.checkerframework.checker.pico.qual.Readonly;
+
 /*
  * FastPath char[]/byte[] -> byte[] encoder, REPLACE on malformed input or
  * unmappable input.
@@ -35,11 +37,11 @@ public interface ArrayEncoder {
     //  is only used by j.u.zip.ZipCoder for utf8
     int encode(char[] src, int off, int len, byte[] dst);
 
-    default int encodeFromLatin1(byte[] src, int sp, int len, byte[] dst) {
+    default int encodeFromLatin1(byte @Readonly [] src, int sp, int len, byte[] dst) {
         return -1;
     }
 
-    default int encodeFromUTF16(byte[] src, int sp, int len, byte[] dst) {
+    default int encodeFromUTF16(byte @Readonly [] src, int sp, int len, byte[] dst) {
         return -1;
     }
 

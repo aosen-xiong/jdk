@@ -2296,7 +2296,7 @@ public final @UsesObjectEquals class System {
             public AnnotationType getAnnotationType(Class<?> klass) {
                 return klass.getAnnotationType();
             }
-            public Map<Class<? extends @Readonly Annotation>, Annotation> getDeclaredAnnotationMap(Class<?> klass) {
+            public Map<Class<? extends @Readonly Annotation>, @Readonly Annotation> getDeclaredAnnotationMap(Class<?> klass) {
                 return klass.getDeclaredAnnotationMap();
             }
             public byte[] getRawClassAnnotations(Class<?> klass) {

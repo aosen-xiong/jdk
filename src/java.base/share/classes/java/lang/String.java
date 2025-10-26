@@ -956,7 +956,7 @@ public final class String
         return encodeUTF8(s.coder(), s.value(), false);
     }
 
-    private static boolean isASCII(byte[] src) {
+    private static boolean isASCII(byte @Readonly [] src) {
         return !StringCoding.hasNegatives(src, 0, src.length);
     }
 
@@ -976,7 +976,7 @@ public final class String
         }
     }
 
-    private static byte[] getBytesNoRepl1(String s, Charset cs) {
+    private static byte @Immutable [] getBytesNoRepl1(String s, Charset cs) {
         byte[] val = s.value();
         byte coder = s.coder();
         if (cs == UTF_8.INSTANCE) {
@@ -1034,11 +1034,11 @@ public final class String
         return Arrays.copyOf(dst, dp);
     }
 
-    private static byte[] encode8859_1(byte coder, byte[] val) {
+    private static byte[] encode8859_1(byte coder, byte @Readonly [] val) {
         return encode8859_1(coder, val, true);
     }
 
-    private static byte[] encode8859_1(byte coder, byte[] val, boolean doReplace) {
+    private static byte[] encode8859_1(byte coder, byte @Readonly [] val, boolean doReplace) {
         if (coder == LATIN1) {
             return Arrays.copyOf(val, val.length);
         }
@@ -1311,7 +1311,7 @@ public final class String
         throw new IllegalArgumentException(msg, new UnmappableCharacterException(1));
     }
 
-    private static void throwUnmappable(byte[] val) {
+    private static void throwUnmappable(byte @Readonly [] val) {
         int dp = 0;
         while (dp < val.length && val[dp] >=0) { dp++; }
         throwUnmappable(dp);
@@ -1496,7 +1496,7 @@ public final class String
      */
     @SideEffectFree
     @StaticallyExecutable
-    public @Unique String(@PolySigned byte @GuardSatisfied [] bytes) {
+    public @Unique String(@PolySigned byte @GuardSatisfied @Immutable [] bytes) {
         this(bytes, 0, bytes.length);
     }
 
@@ -2677,7 +2677,7 @@ public final class String
      * @param   tgtStr    the characters being searched for.
      * @param   fromIndex the index to begin searching from.
      */
-    static int indexOf(byte[] src, byte srcCoder, int srcCount,
+    static int indexOf(byte @Readonly [] src, byte srcCoder, int srcCount,
                        String tgtStr, int fromIndex) {
         byte[] tgt    = tgtStr.value;
         byte tgtCoder = tgtStr.coder();
@@ -2882,7 +2882,7 @@ public final class String
      */
     @SideEffectFree
     @StaticallyExecutable
-    public CharSequence subSequence(@IndexOrHigh({"this"}) int beginIndex, @IndexOrHigh({"this"}) int endIndex) {
+    public @Immutable CharSequence subSequence(@IndexOrHigh({"this"}) int beginIndex, @IndexOrHigh({"this"}) int endIndex) {
         return this.substring(beginIndex, endIndex);
     }
 
@@ -3406,6 +3406,7 @@ public final class String
      * @return the joined string
      */
     @ForceInline
+    @SuppressWarnings("pico:argument.type.incompatible") // cast from @Unique @Mutable to @Immutable
     static String join(String prefix, String suffix, String delimiter, String[] elements, int size) {
         int icoder = prefix.coder() | suffix.coder();
         long len = (long) prefix.length() + suffix.length();
@@ -4138,6 +4139,7 @@ public final class String
      * @since 15
      */
     @SideEffectFree
+    @SuppressWarnings("pico:argument.type.incompatible") // cast from @Unique @Mutable to @Immutable
     public String translateEscapes() {
         if (isEmpty()) {
             return "";
@@ -4517,6 +4519,7 @@ public final class String
      */
     @SideEffectFree
     @StaticallyExecutable
+    @SuppressWarnings("pico:argument.type.incompatible") // cast from @Unique @Mutable to @Immutable
     public static @NewObject @ArrayLen(1) String valueOf(char c) {
         if (COMPACT_STRINGS && StringLatin1.canEncode(c)) {
             return new String(StringLatin1.toBytes(c), LATIN1);
@@ -4845,6 +4848,7 @@ public final class String
      *          {@code codePoint} is not a {@linkplain Character#isValidCodePoint
      *          valid Unicode code point}.
      */
+    @SuppressWarnings("pico:argument.type.incompatible") // cast from @Unique @Mutable to @Immutable
     static String valueOfCodePoint(int codePoint) {
         if (COMPACT_STRINGS && StringLatin1.canEncode(codePoint)) {
             return new String(StringLatin1.toBytes((char)codePoint), LATIN1);

@@ -32,7 +32,6 @@ import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.checker.pico.qual.Mutable;
-import org.checkerframework.checker.pico.qual.LazyFinal;
 import org.checkerframework.checker.pico.qual.PolyMutable;
 import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
@@ -1135,7 +1134,7 @@ public @UsesObjectEquals class Throwable implements Serializable {
      *         suppressed to deliver this exception.
      * @since 1.7
      */
-    public final synchronized Throwable[] getSuppressed() {
+    public final synchronized Throwable[] getSuppressed(@Readonly Throwable this) {
         if (suppressedExceptions == SUPPRESSED_SENTINEL ||
             suppressedExceptions == null)
             return EMPTY_THROWABLE_ARRAY;

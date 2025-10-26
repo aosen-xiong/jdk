@@ -30,7 +30,7 @@ import org.checkerframework.checker.index.qual.IndexOrHigh;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.checkerframework.checker.pico.qual.Mutable;
+import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.framework.qual.AnnotatedFor;
@@ -522,7 +522,7 @@ public final class StringBuffer
      * @since      1.4
      */
     @Override
-    public synchronized CharSequence subSequence(int start, int end) {
+    public synchronized @Immutable CharSequence subSequence(int start, int end) {
         return super.substring(start, end);
     }
 

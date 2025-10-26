@@ -47,6 +47,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
 import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.Mutable;
+import org.checkerframework.checker.pico.qual.PolyMutable;
 import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.checker.signedness.qual.PolySigned;
@@ -1289,10 +1291,10 @@ public class ConcurrentHashMap<K extends @NonNull @Immutable Object,V extends @N
      * @return the collection view
      */
     @SideEffectFree
-    public Collection<V> values() {
+    public @PolyMutable Collection<V> values(@PolyMutable ConcurrentHashMap<K,V> this) {
         ValuesView<K,V> vs;
         if ((vs = values) != null) return vs;
-        return values = new ValuesView<K,V>(this);
+        return values = new @PolyMutable ValuesView<K,V>(this);
     }
 
     /**
@@ -1573,7 +1575,7 @@ public class ConcurrentHashMap<K extends @NonNull @Immutable Object,V extends @N
      * @throws NullPointerException if the specified key or value is null
      */
     @EnsuresKeyFor(value={"#1"}, map={"this"})
-    public @Nullable V putIfAbsent(K key, V value) {
+    public @Nullable V putIfAbsent(@Mutable ConcurrentHashMap<K,V> this, K key, V value) {
         return putVal(key, value, true);
     }
 

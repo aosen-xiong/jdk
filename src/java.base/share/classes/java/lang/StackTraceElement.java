@@ -33,7 +33,6 @@ import org.checkerframework.checker.signature.qual.FullyQualifiedName;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.framework.qual.AnnotatedFor;
-import org.checkerframework.framework.qual.CFComment;
 
 import jdk.internal.loader.BuiltinClassLoader;
 import jdk.internal.misc.VM;
@@ -435,7 +434,7 @@ public final class StackTraceElement implements java.io.Serializable {
      * Returns a hash code value for this stack trace element.
      */
     @Pure
-    public int hashCode(@GuardSatisfied StackTraceElement this) {
+    public int hashCode(@GuardSatisfied @Readonly StackTraceElement this) {
         int result = 31*declaringClass.hashCode() + methodName.hashCode();
         result = 31*result + Objects.hashCode(classLoaderName);
         result = 31*result + Objects.hashCode(moduleName);

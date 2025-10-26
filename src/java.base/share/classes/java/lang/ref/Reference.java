@@ -27,7 +27,9 @@ package java.lang.ref;
 
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Mutable;
 import org.checkerframework.checker.pico.qual.Readonly;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.framework.qual.AnnotatedFor;
@@ -51,6 +53,7 @@ import jdk.internal.ref.Cleaner;
 
 @AnnotatedFor({"lock", "nullness"})
 @SuppressWarnings({"rawtypes"})
+@ReceiverDependentMutable
 public abstract class Reference<T> {
 
     /* The state of a Reference object is characterized by two attributes.  It
@@ -248,7 +251,7 @@ public abstract class Reference<T> {
      * takes us from the Reference<?> domain of the pending list elements to
      * having a Reference<T> with a correspondingly typed queue.
      */
-    private void enqueueFromPending() {
+    private void enqueueFromPending(@Mutable Reference<T> this) {
         var q = queue;
         if (q != ReferenceQueue.NULL) q.enqueue(this);
     }
@@ -361,7 +364,7 @@ public abstract class Reference<T> {
      */
     @SideEffectFree
     @IntrinsicCandidate
-    public @Nullable T get(@GuardSatisfied Reference<T> this) {
+    public @Nullable T get(@GuardSatisfied @Readonly Reference<T> this) {
         return this.referent;
     }
 
@@ -391,7 +394,7 @@ public abstract class Reference<T> {
      * <p> This method is invoked only by Java code; when the garbage collector
      * clears references it does so directly, without invoking this method.
      */
-    public void clear() {
+    public void clear(@Mutable Reference<T> this) {
         clear0();
     }
 
@@ -399,7 +402,7 @@ public abstract class Reference<T> {
      * assignment of the referent field won't do for some garbage
      * collectors.
      */
-    private native void clear0();
+    private native void clear0(@Mutable Reference<T> this);
 
     /* -- Operations on inactive FinalReferences -- */
 
@@ -477,7 +480,7 @@ public abstract class Reference<T> {
      *           enqueued; {@code false} if it was already enqueued or if
      *           it was not registered with a queue when it was created
      */
-    public boolean enqueue() {
+    public boolean enqueue(@Mutable Reference<T> this) {
         clear0();               // Intentionally clear0() rather than clear()
         return this.queue.enqueue(this);
     }
@@ -503,7 +506,7 @@ public abstract class Reference<T> {
     }
 
     @SuppressWarnings({"unchecked"})
-    Reference(T referent, ReferenceQueue<? super T> queue) {
+    Reference(T referent, @ReceiverDependentMutable ReferenceQueue<? super T> queue) {
         this.referent = referent;
         this.queue = (queue == null) ? ReferenceQueue.NULL : queue;
     }

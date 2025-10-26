@@ -439,6 +439,7 @@ final class StringLatin1 {
         return true;
     }
 
+    @SuppressWarnings("pico:argument.type.incompatible") // cast from @Unique @Mutable to @Immutable
     public static String toLowerCase(String str, byte @Readonly [] value, Locale locale) {
         if (locale == null) {
             throw new NullPointerException();
@@ -513,6 +514,7 @@ final class StringLatin1 {
         return StringUTF16.newString(result, 0, resultOffset);
     }
 
+    @SuppressWarnings("pico:argument.type.incompatible") // cast from @Unique @Mutable to @Immutable
     public static String toUpperCase(String str, byte @Readonly [] value, Locale locale) {
         if (locale == null) {
             throw new NullPointerException();

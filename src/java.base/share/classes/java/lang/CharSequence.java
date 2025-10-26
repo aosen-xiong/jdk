@@ -315,7 +315,7 @@ public interface CharSequence {
         }
 
         if (cs1.getClass() == cs2.getClass() && cs1 instanceof Comparable) {
-            return ((Comparable<Object>) cs1).compareTo(cs2);
+            return ((Comparable<@Readonly Object>) cs1).compareTo(cs2);
         }
 
         for (int i = 0, len = Math.min(cs1.length(), cs2.length()); i < len; i++) {
