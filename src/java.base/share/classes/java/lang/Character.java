@@ -35,6 +35,7 @@ import org.checkerframework.checker.interning.qual.Interned;
 import org.checkerframework.checker.lock.qual.NewObject;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.checker.signedness.qual.SignedPositive;
 import org.checkerframework.checker.signedness.qual.SignednessGlb;
 import org.checkerframework.common.value.qual.ArrayLen;
@@ -9423,7 +9424,7 @@ class Character implements java.io.Serializable, Comparable<Character>, Constabl
      */
     @Pure
     @StaticallyExecutable
-    public static int offsetByCodePoints(CharSequence seq, @IndexOrHigh({"#1"}) int index,
+    public static int offsetByCodePoints(@Readonly CharSequence seq, @IndexOrHigh({"#1"}) int index,
                                          int codePointOffset) {
         int length = seq.length();
         if (index < 0 || index > length) {

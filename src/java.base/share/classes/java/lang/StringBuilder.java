@@ -215,7 +215,7 @@ public final class StringBuilder
     }
 
     @Override
-    public StringBuilder append(@Nullable CharSequence s) {
+    public StringBuilder append(@Nullable @Readonly CharSequence s) {
         super.append(s);
         return this;
     }
@@ -224,7 +224,7 @@ public final class StringBuilder
      * @throws     IndexOutOfBoundsException {@inheritDoc}
      */
     @Override
-    public StringBuilder append(@Nullable CharSequence s, @IndexOrHigh({"#1"}) int start, @IndexOrHigh({"#1"}) int end) {
+    public StringBuilder append(@Nullable @Readonly CharSequence s, @IndexOrHigh({"#1"}) int start, @IndexOrHigh({"#1"}) int end) {
         super.append(s, start, end);
         return this;
     }

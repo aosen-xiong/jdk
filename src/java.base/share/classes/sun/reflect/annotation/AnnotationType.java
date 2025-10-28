@@ -33,6 +33,9 @@ import java.security.PrivilegedAction;
 import jdk.internal.access.SharedSecrets;
 import jdk.internal.access.JavaLangAccess;
 
+import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.Readonly;
+
 /**
  * Represents an annotation type at run time.  Used to type-check annotations
  * and apply member defaults.
@@ -40,6 +43,7 @@ import jdk.internal.access.JavaLangAccess;
  * @author  Josh Bloch
  * @since   1.5
  */
+@Immutable
 public class AnnotationType {
     /**
      * Member name -> type mapping. Note that primitive types
@@ -52,7 +56,7 @@ public class AnnotationType {
     /**
      * Member name -> default value mapping.
      */
-    private final Map<String, Object> memberDefaults;
+    private final Map<String, @Readonly Object> memberDefaults;
 
     /**
      * Member name -> Method object mapping. This (and its associated
@@ -77,7 +81,7 @@ public class AnnotationType {
      *         does not represent a valid annotation type
      */
     public static AnnotationType getInstance(
-        Class<? extends Annotation> annotationClass)
+        Class<? extends @Readonly Annotation> annotationClass)
     {
         JavaLangAccess jla = SharedSecrets.getJavaLangAccess();
         AnnotationType result = jla.getAnnotationType(annotationClass); // volatile read
@@ -101,7 +105,7 @@ public class AnnotationType {
      * @throws IllegalArgumentException if the specified class object for
      *         does not represent a valid annotation type
      */
-    private AnnotationType(final Class<? extends Annotation> annotationClass) {
+    private AnnotationType(final Class<? extends @Readonly Annotation> annotationClass) {
         if (!annotationClass.isAnnotation())
             throw new IllegalArgumentException("Not an annotation type");
 
@@ -142,7 +146,7 @@ public class AnnotationType {
         if (annotationClass != Retention.class &&
             annotationClass != Inherited.class) {
             JavaLangAccess jla = SharedSecrets.getJavaLangAccess();
-            Map<Class<? extends Annotation>, Annotation> metaAnnotations =
+            Map<Class<? extends @Readonly Annotation>, @Readonly Annotation> metaAnnotations =
                 AnnotationParser.parseSelectAnnotations(
                     jla.getRawClassAnnotations(annotationClass),
                     jla.getConstantPool(annotationClass),

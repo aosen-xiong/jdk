@@ -38,7 +38,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @see     java.lang.Integer#parseInt(String)
  * @since   1.0
  */
-@AnnotatedFor({"nullness"})
+@AnnotatedFor({"nullness", "pico"})
 @ReceiverDependentMutable
 public class NumberFormatException extends IllegalArgumentException {
     @java.io.Serial

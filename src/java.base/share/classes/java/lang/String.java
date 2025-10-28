@@ -963,7 +963,7 @@ public final class String
     /*
      * Throws CCE, instead of replacing, if unmappable.
      */
-    static byte[] getBytesNoRepl(String s, Charset cs) throws CharacterCodingException {
+    static byte @Immutable [] getBytesNoRepl(String s, Charset cs) throws CharacterCodingException {
         try {
             return getBytesNoRepl1(s, cs);
         } catch (IllegalArgumentException e) {
@@ -976,6 +976,7 @@ public final class String
         }
     }
 
+    @SuppressWarnings("pico:return.type.incompatible") // cast from @Unique @Mutable to @Immutable
     private static byte @Immutable [] getBytesNoRepl1(String s, Charset cs) {
         byte[] val = s.value();
         byte coder = s.coder();
@@ -2447,6 +2448,7 @@ public final class String
      */
     @Pure
     @StaticallyExecutable
+    @SuppressWarnings("pico:illegal.field.write") // Lazy
     public int hashCode() {
         // The hash or hashIsZero fields are subject to a benign data race,
         // making it crucial to ensure that any observable result of the
@@ -4380,7 +4382,7 @@ public final class String
     @SideEffectFree
     @StaticallyExecutable
     @FormatMethod
-    public static String format(@Readonly @GuardSatisfied @Nullable Locale l, String format, @Readonly @GuardSatisfied @Nullable Object @GuardSatisfied ... args) {
+    public static String format(@GuardSatisfied @Nullable Locale l, String format, @Readonly @GuardSatisfied @Nullable Object @GuardSatisfied ... args) {
         return new Formatter(l).format(format, args).toString();
     }
 

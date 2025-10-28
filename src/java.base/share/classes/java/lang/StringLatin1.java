@@ -88,7 +88,7 @@ final class StringLatin1 {
         return ret;
     }
 
-    public static void getChars(byte @Readonly [] value, int srcBegin, int srcEnd, char dst @Readonly [], int dstBegin) {
+    public static void getChars(byte @Readonly [] value, int srcBegin, int srcEnd, char dst[], int dstBegin) {
         inflate(value, srcBegin, dst, dstBegin, srcEnd - srcBegin);
     }
 
@@ -789,7 +789,7 @@ final class StringLatin1 {
 
     // inflatedCopy byte[] -> char[]
     @IntrinsicCandidate
-    public static void inflate(byte[] src, int srcOff, char[] dst, int dstOff, int len) {
+    public static void inflate(byte @Readonly [] src, int srcOff, char[] dst, int dstOff, int len) {
         for (int i = 0; i < len; i++) {
             dst[dstOff++] = (char)(src[srcOff++] & 0xff);
         }

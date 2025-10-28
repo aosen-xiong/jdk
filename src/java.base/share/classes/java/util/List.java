@@ -275,7 +275,7 @@ public interface List<E> extends Collection<E> {
      * @throws NullPointerException if the specified array is null
      */
     @SideEffectFree
-    <T extends @UnknownSignedness @Readonly Object> @Nullable T @PolyMutable [] toArray(@PolyMutable List<E> this, @PolyNull T @PolyMutable [] a);
+    <T extends @UnknownSignedness @Readonly Object> @Nullable T @PolyMutable [] toArray(@Readonly List<E> this, @PolyNull T @PolyMutable [] a);
 
 
     // Modification Operations

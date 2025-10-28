@@ -46,7 +46,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @jls 11.2 Compile-Time Checking of Exceptions
  * @since   1.0
  */
-@AnnotatedFor({"nullness"})
+@AnnotatedFor({"nullness", "pico"})
 @ReceiverDependentMutable
 public class RuntimeException extends Exception {
     @java.io.Serial

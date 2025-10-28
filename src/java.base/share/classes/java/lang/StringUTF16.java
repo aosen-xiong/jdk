@@ -674,8 +674,8 @@ final class StringUTF16 {
 
     @SuppressWarnings("pico:argument.type.incompatible") // cast from @Unique @Mutable to @Immutable
     public static String replace(byte @Readonly [] value, int valLen, boolean valLat1,
-                                 byte[] targ, int targLen, boolean targLat1,
-                                 byte[] repl, int replLen, boolean replLat1)
+                                 byte @Readonly [] targ, int targLen, boolean targLat1,
+                                 byte @Readonly [] repl, int replLen, boolean replLat1)
     {
         assert targLen > 0;
         assert !valLat1 || !targLat1 || !replLat1;
@@ -1011,6 +1011,7 @@ final class StringUTF16 {
         return newString(result, 0, resultOffset);
     }
 
+    @SuppressWarnings("pico:argument.type.incompatible") // cast from @Unique @Mutable to @Immutable
     public static String trim(byte @Readonly [] value) {
         int length = value.length >> 1;
         int len = length;
@@ -1350,7 +1351,7 @@ final class StringUTF16 {
         putChar(val, index, c);
     }
 
-    public static void putCharsSB(byte[] val, int index, char[] ca, int off, int end) {
+    public static void putCharsSB(byte[] val, int index, char @Readonly [] ca, int off, int end) {
         checkBoundsBeginEnd(index, index + end - off, val);
         putChars(val, index, ca, off, end);
     }

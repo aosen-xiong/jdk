@@ -39,9 +39,11 @@ import java.util.*;
  */
 
 @AnnotatedFor({"interning"})
+@SuppressWarnings("pico:type.arguments.not.inferred")
 @UsesObjectEquals class ApplicationShutdownHooks {
     /* The set of registered hooks */
-    private static IdentityHashMap<@Immutable Thread, Thread> hooks;
+    @SuppressWarnings("pico:type.argument.type.incompatible") // AOSEN: special case?
+    private static IdentityHashMap<Thread, Thread> hooks;
     static {
         try {
             Shutdown.add(1 /* shutdown hook invocation order */,

@@ -491,10 +491,10 @@ public @UsesObjectEquals class Throwable implements Serializable {
     @SuppressWarnings("pico:illegal.field.write") // should the receiver be underinitialization then?
     public synchronized @PolyInitialized @ReceiverDependentMutable Throwable initCause(@PolyInitialized Throwable this, @Nullable @ReceiverDependentMutable Throwable cause) {
         if (this.cause != this)
-            throw new IllegalStateException("Can't overwrite cause with " +
+            throw new @ReceiverDependentMutable IllegalStateException("Can't overwrite cause with " +
                                             Objects.toString(cause, "a null"), this);
         if (cause == this)
-            throw new IllegalArgumentException("Self-causation not permitted", this);
+            throw new @ReceiverDependentMutable IllegalArgumentException("Self-causation not permitted", this);
         this.cause = cause;
         return this;
     }
@@ -722,7 +722,8 @@ public @UsesObjectEquals class Throwable implements Serializable {
      * Print our stack trace as an enclosed exception for the specified
      * stack trace.
      */
-    private void printEnclosedStackTrace(PrintStreamOrWriter s,
+    private void printEnclosedStackTrace(@Readonly Throwable this,
+            PrintStreamOrWriter s,
                                          StackTraceElement[] enclosingTrace,
                                          String caption,
                                          String prefix,

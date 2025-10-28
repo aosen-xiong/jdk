@@ -630,7 +630,7 @@ abstract @UsesObjectEquals class AbstractStringBuilder implements Appendable, Ch
 
     // Documentation in subclasses because of synchro difference
     @Override
-    public AbstractStringBuilder append(@Nullable CharSequence s) {
+    public AbstractStringBuilder append(@Nullable @Readonly CharSequence s) {
         if (s == null) {
             return appendNull();
         }

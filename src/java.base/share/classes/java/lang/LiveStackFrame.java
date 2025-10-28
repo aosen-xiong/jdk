@@ -157,6 +157,7 @@ interface LiveStackFrame extends StackFrame {
      * @throws SecurityException if the security manager is present and
      * denies access to {@code RuntimePermission("liveStackFrames")}
      */
+    @SuppressWarnings("pico:argument.type.incompatible") // cast from @Unique @Mutable to @Immutable
     public static StackWalker getStackWalker() {
         return getStackWalker(EnumSet.noneOf(StackWalker.Option.class));
     }

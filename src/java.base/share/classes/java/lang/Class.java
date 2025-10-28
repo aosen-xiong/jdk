@@ -3654,7 +3654,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
     // Other helpers and base implementation
     //
 
-    private static boolean arrayContentsEq(Object[] a1, Object[] a2) {
+    private static boolean arrayContentsEq(@Readonly Object[] a1, @Readonly Object[] a2) {
         if (a1 == null) {
             return a2 == null || a2.length == 0;
         }
@@ -4027,7 +4027,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * @since 1.8
      */
     @Override
-    public <A extends Annotation> A[] getAnnotationsByType(Class<A> annotationClass) {
+    public <A extends @Readonly Annotation> A[] getAnnotationsByType(Class<A> annotationClass) {
         Objects.requireNonNull(annotationClass);
 
         AnnotationData annotationData = annotationData();
@@ -4058,7 +4058,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      */
     @Override
     @SuppressWarnings("unchecked")
-    public <A extends Annotation> @Nullable A getDeclaredAnnotation(Class<A> annotationClass) {
+    public <A extends @Readonly Annotation> @Nullable A getDeclaredAnnotation(Class<A> annotationClass) {
         Objects.requireNonNull(annotationClass);
 
         return (A) annotationData().declaredAnnotations.get(annotationClass);
@@ -4073,7 +4073,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * @since 1.8
      */
     @Override
-    public <A extends Annotation> A[] getDeclaredAnnotationsByType(Class<A> annotationClass) {
+    public <A extends @Readonly Annotation> A[] getDeclaredAnnotationsByType(Class<A> annotationClass) {
         Objects.requireNonNull(annotationClass);
 
         return AnnotationSupport.getDirectlyAndIndirectlyPresent(annotationData().declaredAnnotations,
@@ -4094,14 +4094,14 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
 
     // annotation data that might get invalidated when JVM TI RedefineClasses() is called
     private static class AnnotationData {
-        final Map<@Immutable Class<? extends @Readonly Annotation>, @Readonly Annotation> annotations;
-        final Map<@Immutable Class<? extends @Readonly Annotation>, @Readonly Annotation> declaredAnnotations;
+        final Map<Class<? extends @Readonly Annotation>, @Readonly Annotation> annotations;
+        final Map<Class<? extends @Readonly Annotation>, @Readonly Annotation> declaredAnnotations;
 
         // Value of classRedefinedCount when we created this AnnotationData instance
         final int redefinedCount;
 
-        AnnotationData(Map<@Immutable Class<? extends @Readonly Annotation>, @Readonly Annotation> annotations,
-                       Map<@Immutable Class<? extends @Readonly Annotation>, @Readonly Annotation> declaredAnnotations,
+        AnnotationData(Map<Class<? extends @Readonly Annotation>, @Readonly Annotation> annotations,
+                       Map<Class<? extends @Readonly Annotation>, @Readonly Annotation> declaredAnnotations,
                        int redefinedCount) {
             this.annotations = annotations;
             this.declaredAnnotations = declaredAnnotations;
@@ -4132,15 +4132,15 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
     }
 
     private AnnotationData createAnnotationData(int classRedefinedCount) {
-        Map<@Immutable Class<? extends @Readonly Annotation>, @Readonly Annotation> declaredAnnotations =
+        Map<Class<? extends @Readonly Annotation>, @Readonly Annotation> declaredAnnotations =
             AnnotationParser.parseAnnotations(getRawAnnotations(), getConstantPool(), this);
         Class<?> superClass = getSuperclass();
-        Map<Class<? extends Annotation>, Annotation> annotations = null;
+        Map<Class<? extends @Readonly Annotation>, @Readonly Annotation> annotations = null;
         if (superClass != null) {
-            Map<Class<? extends Annotation>, Annotation> superAnnotations =
+            Map<Class<? extends @Readonly Annotation>, @Readonly Annotation> superAnnotations =
                 superClass.annotationData().annotations;
-            for (Map.Entry<Class<? extends Annotation>, Annotation> e : superAnnotations.entrySet()) {
-                Class<? extends Annotation> annotationClass = e.getKey();
+            for (Map.Entry<Class<? extends @Readonly Annotation>, @Readonly Annotation> e : superAnnotations.entrySet()) {
+                Class<? extends @Readonly Annotation> annotationClass = e.getKey();
                 if (AnnotationType.getInstance(annotationClass).isInherited()) {
                     if (annotations == null) { // lazy construction
                         annotations = new LinkedHashMap<>((Math.max(

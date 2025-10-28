@@ -173,7 +173,7 @@ public abstract class Reference<T> {
      *        dequeued: ReferenceQueue.NULL
      *    unregistered: ReferenceQueue.NULL
      */
-    volatile ReferenceQueue<? super T> queue;
+    volatile @Mutable ReferenceQueue<? super T> queue;
 
     /* The link in a ReferenceQueue's list of Reference objects.
      *
@@ -506,7 +506,7 @@ public abstract class Reference<T> {
     }
 
     @SuppressWarnings({"unchecked"})
-    Reference(T referent, @ReceiverDependentMutable ReferenceQueue<? super T> queue) {
+    Reference(T referent, ReferenceQueue<? super T> queue) {
         this.referent = referent;
         this.queue = (queue == null) ? ReferenceQueue.NULL : queue;
     }

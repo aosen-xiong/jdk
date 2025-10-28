@@ -27,6 +27,7 @@ package java.lang;
 
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
@@ -51,7 +52,8 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @jls 11.2 Compile-Time Checking of Exceptions
  * @since   1.0
  */
-@AnnotatedFor({"lock", "nullness"})
+@AnnotatedFor({"lock", "nullness", "pico"})
+@ReceiverDependentMutable
 public class Error extends Throwable {
     @java.io.Serial
     static final long serialVersionUID = 4980196508277280342L;
@@ -94,7 +96,7 @@ public class Error extends Throwable {
      * @since  1.4
      */
     @SideEffectFree
-    public Error(@Nullable String message, @GuardSatisfied @Nullable Throwable cause) {
+    public Error(@Nullable String message, @GuardSatisfied @Nullable @ReceiverDependentMutable Throwable cause) {
         super(message, cause);
     }
 
@@ -112,7 +114,7 @@ public class Error extends Throwable {
      * @since  1.4
      */
     @SideEffectFree
-    public Error(@Nullable Throwable cause) {
+    public Error(@Nullable @ReceiverDependentMutable Throwable cause) {
         super(cause);
     }
 
@@ -132,7 +134,7 @@ public class Error extends Throwable {
      * @since 1.7
      */
     @SideEffectFree
-    protected Error(@Nullable String message, @Nullable Throwable cause,
+    protected Error(@Nullable String message, @Nullable @ReceiverDependentMutable Throwable cause,
                     boolean enableSuppression,
                     boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);

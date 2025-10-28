@@ -54,7 +54,7 @@ import java.util.function.BiFunction;
 final class WeakPairMap<K1 extends @Immutable Object, K2 extends @Immutable Object, V> {
 
     private final ConcurrentHashMap<@Immutable Pair<K1, K2>, V> map = new ConcurrentHashMap<>();
-    private final ReferenceQueue<@Readonly Object> queue = new ReferenceQueue<>();
+    private final @Mutable ReferenceQueue<@Readonly Object> queue = new ReferenceQueue<>();
 
     /**
      * Tests if the specified pair of keys are associated with a value
@@ -193,7 +193,6 @@ final class WeakPairMap<K1 extends @Immutable Object, K2 extends @Immutable Obje
      * keys in key pair has been found weakly-reachable and corresponding
      * WeakRefPeer(s) enqueued. Called as part of each public operation.
      */
-    @SuppressWarnings("pico:method.invocation.invalid") // remove stale entry method
     private void expungeStaleAssociations(@Readonly WeakPairMap<K1, K2, V> this) {
         WeakRefPeer<?> peer;
         while ((peer = (WeakRefPeer<?>) queue.poll()) != null) {
@@ -208,7 +207,7 @@ final class WeakPairMap<K1 extends @Immutable Object, K2 extends @Immutable Obje
     private interface Pair<K1, K2> {
 
         static <K1, K2> @Immutable Pair<K1, K2> weak(K1 k1, K2 k2,
-                                                     @Immutable ReferenceQueue<@Readonly Object> queue) {
+                                                     ReferenceQueue<@Readonly Object> queue) {
             return new @Immutable Weak<>(k1, k2, queue);
         }
 
@@ -270,7 +269,7 @@ final class WeakPairMap<K1 extends @Immutable Object, K2 extends @Immutable Obje
             // link to <K2> peer
             private final WeakRefPeer<K2> peer;
 
-            @Mutable Weak(K1 k1, K2 k2, ReferenceQueue<@Readonly Object> queue) {
+            Weak(K1 k1, K2 k2, ReferenceQueue<@Readonly Object> queue) {
                 super(k1, queue);
                 hash = Pair.hashCode(k1, k2);
                 peer = new WeakRefPeer<>(k2, queue) {
@@ -356,7 +355,7 @@ final class WeakPairMap<K1 extends @Immutable Object, K2 extends @Immutable Obje
     @ReceiverDependentMutable
     private static abstract class WeakRefPeer<K> extends WeakReference<K> {
 
-        WeakRefPeer(K k, @ReceiverDependentMutable ReferenceQueue<@Readonly Object> queue) {
+        WeakRefPeer(K k, ReferenceQueue<@Readonly Object> queue) {
             super(Objects.requireNonNull(k), queue);
         }
 

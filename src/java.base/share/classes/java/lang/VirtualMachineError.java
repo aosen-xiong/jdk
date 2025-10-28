@@ -26,6 +26,7 @@
 package java.lang;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
@@ -37,7 +38,8 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @author  Frank Yellin
  * @since   1.0
  */
-@AnnotatedFor({"nullness"})
+@AnnotatedFor({"nullness", "pico"})
+@ReceiverDependentMutable
 public abstract class VirtualMachineError extends Error {
     @java.io.Serial
     private static final long serialVersionUID = 4161983926571568670L;
@@ -76,7 +78,7 @@ public abstract class VirtualMachineError extends Error {
      * @since  1.8
      */
     @SideEffectFree
-    public VirtualMachineError(@Nullable String message, @Nullable Throwable cause) {
+    public VirtualMachineError(@Nullable String message, @Nullable @ReceiverDependentMutable Throwable cause) {
         super(message, cause);
     }
 
@@ -93,7 +95,7 @@ public abstract class VirtualMachineError extends Error {
      * @since  1.8
      */
     @SideEffectFree
-    public VirtualMachineError(@Nullable Throwable cause) {
+    public VirtualMachineError(@Nullable @ReceiverDependentMutable Throwable cause) {
         super(cause);
     }
 }

@@ -44,7 +44,7 @@ import org.checkerframework.checker.interning.qual.Interned;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.checkerframework.checker.pico.qual.Mutable;
+import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.framework.qual.AnnotatedFor;
@@ -503,6 +503,7 @@ import sun.util.locale.provider.TimeZoneNameUtility;
  */
 @AnnotatedFor({"index", "interning", "lock", "nullness"})
 @SuppressWarnings("pico") // Not interesting class, fix later
+@Immutable
 public final class Locale implements Cloneable, Serializable {
 
     /** Useful constant for language.
@@ -1376,7 +1377,7 @@ public final class Locale implements Cloneable, Serializable {
      * no Unicode locale keywords.
      * @since 1.7
      */
-    public Set<String> getUnicodeLocaleKeys() {
+    public @Immutable Set<String> getUnicodeLocaleKeys() {
         if (localeExtensions == null) {
             return Collections.emptySet();
         }
