@@ -32,6 +32,8 @@ package java.math;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.common.value.qual.IntRange;
 import org.checkerframework.common.value.qual.PolyValue;
 import org.checkerframework.common.value.qual.StaticallyExecutable;
@@ -140,6 +142,7 @@ import jdk.internal.vm.annotation.Stable;
  */
 
 @AnnotatedFor({"initialization", "nullness", "value"})
+@Immutable
 public class BigInteger extends Number implements Comparable<BigInteger> {
     /**
      * The signum of this BigInteger: -1 for negative, 0 for zero, or
@@ -3889,7 +3892,7 @@ public class BigInteger extends Number implements Comparable<BigInteger> {
      */
     @Pure
     @EnsuresNonNullIf(expression="#1", result=true)
-    public boolean equals(@Nullable Object x) {
+    public boolean equals(@Nullable @Readonly Object x) {
         // This test is just an optimization, which may or may not help
         if (x == this)
             return true;

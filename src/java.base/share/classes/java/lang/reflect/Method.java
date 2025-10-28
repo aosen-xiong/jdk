@@ -28,6 +28,7 @@ package java.lang.reflect;
 import org.checkerframework.checker.interning.qual.Interned;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.nullness.qual.Readonly;
 import org.checkerframework.common.reflection.qual.Invoke;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
@@ -573,7 +574,7 @@ public final class Method extends Executable {
     @CallerSensitive
     @ForceInline // to ensure Reflection.getCallerClass optimization
     @IntrinsicCandidate
-    public @Nullable Object invoke(Object obj, Object... args)
+    public @Nullable @Readonly Object invoke(@Readonly Object obj, @Readonly Object... args)
         throws IllegalAccessException, IllegalArgumentException,
            InvocationTargetException
     {
