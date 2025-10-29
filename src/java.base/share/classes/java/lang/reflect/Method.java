@@ -374,7 +374,7 @@ public final class Method extends Executable {
      * and formal parameter types and return type.
      */
     @Pure
-    public boolean equals(@GuardSatisfied Method this, @GuardSatisfied @Nullable Object obj) {
+    public boolean equals(@GuardSatisfied Method this, @GuardSatisfied @Nullable @Readonly Object obj) {
         if (obj instanceof Method other) {
             if ((getDeclaringClass() == other.getDeclaringClass())
                 && (getName() == other.getName())) {
