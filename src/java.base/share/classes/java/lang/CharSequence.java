@@ -32,6 +32,7 @@ import org.checkerframework.checker.index.qual.SameLen;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nonempty.qual.EnsuresNonEmptyIf;
 import org.checkerframework.checker.nonempty.qual.NonEmpty;
+import org.checkerframework.checker.pico.qual.PolyMutable;
 import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.dataflow.qual.Pure;
@@ -140,7 +141,7 @@ public interface CharSequence {
      *          or if {@code start} is greater than {@code end}
      */
     @SideEffectFree
-    CharSequence subSequence(@IndexOrHigh({"this"}) int start, @IndexOrHigh({"this"}) int end);
+    @PolyMutable CharSequence subSequence(@PolyMutable CharSequence this, @IndexOrHigh({"this"}) int start, @IndexOrHigh({"this"}) int end);
 
     /**
      * Returns a string containing the characters in this sequence in the same
