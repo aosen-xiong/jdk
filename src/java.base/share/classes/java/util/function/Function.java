@@ -24,6 +24,7 @@
  */
 package java.util.function;
 
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.framework.qual.AnnotatedFor;
 import org.checkerframework.framework.qual.Covariant;
 
@@ -40,9 +41,10 @@ import java.util.Objects;
  *
  * @since 1.8
  */
-@AnnotatedFor({"lock", "nullness"})
+@AnnotatedFor({"lock", "nullness", "pico"})
 @Covariant(1)
 @FunctionalInterface
+@ReceiverDependentMutable
 public interface Function<T, R> {
 
     /**
