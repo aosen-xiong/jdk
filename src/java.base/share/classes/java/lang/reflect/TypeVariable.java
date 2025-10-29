@@ -25,6 +25,8 @@
 
 package java.lang.reflect;
 
+import org.checkerframework.checker.nullness.qual.Immutable;
+
 /**
  * TypeVariable is the common superinterface for type variables of kinds.
  * A type variable is created the first time it is needed by a reflective
@@ -49,7 +51,8 @@ package java.lang.reflect;
  * @jls 4.4 Type Variables
  * @since 1.5
  */
-public interface TypeVariable<D extends GenericDeclaration> extends Type, AnnotatedElement {
+@Immutable
+public interface TypeVariable<D extends @Immutable GenericDeclaration> extends Type, AnnotatedElement {
     /**
      * Returns an array of {@code Type} objects representing the
      * upper bound(s) of this type variable.  If no upper bound is

@@ -28,6 +28,7 @@ package java.lang.reflect;
 import org.checkerframework.checker.interning.qual.Interned;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.nullness.qual.Immutable;
 import org.checkerframework.checker.nullness.qual.Readonly;
 import org.checkerframework.common.reflection.qual.Invoke;
 import org.checkerframework.dataflow.qual.Pure;
@@ -76,8 +77,9 @@ import java.util.StringJoiner;
  * @author Nakul Saraiya
  * @since 1.1
  */
-@AnnotatedFor({"interning", "lock", "nullness"})
+@AnnotatedFor({"interning", "lock", "nullness", "pico"})
 @SuppressWarnings({"rawtypes"})
+@Immutable
 public final class Method extends Executable {
     @Stable
     private Class<?>            clazz;
