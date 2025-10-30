@@ -508,7 +508,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
      * @throws  NullPointerException if the specified map is null
      */
     @SuppressWarnings("pico") // PICO constructor fix
-    public @PolyNonEmpty HashMap(@PolyNonEmpty Map<? extends K, ? extends V> m) {
+    public @PolyNonEmpty HashMap(@PolyNonEmpty @Readonly Map<? extends K, ? extends V> m) {
         this.loadFactor = DEFAULT_LOAD_FACTOR;
         putMapEntries(m, false);
     }

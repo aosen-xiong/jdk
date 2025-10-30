@@ -123,7 +123,7 @@ public interface NavigableMap<K extends @Immutable Object,V> extends SortedMap<K
      * @throws NullPointerException if the specified key is null
      *         and this map does not permit null keys
      */
-    Map.@Nullable @PolyMutable  Entry<K,V> lowerEntry(@PolyMutable NavigableMap<K,V> this, K key);
+    Map.@Nullable @PolyMutable Entry<K,V> lowerEntry(@PolyMutable NavigableMap<K,V> this, K key);
 
     /**
      * Returns the greatest key strictly less than the given key, or
@@ -181,7 +181,7 @@ public interface NavigableMap<K extends @Immutable Object,V> extends SortedMap<K
      * @throws NullPointerException if the specified key is null
      *         and this map does not permit null keys
      */
-    Map.@Nullable @PolyMutable  Entry<K,V> ceilingEntry(@PolyMutable NavigableMap<K,V> this, K key);
+    Map.@Nullable @PolyMutable Entry<K,V> ceilingEntry(@PolyMutable NavigableMap<K,V> this, K key);
 
     /**
      * Returns the least key greater than or equal to the given key,

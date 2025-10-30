@@ -425,7 +425,7 @@ public abstract class AbstractCollection<E> implements Collection<E> {
      * @see #remove(Object)
      * @see #contains(Object)
      */
-    public boolean retainAll(@Mutable @GuardSatisfied AbstractCollection<E> this, Collection<? extends @UnknownSignedness @Readonly Object> c) {
+    public boolean retainAll(@Mutable @GuardSatisfied AbstractCollection<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) {
         Objects.requireNonNull(c);
         boolean modified = false;
         Iterator<E> it = iterator();
