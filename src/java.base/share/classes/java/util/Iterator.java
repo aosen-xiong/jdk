@@ -90,7 +90,7 @@ public interface Iterator<E> {
      * @return the next element in the iteration
      * @throws NoSuchElementException if the iteration has no more elements
      */
-    E next(@GuardSatisfied @NonEmpty Iterator<E> this);
+    E next(@GuardSatisfied @NonEmpty @Mutable Iterator<E> this);
 
     /**
      * Removes from the underlying collection the last element returned
