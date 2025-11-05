@@ -202,7 +202,7 @@ import jdk.internal.vm.annotation.Stable;
      * @return the new list
      */
     @SafeVarargs
-    @SuppressWarnings("pico") // convert mutable to immutable
+    @SuppressWarnings("pico") // cast from @Unique @Mutable to @Immutable
     static <E> @Immutable List<E> listFromArray(E @Readonly... input) {
         // copy and check manually to avoid TOCTOU
         @SuppressWarnings("unchecked")
