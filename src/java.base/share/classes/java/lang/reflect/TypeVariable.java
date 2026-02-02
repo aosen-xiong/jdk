@@ -25,7 +25,7 @@
 
 package java.lang.reflect;
 
-import org.checkerframework.checker.nullness.qual.Immutable;
+import org.checkerframework.checker.pico.qual.Immutable;
 
 /**
  * TypeVariable is the common superinterface for type variables of kinds.

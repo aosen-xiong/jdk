@@ -107,7 +107,8 @@ import jdk.internal.access.SharedSecrets;
  * @since   1.6
  */
 @AnnotatedFor({"lock", "nullness", "index", "pico"})
-@ReceiverDependentMutable public class ArrayDeque<E extends @NonNull @Readonly Object> extends AbstractCollection<E>
+@ReceiverDependentMutable
+public class ArrayDeque<E extends @NonNull @Readonly Object> extends AbstractCollection<E>
                            implements Deque<E>, Cloneable, Serializable
 {
     /*

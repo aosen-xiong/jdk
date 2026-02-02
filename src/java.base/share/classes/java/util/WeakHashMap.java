@@ -157,6 +157,7 @@ import java.util.function.Consumer;
 @CFComment({"lock: permits null keys and values"})
 @AnnotatedFor({"lock", "index", "nullness"})
 @ReceiverDependentMutable
+@SuppressWarnings("pico")
 public class WeakHashMap<K extends @Immutable Object,V>
     extends AbstractMap<K,V>
     implements Map<K,V> {
