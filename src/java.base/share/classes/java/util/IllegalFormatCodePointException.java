@@ -25,6 +25,9 @@
 
 package java.util;
 
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 /**
  * Unchecked exception thrown when a character with an invalid Unicode code
  * point as defined by {@link Character#isValidCodePoint} is passed to the
@@ -36,7 +39,8 @@ package java.util;
  *
  * @since 1.5
  */
-@SuppressWarnings("pico") // Not interesting class, fix later
+@AnnotatedFor("pico")
+@ReceiverDependentMutable
 public class IllegalFormatCodePointException extends IllegalFormatException {
 
     @java.io.Serial

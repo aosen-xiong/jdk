@@ -25,6 +25,9 @@
 
 package java.util;
 
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 /**
  * Unchecked exception thrown when the format width is a negative value other
  * than {@code -1} or is otherwise unsupported. If a given format width is not
@@ -33,7 +36,8 @@ package java.util;
  *
  * @since 1.5
  */
-@SuppressWarnings("pico") // Not interesting class, fix later
+@AnnotatedFor("pico")
+@ReceiverDependentMutable
 public class IllegalFormatWidthException extends IllegalFormatException {
 
     @java.io.Serial

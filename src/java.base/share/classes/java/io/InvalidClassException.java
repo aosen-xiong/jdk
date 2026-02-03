@@ -25,6 +25,9 @@
 
 package java.io;
 
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 /**
  * Thrown when the Serialization runtime detects one of the following
  * problems with a Class.
@@ -41,6 +44,8 @@ package java.io;
  *
  * @since   1.1
  */
+@AnnotatedFor("pico")
+@ReceiverDependentMutable
 public class InvalidClassException extends ObjectStreamException {
 
     @java.io.Serial

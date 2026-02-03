@@ -25,6 +25,9 @@
 
 package java.util;
 
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 /**
  * Unchecked exception thrown when a conversion and flag are incompatible.
  *
@@ -34,7 +37,8 @@ package java.util;
  *
  * @since 1.5
  */
-@SuppressWarnings("pico") // Not interesting class, fix later
+@AnnotatedFor("pico")
+@ReceiverDependentMutable
 public class FormatFlagsConversionMismatchException
     extends IllegalFormatException
 {
