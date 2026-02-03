@@ -500,12 +500,12 @@ public final class AnnotatedTypeFactory {
     }
 
     private static final class AnnotatedWildcardTypeImpl extends AnnotatedTypeBaseImpl implements AnnotatedWildcardType {
-        private final boolean hasUpperBounds;
+        private final boolean hasUpperBounds_h;
         AnnotatedWildcardTypeImpl(WildcardType type, LocationInfo location,
                 TypeAnnotation[] actualTypeAnnotations, TypeAnnotation[] allOnSameTargetTypeAnnotations,
                 AnnotatedElement decl) {
             super(type, location, actualTypeAnnotations, allOnSameTargetTypeAnnotations, decl);
-            hasUpperBounds = (type.getLowerBounds().length == 0);
+            hasUpperBounds_h = (type.getLowerBounds().length == 0);
         }
 
         @Override
@@ -523,7 +523,7 @@ public final class AnnotatedTypeFactory {
 
         @Override
         public AnnotatedType[] getAnnotatedLowerBounds() {
-            if (hasUpperBounds)
+            if (hasUpperBounds_h)
                 return new AnnotatedType[0];
             return getAnnotatedBounds(getWildcardType().getLowerBounds());
         }
@@ -557,7 +557,7 @@ public final class AnnotatedTypeFactory {
         }
 
         private boolean hasUpperBounds() {
-            return hasUpperBounds;
+            return hasUpperBounds_h;
         }
 
         @Override

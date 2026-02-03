@@ -1080,35 +1080,35 @@ final class StringUTF16 {
     private static final class LinesSpliterator implements Spliterator<String> {
         private byte @Readonly [] value;
         private int index;        // current index, modified on advance/split
-        private final int fence;  // one past last index
+        private final int fence_h;  // one past last index
 
         private LinesSpliterator(byte @Readonly [] value, int start, int length) {
             this.value = value;
             this.index = start;
-            this.fence = start + length;
+            this.fence_h = start + length;
         }
 
         private int indexOfLineSeparator(@Readonly LinesSpliterator this, int start) {
-            for (int current = start; current < fence; current++) {
+            for (int current = start; current < fence_h; current++) {
                 char ch = getChar(value, current);
                 if (ch == '\n' || ch == '\r') {
                     return current;
                 }
             }
-            return fence;
+            return fence_h;
         }
 
         private int skipLineSeparator(@Readonly LinesSpliterator this, int start) {
-            if (start < fence) {
+            if (start < fence_h) {
                 if (getChar(value, start) == '\r') {
                     int next = start + 1;
-                    if (next < fence && getChar(value, next) == '\n') {
+                    if (next < fence_h && getChar(value, next) == '\n') {
                         return next + 1;
                     }
                 }
                 return start + 1;
             }
-            return fence;
+            return fence_h;
         }
 
         private String next(@Mutable LinesSpliterator this) {
@@ -1123,7 +1123,7 @@ final class StringUTF16 {
             if (action == null) {
                 throw new NullPointerException("tryAdvance action missing");
             }
-            if (index != fence) {
+            if (index != fence_h) {
                 action.accept(next());
                 return true;
             }
@@ -1135,16 +1135,16 @@ final class StringUTF16 {
             if (action == null) {
                 throw new NullPointerException("forEachRemaining action missing");
             }
-            while (index != fence) {
+            while (index != fence_h) {
                 action.accept(next());
             }
         }
 
         @Override
         public Spliterator<String> trySplit(@Mutable LinesSpliterator this) {
-            int half = (fence + index) >>> 1;
+            int half = (fence_h + index) >>> 1;
             int mid = skipLineSeparator(indexOfLineSeparator(half));
-            if (mid < fence) {
+            if (mid < fence_h) {
                 int start = index;
                 index = mid;
                 return new LinesSpliterator(value, start, mid - start);
@@ -1154,7 +1154,7 @@ final class StringUTF16 {
 
         @Override
         public long estimateSize(@Readonly LinesSpliterator this) {
-            return fence - index + 1;
+            return fence_h - index + 1;
         }
 
         @Override
