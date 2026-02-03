@@ -101,7 +101,7 @@ public abstract class EnumSet<E extends Enum<E>> extends AbstractSet<E>
      */
     final transient Enum<?>[] universe;
 
-    EnumSet(Class<E>elementType, Enum<?>[] universe) {
+    EnumSet(Class<E>elementType, Enum<?> @ReceiverDependentMutable [] universe) {
         this.elementType = elementType;
         this.universe    = universe;
     }

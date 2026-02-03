@@ -918,7 +918,7 @@ public class LinkedList<E>
         private int nextIndex;
         private int expectedModCount = modCount;
 
-        @SuppressWarnings("pico:initialization.fields.uninitialized") // Lazy
+        // @SuppressWarnings("pico:initialization.fields.uninitialized") // Lazy
         ListItr(int index) {
             // assert isPositionIndex(index);
             next = (index == size) ? null : node(index);
@@ -1238,9 +1238,9 @@ public class LinkedList<E>
         static final int BATCH_UNIT = 1 << 10;  // batch array size increment
         static final int MAX_BATCH = 1 << 25;  // max batch array size;
         final @Readonly LinkedList<E> list; // null OK unless traversed
-        @Readonly Node<E> current;      // current node; null until initialized
-        int est;              // size estimate; -1 until first needed
-        int expectedModCount; // initialized when est set
+        @Assignable /* should be @LazyFinal */ @Readonly Node<E> current;      // current node; null until initialized
+        @Assignable /* should be @LazyFinal */ int est;              // size estimate; -1 until first needed
+        @Assignable /* should be @LazyFinal */ int expectedModCount; // initialized when est set
         int batch;            // batch size for splits
 
         LLSpliterator(@Readonly LinkedList<E> list, int est, int expectedModCount) {

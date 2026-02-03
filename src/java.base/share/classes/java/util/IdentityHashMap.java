@@ -1460,9 +1460,9 @@ public class IdentityHashMap<K extends @Immutable Object,V>
     static class IdentityHashMapSpliterator<K extends @Immutable Object,V> {
         final @Readonly IdentityHashMap<K,V> map;
         int index;             // current index, modified on advance/split
-        int fence;             // -1 until first use; then one past last index
-        int est;               // size estimate
-        int expectedModCount;  // initialized when fence set
+        @Assignable /* should be @LazyFinal */ int fence;             // -1 until first use; then one past last index
+        @Assignable /* should be @LazyFinal */ int est;               // size estimate
+        @Assignable /* should be @LazyFinal */ int expectedModCount;  // initialized when fence set
 
         IdentityHashMapSpliterator(@Readonly IdentityHashMap<K,V> map, int origin,
                                    int fence, int est, int expectedModCount) {
