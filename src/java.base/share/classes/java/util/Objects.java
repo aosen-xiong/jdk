@@ -55,7 +55,7 @@ import java.util.function.Supplier;
  *
  * @since 1.7
  */
-@AnnotatedFor({"index", "interning", "lock", "nullness"})
+@AnnotatedFor({"index", "interning", "lock", "nullness", "pico"})
 public final @UsesObjectEquals class Objects {
     private Objects() {
         throw new AssertionError("No java.util.Objects instances for you!");

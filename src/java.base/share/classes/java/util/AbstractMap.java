@@ -35,6 +35,7 @@ import org.checkerframework.checker.nullness.qual.EnsuresKeyFor;
 import org.checkerframework.checker.nullness.qual.EnsuresKeyForIf;
 import org.checkerframework.checker.nullness.qual.KeyFor;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Assignable;
 import org.checkerframework.checker.pico.qual.LazyFinal;
 import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.checker.pico.qual.Mutable;
@@ -360,8 +361,8 @@ public abstract class AbstractMap<K extends @Immutable Object,V> implements Map<
      * }
      *}</pre>
      */
-    transient @LazyFinal Set<K>        keySet;
-    transient @LazyFinal Collection<V> values;
+    transient @Assignable /* should be @LazyFinal */ Set<K>        keySet;
+    transient @Assignable /* should be @LazyFinal */ Collection<V> values;
 
     /**
      * {@inheritDoc}

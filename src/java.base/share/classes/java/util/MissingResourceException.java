@@ -40,6 +40,9 @@
 
 package java.util;
 
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 /**
  * Signals that a resource is missing.
  * @see java.lang.Exception
@@ -47,7 +50,8 @@ package java.util;
  * @author      Mark Davis
  * @since       1.1
  */
-@SuppressWarnings("pico") // Not interesting class, fix later
+@AnnotatedFor("pico")
+@ReceiverDependentMutable
 public class MissingResourceException extends RuntimeException {
 
     /**
@@ -81,7 +85,7 @@ public class MissingResourceException extends RuntimeException {
      *        permitted, and indicates that the cause is nonexistent
      *        or unknown.)
      */
-    MissingResourceException(String message, String className, String key, Throwable cause) {
+    MissingResourceException(String message, String className, String key, @ReceiverDependentMutable Throwable cause) {
         super(message, cause);
         this.className = className;
         this.key = key;

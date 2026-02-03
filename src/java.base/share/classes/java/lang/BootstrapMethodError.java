@@ -25,6 +25,8 @@
 
 package java.lang;
 
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 /**
  * Thrown to indicate that an {@code invokedynamic} instruction or a dynamic
  * constant failed to resolve its bootstrap method and arguments,
@@ -39,6 +41,7 @@ package java.lang;
  * @author John Rose, JSR 292 EG
  * @since 1.7
  */
+@AnnotatedFor("pico")
 public class BootstrapMethodError extends LinkageError {
     @java.io.Serial
     private static final long serialVersionUID = 292L;

@@ -54,6 +54,7 @@ import sun.security.util.SecurityConstants;
 
 import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.checker.pico.qual.Readonly;
+import org.checkerframework.framework.qual.AnnotatedFor;
 
 /**
  * A layer of modules in the Java virtual machine.
@@ -148,6 +149,7 @@ import org.checkerframework.checker.pico.qual.Readonly;
  * @since 9
  * @see Module#getLayer()
  */
+@AnnotatedFor("pico")
 @Immutable
 public final class ModuleLayer {
 

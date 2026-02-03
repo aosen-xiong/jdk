@@ -51,7 +51,7 @@ import java.io.ObjectStreamField;
  * @see     java.lang.ClassLoader#loadClass(java.lang.String, boolean)
  * @since   1.0
  */
-@AnnotatedFor({"nullness"})
+@AnnotatedFor({"nullness", "pico"})
 public class ClassNotFoundException extends ReflectiveOperationException {
     /**
      * use serialVersionUID from JDK 1.1.X for interoperability

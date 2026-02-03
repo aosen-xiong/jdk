@@ -970,7 +970,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
      * view the first time this view is requested.  The view is stateless,
      * so there's no reason to create more than one.
      */
-    private transient @LazyFinal Set<Map.@ReceiverDependentMutable Entry<K,V>> entrySet;
+    private transient @Assignable /* should be @LazyFinal */ Set<Map.@ReceiverDependentMutable Entry<K,V>> entrySet;
 
     /**
      * Returns an identity-based set view of the keys contained in this map.

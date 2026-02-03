@@ -65,7 +65,7 @@ public class Object {
      */
     @Pure
     @IntrinsicCandidate
-    public @ReceiverDependentMutable @Unique @Untainted Object() {}
+    public @Unique @Untainted Object() {}
 
     /**
      * Returns the runtime class of this {@code Object}. The returned

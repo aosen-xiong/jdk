@@ -35,6 +35,7 @@ import org.checkerframework.checker.nullness.qual.EnsuresKeyForIf;
 import org.checkerframework.checker.nullness.qual.KeyFor;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
+import org.checkerframework.checker.pico.qual.Assignable;
 import org.checkerframework.checker.pico.qual.LazyFinal;
 import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.checker.pico.qual.Mutable;
@@ -893,7 +894,7 @@ public class WeakHashMap<K extends @Immutable Object,V>
 
     // Views
 
-    private transient @LazyFinal  Set<Map.Entry<K,V>> entrySet;
+    private transient @Assignable /* should be @LazyFinal */  Set<Map.Entry<K,V>> entrySet;
 
     /**
      * Returns a {@link Set} view of the keys contained in this map.

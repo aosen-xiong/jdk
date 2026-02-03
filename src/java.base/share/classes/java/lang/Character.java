@@ -193,7 +193,7 @@ import static java.lang.constant.ConstantDescs.DEFAULT_NAME;
  * @author  Ulf Zibis
  * @since   1.0
  */
-@AnnotatedFor({"index", "initialization", "interning", "nullness", "value"})
+@AnnotatedFor({"index", "initialization", "interning", "nullness", "pico", "value"})
 @jdk.internal.ValueBased
 @Immutable
 public final

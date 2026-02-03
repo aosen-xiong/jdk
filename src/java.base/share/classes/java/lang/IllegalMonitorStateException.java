@@ -41,7 +41,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @see     java.lang.Object#wait(long, int)
  * @since   1.0
  */
-@AnnotatedFor({"nullness"})
+@AnnotatedFor({"nullness", "pico"})
 public class IllegalMonitorStateException extends RuntimeException {
     @java.io.Serial
     private static final long serialVersionUID = 3713306369498869069L;

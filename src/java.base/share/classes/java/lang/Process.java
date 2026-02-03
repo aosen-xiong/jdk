@@ -104,7 +104,7 @@ import java.util.stream.Stream;
  *
  * @since   1.0
  */
-@AnnotatedFor({"interning", "nullness", "mustcall"})
+@AnnotatedFor({"interning", "nullness", "mustcall", "pico"})
 public abstract @UsesObjectEquals class Process {
 
     // Readers and Writers created for this process; so repeated calls return the same object

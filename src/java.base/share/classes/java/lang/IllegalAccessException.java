@@ -59,7 +59,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @see     java.lang.reflect.Constructor#newInstance(Object[])
  * @since   1.0
  */
-@AnnotatedFor({"nullness"})
+@AnnotatedFor({"nullness", "pico"})
 public class IllegalAccessException extends ReflectiveOperationException {
     private static final long serialVersionUID = 6616958222490762034L;
 

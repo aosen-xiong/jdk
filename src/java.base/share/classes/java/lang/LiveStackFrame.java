@@ -31,6 +31,7 @@ import java.util.Set;
 import static java.lang.StackWalker.ExtendedOption.LOCALS_AND_OPERANDS;
 
 import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.framework.qual.AnnotatedFor;
 
 /**
  * <em>UNSUPPORTED</em> This interface is intended to be package-private
@@ -43,6 +44,7 @@ import org.checkerframework.checker.pico.qual.Immutable;
  * @jvms 2.6 Frames
  */
 /* package-private */
+@AnnotatedFor("pico")
 interface LiveStackFrame extends StackFrame {
     /**
      * Return the monitors held by this stack frame. This method returns

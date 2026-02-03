@@ -36,7 +36,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @see     java.lang.Runtime
  * @since   1.0
  */
-@AnnotatedFor({"nullness"})
+@AnnotatedFor({"nullness", "pico"})
 public class UnsatisfiedLinkError extends LinkageError {
     @java.io.Serial
     private static final long serialVersionUID = -4019343241616879428L;

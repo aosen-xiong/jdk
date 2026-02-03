@@ -27,6 +27,8 @@ package java.lang;
 
 import java.lang.annotation.*;
 
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 /**
  * A programmer assertion that the body of the annotated method or
  * constructor does not perform potentially unsafe operations on its
@@ -87,6 +89,7 @@ import java.lang.annotation.*;
  * @jls 8.4.1 Formal Parameters
  * @jls 9.6.4.7 @SafeVarargs
  */
+@AnnotatedFor("pico")
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.CONSTRUCTOR, ElementType.METHOD})

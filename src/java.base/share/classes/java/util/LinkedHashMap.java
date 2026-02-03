@@ -179,7 +179,7 @@ import java.io.IOException;
  * @see     Hashtable
  * @since   1.4
  */
-@AnnotatedFor({"lock", "nullness", "index"})
+@AnnotatedFor({"lock", "nullness", "index", "pico"})
 @ReceiverDependentMutable
 public class LinkedHashMap<K extends @Immutable Object,V>
     extends HashMap<K,V>

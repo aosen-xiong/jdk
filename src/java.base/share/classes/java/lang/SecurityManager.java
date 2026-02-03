@@ -321,7 +321,7 @@ import sun.security.util.SecurityConstants;
  *       See <a href="https://openjdk.java.net/jeps/411">JEP 411</a> for
  *       discussion and alternatives.
  */
-@AnnotatedFor({"interning", "nullness"})
+@AnnotatedFor({"interning", "nullness", "pico"})
 @Deprecated(since="17", forRemoval=true)
 public @UsesObjectEquals class SecurityManager {
 

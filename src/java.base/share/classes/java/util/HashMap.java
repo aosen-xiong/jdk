@@ -419,7 +419,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
      * Holds cached entrySet(). Note that AbstractMap fields are used
      * for keySet() and values().
      */
-    transient @LazyFinal Set<Map.@ReceiverDependentMutable Entry<K,V>> entrySet;
+    transient @Assignable /* should be @LazyFinal */ Set<Map.@ReceiverDependentMutable Entry<K,V>> entrySet;
 
     /**
      * The number of key-value mappings contained in this map.

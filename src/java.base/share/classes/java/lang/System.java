@@ -33,6 +33,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
 import org.checkerframework.checker.signedness.qual.PolySigned;
 import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.Mutable;
 import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
@@ -114,7 +115,7 @@ import sun.security.util.SecurityConstants;
  *
  * @since   1.0
  */
-@AnnotatedFor({"index", "interning", "lock", "mustcall", "nullness", "signedness"})
+@AnnotatedFor({"index", "interning", "lock", "mustcall", "nullness", "pico", "signedness"})
 public final @UsesObjectEquals class System {
     /* Register the natives via the static initializer.
      *
@@ -1359,7 +1360,7 @@ public final @UsesObjectEquals class System {
          * @throws NullPointerException if {@code level} is {@code null}.
          */
         public default void log(Level level, String msg) {
-            log(level, (ResourceBundle) null, msg, (Object[]) null);
+            log(level, (ResourceBundle) null, msg, (Object @Mutable []) null);
         }
 
         /**
@@ -1382,7 +1383,7 @@ public final @UsesObjectEquals class System {
         public default void log(Level level, Supplier<String> msgSupplier) {
             Objects.requireNonNull(msgSupplier);
             if (isLoggable(Objects.requireNonNull(level))) {
-                log(level, (ResourceBundle) null, msgSupplier.get(), (Object[]) null);
+                log(level, (ResourceBundle) null, msgSupplier.get(), (Object @Mutable []) null);
             }
         }
 
@@ -1407,7 +1408,7 @@ public final @UsesObjectEquals class System {
         public default void log(Level level, Object obj) {
             Objects.requireNonNull(obj);
             if (isLoggable(Objects.requireNonNull(level))) {
-                this.log(level, (ResourceBundle) null, obj.toString(), (Object[]) null);
+                this.log(level, (ResourceBundle) null, obj.toString(), (Object @Mutable []) null);
             }
         }
 

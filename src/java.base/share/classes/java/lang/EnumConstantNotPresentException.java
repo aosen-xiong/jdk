@@ -39,7 +39,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @see     java.lang.reflect.AnnotatedElement
  * @since   1.5
  */
-@AnnotatedFor({"nullness"})
+@AnnotatedFor({"nullness", "pico"})
 @SuppressWarnings("rawtypes") /* rawtypes are part of the public api */
 public class EnumConstantNotPresentException extends RuntimeException {
     @java.io.Serial

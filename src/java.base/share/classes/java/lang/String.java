@@ -42,6 +42,7 @@ import org.checkerframework.checker.lock.qual.NewObject;
 import org.checkerframework.checker.nonempty.qual.EnsuresNonEmptyIf;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Assignable;
 import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.checker.pico.qual.LazyFinal;
 import org.checkerframework.checker.pico.qual.Readonly;
@@ -208,13 +209,13 @@ public final class String
     private final byte coder;
 
     /** Cache the hash code for the string */
-    private @LazyFinal  int hash; // Default to 0
+    private @Assignable /* should be @LazyFinal */  int hash; // Default to 0
 
     /**
      * Cache if the hash has been calculated as actually being zero, enabling
      * us to avoid recalculating this.
      */
-    private @LazyFinal boolean hashIsZero; // Default to false;
+    private @Assignable /* should be @LazyFinal */ boolean hashIsZero; // Default to false;
 
     /** use serialVersionUID from JDK 1.0.2 for interoperability */
     @java.io.Serial
@@ -1257,6 +1258,7 @@ public final class String
         return dp;
     }
 
+    @SuppressWarnings("pico:argument.type.incompatible") // ByteBuffer not exist in EISOP JDK
     private static int decodeWithDecoder(CharsetDecoder cd, char[] dst, byte @Readonly [] src, int offset, int length) {
         ByteBuffer bb = ByteBuffer.wrap(src, offset, length);
         CharBuffer cb = CharBuffer.wrap(dst, 0, dst.length);

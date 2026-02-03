@@ -148,7 +148,7 @@ import org.checkerframework.framework.qual.CFComment;
  * @param <E> the type of elements held in this queue
  */
 @CFComment({"lock/nullness: Subclasses of this interface/class may opt to prohibit null elements"})
-@AnnotatedFor({"lock", "nullness"})
+@AnnotatedFor({"lock", "nullness", "pico"})
 @ReceiverDependentMutable
 public interface Queue<E> extends Collection<E> {
     /**

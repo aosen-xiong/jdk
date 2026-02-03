@@ -25,12 +25,15 @@
 
 package java.lang;
 
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 /**
  * Thrown when creating a {@linkplain ModuleLayer module layer} fails.
  *
  * @see ModuleLayer
  * @since 9
  */
+@AnnotatedFor("pico")
 public class LayerInstantiationException extends RuntimeException {
     @java.io.Serial
     private static final long serialVersionUID = -906239691613568347L;

@@ -74,6 +74,7 @@ import org.checkerframework.checker.initialization.qual.UnderInitialization;
 import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.checker.pico.qual.Mutable;
 import org.checkerframework.checker.pico.qual.Readonly;
+import org.checkerframework.framework.qual.AnnotatedFor;
 
 /**
  * Represents a run-time module, either {@link #isNamed() named} or unnamed.
@@ -102,6 +103,7 @@ import org.checkerframework.checker.pico.qual.Readonly;
  * @jls 7.7 Module Declarations
  */
 
+@AnnotatedFor("pico")
 @Immutable
 public final class Module implements AnnotatedElement {
 
@@ -1131,6 +1133,7 @@ public final class Module implements AnnotatedElement {
      *         If the module cannot be defined to the VM or its packages overlap
      *         with another module mapped to the same class loader
      */
+    @SuppressWarnings("pico:method.invocation.invalid") // Type system is not precise enough at line nameToSource.put(other.name(), m2);
     static Map<String, Module> defineModules(Configuration cf,
                                              Function<String, ClassLoader> clf,
                                              ModuleLayer layer)
@@ -1344,8 +1347,8 @@ public final class Module implements AnnotatedElement {
      */
     @SuppressWarnings("pico:assignment.type.incompatible") // cast from @Unique @Mutable to @Immutable
     private static void initExportsAndOpens(@UnderInitialization Module m,
-                                            Map<String, Module> nameToSource,
-                                            Map<String, Module> nameToModule,
+                                            @Readonly Map<String, Module> nameToSource,
+                                            @Readonly Map<String, Module> nameToModule,
                                             @Readonly List<ModuleLayer> parents) {
         ModuleDescriptor descriptor = m.getDescriptor();
         Map<String, Set<Module>> openPackages = new HashMap<>();
@@ -1423,8 +1426,8 @@ public final class Module implements AnnotatedElement {
      * @param parents The parent layers
      */
     private static Module findModule(String target,
-                                     Map<String, Module> nameToSource,
-                                     Map<String, Module> nameToModule,
+                                     @Readonly Map<String, Module> nameToSource,
+                                     @Readonly Map<String, Module> nameToModule,
                                      @Readonly List<ModuleLayer> parents) {
         Module m = nameToSource.get(target);
         if (m == null) {

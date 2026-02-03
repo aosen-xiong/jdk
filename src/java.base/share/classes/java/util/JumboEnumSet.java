@@ -49,7 +49,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @since 1.5
  * @serial exclude
  */
-@AnnotatedFor({"index"})
+@AnnotatedFor({"index", "pico"})
 class JumboEnumSet<E extends Enum<E>> extends EnumSet<E> {
     @java.io.Serial
     private static final long serialVersionUID = 334349849919042784L;

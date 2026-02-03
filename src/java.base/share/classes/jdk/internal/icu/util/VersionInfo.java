@@ -38,11 +38,16 @@ package jdk.internal.icu.util;
 
 import java.util.HashMap;
 
+import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 /**
  * Class to store version numbers of the form major.minor.milli.micro.
  * @author synwee
  * @stable ICU 2.6
  */
+@AnnotatedFor("pico")
+@Immutable
 public final class VersionInfo
 {
     // public data members -------------------------------------------------

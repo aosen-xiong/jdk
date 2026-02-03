@@ -48,7 +48,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @see     java.lang.reflect.AnnotatedElement
  * @since 1.5
  */
-@AnnotatedFor({"nullness", "signature"})
+@AnnotatedFor({"nullness", "signature", "pico"})
 public class TypeNotPresentException extends RuntimeException {
     @java.io.Serial
     private static final long serialVersionUID = -5101214195716534496L;

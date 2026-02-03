@@ -38,7 +38,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @see java.lang.String#charAt(int)
  * @since 1.0
  */
-@AnnotatedFor({"nullness"})
+@AnnotatedFor({"nullness", "pico"})
 public class StringIndexOutOfBoundsException extends IndexOutOfBoundsException {
     @java.io.Serial
     private static final long serialVersionUID = -6762910422159637258L;

@@ -1586,9 +1586,9 @@ public class Collections {
             throw new UnsupportedOperationException();
         }
 
-        private transient @LazyFinal Set<K> keySet;
-        private transient @LazyFinal Set<Map.@Immutable Entry<K,V>> entrySet;
-        private transient @LazyFinal Collection<V> values;
+        private transient @Assignable /* should be @LazyFinal */ Set<K> keySet;
+        private transient @Assignable /* should be @LazyFinal */ Set<Map.@Immutable Entry<K,V>> entrySet;
+        private transient @Assignable /* should be @LazyFinal */ Collection<V> values;
 
         public @Immutable Set<K> keySet() {
             if (keySet==null)
@@ -2799,9 +2799,9 @@ public class Collections {
             synchronized (mutex) {m.clear();}
         }
 
-        private transient @LazyFinal Set<K> keySet;
-        private transient @LazyFinal Set<Map.@ReceiverDependentMutable Entry<K,V>> entrySet;
-        private transient @LazyFinal Collection<V> values;
+        private transient @Assignable /* should be @LazyFinal */ Set<K> keySet;
+        private transient @Assignable /* should be @LazyFinal */ Set<Map.@ReceiverDependentMutable Entry<K,V>> entrySet;
+        private transient @Assignable /* should be @LazyFinal */ Collection<V> values;
 
         public @PolyMutable Set<K> keySet(@PolyMutable SynchronizedMap<K,V> this) {
             synchronized (mutex) {
@@ -3256,7 +3256,7 @@ public class Collections {
         @SuppressWarnings("serial") // Conditionally serializable
         final Collection<E> c;
         @SuppressWarnings("serial") // Conditionally serializable
-        final @Mutable Class<E> type;
+        final Class<E> type;
 
         @SuppressWarnings("unchecked")
         E typeCheck(@Readonly Object o) {
@@ -3833,9 +3833,9 @@ public class Collections {
         @SuppressWarnings("serial") // Conditionally serializable
         private final Map<K, V> m;
         @SuppressWarnings("serial") // Conditionally serializable
-        final @Mutable Class<K> keyType;
+        final Class<K> keyType;
         @SuppressWarnings("serial") // Conditionally serializable
-        final @Mutable Class<V> valueType;
+        final Class<V> valueType;
 
         private void typeCheck(@Readonly Object key, @Readonly Object value) {
             if (key != null && !keyType.isInstance(key))
@@ -3917,7 +3917,7 @@ public class Collections {
                 m.put(e.getKey(), e.getValue());
         }
 
-        private transient @LazyFinal Set<Map.@ReceiverDependentMutable Entry<K,V>> entrySet;
+        private transient @Assignable /* should be @LazyFinal */ Set<Map.@ReceiverDependentMutable Entry<K,V>> entrySet;
 
         @SideEffectFree
         @SuppressWarnings("pico:assignment.type.incompatible") // polyq on supertype's type argument
@@ -4007,7 +4007,7 @@ public class Collections {
         @ReceiverDependentMutable
         static class CheckedEntrySet<K extends @Immutable Object,V> implements Set<Map.@Readonly Entry<K,V>> {
             private final Set<Map.@ReceiverDependentMutable Entry<K,V>> s;
-            private final @Mutable Class<V> valueType;
+            private final Class<V> valueType;
 
             CheckedEntrySet(@ReceiverDependentMutable Set<Map.@ReceiverDependentMutable Entry<K, V>> s, Class<V> valueType) {
                 this.s = s;
@@ -4160,9 +4160,10 @@ public class Collections {
              * an ill-behaved Map.Entry that attempts to modify another
              * Map.Entry when asked to perform an equality check.
              */
-            @ReceiverDependentMutable private static class CheckedEntry<K extends @Immutable Object,V,T> implements Map.Entry<K,V> {
+            @ReceiverDependentMutable
+            private static class CheckedEntry<K extends @Immutable Object,V,T> implements Map.Entry<K,V> {
                 private final Map.Entry<K, V> e;
-                private final @Mutable Class<T> valueType;
+                private final Class<T> valueType;
 
                 CheckedEntry(Map.@ReceiverDependentMutable Entry<K, V> e, Class<T> valueType) {
                     this.e = Objects.requireNonNull(e);
@@ -5272,9 +5273,9 @@ public class Collections {
         public boolean containsValue(@UnknownSignedness @Readonly Object value)       {return eq(value, v);}
         public V get(@Readonly Object key)              {return (eq(key, k) ? v : null);}
 
-        private transient @LazyFinal Set<K> keySet;
-        private transient @LazyFinal Set<Map.@Immutable Entry<K,V>> entrySet;
-        private transient @LazyFinal Collection<V> values;
+        private transient @Assignable /* should be @LazyFinal */ Set<K> keySet;
+        private transient @Assignable /* should be @LazyFinal */ Set<Map.@Immutable Entry<K,V>> entrySet;
+        private transient @Assignable /* should be @LazyFinal */ Collection<V> values;
 
         public @Immutable Set<K> keySet() {
             if (keySet==null)

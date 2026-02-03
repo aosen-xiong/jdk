@@ -124,9 +124,10 @@ import java.util.Comparators;
  */
 @CFComment({"lock/nullness: Javadoc says: \"a comparator may optionally permit comparison of null",
 "arguments, while maintaining the requirements for an equivalence relation.\""})
-@AnnotatedFor({"lock", "nullness", "index"})
+@AnnotatedFor({"lock", "nullness", "index", "pico"})
 @FunctionalInterface
-@ReceiverDependentMutable public interface Comparator<T extends @Readonly Object> {
+@ReceiverDependentMutable
+public interface Comparator<T extends @Readonly Object> {
     /**
      * Compares its two arguments for order.  Returns a negative integer,
      * zero, or a positive integer as the first argument is less than, equal

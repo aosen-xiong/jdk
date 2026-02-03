@@ -97,7 +97,7 @@ import java.io.IOException;
  * @see         java.lang.String
  * @since       1.5
  */
-@AnnotatedFor({"lock", "nullness", "index", "regex"})
+@AnnotatedFor({"lock", "nullness", "index", "pico", "regex"})
 public final class StringBuilder
     extends AbstractStringBuilder
     implements java.io.Serializable, Comparable<StringBuilder>, CharSequence

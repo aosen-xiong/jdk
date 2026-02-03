@@ -34,7 +34,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  *
  * @since      1.0
  */
-@AnnotatedFor({"nullness"})
+@AnnotatedFor({"nullness", "pico"})
 public class NoSuchMethodException extends ReflectiveOperationException {
     @java.io.Serial
     private static final long serialVersionUID = 5034388446362600923L;

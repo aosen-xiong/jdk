@@ -56,7 +56,7 @@ import java.lang.ref.*;
  */
 
 @CFComment({"nullness: See comment in ThreadLocal class about type parameter annotation."})
-@AnnotatedFor({"nullness"})
+@AnnotatedFor({"nullness", "pico"})
 public class InheritableThreadLocal<@Nullable T> extends ThreadLocal<T> {
     /**
      * Creates an inheritable thread local variable.

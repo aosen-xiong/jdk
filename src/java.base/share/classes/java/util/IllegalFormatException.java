@@ -25,6 +25,9 @@
 
 package java.util;
 
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 /**
  * Unchecked exception thrown when a format string contains an illegal syntax
  * or a format specifier that is incompatible with the given arguments.  Only
@@ -33,7 +36,8 @@ package java.util;
  *
  * @since 1.5
  */
-@SuppressWarnings("pico") // Not interesting class, fix later
+@AnnotatedFor("pico")
+@ReceiverDependentMutable
 public class IllegalFormatException extends IllegalArgumentException {
 
     @java.io.Serial

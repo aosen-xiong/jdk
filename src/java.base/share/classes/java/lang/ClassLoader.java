@@ -32,6 +32,7 @@ import org.checkerframework.checker.nonempty.qual.NonEmpty;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.RequiresNonNull;
+import org.checkerframework.checker.pico.qual.Mutable;
 import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.checker.signature.qual.BinaryName;
 import org.checkerframework.checker.signature.qual.FullyQualifiedName;
@@ -327,7 +328,7 @@ public abstract @UsesObjectEquals class ClassLoader {
     // The "default" domain. Set as the default ProtectionDomain on newly
     // created classes.
     private final ProtectionDomain defaultDomain =
-        new ProtectionDomain(new CodeSource(null, (Certificate[]) null),
+        new ProtectionDomain(new CodeSource(null, (Certificate @Mutable []) null),
                              null, this, null);
 
     // Invoked by the VM to record every loaded class with this loader.

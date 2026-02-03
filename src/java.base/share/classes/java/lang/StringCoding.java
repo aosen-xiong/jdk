@@ -34,7 +34,7 @@ import jdk.internal.vm.annotation.IntrinsicCandidate;
 /**
  * Utility class for string encoding and decoding.
  */
-@AnnotatedFor({"index", "interning"})
+@AnnotatedFor({"index", "interning", "pico"})
 @UsesObjectEquals class StringCoding {
 
     private StringCoding() { }

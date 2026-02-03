@@ -34,7 +34,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  *
  * @since   1.1
  */
-@AnnotatedFor({"nullness"})
+@AnnotatedFor({"nullness", "pico"})
 public class NoSuchFieldException extends ReflectiveOperationException {
     @java.io.Serial
     private static final long serialVersionUID = -6143714805279938260L;

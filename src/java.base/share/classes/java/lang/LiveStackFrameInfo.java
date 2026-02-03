@@ -24,6 +24,9 @@
  */
 package java.lang;
 
+import org.checkerframework.framework.qual.AnnotatedFor;
+
+@AnnotatedFor("pico")
 final class LiveStackFrameInfo extends StackFrameInfo implements LiveStackFrame {
     private static Object[] EMPTY_ARRAY = new Object[0];
 

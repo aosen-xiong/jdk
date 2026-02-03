@@ -727,7 +727,7 @@ public @UsesObjectEquals class Throwable implements Serializable {
                                          StackTraceElement[] enclosingTrace,
                                          String caption,
                                          String prefix,
-                                         Set<Throwable> dejaVu) {
+                                         Set<@Readonly Throwable> dejaVu) {
         assert Thread.holdsLock(s.lock());
         if (dejaVu.contains(this)) {
             s.println(prefix + caption + "[CIRCULAR REFERENCE: " + this + "]");
@@ -867,7 +867,7 @@ public @UsesObjectEquals class Throwable implements Serializable {
         return getOurStackTrace().clone();
     }
 
-    private synchronized StackTraceElement[] getOurStackTrace() {
+    private synchronized StackTraceElement[] getOurStackTrace(@Readonly Throwable this) {
         // Initialize stack trace field with information from
         // backtrace if this is the first call to this method
         if (stackTrace == UNASSIGNED_STACK ||

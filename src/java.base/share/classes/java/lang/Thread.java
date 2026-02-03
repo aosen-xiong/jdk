@@ -151,7 +151,7 @@ import sun.security.util.SecurityConstants;
  * @see     #stop()
  * @since   1.0
  */
-@AnnotatedFor({"interning", "lock", "nullness"})
+@AnnotatedFor({"interning", "lock", "nullness", "pico"})
 public
 @UsesObjectEquals class Thread implements Runnable {
     /* Make sure registerNatives is the first thing <clinit> does. */

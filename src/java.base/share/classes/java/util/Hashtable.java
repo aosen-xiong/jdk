@@ -680,9 +680,9 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
      * appropriate view the first time this view is requested.  The views are
      * stateless, so there's no reason to create more than one of each.
      */
-    private transient volatile @LazyFinal Set<K> keySet;
-    private transient volatile @LazyFinal Set<Map.@ReceiverDependentMutable Entry<K,V>> entrySet;
-    private transient volatile @LazyFinal Collection<V> values;
+    private transient volatile @Assignable /* should be @LazyFinal */ Set<K> keySet;
+    private transient volatile @Assignable /* should be @LazyFinal */ Set<Map.@ReceiverDependentMutable Entry<K,V>> entrySet;
+    private transient volatile @Assignable /* should be @LazyFinal */ Collection<V> values;
 
     /**
      * Returns a {@link Set} view of the keys contained in this map.

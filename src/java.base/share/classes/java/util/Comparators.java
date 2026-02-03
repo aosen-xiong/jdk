@@ -25,6 +25,7 @@
 package java.util;
 
 import org.checkerframework.checker.pico.qual.Readonly;
+import org.checkerframework.framework.qual.AnnotatedFor;
 
 import java.io.Serializable;
 import java.util.function.BinaryOperator;
@@ -36,6 +37,7 @@ import java.util.function.ToLongFunction;
 /**
  * Package private supporting class for {@link Comparator}.
  */
+@AnnotatedFor("pico")
 class Comparators {
     private Comparators() {
         throw new AssertionError("no instances");

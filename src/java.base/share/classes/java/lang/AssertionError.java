@@ -45,7 +45,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  *
  * @since   1.4
  */
-@AnnotatedFor({"nullness"})
+@AnnotatedFor({"nullness", "pico"})
 public class AssertionError extends Error {
     @java.io.Serial
     private static final long serialVersionUID = -5013299493970297370L;

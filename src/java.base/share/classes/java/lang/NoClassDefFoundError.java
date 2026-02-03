@@ -41,7 +41,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  *
  * @since   1.0
  */
-@AnnotatedFor({"nullness"})
+@AnnotatedFor({"nullness", "pico"})
 public class NoClassDefFoundError extends LinkageError {
     @java.io.Serial
     private static final long serialVersionUID = 9095859863287012458L;

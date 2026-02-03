@@ -39,7 +39,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @author Frank Yellin
  * @since 1.0
  */
-@AnnotatedFor({"nullness"})
+@AnnotatedFor({"nullness", "pico"})
 @ReceiverDependentMutable
 public class IndexOutOfBoundsException extends RuntimeException {
     @java.io.Serial

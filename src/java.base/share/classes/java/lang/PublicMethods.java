@@ -34,13 +34,14 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.checkerframework.checker.pico.qual.Immutable;
-
+import org.checkerframework.framework.qual.AnnotatedFor;
 
 /**
  * A collection of most specific public methods. Methods are added to it using
  * {@link #merge(Method)} method. Only the most specific methods for a
  * particular signature are kept.
  */
+@AnnotatedFor("pico")
 final class PublicMethods {
 
     /**

@@ -79,7 +79,7 @@ import static java.lang.annotation.ElementType.*;
  * @since 1.5
  * @jls 9.6.4.6 @Deprecated
  */
-@AnnotatedFor({"nullness"})
+@AnnotatedFor({"nullness", "pico"})
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value={CONSTRUCTOR, FIELD, LOCAL_VARIABLE, METHOD, PACKAGE, MODULE, PARAMETER, TYPE})

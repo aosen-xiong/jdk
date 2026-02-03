@@ -66,7 +66,8 @@ import jdk.internal.vm.annotation.Stable;
  * classes use a serial proxy and thus have no need to declare serialVersionUID.
  */
 @SuppressWarnings("serial")
-@Immutable class ImmutableCollections {
+@Immutable
+class ImmutableCollections {
     /**
      * A "salt" value used for randomizing iteration order. This is initialized once
      * and stays constant for the lifetime of the JVM. It need not be truly random, but
@@ -167,10 +168,10 @@ import jdk.internal.vm.annotation.Stable;
         public boolean add(E e) { throw uoe(); }
         @Override public boolean addAll(Collection<? extends E> c) { throw uoe(); }
         @Override public void    clear() { throw uoe(); }
-        @Override public boolean remove(@UnknownSignedness Object o) { throw uoe(); }
-        @Override public boolean removeAll(Collection<? extends @UnknownSignedness Object> c) { throw uoe(); }
+        @Override public boolean remove(@UnknownSignedness @Readonly Object o) { throw uoe(); }
+        @Override public boolean removeAll(Collection<? extends @UnknownSignedness @Readonly Object> c) { throw uoe(); }
         @Override public boolean removeIf(Predicate<? super E> filter) { throw uoe(); }
-        @Override public boolean retainAll(Collection<? extends @UnknownSignedness Object> c) { throw uoe(); }
+        @Override public boolean retainAll(Collection<? extends @UnknownSignedness @Readonly Object> c) { throw uoe(); }
     }
 
     // ---------- List Static Factory Methods ----------
@@ -1313,7 +1314,7 @@ import jdk.internal.vm.annotation.Stable;
             return size == 0;
         }
 
-        class MapNIterator implements Iterator<Map.Entry<K,V>> {
+        class MapNIterator implements Iterator<Map.@Immutable Entry<K,V>> {
 
             private int remaining;
 
@@ -1348,7 +1349,7 @@ import jdk.internal.vm.annotation.Stable;
             }
 
             @Override
-            public Map.Entry<K,V> next(@NonEmpty MapNIterator this) {
+            public Map.@Immutable Entry<K,V> next(@NonEmpty MapNIterator this) {
                 if (remaining > 0) {
                     int idx;
                     while (table[idx = nextIndex()] == null) {}

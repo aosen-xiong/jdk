@@ -37,6 +37,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.framework.qual.AnnotatedFor;
 
 /**
  * A stack walker.
@@ -91,6 +92,7 @@ import org.checkerframework.checker.pico.qual.Immutable;
  * @since 9
  */
 
+@AnnotatedFor("pico")
 @Immutable
 public final class StackWalker {
     /**

@@ -59,7 +59,7 @@ import jdk.internal.reflect.Reflection;
  * @since   1.0
  */
 
-@AnnotatedFor({"interning", "nullness", "tainting"})
+@AnnotatedFor({"interning", "nullness", "pico", "tainting"})
 public @UsesObjectEquals class Runtime {
     private static final Runtime currentRuntime = new Runtime();
 

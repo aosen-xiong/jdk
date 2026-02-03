@@ -45,7 +45,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @see     java.lang.Class#newInstance()
  * @since   1.0
  */
-@AnnotatedFor({"nullness"})
+@AnnotatedFor({"nullness", "pico"})
 public class InstantiationException extends ReflectiveOperationException {
     @java.io.Serial
     private static final long serialVersionUID = -8441929162975509110L;

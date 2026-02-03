@@ -133,7 +133,7 @@ import jdk.internal.vm.annotation.IntrinsicCandidate;
  * @since   1.0
  */
 
-@AnnotatedFor({"index", "interning", "lock", "nullness"})
+@AnnotatedFor({"index", "interning", "lock", "nullness", "pico"})
 public final @UsesObjectEquals class Math {
 
     /**

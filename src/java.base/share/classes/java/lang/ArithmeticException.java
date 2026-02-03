@@ -41,7 +41,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  *
  * @since   1.0
  */
-@AnnotatedFor({"nullness"})
+@AnnotatedFor({"nullness", "pico"})
 public class ArithmeticException extends RuntimeException {
     @java.io.Serial
     private static final long serialVersionUID = 2256477558314496007L;

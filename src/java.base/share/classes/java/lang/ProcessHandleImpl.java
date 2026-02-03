@@ -31,6 +31,7 @@ import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
+import org.checkerframework.framework.qual.AnnotatedFor;
 
 import java.lang.annotation.Native;
 import java.security.AccessController;
@@ -56,6 +57,7 @@ import java.util.stream.Stream;
  * @since 9
  */
 @jdk.internal.ValueBased
+@AnnotatedFor("pico")
 @Immutable
 final class ProcessHandleImpl implements ProcessHandle {
     /**

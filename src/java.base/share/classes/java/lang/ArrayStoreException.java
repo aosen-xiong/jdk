@@ -40,7 +40,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  *
  * @since   1.0
  */
-@AnnotatedFor({"nullness"})
+@AnnotatedFor({"nullness", "pico"})
 public class ArrayStoreException extends RuntimeException {
     @java.io.Serial
     private static final long serialVersionUID = -4522193890499838241L;

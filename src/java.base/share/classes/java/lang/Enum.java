@@ -85,7 +85,7 @@ import static java.util.Objects.requireNonNull;
  * @jls 8.9.3 Enum Members
  * @since   1.5
  */
-@AnnotatedFor({"lock", "nullness", "index", "value", "tainting"})
+@AnnotatedFor({"lock", "nullness", "index", "pico", "value", "tainting"})
 @Covariant(0)
 @SuppressWarnings("serial") // No serialVersionUID needed due to
                             // special-casing of enum classes.

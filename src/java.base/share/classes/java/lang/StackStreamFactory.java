@@ -26,6 +26,8 @@ package java.lang;
 
 import org.checkerframework.checker.nonempty.qual.EnsuresNonEmptyIf;
 import org.checkerframework.dataflow.qual.Pure;
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 import jdk.internal.reflect.MethodAccessor;
 import jdk.internal.reflect.ConstructorAccessor;
 import java.lang.StackWalker.Option;
@@ -60,6 +62,7 @@ import static java.lang.StackStreamFactory.WalkerState.*;
  * 2. StackWalker::getCallerClass
  * 3. AccessControlContext getting ProtectionDomain
  */
+@AnnotatedFor("pico")
 final class StackStreamFactory {
     private StackStreamFactory() {}
 

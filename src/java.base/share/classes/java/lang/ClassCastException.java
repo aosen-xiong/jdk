@@ -41,7 +41,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  *
  * @since   1.0
  */
-@AnnotatedFor({"nullness"})
+@AnnotatedFor({"nullness", "pico"})
 @ReceiverDependentMutable
 public class ClassCastException extends RuntimeException {
     @java.io.Serial

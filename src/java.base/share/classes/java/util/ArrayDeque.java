@@ -227,7 +227,7 @@ public class ArrayDeque<E extends @NonNull @Readonly Object> extends AbstractCol
      * @param c the collection whose elements are to be placed into the deque
      * @throws NullPointerException if the specified collection is null
      */
-    @SuppressWarnings("pico") // PICO constructor fix
+    @SuppressWarnings("pico") // PICO RDM constructor call mutable method
     public @PolyNonEmpty ArrayDeque(@PolyNonEmpty Collection<? extends E> c) {
         this(c.size());
         copyElements(c);
@@ -1105,7 +1105,6 @@ public class ArrayDeque<E extends @NonNull @Readonly Object> extends AbstractCol
      * @return an array containing all of the elements in this deque
      */
     @SideEffectFree
-    @SuppressWarnings("pico") // How to annotate class literal
     public @PolyNull @PolySigned @PolyMutable Object[] toArray(@Readonly ArrayDeque<@PolyNull @PolySigned @PolyMutable E> this) {
         return this.<@PolyMutable Object>toArray(Object[].class);
     }

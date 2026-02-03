@@ -108,7 +108,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
      *
      * @serial
      */
-    private final @Mutable Class<K> keyType;
+    private final Class<K> keyType;
 
     /**
      * All of the values comprising K.  (Cached for performance.)
@@ -402,7 +402,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
      * view the first time this view is requested.  The view is stateless,
      * so there's no reason to create more than one.
      */
-    private transient @LazyFinal @Nullable Set<Map.@ReceiverDependentMutable Entry<K,V>> entrySet;
+    private transient @Assignable /* should be @LazyFinal */ @Nullable Set<Map.@ReceiverDependentMutable Entry<K,V>> entrySet;
 
     /**
      * Returns a {@link Set} view of the keys contained in this map.

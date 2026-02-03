@@ -48,7 +48,7 @@ import sun.text.Normalizer;
  * Note that the unconditional case mappings (including 1:M mappings)
  * are handled in {@code Character.toLower/UpperCase()}.
  */
-@AnnotatedFor({"interning"})
+@AnnotatedFor({"interning", "pico"})
 @Immutable
 final @UsesObjectEquals class ConditionalSpecialCasing {
 
@@ -139,11 +139,11 @@ final @UsesObjectEquals class ConditionalSpecialCasing {
         }
     }
 
-    static char[] toLowerCaseCharArray(String src, int index, Locale locale) {
+    static char @Immutable [] toLowerCaseCharArray(String src, int index, Locale locale) {
         return lookUpTable(src, index, locale, true);
     }
 
-    static char[] toUpperCaseCharArray(String src, int index, Locale locale) {
+    static char @Immutable [] toUpperCaseCharArray(String src, int index, Locale locale) {
         char[] result = lookUpTable(src, index, locale, false);
         if (result != null) {
             return result;
@@ -152,7 +152,7 @@ final @UsesObjectEquals class ConditionalSpecialCasing {
         }
     }
 
-    private static char[] lookUpTable(String src, int index, Locale locale, boolean bLowerCasing) {
+    private static char @Immutable [] lookUpTable(String src, int index, Locale locale, boolean bLowerCasing) {
         HashSet<Entry> set = entryTable.get(src.codePointAt(index));
         char[] ret = null;
 

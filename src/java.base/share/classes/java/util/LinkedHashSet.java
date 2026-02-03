@@ -121,7 +121,7 @@ import org.checkerframework.framework.qual.CFComment;
  */
 
 @CFComment({"lock/nullness: This class permits null elements"})
-@AnnotatedFor({"lock", "nullness"})
+@AnnotatedFor({"lock", "nullness", "pico"})
 @ReceiverDependentMutable
 public class LinkedHashSet<E extends @Immutable Object>
     extends HashSet<E>

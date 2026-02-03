@@ -31,6 +31,7 @@ import org.checkerframework.checker.pico.qual.Mutable;
 import org.checkerframework.checker.pico.qual.PolyMutable;
 import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
+import org.checkerframework.framework.qual.AnnotatedFor;
 
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
@@ -50,6 +51,7 @@ import java.util.function.BiFunction;
  * @param <V>  the type of value
  * @author Peter Levart
  */
+@AnnotatedFor("pico")
 @ReceiverDependentMutable
 final class WeakPairMap<K1 extends @Immutable Object, K2 extends @Immutable Object, V> {
 

@@ -34,7 +34,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @see     java.lang.SecurityManager
  * @since   1.0
  */
-@AnnotatedFor({"nullness"})
+@AnnotatedFor({"nullness", "pico"})
 public class SecurityException extends RuntimeException {
 
     @java.io.Serial
