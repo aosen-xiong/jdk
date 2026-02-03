@@ -401,7 +401,6 @@ public abstract class EnumSet<E extends Enum<E>> extends AbstractSet<E>
     /**
      * Throws an exception if e is not of the correct type for this enum set.
      */
-    @SuppressWarnings("pico:type.invalid.annotations.on.use") // Aosen: This is a bug in validator
     final void typeCheck(E e) {
         Class<?> eClass = e.getClass();
         if (eClass != elementType && eClass.getSuperclass() != elementType)
