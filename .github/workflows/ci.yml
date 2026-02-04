@@ -1,9 +1,10 @@
 name: CI tests
 
 on:
-  push:
-    branches: [ "master" ]
+  schedule:
+    - cron: '0 7 * * *' # Runs daily at 2:00 AM EST
   pull_request:
+  push:
     branches: [ "master" ]
 
 concurrency:
@@ -48,20 +49,29 @@ jobs:
     strategy:
       matrix:
         script: ['cftests-junit', 'cftests-nonjunit']
-        java_version: [8, 11, 17, 21, 23]
+        java_version: ['8', '11', '17', '21', '24', '25-ea']
     continue-on-error: true
     env:
       JAVA_VERSION: ${{ matrix.java_version }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21 for Gradle to run on
+        uses: actions/setup-java@v4
+        with:
+          # Install JDK 21 first, to make it available to Gradle using `gradle.properties` below.
+          java-version: '21'
+          distribution: 'temurin'
       - name: Set up JDK ${{ matrix.java_version }}
         uses: actions/setup-java@v4
         with:
           java-version: ${{ matrix.java_version }}
           distribution: 'temurin'
-    
+      - name: Inject JAVA_HOME_21_64 into `gradle.properties` to always use JDK 21 for Gradle
+        run: mkdir ~/.gradle && echo "org.gradle.java.home=$JAVA_HOME_21_X64" >> ~/.gradle/gradle.properties
+
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4.1.0
+        uses: gradle/actions/setup-gradle@v4.3.1
     
       - name: Setup Bazel
         uses: bazel-contrib/setup-bazel@0.9.0
@@ -83,6 +93,8 @@ jobs:
       - name: Run test script checker/bin-devel/test-${{ matrix.script }}.sh
         run: ./checker/bin-devel/test-${{ matrix.script }}.sh
         working-directory: ../checker-framework
+        env:
+          ORG_GRADLE_PROJECT_useJdkVersion: ${{ matrix.java_version }}
 
   extra:
     name: ${{ matrix.script }} on JDK ${{ matrix.java_version }}
@@ -91,11 +103,12 @@ jobs:
       fail-fast: true
       matrix:
         script: ['plume-lib', 'daikon']
-        java_version: [17]
+        java_version: ['21']
     env:
       JAVA_VERSION: ${{ matrix.java_version }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+
       - name: Set up JDK ${{ matrix.java_version }}
         uses: actions/setup-java@v4
         with:
@@ -124,7 +137,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        java_version: [ 17 ]
+        java_version: ['21']
     env:
       JAVA_VERSION: ${{ matrix.java_version }}
     steps:

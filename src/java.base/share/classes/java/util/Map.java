@@ -1186,8 +1186,8 @@ public interface Map<K extends @Immutable Object, V> {
      *         (<a href="{@docRoot}/java.base/java/util/Collection.html#optional-restrictions">optional</a>)
      * @since 1.8
      */
-    default @PolyNull V computeIfPresent(@Mutable Map<K, V> this, K key,
-            BiFunction<? super K, ? super @NonNull V, ? extends @PolyNull V> remappingFunction) {
+    default @Nullable V computeIfPresent(@Mutable Map<K, V> this, K key,
+            BiFunction<? super K, ? super @NonNull V, ? extends @Nullable V> remappingFunction) {
         Objects.requireNonNull(remappingFunction);
         V oldValue;
         if ((oldValue = get(key)) != null) {
@@ -1272,8 +1272,8 @@ public interface Map<K extends @Immutable Object, V> {
      *         (<a href="{@docRoot}/java.base/java/util/Collection.html#optional-restrictions">optional</a>)
      * @since 1.8
      */
-    default @PolyNull V compute(@Mutable Map<K, V> this, K key,
-            BiFunction<? super K, ? super @Nullable V, ? extends @PolyNull V> remappingFunction) {
+    default @Nullable V compute(@Mutable Map<K, V> this, K key,
+            BiFunction<? super K, ? super @Nullable V, ? extends @Nullable V> remappingFunction) {
         Objects.requireNonNull(remappingFunction);
         V oldValue = get(key);
 
@@ -1370,8 +1370,8 @@ public interface Map<K extends @Immutable Object, V> {
      *         null
      * @since 1.8
      */
-    default @PolyNull V merge(@Mutable Map<K, V> this, K key, @NonNull V value,
-            BiFunction<? super @NonNull V, ? super @NonNull V, ? extends @PolyNull V> remappingFunction) {
+    default @Nullable V merge(@Mutable Map<K, V> this, K key, @NonNull V value,
+            BiFunction<? super @NonNull V, ? super @NonNull V, ? extends @Nullable V> remappingFunction) {
         Objects.requireNonNull(remappingFunction);
         Objects.requireNonNull(value);
         V oldValue = get(key);
