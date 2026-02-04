@@ -548,7 +548,7 @@ public final class StackTraceElement implements java.io.Serializable {
      * Returns an array of StackTraceElements of the given depth
      * filled from the backtrace of a given Throwable.
      */
-    static StackTraceElement[] of(Throwable x, int depth) {
+    static StackTraceElement[] of(@Readonly Throwable x, int depth) {
         StackTraceElement[] stackTrace = new StackTraceElement[depth];
         for (int i = 0; i < depth; i++) {
             stackTrace[i] = new StackTraceElement();
@@ -580,7 +580,7 @@ public final class StackTraceElement implements java.io.Serializable {
      * of the given Throwable.
      */
     private static native void initStackTraceElements(StackTraceElement[] elements,
-                                                      Throwable x);
+                                                      @Readonly Throwable x);
     /*
      * Sets the given stack trace element with the given StackFrameInfo
      */

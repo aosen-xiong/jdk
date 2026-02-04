@@ -727,7 +727,7 @@ public final class ModuleLayer {
                                               Function<String, ClassLoader> clf)
     {
         // HashMap allows null keys
-        Map<ClassLoader, Set<String>> loaderToPackages = new HashMap<>();
+        Map<@Immutable ClassLoader, Set<String>> loaderToPackages = new HashMap<>();
         for (ResolvedModule resolvedModule : cf.modules()) {
             ModuleDescriptor descriptor = resolvedModule.reference().descriptor();
             ClassLoader loader = clf.apply(descriptor.name());

@@ -34,6 +34,7 @@ import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.mustcall.qual.MustCall;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.PolyMutable;
 import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.checker.signedness.qual.UnknownSignedness;
@@ -256,7 +257,8 @@ public class Object {
      */
     @SideEffectFree
     @IntrinsicCandidate
-    protected native @ReceiverDependentMutable Object clone(@GuardSatisfied Object this) throws CloneNotSupportedException;
+    @CFComment("pico: clone is poly because it be implemented as shallow copy?")
+    protected native @PolyMutable Object clone(@GuardSatisfied @PolyMutable Object this) throws CloneNotSupportedException;
 
     /**
      * Returns a string representation of the object.

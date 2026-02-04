@@ -30,6 +30,7 @@ import org.checkerframework.checker.initialization.qual.UnderInitialization;
 import org.checkerframework.checker.interning.qual.UsesObjectEquals;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Assignable;
 import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.checker.pico.qual.Mutable;
 import org.checkerframework.checker.pico.qual.PolyMutable;
@@ -225,7 +226,7 @@ public @UsesObjectEquals class Throwable implements Serializable {
      * @since 1.4
      */
     @SuppressWarnings("pico:assignment.type.incompatible") // initialize field with static variable
-    private StackTraceElement[] stackTrace = UNASSIGNED_STACK;
+    private @Assignable /* should be @LazyFinal */ StackTraceElement @Mutable [] stackTrace = UNASSIGNED_STACK;
 
     /**
      * The JVM code sets the depth of the backtrace for later retrieval
@@ -943,6 +944,7 @@ public @UsesObjectEquals class Throwable implements Serializable {
      * @throws ClassNotFoundException if a serialized class cannot be loaded
      */
     @java.io.Serial
+    @SuppressWarnings("pico:assignment.type.incompatible") // suppressedExceptions being assigned sentinel value
     private void readObject(@Mutable Throwable this, ObjectInputStream s)
         throws IOException, ClassNotFoundException {
         s.defaultReadObject();     // read in all fields

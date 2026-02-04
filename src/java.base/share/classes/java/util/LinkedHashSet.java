@@ -173,7 +173,7 @@ public class LinkedHashSet<E extends @Immutable Object>
      *           this set
      * @throws NullPointerException if the specified collection is null
      */
-    @SuppressWarnings("pico") // PICO constructor fix
+    @SuppressWarnings("pico:method.invocation.invalid") // PICO constructor fix
     public LinkedHashSet(Collection<? extends E> c) {
         super(Math.max(2*c.size(), 11), .75f, true);
         addAll(c);

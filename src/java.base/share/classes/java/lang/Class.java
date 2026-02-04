@@ -32,7 +32,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
 import org.checkerframework.checker.nullness.qual.UnknownKeyFor;
+import org.checkerframework.checker.pico.qual.Assignable;
 import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.Mutable;
 import org.checkerframework.checker.pico.qual.PolyMutable;
 import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.checker.signature.qual.CanonicalName;
@@ -248,7 +250,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * This constructor is not used and prevents the default constructor being
      * generated.
      */
-    private Class(ClassLoader loader, Class<?> arrayComponentType) {
+    private Class(@Immutable ClassLoader loader, Class<?> arrayComponentType) {
         // Initialize final field for classLoader.  The initialization value of non-null
         // prevents future JIT optimizations from assuming this final field is null.
         classLoader = loader;
@@ -688,7 +690,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
         }
     }
 
-    private transient volatile Constructor<T> cachedConstructor;
+    private transient volatile @Assignable /* should be @LazyFinal */ @Mutable Constructor<T> cachedConstructor;
 
     /**
      * Determines if the specified {@code Object} is assignment-compatible
@@ -954,7 +956,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
     }
 
     // Package-private to allow ClassLoader access
-    ClassLoader getClassLoader0() { return classLoader; }
+    @Immutable ClassLoader getClassLoader0() { return classLoader; }
 
     /**
      * Returns the module that this class or interface is a member of.
@@ -988,7 +990,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
     private transient Object classData;
 
     // package-private
-    Object getClassData() {
+    @Immutable Object getClassData() {
         return classData;
     }
 
@@ -1141,7 +1143,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
     }
 
     // cached package name
-    private transient String packageName;
+    private transient @Assignable /* should be @LazyFinal */ String packageName;
 
     /**
      * Returns the interfaces directly implemented by the class or interface
@@ -3958,7 +3960,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
         return (T) obj;
     }
 
-    private String cannotCastMsg(Object obj) {
+    private String cannotCastMsg(@Readonly Object obj) {
         return "Cannot cast " + obj.getClass().getName() + " to " + getName();
     }
 
@@ -4094,6 +4096,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
     }
 
     // annotation data that might get invalidated when JVM TI RedefineClasses() is called
+    @Immutable
     private static class AnnotationData {
         final Map<Class<? extends @Readonly Annotation>, @Readonly Annotation> annotations;
         final Map<Class<? extends @Readonly Annotation>, @Readonly Annotation> declaredAnnotations;

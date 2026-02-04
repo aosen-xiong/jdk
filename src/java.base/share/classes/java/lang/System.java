@@ -2464,7 +2464,7 @@ public final @UsesObjectEquals class System {
                 return String.join(prefix, suffix, delimiter, elements, size);
             }
 
-            public Object classData(Class<?> c) {
+            public @Immutable Object classData(Class<?> c) {
                 return c.getClassData();
             }
 

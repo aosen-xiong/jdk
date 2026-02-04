@@ -420,7 +420,7 @@ public @UsesObjectEquals class ThreadLocal<@Nullable T> {
             for (Entry e : parentTable) {
                 if (e != null) {
                     @SuppressWarnings("unchecked")
-                    ThreadLocal<Object> key = (ThreadLocal<Object>) e.get();
+                    ThreadLocal<@Readonly Object> key = (ThreadLocal<@Readonly Object>) e.get();
                     if (key != null) {
                         Object value = key.childValue(e.value);
                         Entry c = new Entry(key, value);

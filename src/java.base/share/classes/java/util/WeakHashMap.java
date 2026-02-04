@@ -203,7 +203,7 @@ public class WeakHashMap<K extends @Immutable Object,V>
     /**
      * Reference queue for cleared WeakEntries
      */
-    private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
+    private final @Mutable ReferenceQueue<Object> queue = new ReferenceQueue<>();
 
     /**
      * The number of times this WeakHashMap has been structurally modified.

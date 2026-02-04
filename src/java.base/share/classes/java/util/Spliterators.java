@@ -38,6 +38,7 @@ import org.checkerframework.checker.nullness.qual.PolyNull;
 import org.checkerframework.checker.pico.qual.Mutable;
 import org.checkerframework.checker.pico.qual.PolyMutable;
 import org.checkerframework.checker.pico.qual.Readonly;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
 /**
@@ -49,8 +50,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @see Spliterator
  * @since 1.8
  */
-@AnnotatedFor("nullness")
-@SuppressWarnings("pico") // Not interesting class, fix later
+@AnnotatedFor({"nullness", "pico"})
 public final class Spliterators {
 
     // Suppresses default constructor, ensuring non-instantiability.
@@ -966,7 +966,7 @@ public final class Spliterators {
          * so long as no methods write into the array or serialize it,
          * which we ensure here by defining this class as final.
          */
-        private final Object[] array;
+        private final @Readonly Object @Readonly [] array;
         private int index;        // current index, modified on advance/split
         private final int fence;  // one past last index
         private final int characteristics;
@@ -978,7 +978,7 @@ public final class Spliterators {
          * of this spliterator's source or elements beyond {@code SIZED} and
          * {@code SUBSIZED} which are always reported
          */
-        public ArraySpliterator(Object[] array, int additionalCharacteristics) {
+        public ArraySpliterator(@Readonly Object @Readonly [] array, int additionalCharacteristics) {
             this(array, 0, array.length, additionalCharacteristics);
         }
 
@@ -991,7 +991,7 @@ public final class Spliterators {
          * of this spliterator's source or elements beyond {@code SIZED} and
          * {@code SUBSIZED} which are always reported
          */
-        public ArraySpliterator(Object[] array, int origin, int fence, int additionalCharacteristics) {
+        public ArraySpliterator(@Readonly Object @Readonly [] array, int origin, int fence, int additionalCharacteristics) {
             this.array = array;
             this.index = origin;
             this.fence = fence;
@@ -1009,7 +1009,7 @@ public final class Spliterators {
         @SuppressWarnings("unchecked")
         @Override
         public void forEachRemaining(Consumer<? super T> action) {
-            Object[] a; int i, hi; // hoist accesses and checks from loop
+            @Readonly Object[] a; int i, hi; // hoist accesses and checks from loop
             if (action == null)
                 throw new NullPointerException();
             if ((a = array).length >= (hi = fence) &&
@@ -1051,7 +1051,7 @@ public final class Spliterators {
      * elements maintained in an unmodifiable {@code int[]} array.
      */
     static final class IntArraySpliterator implements Spliterator.OfInt {
-        private final int[] array;
+        private final int @Readonly [] array;
         private int index;        // current index, modified on advance/split
         private final int fence;  // one past last index
         private final int characteristics;
@@ -1063,7 +1063,7 @@ public final class Spliterators {
          *        of this spliterator's source or elements beyond {@code SIZED} and
          *        {@code SUBSIZED} which are always reported
          */
-        public IntArraySpliterator(int[] array, int additionalCharacteristics) {
+        public IntArraySpliterator(int @Readonly [] array, int additionalCharacteristics) {
             this(array, 0, array.length, additionalCharacteristics);
         }
 
@@ -1076,7 +1076,7 @@ public final class Spliterators {
          *        of this spliterator's source or elements beyond {@code SIZED} and
          *        {@code SUBSIZED} which are always reported
          */
-        public IntArraySpliterator(int[] array, int origin, int fence, int additionalCharacteristics) {
+        public IntArraySpliterator(int @Readonly [] array, int origin, int fence, int additionalCharacteristics) {
             this.array = array;
             this.index = origin;
             this.fence = fence;
@@ -1134,7 +1134,7 @@ public final class Spliterators {
      * elements maintained in an unmodifiable {@code int[]} array.
      */
     static final class LongArraySpliterator implements Spliterator.OfLong {
-        private final long[] array;
+        private final long @Readonly [] array;
         private int index;        // current index, modified on advance/split
         private final int fence;  // one past last index
         private final int characteristics;
@@ -1146,7 +1146,7 @@ public final class Spliterators {
          *        of this spliterator's source or elements beyond {@code SIZED} and
          *        {@code SUBSIZED} which are always reported
          */
-        public LongArraySpliterator(long[] array, int additionalCharacteristics) {
+        public LongArraySpliterator(long @Readonly [] array, int additionalCharacteristics) {
             this(array, 0, array.length, additionalCharacteristics);
         }
 
@@ -1159,7 +1159,7 @@ public final class Spliterators {
          *        of this spliterator's source or elements beyond {@code SIZED} and
          *        {@code SUBSIZED} which are always reported
          */
-        public LongArraySpliterator(long[] array, int origin, int fence, int additionalCharacteristics) {
+        public LongArraySpliterator(long @Readonly [] array, int origin, int fence, int additionalCharacteristics) {
             this.array = array;
             this.index = origin;
             this.fence = fence;
@@ -1217,7 +1217,7 @@ public final class Spliterators {
      * elements maintained in an unmodifiable {@code int[]} array.
      */
     static final class DoubleArraySpliterator implements Spliterator.OfDouble {
-        private final double[] array;
+        private final double @Readonly [] array;
         private int index;        // current index, modified on advance/split
         private final int fence;  // one past last index
         private final int characteristics;
@@ -1229,7 +1229,7 @@ public final class Spliterators {
          *        of this spliterator's source or elements beyond {@code SIZED} and
          *        {@code SUBSIZED} which are always reported
          */
-        public DoubleArraySpliterator(double[] array, int additionalCharacteristics) {
+        public DoubleArraySpliterator(double @Readonly [] array, int additionalCharacteristics) {
             this(array, 0, array.length, additionalCharacteristics);
         }
 
@@ -1242,7 +1242,7 @@ public final class Spliterators {
          *        of this spliterator's source or elements beyond {@code SIZED} and
          *        {@code SUBSIZED} which are always reported
          */
-        public DoubleArraySpliterator(double[] array, int origin, int fence, int additionalCharacteristics) {
+        public DoubleArraySpliterator(double @Readonly [] array, int origin, int fence, int additionalCharacteristics) {
             this.array = array;
             this.index = origin;
             this.fence = fence;
@@ -1347,7 +1347,7 @@ public final class Spliterators {
         }
 
         static final class HoldingConsumer<T> implements Consumer<T> {
-            Object value;
+            @Readonly Object value;
 
             @Override
             public void accept(T value) {
@@ -1383,7 +1383,7 @@ public final class Spliterators {
                     n = (int) s;
                 if (n > MAX_BATCH)
                     n = MAX_BATCH;
-                Object[] a = new Object[n];
+                @Readonly Object[] a = new Object[n];
                 int j = 0;
                 do { a[j] = holder.value; } while (++j < n && tryAdvance(holder));
                 batch = j;
@@ -1760,7 +1760,7 @@ public final class Spliterators {
     static class IteratorSpliterator<T> implements Spliterator<T> {
         static final int BATCH_UNIT = 1 << 10;  // batch array size increment
         static final int MAX_BATCH = 1 << 25;  // max batch array size;
-        private final Collection<? extends T> collection; // null OK
+        private final @Readonly Collection<? extends T> collection; // null OK
         private Iterator<? extends T> it;
         private final int characteristics;
         private long est;             // size estimate
@@ -1776,7 +1776,7 @@ public final class Spliterators {
          * @param characteristics properties of this spliterator's
          *        source or elements.
          */
-        public IteratorSpliterator(Collection<? extends T> collection, int characteristics) {
+        public IteratorSpliterator(@Readonly Collection<? extends T> collection, int characteristics) {
             this.collection = collection;
             this.it = null;
             this.characteristics = (characteristics & Spliterator.CONCURRENT) == 0
@@ -1848,7 +1848,7 @@ public final class Spliterators {
                     n = (int) s;
                 if (n > MAX_BATCH)
                     n = MAX_BATCH;
-                Object[] a = new Object[n];
+                @Readonly Object[] a = new Object[n];
                 int j = 0;
                 do { a[j] = i.next(); } while (++j < n && i.hasNext());
                 batch = j;

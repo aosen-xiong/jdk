@@ -55,8 +55,8 @@ import java.util.function.BiFunction;
 @ReceiverDependentMutable
 final class WeakPairMap<K1 extends @Immutable Object, K2 extends @Immutable Object, V> {
 
-    private final ConcurrentHashMap<@Immutable Pair<K1, K2>, V> map = new ConcurrentHashMap<>();
-    private final @Mutable ReferenceQueue<@Readonly Object> queue = new ReferenceQueue<>();
+    private final ConcurrentHashMap<@Immutable Pair<K1, K2>, V> map = new @ReceiverDependentMutable ConcurrentHashMap<>();
+    private final ReferenceQueue<@Readonly Object> queue = new @ReceiverDependentMutable ReferenceQueue<>();
 
     /**
      * Tests if the specified pair of keys are associated with a value
@@ -195,6 +195,7 @@ final class WeakPairMap<K1 extends @Immutable Object, K2 extends @Immutable Obje
      * keys in key pair has been found weakly-reachable and corresponding
      * WeakRefPeer(s) enqueued. Called as part of each public operation.
      */
+    @SuppressWarnings("pico:method.invocation.invalid") // need to refactor the code because PICO does not typecheck
     private void expungeStaleAssociations(@Readonly WeakPairMap<K1, K2, V> this) {
         WeakRefPeer<?> peer;
         while ((peer = (WeakRefPeer<?>) queue.poll()) != null) {
@@ -271,10 +272,10 @@ final class WeakPairMap<K1 extends @Immutable Object, K2 extends @Immutable Obje
             // link to <K2> peer
             private final WeakRefPeer<K2> peer;
 
-            Weak(K1 k1, K2 k2, ReferenceQueue<@Readonly Object> queue) {
+            Weak(K1 k1, K2 k2, @ReceiverDependentMutable ReferenceQueue<@Readonly Object> queue) {
                 super(k1, queue);
                 hash = Pair.hashCode(k1, k2);
-                peer = new WeakRefPeer<>(k2, queue) {
+                peer = new @ReceiverDependentMutable WeakRefPeer<>(k2, queue) {
                     // link back to <K1> peer
                     @Override
                     Weak<?, ?> weakPair() { return Weak.this; }

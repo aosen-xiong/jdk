@@ -28,6 +28,8 @@ package java.util;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nonempty.qual.EnsuresNonEmptyIf;
 import org.checkerframework.checker.pico.qual.Mutable;
+import org.checkerframework.checker.pico.qual.Readonly;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.framework.qual.AnnotatedFor;
@@ -54,7 +56,8 @@ import org.checkerframework.framework.qual.CFComment;
  * @since   1.0
  */
 @CFComment({"lock/nullness: permit null elements"})
-@AnnotatedFor({"lock", "nullness"})
+@AnnotatedFor({"lock", "nullness", "pico"})
+@ReceiverDependentMutable
 public class Stack<E> extends Vector<E> {
     /**
      * Creates an empty Stack.
@@ -105,7 +108,7 @@ public class Stack<E> extends Vector<E> {
      * @throws  EmptyStackException  if this stack is empty.
      */
     @Pure
-    public synchronized E peek(Stack<E> this) {
+    public synchronized E peek(@Readonly Stack<E> this) {
         int     len = size();
 
         if (len == 0)
@@ -121,7 +124,7 @@ public class Stack<E> extends Vector<E> {
      */
     @Pure
     @EnsuresNonEmptyIf(result = false, expression = "this")
-    public boolean empty(Stack<E> this) {
+    public boolean empty(@Readonly Stack<E> this) {
         return size() == 0;
     }
 
@@ -139,7 +142,7 @@ public class Stack<E> extends Vector<E> {
      *          the object is located; the return value {@code -1}
      *          indicates that the object is not on the stack.
      */
-    public synchronized int search(Stack<E> this, Object o) {
+    public synchronized int search(@Readonly Stack<E> this, @Readonly Object o) {
         int i = lastIndexOf(o);
 
         if (i >= 0) {

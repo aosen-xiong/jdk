@@ -36,6 +36,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
 import org.checkerframework.checker.pico.qual.Assignable;
 import org.checkerframework.checker.pico.qual.Mutable;
+import org.checkerframework.checker.pico.qual.PolyMutable;
 import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.checker.signedness.qual.PolySigned;
@@ -111,6 +112,7 @@ import jdk.internal.util.ArraysSupport;
  */
 @CFComment({"lock/nullness: permits nullable object"})
 @AnnotatedFor({"lock", "nullness", "index"})
+@ReceiverDependentMutable
 public class Vector<E>
     extends AbstractList<E>
     implements List<E>, RandomAccess, Cloneable, java.io.Serializable
@@ -160,12 +162,13 @@ public class Vector<E>
      * @throws IllegalArgumentException if the specified initial capacity
      *         is negative
      */
+    @SuppressWarnings("pico:assignment.type.incompatible") // array component type
     public Vector(@NonNegative int initialCapacity, int capacityIncrement) {
         super();
         if (initialCapacity < 0)
             throw new IllegalArgumentException("Illegal Capacity: "+
                                                initialCapacity);
-        this.elementData = new Object[initialCapacity];
+        this.elementData = new Object @ReceiverDependentMutable [initialCapacity];
         this.capacityIncrement = capacityIncrement;
     }
 
@@ -200,8 +203,9 @@ public class Vector<E>
      * @throws NullPointerException if the specified collection is null
      * @since   1.2
      */
+    @SuppressWarnings("pico") // cast from @Unique @Mutable to @RDM and class literal
     public @PolyNonEmpty Vector(@PolyNonEmpty Collection<? extends E> c) {
-        @Readonly Object[] a = c.toArray();
+        @Readonly Object @ReceiverDependentMutable [] a = c.toArray();
         elementCount = a.length;
         if (c.getClass() == ArrayList.class) {
             elementData = a;
@@ -352,7 +356,7 @@ public class Vector<E>
      * @return  an enumeration of the components of this vector
      * @see     Iterator
      */
-    public Enumeration<E> elements() {
+    public Enumeration<E> elements(@Readonly Vector<E> this) {
         return new Enumeration<E>() {
             int count = 0;
 
@@ -493,7 +497,7 @@ public class Vector<E>
      * @throws ArrayIndexOutOfBoundsException if the index is out of range
      *         ({@code index < 0 || index >= size()})
      */
-    public synchronized E elementAt(@NonNegative int index) {
+    public synchronized E elementAt(@Readonly Vector<E> this, @NonNegative int index) {
         if (index >= elementCount) {
             throw new ArrayIndexOutOfBoundsException(index + " >= " + elementCount);
         }
@@ -508,7 +512,7 @@ public class Vector<E>
      * @return     the first component of this vector
      * @throws NoSuchElementException if this vector has no components
      */
-    public synchronized E firstElement(@NonEmpty Vector<E> this) {
+    public synchronized E firstElement(@NonEmpty @Readonly Vector<E> this) {
         if (elementCount == 0) {
             throw new NoSuchElementException();
         }
@@ -522,7 +526,7 @@ public class Vector<E>
      *          {@code size() - 1}
      * @throws NoSuchElementException if this vector is empty
      */
-    public synchronized E lastElement(@NonEmpty Vector<E> this) {
+    public synchronized E lastElement(@NonEmpty @Readonly Vector<E> this) {
         if (elementCount == 0) {
             throw new NoSuchElementException();
         }
@@ -664,7 +668,7 @@ public class Vector<E>
      * @return  {@code true} if the argument was a component of this
      *          vector; {@code false} otherwise.
      */
-    public synchronized boolean removeElement(@Mutable @GuardSatisfied Vector<E> this, Object obj) {
+    public synchronized boolean removeElement(@Mutable @GuardSatisfied Vector<E> this, @Readonly Object obj) {
         modCount++;
         int i = indexOf(obj);
         if (i >= 0) {
@@ -746,7 +750,7 @@ public class Vector<E>
      * @since 1.2
      */
     @SideEffectFree
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "pico:argument.type.incompatible"}) // getClass error
     public synchronized <T> @Nullable T[] toArray(@PolyNull T[] a) {
         if (a.length < elementCount)
             return (T[]) Arrays.copyOf(elementData, elementCount, a.getClass());
@@ -762,7 +766,7 @@ public class Vector<E>
     // Positional Access Operations
 
     @SuppressWarnings("unchecked")
-    E elementData(int index) {
+    E elementData(@Readonly Vector<E> this, int index) {
         return (E) elementData[index];
     }
 
@@ -781,7 +785,7 @@ public class Vector<E>
      * @since 1.2
      */
     @Pure
-    public synchronized E get(@GuardSatisfied Vector<E> this, @NonNegative int index) {
+    public synchronized E get(@GuardSatisfied @Readonly Vector<E> this, @NonNegative int index) {
         if (index >= elementCount)
             throw new ArrayIndexOutOfBoundsException(index);
 
@@ -799,7 +803,7 @@ public class Vector<E>
      *         ({@code index < 0 || index >= size()})
      * @since 1.2
      */
-    public synchronized E set(@GuardSatisfied Vector<E> this, @NonNegative int index, E element) {
+    public synchronized E set(@GuardSatisfied @Mutable Vector<E> this, @NonNegative int index, E element) {
         if (index >= elementCount)
             throw new ArrayIndexOutOfBoundsException(index);
 
@@ -813,7 +817,7 @@ public class Vector<E>
      * bytecode size under 35 (the -XX:MaxInlineSize default value),
      * which helps when add(E) is called in a C1-compiled loop.
      */
-    private void add(E e, @Readonly Object[] elementData, int s) {
+    private void add(@Mutable Vector<E> this, E e, @Readonly Object[] elementData, int s) {
         if (s == elementData.length)
             elementData = grow();
         elementData[s] = e;
@@ -845,7 +849,7 @@ public class Vector<E>
      * @return true if the Vector contained the specified element
      * @since 1.2
      */
-    public boolean remove(@Mutable @GuardSatisfied Vector<E> this, @GuardSatisfied @Nullable @UnknownSignedness Object o) {
+    public boolean remove(@Mutable @GuardSatisfied Vector<E> this, @GuardSatisfied @Nullable @UnknownSignedness @Readonly Object o) {
         return removeElement(o);
     }
 
@@ -913,7 +917,7 @@ public class Vector<E>
      * @throws NullPointerException if the specified collection is null
      */
     @Pure
-    public synchronized boolean containsAll(@GuardSatisfied Vector<E> this, @GuardSatisfied Collection<? extends @UnknownSignedness Object> c) {
+    public synchronized boolean containsAll(@GuardSatisfied @Readonly Vector<E> this, @GuardSatisfied @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) {
         return super.containsAll(c);
     }
 
@@ -930,7 +934,7 @@ public class Vector<E>
      * @throws NullPointerException if the specified collection is null
      * @since 1.2
      */
-    public boolean addAll(@Mutable @GuardSatisfied Vector<E> this, Collection<? extends E> c) {
+    public boolean addAll(@Mutable @GuardSatisfied Vector<E> this, @Readonly Collection<? extends E> c) {
         @Readonly Object[] a = c.toArray();
         modCount++;
         int numNew = a.length;
@@ -964,7 +968,7 @@ public class Vector<E>
      *         or if the specified collection is null
      * @since 1.2
      */
-    public boolean removeAll(@Mutable @GuardSatisfied Vector<E> this, Collection<? extends @UnknownSignedness Object> c) {
+    public boolean removeAll(@Mutable @GuardSatisfied Vector<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) {
         Objects.requireNonNull(c);
         return bulkRemove(e -> c.contains(e));
     }
@@ -988,7 +992,7 @@ public class Vector<E>
      *         or if the specified collection is null
      * @since 1.2
      */
-    public boolean retainAll(@Mutable @GuardSatisfied Vector<E> this, Collection<? extends @UnknownSignedness Object> c) {
+    public boolean retainAll(@Mutable @GuardSatisfied Vector<E> this, Collection<? extends @UnknownSignedness @Readonly Object> c) {
         Objects.requireNonNull(c);
         return bulkRemove(e -> !c.contains(e));
     }
@@ -998,7 +1002,7 @@ public class Vector<E>
      */
     @SuppressWarnings({"unchecked"})
     @Override
-    public boolean removeIf(Predicate<? super E> filter) {
+    public boolean removeIf(@Mutable Vector<E> this, Predicate<? super E> filter) {
         Objects.requireNonNull(filter);
         return bulkRemove(filter);
     }
@@ -1015,7 +1019,7 @@ public class Vector<E>
         return (bits[i >> 6] & (1L << i)) == 0;
     }
 
-    private synchronized boolean bulkRemove(Predicate<? super E> filter) {
+    private synchronized boolean bulkRemove(@Mutable Vector<E> this, Predicate<? super E> filter) {
         int expectedModCount = modCount;
         final @Readonly Object[] es = elementData;
         final int end = elementCount;
@@ -1067,7 +1071,7 @@ public class Vector<E>
      * @throws NullPointerException if the specified collection is null
      * @since 1.2
      */
-    public synchronized boolean addAll(@GuardSatisfied @Mutable Vector<E> this, @NonNegative int index, Collection<? extends E> c) {
+    public synchronized boolean addAll(@GuardSatisfied @Mutable Vector<E> this, @NonNegative int index, @Readonly Collection<? extends E> c) {
         if (index < 0 || index > elementCount)
             throw new ArrayIndexOutOfBoundsException(index);
 
@@ -1104,7 +1108,7 @@ public class Vector<E>
      * @return true if the specified Object is equal to this Vector
      */
     @Pure
-    public synchronized boolean equals(@GuardSatisfied Vector<E> this, @GuardSatisfied @Nullable Object o) {
+    public synchronized boolean equals(@GuardSatisfied @Readonly Vector<E> this, @GuardSatisfied @Nullable @Readonly Object o) {
         return super.equals(o);
     }
 
@@ -1112,7 +1116,7 @@ public class Vector<E>
      * Returns the hash code value for this Vector.
      */
     @Pure
-    public synchronized int hashCode(@GuardSatisfied Vector<E> this) {
+    public synchronized int hashCode(@GuardSatisfied @Readonly Vector<E> this) {
         return super.hashCode();
     }
 
@@ -1121,7 +1125,7 @@ public class Vector<E>
      * the String representation of each element.
      */
     @SideEffectFree
-    public synchronized String toString(@GuardSatisfied Vector<E> this) {
+    public synchronized String toString(@GuardSatisfied @Readonly Vector<E> this) {
         return super.toString();
     }
 
@@ -1160,7 +1164,7 @@ public class Vector<E>
      *         {@code (fromIndex > toIndex)}
      */
     @SideEffectFree
-    public synchronized List<E> subList(@GuardSatisfied Vector<E> this, int fromIndex, int toIndex) {
+    public synchronized @PolyMutable List<E> subList(@GuardSatisfied @PolyMutable Vector<E> this, int fromIndex, int toIndex) {
         return Collections.synchronizedList(super.subList(fromIndex, toIndex),
                                             this);
     }
@@ -1172,13 +1176,13 @@ public class Vector<E>
      * This call shortens the list by {@code (toIndex - fromIndex)} elements.
      * (If {@code toIndex==fromIndex}, this operation has no effect.)
      */
-    protected synchronized void removeRange(int fromIndex, int toIndex) {
+    protected synchronized void removeRange(@Mutable Vector<E> this, int fromIndex, int toIndex) {
         modCount++;
         shiftTailOverGap(elementData, fromIndex, toIndex);
     }
 
     /** Erases the gap from lo to hi, by sliding down following elements. */
-    private void shiftTailOverGap(@Readonly Object[] es, int lo, int hi) {
+    private void shiftTailOverGap(@Mutable Vector<E> this, @Readonly Object[] es, int lo, int hi) {
         System.arraycopy(es, hi, es, lo, elementCount - hi);
         for (int to = elementCount, i = (elementCount -= hi - lo); i < to; i++)
             es[i] = null;
@@ -1196,7 +1200,7 @@ public class Vector<E>
      *         of a non-existing class
      */
     @java.io.Serial
-    private void readObject(ObjectInputStream in)
+    private void readObject(@Mutable Vector<E> this, ObjectInputStream in)
             throws IOException, ClassNotFoundException {
         ObjectInputStream.GetField gfields = in.readFields();
         int count = gfields.get("elementCount", 0);
@@ -1218,7 +1222,7 @@ public class Vector<E>
      * @throws java.io.IOException if an I/O error occurs
      */
     @java.io.Serial
-    private void writeObject(java.io.ObjectOutputStream s)
+    private void writeObject(@Mutable Vector<E> this, java.io.ObjectOutputStream s)
             throws java.io.IOException {
         final java.io.ObjectOutputStream.PutField fields = s.putFields();
         final @Readonly Object[] data;
@@ -1301,7 +1305,7 @@ public class Vector<E>
             }
         }
 
-        public void remove(@Mutable Itr this) {
+        public void remove(@Mutable Vector<E>.@Mutable Itr this) {
             if (lastRet == -1)
                 throw new IllegalStateException();
             synchronized (Vector.this) {

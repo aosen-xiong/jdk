@@ -756,7 +756,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
         int expectedModCount = modCount; // to support fast-fail
         int lastReturnedIndex = -1;      // to allow remove()
         @Assignable boolean indexValid; // To avoid unnecessary next computation
-        @SuppressWarnings("pico") // This assignment should work but does not. Try to come up with minimal example that default use of outter class
+        @SuppressWarnings("pico") // Field use from outter class
         @Readonly Object[] traversalTable = table; // reference to main table or copy
 
         @Pure
@@ -884,7 +884,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
     private class EntryIterator
         extends IdentityHashMapIterator<Map.@Readonly Entry<K,V>>
     {
-        @SuppressWarnings("pico:initialization.field.uninitialized") // lazy
+        // @SuppressWarnings("pico:initialization.field.uninitialized") // lazy
         private @Readonly Entry lastReturnedEntry;
 
         public Map.@Readonly Entry<K,V> next(@NonEmpty @Mutable EntryIterator this) {

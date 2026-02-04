@@ -228,8 +228,8 @@ class ImmutableCollections {
      * @param input the input array
      * @return the new list
      */
-    @SuppressWarnings("unchecked")
-    static <E> @Immutable List<E> listFromTrustedArray(@Readonly Object @Immutable... input) {
+    @SuppressWarnings({"unchecked", "pico:argument.type.incompatible"}) // This array should be unique
+    static <E> @Immutable List<E> listFromTrustedArray(@Readonly Object @Readonly... input) {
         assert input.getClass() == Object[].class;
         for (Object o : input) { // implicit null check of 'input' array
             Objects.requireNonNull(o);
@@ -582,7 +582,7 @@ class ImmutableCollections {
         @Stable
         private final Object e1;
 
-        @SuppressWarnings("pico") // covariant
+        @SuppressWarnings("pico:assignment.type.incompatible") // type parameter covariant
         List12(E e0) {
             this.e0 = Objects.<@Readonly E>requireNonNull(e0);
             // Use EMPTY as a sentinel for an unused element: not using null
@@ -590,7 +590,7 @@ class ImmutableCollections {
             this.e1 = EMPTY;
         }
 
-        @SuppressWarnings("pico") // covariant
+        @SuppressWarnings("pico:assignment.type.incompatible") // type parameter covariant
         List12(E e0, E e1) {
             this.e0 = Objects.<@Readonly E>requireNonNull(e0);
             this.e1 = Objects.<@Readonly E>requireNonNull(e1);
@@ -734,7 +734,7 @@ class ImmutableCollections {
         }
 
         @Override
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({"unchecked", "pico:argument.type.incompatible"}) // getClass error
         public <T> @Nullable T[] toArray(@PolyNull T[] a) {
             int size = elements.length;
             if (a.length < size) {
@@ -1375,7 +1375,7 @@ class ImmutableCollections {
                 }
 
                 @Override
-                public Iterator<Map.Entry<K,V>> iterator() {
+                public Iterator<Map.@Immutable Entry<K,V>> iterator() {
                     return new MapNIterator();
                 }
             };
@@ -1553,7 +1553,7 @@ final class CollSer implements Serializable {
      * @since 9
      */
     @java.io.Serial
-    @SuppressWarnings("pico:argument.type.incompatible") // covariant
+    @SuppressWarnings("pico:argument.type.incompatible") // array component type
     private @Immutable Object readResolve() throws ObjectStreamException {
         try {
             if (array == null) {

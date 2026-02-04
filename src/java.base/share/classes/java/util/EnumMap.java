@@ -140,7 +140,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
         }
     };
 
-    @SuppressWarnings("pico") // Not expressive enough
+    @SuppressWarnings("pico") // Not precise enough
     private @PolyMutable Object maskNull(@Readonly EnumMap<K,V> this, @Nullable @PolyMutable Object value) {
         return (value == null ? NULL : value);
     }
@@ -170,7 +170,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
      * @param m the enum map from which to initialize this enum map
      * @throws NullPointerException if {@code m} is null
      */
-    @SuppressWarnings("pico") // PICO constructor fix
+    @SuppressWarnings("pico:method.invocation.invalid") // array clone
     public EnumMap(@ReceiverDependentMutable EnumMap<K, ? extends V> m) {
         keyType = m.keyType;
         keyUniverse = m.keyUniverse;
@@ -190,7 +190,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
      *     {@code EnumMap} instance and contains no mappings
      * @throws NullPointerException if {@code m} is null
      */
-    @SuppressWarnings("pico") // PICO constructor fix
+    @SuppressWarnings("pico:method.invocation.invalid") // PICO constructor fix
     public EnumMap(@ReceiverDependentMutable Map<K, ? extends V> m) {
         if (m instanceof EnumMap) {
             EnumMap<K, ? extends V> em = (@ReceiverDependentMutable EnumMap<K, ? extends V>) m;
@@ -203,7 +203,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
                 throw new IllegalArgumentException("Specified map is empty");
             keyType = m.keySet().iterator().next().getDeclaringClass();
             keyUniverse = getKeyUniverse(keyType);
-            vals = new Object[keyUniverse.length];
+            vals = new Object @ReceiverDependentMutable [keyUniverse.length];
             putAll(m);
         }
     }
@@ -817,7 +817,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
     /**
      * Throws an exception if e is not of the correct type for this enum set.
      */
-    @SuppressWarnings("pico:type.invalid.annotations.on.use") // Aosen: This is a bug in validator
+    // @SuppressWarnings("pico:type.invalid.annotations.on.use") // Aosen: This is a bug in validator
     private void typeCheck(@Readonly EnumMap<K,V> this, K key) {
         Class<?> keyClass = key.getClass();
         if (keyClass != keyType && keyClass.getSuperclass() != keyType)
@@ -828,7 +828,8 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
      * Returns all of the values comprising K.
      * The result is uncloned, cached, and shared by all callers.
      */
-    private static <K extends Enum<K>> K [] getKeyUniverse(Class<K> keyType) {
+    @SuppressWarnings("pico:return.type.incompatible") // return type
+    private static <K extends Enum<K>> K @ReceiverDependentMutable [] getKeyUniverse(Class<K> keyType) {
         return SharedSecrets.getJavaLangAccess()
                                         .getEnumConstantsShared(keyType);
     }
@@ -870,7 +871,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
      * Reconstitute the {@code EnumMap} instance from a stream (i.e.,
      * deserialize it).
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "pico:assignment.type.incompatible"}) // why getKeyUniverse return type not adapted?
     @java.io.Serial
     private void readObject(@Mutable EnumMap<K,V> this, java.io.ObjectInputStream s)
         throws java.io.IOException, ClassNotFoundException

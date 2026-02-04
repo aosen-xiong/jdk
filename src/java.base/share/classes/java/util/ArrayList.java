@@ -404,7 +404,7 @@ import jdk.internal.util.ArraysSupport;
      *         proper sequence
      */
     @SideEffectFree
-    @SuppressWarnings("pico")// Backing array element type
+    @SuppressWarnings("pico:argument.type.incompatible") // Backing array element type
     public @PolyNull @PolySigned @PolyMutable Object[] toArray(@Readonly ArrayList<@PolyNull @PolySigned @PolyMutable E> this) {
         return Arrays.<@PolyMutable Object>copyOf(elementData, size);
     }
@@ -434,7 +434,7 @@ import jdk.internal.util.ArraysSupport;
      * @throws NullPointerException if the specified array is null
      */
     @SideEffectFree
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "pico:argument.type.incompatible"}) // getClass error
     public <T> @Nullable T[] toArray(@PolyNull T[] a) {
         if (a.length < size)
             // Make a new array of a's runtime type, but my contents:
@@ -1276,13 +1276,13 @@ import jdk.internal.util.ArraysSupport;
             return modified;
         }
 
-        @SuppressWarnings("pico")// Backing array element type
-        public @PolyNull @PolySigned @PolyMutable Object[] toArray(SubList<@PolyNull @PolySigned @PolyMutable E> this) {
+        @SuppressWarnings("pico:argument.type.incompatible")// poly does not work on field's type argument
+        public @PolyNull @PolySigned @PolyMutable Object[] toArray(@Readonly SubList<@PolyNull @PolySigned @PolyMutable E> this) {
             checkForComodification();
             return Arrays.<@PolyMutable Object>copyOfRange(root.elementData, offset, offset + size);
         }
 
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({"unchecked", "pico:argument.type.incompatible"}) // getClass error
         public <T> @Nullable T[] toArray(T[] a) {
             checkForComodification();
             if (a.length < size)

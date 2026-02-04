@@ -48,6 +48,8 @@ import sun.reflect.misc.ReflectUtil;
 import sun.security.action.GetPropertyAction;
 import sun.security.util.SecurityConstants;
 
+import org.checkerframework.checker.pico.qual.Readonly;
+
 /** <P> The master factory for all reflective objects, both those in
     java.lang.reflect (Fields, Methods, Constructors) as well as their
     delegates (FieldAccessors, MethodAccessors, ConstructorAccessors).
@@ -333,11 +335,11 @@ public class ReflectionFactory {
 
     /** Gets the byte[] that encodes TypeAnnotations on an executable.
      */
-    public byte[] getExecutableTypeAnnotationBytes(Executable ex) {
+    public byte[] getExecutableTypeAnnotationBytes(@Readonly Executable ex) {
         return langReflectAccess.getExecutableTypeAnnotationBytes(ex);
     }
 
-    public Class<?>[] getExecutableSharedParameterTypes(Executable ex) {
+    public Class<?>[] getExecutableSharedParameterTypes(@Readonly Executable ex) {
         return langReflectAccess.getExecutableSharedParameterTypes(ex);
     }
 

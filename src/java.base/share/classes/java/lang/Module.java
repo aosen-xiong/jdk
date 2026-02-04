@@ -71,6 +71,7 @@ import jdk.internal.reflect.Reflection;
 import sun.security.util.SecurityConstants;
 
 import org.checkerframework.checker.initialization.qual.UnderInitialization;
+import org.checkerframework.checker.pico.qual.Assignable;
 import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.checker.pico.qual.Mutable;
 import org.checkerframework.checker.pico.qual.Readonly;
@@ -1308,7 +1309,7 @@ public final class Module implements AnnotatedElement {
      */
     @SuppressWarnings("pico:assignment.type.incompatible") // cast from @Unique @Mutable to @Immutable
     private static void initExports(@UnderInitialization Module m, Map<String, Module> nameToModule) {
-        Map<String, Set<Module>> exportedPackages = new HashMap<>();
+        Map<String, @Immutable Set<Module>> exportedPackages = new HashMap<>();
 
         for (Exports exports : m.getDescriptor().exports()) {
             String source = exports.source();
@@ -1351,8 +1352,8 @@ public final class Module implements AnnotatedElement {
                                             @Readonly Map<String, Module> nameToModule,
                                             @Readonly List<ModuleLayer> parents) {
         ModuleDescriptor descriptor = m.getDescriptor();
-        Map<String, Set<Module>> openPackages = new HashMap<>();
-        Map<String, Set<Module>> exportedPackages = new HashMap<>();
+        Map<String, @Immutable Set<Module>> openPackages = new HashMap<>();
+        Map<String, @Immutable Set<Module>> exportedPackages = new HashMap<>();
 
         // process the open packages first
         for (Opens opens : descriptor.opens()) {
@@ -1482,7 +1483,7 @@ public final class Module implements AnnotatedElement {
     }
 
     // cached class file with annotations
-    private volatile Class<?> moduleInfoClass;
+    private volatile @Assignable /* should be @LazyFinal */ Class<?> moduleInfoClass;
 
     @SuppressWarnings("removal")
     private Class<?> moduleInfoClass() {

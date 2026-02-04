@@ -1105,6 +1105,7 @@ public class ArrayDeque<E extends @NonNull @Readonly Object> extends AbstractCol
      * @return an array containing all of the elements in this deque
      */
     @SideEffectFree
+    @SuppressWarnings("pico:argument.type.incompatible") // annotate class literal
     public @PolyNull @PolySigned @PolyMutable Object[] toArray(@Readonly ArrayDeque<@PolyNull @PolySigned @PolyMutable E> this) {
         return this.<@PolyMutable Object>toArray(Object[].class);
     }

@@ -209,7 +209,7 @@ public class TreeMap<K extends @Immutable Object,V>
      *         or are not mutually comparable
      * @throws NullPointerException if the specified map is null
      */
-    @SuppressWarnings("pico") // PICO constructor fix
+    @SuppressWarnings("pico:method.invocation.invalid") // PICO constructor fix
     public @PolyNonEmpty TreeMap(@PolyNonEmpty Map<? extends K, ? extends V> m) {
         comparator = null;
         putAll(m);
@@ -224,7 +224,7 @@ public class TreeMap<K extends @Immutable Object,V>
      *         and whose comparator is to be used to sort this map
      * @throws NullPointerException if the specified map is null
      */
-    @SuppressWarnings("pico") // PICO constructor fix
+    @SuppressWarnings("pico:method.invocation.invalid") // PICO constructor fix
     public @PolyNonEmpty TreeMap(@PolyNonEmpty @ReceiverDependentMutable SortedMap<K, ? extends V> m) {
         comparator = m.comparator();
         try {
@@ -1198,7 +1198,7 @@ public class TreeMap<K extends @Immutable Object,V>
      * {@code add} or {@code addAll} operations.
      */
     @SideEffectFree
-    @SuppressWarnings({"pico:assignment.type.incompatible", "pico:return.type.incompatible"}) // polyq on supertype's type argument
+    @SuppressWarnings("pico:return.type.incompatible") // class polymorphic qualifier
     public @PolyMutable Set<Map.@PolyMutable Entry<@KeyFor({"this"}) K,V>> entrySet(@GuardSatisfied @PolyMutable TreeMap<K, V> this) {
         EntrySet es = entrySet;
         return (es != null) ? es : (entrySet = new @PolyMutable EntrySet());
@@ -1567,7 +1567,7 @@ public class TreeMap<K extends @Immutable Object,V>
             lastReturned = e;
             return e;
         }
-        @SuppressWarnings("pico") // not expressive enough
+        @SuppressWarnings("pico:argument.type.incompatible") // outter receiver dependence
         public void remove(@Mutable TreeMap<K,V>.@Mutable PrivateEntryIterator<T> this) {
             if (lastReturned == null)
                 throw new IllegalStateException();
@@ -1620,7 +1620,7 @@ public class TreeMap<K extends @Immutable Object,V>
         public K next(@NonEmpty @Mutable DescendingKeyIterator this) {
             return prevEntry().key;
         }
-        @SuppressWarnings("pico") // not expressive enough
+        @SuppressWarnings("pico:argument.type.incompatible") // outter receiver dependence
         public void remove(@Mutable TreeMap<K,V>.@Mutable DescendingKeyIterator this) {
             if (lastReturned == null)
                 throw new IllegalStateException();
@@ -2102,6 +2102,7 @@ public class TreeMap<K extends @Immutable Object,V>
                 return next != null && next.key != fenceKey;
             }
 
+            @SuppressWarnings("pico:return.type.incompatible") // outter receiver dependence
             final TreeMap.@PolyMutable Entry<K,V> nextEntry(@PolyMutable NavigableSubMap<K,V>.@Mutable SubMapIterator<T> this) {
                 TreeMap.Entry<K,V> e = next;
                 if (e == null || e.key == fenceKey)
@@ -2123,7 +2124,7 @@ public class TreeMap<K extends @Immutable Object,V>
                 lastReturned = e;
                 return e;
             }
-            @SuppressWarnings("pico") // not expressive enough
+            @SuppressWarnings("pico:argument.type.incompatible") // outter receiver dependence
             final void removeAscending(@Mutable NavigableSubMap<K,V>.@Mutable SubMapIterator<T> this) {
                 if (lastReturned == null)
                     throw new IllegalStateException();
@@ -2137,7 +2138,7 @@ public class TreeMap<K extends @Immutable Object,V>
                 expectedModCount = m.modCount;
             }
 
-            @SuppressWarnings("pico") // not expressive enough
+            @SuppressWarnings("pico:argument.type.incompatible") // outter receiver dependence
             final void removeDescending(@Mutable NavigableSubMap<K,V>.@Mutable SubMapIterator<T> this) {
                 if (lastReturned == null)
                     throw new IllegalStateException();
@@ -2334,7 +2335,7 @@ public class TreeMap<K extends @Immutable Object,V>
         }
 
         @SideEffectFree
-        @SuppressWarnings({"pico:assignment.type.incompatible", "pico:return.type.incompatible"}) // polyq on supertype's type argument
+        @SuppressWarnings("pico:return.type.incompatible") // polyq on supertype's type argument
         public @PolyMutable Set<Map.@PolyMutable Entry<K,V>> entrySet(@PolyMutable AscendingSubMap<K,V> this) {
             EntrySetView es = entrySetView;
             return (es != null) ? es : (entrySetView = new @PolyMutable AscendingEntrySetView());
@@ -2430,7 +2431,7 @@ public class TreeMap<K extends @Immutable Object,V>
         }
 
         @SideEffectFree
-        @SuppressWarnings({"pico:assignment.type.incompatible", "pico:return.type.incompatible"}) // polyq on supertype's type argument
+        @SuppressWarnings("pico:return.type.incompatible") // polyq on supertype's type argument
         public @PolyMutable Set<Map.@PolyMutable Entry<K,V>> entrySet(@PolyMutable DescendingSubMap<K,V> this) {
             EntrySetView es = entrySetView;
             return (es != null) ? es : (entrySetView = new @PolyMutable DescendingEntrySetView());

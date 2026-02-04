@@ -403,7 +403,7 @@ public class LinkedHashMap<K extends @Immutable Object,V>
      * @param  m the map whose mappings are to be placed in this map
      * @throws NullPointerException if the specified map is null
      */
-    @SuppressWarnings("pico") // PICO constructor fix
+    @SuppressWarnings("pico:method.invocation.invalid") // PICO constructor fix
     public @PolyNonEmpty LinkedHashMap(@PolyNonEmpty @Readonly Map<? extends K, ? extends V> m) {
         super();
         accessOrder = false;

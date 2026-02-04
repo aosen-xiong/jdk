@@ -368,6 +368,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
      * Returns x's Class if it is of the form "class C implements
      * Comparable<C>", else null.
      */
+    @SuppressWarnings("pico:static.receiverdependentmutable.forbidden") // getClass error
     static Class<?> comparableClassFor(@Readonly Object x) {
         if (x instanceof Comparable) {
             Class<?> c; Type[] ts, as; ParameterizedType p;
@@ -464,7 +465,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
      * @throws IllegalArgumentException if the initial capacity is negative
      *         or the load factor is nonpositive
      */
-    @SuppressWarnings("pico:initialization.fields.uninitialized") // Conservative
+    // @SuppressWarnings("pico:initialization.fields.uninitialized") // Conservative
     public HashMap(@NonNegative int initialCapacity, float loadFactor) {
         if (initialCapacity < 0)
             throw new IllegalArgumentException("Illegal initial capacity: " +
@@ -493,7 +494,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
      * Constructs an empty {@code HashMap} with the default initial capacity
      * (16) and the default load factor (0.75).
      */
-    @SuppressWarnings("pico:initialization.fields.uninitialized") // Conservative
+    // @SuppressWarnings("pico:initialization.fields.uninitialized") // Conservative
     public HashMap() {
         this.loadFactor = DEFAULT_LOAD_FACTOR; // all other fields defaulted
     }
@@ -507,7 +508,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
      * @param   m the map whose mappings are to be placed in this map
      * @throws  NullPointerException if the specified map is null
      */
-    @SuppressWarnings("pico") // PICO constructor fix
+    @SuppressWarnings("pico:method.invocation.invalid") // PICO constructor fix
     public @PolyNonEmpty HashMap(@PolyNonEmpty @Readonly Map<? extends K, ? extends V> m) {
         this.loadFactor = DEFAULT_LOAD_FACTOR;
         putMapEntries(m, false);
@@ -1639,7 +1640,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
             return next != null;
         }
 
-        @SuppressWarnings("pico:return.type.incompatible") //field depends on outer class
+        @SuppressWarnings("pico:return.type.incompatible") // field depends on outer class
         final @PolyMutable Node<K,V> nextNode(@PolyMutable HashMap<K,V>.@NonEmpty @Mutable HashIterator this) {
             @PolyMutable Node<K,V>[] t;
             Node<K,V> e = next;
