@@ -176,9 +176,9 @@ final class Grapheme {
             return OTHER;
         }
 
-        if (EmojiData.isExtendedPictographic(cp)) {
-            return EXTENDED_PICTOGRAPHIC;
-        }
+//        if (EmojiData.isExtendedPictographic(cp)) {
+//            return EXTENDED_PICTOGRAPHIC;
+//        }
 
         int type = Character.getType(cp);
         switch(type) {
