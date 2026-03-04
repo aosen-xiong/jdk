@@ -42,6 +42,7 @@ import org.checkerframework.checker.nonempty.qual.NonEmpty;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.checker.signedness.qual.PolySigned;
 import org.checkerframework.checker.signedness.qual.UnknownSignedness;
 import org.checkerframework.dataflow.qual.Pure;
@@ -88,7 +89,7 @@ import java.util.function.Predicate;
  * @param <E> the type of elements held in this deque
  */
 @AnnotatedFor({"nullness"})
-public class LinkedBlockingDeque<E extends Object>
+public class LinkedBlockingDeque<E extends @Readonly Object>
     extends AbstractQueue<E>
     implements BlockingDeque<E>, java.io.Serializable {
 

@@ -34,6 +34,8 @@ import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.mustcall.qual.MustCallAlias;
 import org.checkerframework.checker.mustcall.qual.NotOwning;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Readonly;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.checker.signedness.qual.PolySigned;
 import org.checkerframework.framework.qual.AnnotatedFor;
 import org.checkerframework.framework.qual.CFComment;
@@ -75,6 +77,7 @@ import java.nio.charset.UnsupportedCharsetException;
 
 @CFComment({"lock: TODO: Should parameters be @GuardSatisfied, or is the default of @GuardedBy({}) appropriate? (@GuardedBy({}) is more conservative.)"})
 @AnnotatedFor({"formatter", "i18n", "index", "initialization", "lock", "mustcall", "nullness", "signedness"})
+@ReceiverDependentMutable
 public class PrintStream extends FilterOutputStream
     implements Appendable, Closeable
 {
@@ -888,7 +891,7 @@ public class PrintStream extends FilterOutputStream
      * @param      obj   The {@code Object} to be printed
      * @see        java.lang.Object#toString()
      */
-    public void print(@GuardSatisfied PrintStream this, @Nullable Object obj) {
+    public void print(@GuardSatisfied PrintStream this, @Nullable @Readonly Object obj) {
         write(String.valueOf(obj));
     }
 
@@ -1058,7 +1061,7 @@ public class PrintStream extends FilterOutputStream
      *
      * @param x  The {@code Object} to be printed.
      */
-    public void println(@GuardSatisfied PrintStream this, @Nullable Object x) {
+    public void println(@GuardSatisfied PrintStream this, @Nullable @Readonly Object x) {
         String s = String.valueOf(x);
         if (getClass() == PrintStream.class) {
             // need to apply String.valueOf again since first invocation
@@ -1118,7 +1121,7 @@ public class PrintStream extends FilterOutputStream
      */
     @CFComment({"lock/nullness: The vararg arrays can actually be null, but let's not annotate them because passing null is bad style; see whether this annotation is useful."})
     @FormatMethod
-    public @NotOwning PrintStream printf(@GuardSatisfied PrintStream this, String format, @Nullable Object ... args) {
+    public @NotOwning PrintStream printf(@GuardSatisfied PrintStream this, String format, @Nullable @Readonly Object ... args) {
         return format(format, args);
     }
 
@@ -1171,7 +1174,7 @@ public class PrintStream extends FilterOutputStream
      * @since  1.5
      */
     @FormatMethod
-    public @NotOwning PrintStream printf(@GuardSatisfied PrintStream this, @Nullable Locale l, String format, @Nullable Object ... args) {
+    public @NotOwning PrintStream printf(@GuardSatisfied PrintStream this, @Nullable Locale l, String format, @Nullable @Readonly Object ... args) {
         return format(l, format, args);
     }
 
@@ -1217,7 +1220,7 @@ public class PrintStream extends FilterOutputStream
      * @since  1.5
      */
     @FormatMethod
-    public @NotOwning PrintStream format(@GuardSatisfied PrintStream this, String format, @Nullable Object ... args) {
+    public @NotOwning PrintStream format(@GuardSatisfied PrintStream this, String format, @Nullable @Readonly Object ... args) {
         try {
             synchronized (this) {
                 ensureOpen();
@@ -1277,7 +1280,7 @@ public class PrintStream extends FilterOutputStream
      * @since  1.5
      */
     @FormatMethod
-    public @NotOwning PrintStream format(@GuardSatisfied PrintStream this, @Nullable Locale l, String format, @Nullable Object ... args) {
+    public @NotOwning PrintStream format(@GuardSatisfied PrintStream this, @Nullable Locale l, String format, @Nullable @Readonly Object ... args) {
         try {
             synchronized (this) {
                 ensureOpen();

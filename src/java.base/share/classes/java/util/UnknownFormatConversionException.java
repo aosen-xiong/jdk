@@ -25,6 +25,9 @@
 
 package java.util;
 
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 /**
  * Unchecked exception thrown when an unknown conversion is given.
  *
@@ -34,6 +37,8 @@ package java.util;
  *
  * @since 1.5
  */
+@AnnotatedFor("pico")
+@ReceiverDependentMutable
 public class UnknownFormatConversionException extends IllegalFormatException {
 
     @java.io.Serial

@@ -28,6 +28,8 @@ package java.util;
 
 import org.checkerframework.checker.index.qual.IndexOrHigh;
 import org.checkerframework.checker.interning.qual.UsesObjectEquals;
+import org.checkerframework.checker.pico.qual.Mutable;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
 /**
@@ -44,6 +46,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @author Josh Bloch
  */
 @AnnotatedFor({"index", "interning"})
+@SuppressWarnings("pico") // Not interesting class, fix later
 @UsesObjectEquals class ComparableTimSort {
     /**
      * This is the minimum sized sequence that will be merged.  Shorter
@@ -181,7 +184,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
      * @param workLen usable size of work array
      * @since 1.8
      */
-    static void sort(Object[] a, @IndexOrHigh({"#1"}) int lo, @IndexOrHigh({"#1"}) int hi, Object[] work, int workBase, int workLen) {
+    static void sort(@Readonly Object[] a, @IndexOrHigh({"#1"}) int lo, @IndexOrHigh({"#1"}) int hi, Object[] work, int workBase, int workLen) {
         assert a != null && lo >= 0 && lo <= hi && hi <= a.length;
 
         int nRemaining  = hi - lo;

@@ -29,6 +29,7 @@ import org.checkerframework.checker.interning.qual.Interned;
 import org.checkerframework.checker.interning.qual.UsesObjectEquals;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.checker.signature.qual.BinaryName;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
@@ -1140,7 +1141,7 @@ public @UsesObjectEquals class Logger {
      * @param   thrown  Throwable associated with log message.
      */
     @SideEffectFree
-    public void log(@GuardSatisfied Logger this, @GuardSatisfied Level level, @Nullable String msg, @GuardSatisfied @Nullable Throwable thrown) {
+    public void log(@GuardSatisfied Logger this, @Readonly @GuardSatisfied Level level, @Nullable String msg, @Readonly @GuardSatisfied @Nullable Throwable thrown) {
         if (!isLoggable(level)) {
             return;
         }

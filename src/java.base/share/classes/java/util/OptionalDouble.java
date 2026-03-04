@@ -69,6 +69,7 @@ import java.util.stream.DoubleStream;
  */
 @AnnotatedFor({"lock", "nullness", "optional"})
 @jdk.internal.ValueBased
+@SuppressWarnings("pico") // Not interesting class, fix later
 public final @NonNull class OptionalDouble {
     /**
      * Common instance for {@code empty()}.

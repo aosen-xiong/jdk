@@ -25,6 +25,7 @@
 package java.lang;
 
 import org.checkerframework.checker.interning.qual.UsesObjectEquals;
+import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
 import java.util.*;
@@ -38,8 +39,10 @@ import java.util.*;
  */
 
 @AnnotatedFor({"interning"})
+@SuppressWarnings("pico:type.arguments.not.inferred")
 @UsesObjectEquals class ApplicationShutdownHooks {
     /* The set of registered hooks */
+    @SuppressWarnings("pico:type.argument.type.incompatible") // AOSEN: special case?
     private static IdentityHashMap<Thread, Thread> hooks;
     static {
         try {

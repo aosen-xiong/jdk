@@ -139,6 +139,7 @@ import sun.util.ResourceBundleEnumeration;
  * @since 1.1
  */
 @AnnotatedFor({"lock"})
+@SuppressWarnings("pico") // Not interesting class, fix later
 public class PropertyResourceBundle extends ResourceBundle {
 
     // Check whether the strict encoding is specified.

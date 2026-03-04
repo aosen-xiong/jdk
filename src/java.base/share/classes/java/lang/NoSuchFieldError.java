@@ -39,7 +39,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  *
  * @since   1.0
  */
-@AnnotatedFor({"nullness"})
+@AnnotatedFor({"nullness", "pico"})
 public class NoSuchFieldError extends IncompatibleClassChangeError {
     @java.io.Serial
     private static final long serialVersionUID = -3456430195886129035L;

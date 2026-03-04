@@ -34,6 +34,8 @@ import org.checkerframework.checker.index.qual.Positive;
 import org.checkerframework.checker.interning.qual.Interned;
 import org.checkerframework.checker.lock.qual.NewObject;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.checker.signedness.qual.SignedPositive;
 import org.checkerframework.checker.signedness.qual.SignednessGlb;
 import org.checkerframework.common.value.qual.ArrayLen;
@@ -191,8 +193,9 @@ import static java.lang.constant.ConstantDescs.DEFAULT_NAME;
  * @author  Ulf Zibis
  * @since   1.0
  */
-@AnnotatedFor({"index", "initialization", "interning", "nullness", "value"})
+@AnnotatedFor({"index", "initialization", "interning", "nullness", "pico", "value"})
 @jdk.internal.ValueBased
+@Immutable
 public final
 class Character implements java.io.Serializable, Comparable<Character>, Constable {
     /**
@@ -9421,7 +9424,7 @@ class Character implements java.io.Serializable, Comparable<Character>, Constabl
      */
     @Pure
     @StaticallyExecutable
-    public static int offsetByCodePoints(CharSequence seq, @IndexOrHigh({"#1"}) int index,
+    public static int offsetByCodePoints(@Readonly CharSequence seq, @IndexOrHigh({"#1"}) int index,
                                          int codePointOffset) {
         int length = seq.length();
         if (index < 0 || index > length) {

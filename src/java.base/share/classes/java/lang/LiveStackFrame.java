@@ -30,6 +30,9 @@ import java.util.Set;
 
 import static java.lang.StackWalker.ExtendedOption.LOCALS_AND_OPERANDS;
 
+import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 /**
  * <em>UNSUPPORTED</em> This interface is intended to be package-private
  * or move to an internal package.<p>
@@ -41,6 +44,7 @@ import static java.lang.StackWalker.ExtendedOption.LOCALS_AND_OPERANDS;
  * @jvms 2.6 Frames
  */
 /* package-private */
+@AnnotatedFor("pico")
 interface LiveStackFrame extends StackFrame {
     /**
      * Return the monitors held by this stack frame. This method returns
@@ -155,6 +159,7 @@ interface LiveStackFrame extends StackFrame {
      * @throws SecurityException if the security manager is present and
      * denies access to {@code RuntimePermission("liveStackFrames")}
      */
+    @SuppressWarnings("pico:argument.type.incompatible") // cast from @Unique @Mutable to @Immutable
     public static StackWalker getStackWalker() {
         return getStackWalker(EnumSet.noneOf(StackWalker.Option.class));
     }
@@ -176,7 +181,7 @@ interface LiveStackFrame extends StackFrame {
      * {@link StackWalker.Option#RETAIN_CLASS_REFERENCE Option.RETAIN_CLASS_REFERENCE}
      * and it denies access to {@code RuntimePermission("getStackWalkerWithClassReference")}.
      */
-    public static StackWalker getStackWalker(Set<StackWalker.Option> options) {
+    public static StackWalker getStackWalker(@Immutable Set<StackWalker.Option> options) {
         @SuppressWarnings("removal")
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {

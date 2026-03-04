@@ -28,6 +28,9 @@ package java.util;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.Readonly;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.framework.qual.AnnotatedFor;
 import org.checkerframework.framework.qual.CFComment;
@@ -121,9 +124,10 @@ import java.util.Comparators;
  */
 @CFComment({"lock/nullness: Javadoc says: \"a comparator may optionally permit comparison of null",
 "arguments, while maintaining the requirements for an equivalence relation.\""})
-@AnnotatedFor({"lock", "nullness", "index"})
+@AnnotatedFor({"lock", "nullness", "index", "pico"})
 @FunctionalInterface
-public interface Comparator<T> {
+@ReceiverDependentMutable
+public interface Comparator<T extends @Readonly Object> {
     /**
      * Compares its two arguments for order.  Returns a negative integer,
      * zero, or a positive integer as the first argument is less than, equal
@@ -160,7 +164,7 @@ public interface Comparator<T> {
      * @throws ClassCastException if the arguments' types prevent them from
      *         being compared by this comparator.
      */
-    int compare(T o1, T o2);
+    int compare(@Readonly Comparator<T> this, T o1, T o2);
 
     /**
      * Indicates whether some other object is &quot;equal to&quot;
@@ -186,7 +190,7 @@ public interface Comparator<T> {
      * @see Object#hashCode()
      */
     @Pure
-    boolean equals(@GuardSatisfied Comparator<T> this, @GuardSatisfied @Nullable Object obj);
+    boolean equals(@GuardSatisfied @Readonly Comparator<T> this, @GuardSatisfied @Nullable @Readonly Object obj);
 
     /**
      * Returns a comparator that imposes the reverse ordering of this
@@ -196,7 +200,7 @@ public interface Comparator<T> {
      *         comparator.
      * @since 1.8
      */
-    default Comparator<T> reversed() {
+    default @Readonly Comparator<T> reversed(@Readonly Comparator<T> this) {
         return Collections.reverseOrder(this);
     }
 
@@ -225,7 +229,7 @@ public interface Comparator<T> {
      * @throws NullPointerException if the argument is null.
      * @since 1.8
      */
-    default Comparator<T> thenComparing(Comparator<? super T> other) {
+    default Comparator<T> thenComparing(@Readonly Comparator<T> this, @Readonly Comparator<? super T> other) {
         Objects.requireNonNull(other);
         return (Comparator<T> & Serializable) (c1, c2) -> {
             int res = compare(c1, c2);
@@ -251,6 +255,7 @@ public interface Comparator<T> {
      * @since 1.8
      */
     default <U> Comparator<T> thenComparing(
+            @Readonly Comparator<T> this,
             Function<? super T, ? extends U> keyExtractor,
             Comparator<? super U> keyComparator)
     {
@@ -275,7 +280,7 @@ public interface Comparator<T> {
      * @since 1.8
      */
     default <U extends Comparable<? super U>> Comparator<T> thenComparing(
-            Function<? super T, ? extends U> keyExtractor)
+            @Readonly Comparator<T> this, Function<? super T, ? extends U> keyExtractor)
     {
         return thenComparing(comparing(keyExtractor));
     }
@@ -295,7 +300,7 @@ public interface Comparator<T> {
      * @see #thenComparing(Comparator)
      * @since 1.8
      */
-    default Comparator<T> thenComparingInt(ToIntFunction<? super T> keyExtractor) {
+    default Comparator<T> thenComparingInt(@Readonly Comparator<T> this, ToIntFunction<? super T> keyExtractor) {
         return thenComparing(comparingInt(keyExtractor));
     }
 
@@ -314,7 +319,7 @@ public interface Comparator<T> {
      * @see #thenComparing(Comparator)
      * @since 1.8
      */
-    default Comparator<T> thenComparingLong(ToLongFunction<? super T> keyExtractor) {
+    default Comparator<T> thenComparingLong(@Readonly Comparator<T> this, ToLongFunction<? super T> keyExtractor) {
         return thenComparing(comparingLong(keyExtractor));
     }
 
@@ -333,7 +338,7 @@ public interface Comparator<T> {
      * @see #thenComparing(Comparator)
      * @since 1.8
      */
-    default Comparator<T> thenComparingDouble(ToDoubleFunction<? super T> keyExtractor) {
+    default Comparator<T> thenComparingDouble(@Readonly Comparator<T> this, ToDoubleFunction<? super T> keyExtractor) {
         return thenComparing(comparingDouble(keyExtractor));
     }
 
@@ -368,8 +373,8 @@ public interface Comparator<T> {
      * @since 1.8
      */
     @SuppressWarnings("unchecked")
-    public static <T extends Comparable<? super T>> Comparator<T> naturalOrder() {
-        return (Comparator<T>) Comparators.NaturalOrderComparator.INSTANCE;
+    public static <T extends Comparable<? super T>> @Immutable Comparator<T> naturalOrder() {
+        return (@Immutable Comparator<T>) Comparators.NaturalOrderComparator.INSTANCE;
     }
 
     /**

@@ -400,7 +400,7 @@ import java.lang.module.ModuleFinder;
  * @since 1.2
  */
 
-@AnnotatedFor({"nullness"})
+@AnnotatedFor({"nullness", "pico"})
 public final class RuntimePermission extends BasicPermission {
 
     @java.io.Serial

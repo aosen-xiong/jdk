@@ -40,6 +40,8 @@ import sun.nio.cs.ArrayDecoder;
 import sun.nio.cs.ArrayEncoder;
 import static sun.nio.cs.CharsetMapping.*;
 
+import org.checkerframework.checker.pico.qual.Readonly;
+
 /*
  * Four types of "DoubleByte" charsets are implemented in this class
  * (1)DoubleByte
@@ -434,7 +436,7 @@ public class DoubleByte {
         }
 
         @Override
-        public int decode(byte[] src, int sp, int len, char[] dst) {
+        public int decode(byte @Readonly [] src, int sp, int len, char[] dst) {
             int dp = 0;
             int sl = sp + len;
             currentState = SBCS;
@@ -526,7 +528,7 @@ public class DoubleByte {
         }
 
         @Override
-        public int decode(byte[] src, int sp, int len, char[] dst) {
+        public int decode(byte @Readonly [] src, int sp, int len, char[] dst) {
             int dp = 0;
             int sl = sp + len;
             char repl = replacement().charAt(0);
@@ -706,7 +708,7 @@ public class DoubleByte {
         }
 
         @Override
-        public int encodeFromLatin1(byte[] src, int sp, int len, byte[] dst) {
+        public int encodeFromLatin1(byte @Readonly [] src, int sp, int len, byte[] dst) {
             int dp = 0;
             int sl = sp + len;
             while (sp < sl) {
@@ -732,7 +734,7 @@ public class DoubleByte {
         }
 
         @Override
-        public int encodeFromUTF16(byte[] src, int sp, int len, byte[] dst) {
+        public int encodeFromUTF16(byte @Readonly [] src, int sp, int len, byte[] dst) {
             int dp = 0;
             int sl = sp + len;
             while (sp < sl) {
@@ -1033,7 +1035,7 @@ public class DoubleByte {
         }
 
         @Override
-        public int encodeFromLatin1(byte[] src, int sp, int len, byte[] dst) {
+        public int encodeFromLatin1(byte @Readonly [] src, int sp, int len, byte[] dst) {
             int dp = 0;
             int sl = sp + len;
             while (sp < sl) {
@@ -1069,7 +1071,7 @@ public class DoubleByte {
         }
 
         @Override
-        public int encodeFromUTF16(byte[] src, int sp, int len, byte[] dst) {
+        public int encodeFromUTF16(byte @Readonly [] src, int sp, int len, byte[] dst) {
             int dp = 0;
             int sl = sp + len;
             while (sp < sl) {

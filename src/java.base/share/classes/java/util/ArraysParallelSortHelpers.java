@@ -67,6 +67,7 @@ import java.util.concurrent.CountedCompleter;
  * slices that we will have already allocated, so avoids redundant
  * allocation.
  */
+@SuppressWarnings("pico") // Not interesting class, fix later
 /*package*/ class ArraysParallelSortHelpers {
 
     /*

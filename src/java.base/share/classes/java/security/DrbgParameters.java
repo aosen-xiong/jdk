@@ -470,8 +470,8 @@ public class DrbgParameters {
      */
     public static final class Reseed implements SecureRandomParameters {
 
-        private final byte[] additionalInput;
-        private final boolean predictionResistance;
+        private final byte[] add;
+        private final boolean pre;
 
         /**
          * Returns whether prediction resistance is requested.
@@ -479,7 +479,7 @@ public class DrbgParameters {
          * @return whether prediction resistance is requested
          */
         public boolean getPredictionResistance() {
-            return predictionResistance;
+            return pre;
         }
 
         /**
@@ -490,13 +490,13 @@ public class DrbgParameters {
          * is called.
          */
         public byte[] getAdditionalInput() {
-            return additionalInput == null ? null : additionalInput.clone();
+            return add == null ? null : add.clone();
         }
 
-        private Reseed(boolean predictionResistance, byte[] additionalInput) {
-            this.predictionResistance = predictionResistance;
-            this.additionalInput = (additionalInput == null) ?
-                    null : additionalInput.clone();
+        private Reseed(boolean p, byte[] a) {
+            this.pre = p;
+            this.add = (a == null) ?
+                    null : a.clone();
         }
     }
 

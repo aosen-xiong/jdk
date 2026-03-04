@@ -35,6 +35,13 @@ import org.checkerframework.checker.nullness.qual.EnsuresKeyForIf;
 import org.checkerframework.checker.nullness.qual.KeyFor;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
+import org.checkerframework.checker.pico.qual.Assignable;
+import org.checkerframework.checker.pico.qual.LazyFinal;
+import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.Mutable;
+import org.checkerframework.checker.pico.qual.PolyMutable;
+import org.checkerframework.checker.pico.qual.Readonly;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.checker.signedness.qual.UnknownSignedness;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
@@ -150,7 +157,9 @@ import java.util.function.Consumer;
  */
 @CFComment({"lock: permits null keys and values"})
 @AnnotatedFor({"lock", "index", "nullness"})
-public class WeakHashMap<K,V>
+@ReceiverDependentMutable
+@SuppressWarnings("pico")
+public class WeakHashMap<K extends @Immutable Object,V>
     extends AbstractMap<K,V>
     implements Map<K,V> {
 
@@ -174,7 +183,7 @@ public class WeakHashMap<K,V>
     /**
      * The table, resized as necessary. Length MUST Always be a power of two.
      */
-    Entry<K,V>[] table;
+    @ReceiverDependentMutable Entry<K,V>[] table;
 
     /**
      * The number of key-value mappings contained in this weak hash map.
@@ -194,7 +203,7 @@ public class WeakHashMap<K,V>
     /**
      * Reference queue for cleared WeakEntries
      */
-    private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
+    private final @Mutable ReferenceQueue<Object> queue = new ReferenceQueue<>();
 
     /**
      * The number of times this WeakHashMap has been structurally modified.
@@ -208,7 +217,7 @@ public class WeakHashMap<K,V>
     int modCount;
 
     @SuppressWarnings("unchecked")
-    private Entry<K,V>[] newTable(int n) {
+    private @PolyMutable Entry<K,V>[] newTable(@PolyMutable WeakHashMap<K,V> this,  int n) {
         return (Entry<K,V>[]) new Entry<?,?>[n];
     }
 
@@ -268,6 +277,7 @@ public class WeakHashMap<K,V>
      * @throws  NullPointerException if the specified map is null
      * @since   1.3
      */
+    @SuppressWarnings("pico") // PICO constructor fix
     public @PolyNonEmpty WeakHashMap(@PolyNonEmpty Map<? extends K, ? extends V> m) {
         this(Math.max((int) ((float)m.size() / DEFAULT_LOAD_FACTOR + 1.0F),
                 DEFAULT_INITIAL_CAPACITY),
@@ -285,14 +295,14 @@ public class WeakHashMap<K,V>
     /**
      * Use NULL_KEY for key if it is null.
      */
-    private static Object maskNull(Object key) {
+    private static @Readonly Object maskNull(@Readonly Object key) {
         return (key == null) ? NULL_KEY : key;
     }
 
     /**
      * Returns internal representation of null key back to caller as null.
      */
-    static Object unmaskNull(Object key) {
+    static @Readonly Object unmaskNull(@Readonly Object key) {
         return (key == NULL_KEY) ? null : key;
     }
 
@@ -300,7 +310,7 @@ public class WeakHashMap<K,V>
      * Checks for equality of non-null reference x and possibly-null y.  By
      * default uses Object.equals.
      */
-    private boolean matchesKey(Entry<K,V> e, Object key) {
+    private boolean matchesKey(@Readonly WeakHashMap<K,V> this, @Readonly Entry<K,V> e, @Readonly Object key) {
         // check if the given entry refers to the given key without
         // keeping a strong reference to the entry's referent
         if (e.refersTo(key)) return true;
@@ -317,7 +327,7 @@ public class WeakHashMap<K,V>
      * otherwise encounter collisions for hashCodes that do not differ
      * in lower bits.
      */
-    final int hash(Object k) {
+    final int hash(@Readonly WeakHashMap<K,V> this, @Readonly Object k) {
         int h = k.hashCode();
 
         // This function ensures that hashCodes that differ only by
@@ -337,7 +347,7 @@ public class WeakHashMap<K,V>
     /**
      * Expunges stale entries from the table.
      */
-    private void expungeStaleEntries() {
+    private void expungeStaleEntries(@Mutable WeakHashMap<K, V> this) {
         for (Object x; (x = queue.poll()) != null; ) {
             synchronized (queue) {
                 @SuppressWarnings("unchecked")
@@ -369,7 +379,7 @@ public class WeakHashMap<K,V>
     /**
      * Returns the table after first expunging stale entries.
      */
-    private Entry<K,V>[] getTable() {
+    private Entry<K,V>[] getTable(@Mutable WeakHashMap<K, V> this) {
         expungeStaleEntries();
         return table;
     }
@@ -381,7 +391,7 @@ public class WeakHashMap<K,V>
      * because they are no longer referenced.
      */
     @Pure
-    public @NonNegative int size(@GuardSatisfied WeakHashMap<K, V> this) {
+    public @NonNegative int size(@GuardSatisfied @Readonly WeakHashMap<K, V> this) {
         if (size == 0)
             return 0;
         expungeStaleEntries();
@@ -396,7 +406,7 @@ public class WeakHashMap<K,V>
      */
     @Pure
     @EnsuresNonEmptyIf(result = false, expression = "this")
-    public boolean isEmpty(@GuardSatisfied WeakHashMap<K, V> this) {
+    public boolean isEmpty(@GuardSatisfied @Readonly WeakHashMap<K, V> this) {
         return size() == 0;
     }
 
@@ -419,7 +429,7 @@ public class WeakHashMap<K,V>
      * @see #put(Object, Object)
      */
     @Pure
-    public @Nullable V get(@GuardSatisfied WeakHashMap<K, V> this, @UnknownSignedness @GuardSatisfied @Nullable Object key) {
+    public @Nullable V get(@GuardSatisfied @Readonly WeakHashMap<K, V> this, @UnknownSignedness @GuardSatisfied @Nullable @Readonly Object key) {
         Object k = maskNull(key);
         int h = hash(k);
         Entry<K,V>[] tab = getTable();
@@ -443,7 +453,7 @@ public class WeakHashMap<K,V>
      */
     @EnsuresKeyForIf(expression={"#1"}, result=true, map={"this"})
     @Pure
-    public boolean containsKey(@GuardSatisfied WeakHashMap<K, V> this, @GuardSatisfied @Nullable @UnknownSignedness Object key) {
+    public boolean containsKey(@GuardSatisfied @Readonly WeakHashMap<K, V> this, @GuardSatisfied @Nullable @UnknownSignedness @Readonly Object key) {
         return getEntry(key) != null;
     }
 
@@ -451,7 +461,7 @@ public class WeakHashMap<K,V>
      * Returns the entry associated with the specified key in this map.
      * Returns null if the map contains no mapping for this key.
      */
-    Entry<K,V> getEntry(Object key) {
+    @PolyMutable Entry<K,V> getEntry(@PolyMutable WeakHashMap<K,V> this, @Readonly Object key) {
         Object k = maskNull(key);
         int h = hash(k);
         Entry<K,V>[] tab = getTable();
@@ -475,7 +485,7 @@ public class WeakHashMap<K,V>
      *         previously associated {@code null} with {@code key}.)
      */
     @EnsuresKeyFor(value={"#1"}, map={"this"})
-    public @Nullable V put(@GuardSatisfied WeakHashMap<K, V> this, K key, V value) {
+    public @Nullable V put(@GuardSatisfied @Mutable WeakHashMap<K, V> this, K key, V value) {
         Object k = maskNull(key);
         int h = hash(k);
         Entry<K,V>[] tab = getTable();
@@ -512,7 +522,7 @@ public class WeakHashMap<K,V>
      *        capacity is MAXIMUM_CAPACITY (in which case value
      *        is irrelevant).
      */
-    void resize(int newCapacity) {
+    void resize(@Mutable WeakHashMap<K,V> this, int newCapacity) {
         Entry<K,V>[] oldTable = getTable();
         int oldCapacity = oldTable.length;
         if (oldCapacity == MAXIMUM_CAPACITY) {
@@ -567,7 +577,7 @@ public class WeakHashMap<K,V>
      * @param m mappings to be stored in this map.
      * @throws  NullPointerException if the specified map is null.
      */
-    public void putAll(@GuardSatisfied WeakHashMap<K, V> this, Map<? extends K, ? extends V> m) {
+    public void putAll(@GuardSatisfied @Mutable WeakHashMap<K, V> this, @Readonly Map<? extends K, ? extends V> m) {
         int numKeysToBeAdded = m.size();
         if (numKeysToBeAdded == 0)
             return;
@@ -616,7 +626,7 @@ public class WeakHashMap<K,V>
      * @return the previous value associated with {@code key}, or
      *         {@code null} if there was no mapping for {@code key}
      */
-    public @Nullable V remove(@GuardSatisfied WeakHashMap<K, V> this, @GuardSatisfied @Nullable @UnknownSignedness Object key) {
+    public @Nullable V remove(@GuardSatisfied @Mutable WeakHashMap<K, V> this, @GuardSatisfied @Nullable @UnknownSignedness @Readonly Object key) {
         Object k = maskNull(key);
         int h = hash(k);
         Entry<K,V>[] tab = getTable();
@@ -643,7 +653,7 @@ public class WeakHashMap<K,V>
     }
 
     /** Special version of remove needed by Entry set */
-    boolean removeMapping(Object o) {
+    boolean removeMapping(@Mutable WeakHashMap<K, V> this, @Readonly Object o) {
         if (!(o instanceof Map.Entry<?, ?> entry))
             return false;
         Entry<K,V>[] tab = getTable();
@@ -675,7 +685,7 @@ public class WeakHashMap<K,V>
      * Removes all of the mappings from this map.
      * The map will be empty after this call returns.
      */
-    public void clear(@GuardSatisfied WeakHashMap<K, V> this) {
+    public void clear(@GuardSatisfied @Mutable WeakHashMap<K, V> this) {
         // clear out ref queue. We don't need to expunge entries
         // since table is getting cleared.
         while (queue.poll() != null)
@@ -701,7 +711,7 @@ public class WeakHashMap<K,V>
      *         specified value
      */
     @Pure
-    public boolean containsValue(@GuardSatisfied WeakHashMap<K, V> this, @GuardSatisfied @Nullable @UnknownSignedness Object value) {
+    public boolean containsValue(@GuardSatisfied @Readonly WeakHashMap<K, V> this, @GuardSatisfied @Nullable @UnknownSignedness @Readonly Object value) {
         if (value==null)
             return containsNullValue();
 
@@ -729,7 +739,8 @@ public class WeakHashMap<K,V>
      * The entries in this hash table extend WeakReference, using its main ref
      * field as the key.
      */
-    private static class Entry<K,V> extends WeakReference<Object> implements Map.Entry<K,V> {
+    @ReceiverDependentMutable
+    private static class Entry<K extends @Immutable Object,V> extends WeakReference<Object> implements Map.Entry<K,V> {
         V value;
         final int hash;
         Entry<K,V> next;
@@ -739,7 +750,7 @@ public class WeakHashMap<K,V>
          */
         Entry(Object key, V value,
               ReferenceQueue<Object> queue,
-              int hash, Entry<K,V> next) {
+              int hash, @ReceiverDependentMutable Entry<K,V> next) {
             super(key, queue);
             this.value = value;
             this.hash  = hash;
@@ -747,21 +758,21 @@ public class WeakHashMap<K,V>
         }
 
         @SuppressWarnings("unchecked")
-        public K getKey() {
+        public K getKey(@Readonly Entry<K,V> this) {
             return (K) WeakHashMap.unmaskNull(get());
         }
 
-        public V getValue() {
+        public V getValue(@Readonly Entry<K,V> this) {
             return value;
         }
 
-        public V setValue(V newValue) {
+        public V setValue(@Mutable Entry<K,V> this, V newValue) {
             V oldValue = value;
             value = newValue;
             return oldValue;
         }
 
-        public boolean equals(Object o) {
+        public boolean equals(@Readonly Entry<K,V> this, @Readonly Object o) {
             if (!(o instanceof Map.Entry<?, ?> e))
                 return false;
             K k1 = getKey();
@@ -775,17 +786,18 @@ public class WeakHashMap<K,V>
             return false;
         }
 
-        public int hashCode() {
+        public int hashCode(@Readonly Entry<K,V> this) {
             K k = getKey();
             V v = getValue();
             return Objects.hashCode(k) ^ Objects.hashCode(v);
         }
 
-        public String toString() {
+        public String toString(@Readonly Entry<K,V> this) {
             return getKey() + "=" + getValue();
         }
     }
 
+    @ReceiverDependentMutable
     private abstract class HashIterator<T> implements Iterator<T> {
         private int index;
         private Entry<K,V> entry;
@@ -810,7 +822,7 @@ public class WeakHashMap<K,V>
 
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
-        public boolean hasNext() {
+        public boolean hasNext(@Readonly HashIterator<T> this) {
             Entry<K,V>[] t = table;
 
             while (nextKey == null) {
@@ -832,7 +844,7 @@ public class WeakHashMap<K,V>
         }
 
         /** The common parts of next() across different types of iterators */
-        protected Entry<K,V> nextEntry() {
+        protected Entry<K,V> nextEntry(@Mutable HashIterator<T> this) {
             if (modCount != expectedModCount)
                 throw new ConcurrentModificationException();
             if (nextKey == null && !hasNext())
@@ -845,7 +857,7 @@ public class WeakHashMap<K,V>
             return lastReturned;
         }
 
-        public void remove() {
+        public void remove(@Mutable WeakHashMap<K, V>.@Mutable HashIterator<T> this) {
             if (lastReturned == null)
                 throw new IllegalStateException();
             if (modCount != expectedModCount)
@@ -859,27 +871,30 @@ public class WeakHashMap<K,V>
 
     }
 
+    @ReceiverDependentMutable
     private class ValueIterator extends HashIterator<V> {
-        public V next(@NonEmpty ValueIterator this) {
+        public V next(@NonEmpty @Mutable ValueIterator this) {
             return nextEntry().value;
         }
     }
 
+    @ReceiverDependentMutable
     private class KeyIterator extends HashIterator<K> {
-        public K next(@NonEmpty KeyIterator this) {
+        public K next(@NonEmpty @Mutable KeyIterator this) {
             return nextEntry().getKey();
         }
     }
 
+    @ReceiverDependentMutable
     private class EntryIterator extends HashIterator<Map.Entry<K,V>> {
-        public Map.Entry<K,V> next(@NonEmpty EntryIterator this) {
+        public Map.Entry<K,V> next(@NonEmpty @Mutable EntryIterator this) {
             return nextEntry();
         }
     }
 
     // Views
 
-    private transient Set<Map.Entry<K,V>> entrySet;
+    private transient @Assignable /* should be @LazyFinal */  Set<Map.Entry<K,V>> entrySet;
 
     /**
      * Returns a {@link Set} view of the keys contained in this map.
@@ -895,33 +910,34 @@ public class WeakHashMap<K,V>
      * operations.
      */
     @SideEffectFree
-    public Set<@KeyFor({"this"}) K> keySet(@GuardSatisfied WeakHashMap<K, V> this) {
+    public @PolyMutable Set<@KeyFor({"this"}) K> keySet(@GuardSatisfied @PolyMutable WeakHashMap<K, V> this) {
         Set<K> ks = keySet;
         if (ks == null) {
-            ks = new KeySet();
+            ks = new @PolyMutable KeySet();
             keySet = ks;
         }
         return ks;
     }
 
+    @ReceiverDependentMutable
     private class KeySet extends AbstractSet<K> {
         @SideEffectFree
-        public Iterator<K> iterator() {
+        public Iterator<K> iterator(@Readonly KeySet this) {
             return new KeyIterator();
         }
 
         @Pure
-        public @NonNegative int size() {
+        public @NonNegative int size(@Readonly KeySet this) {
             return WeakHashMap.this.size();
         }
 
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
-        public boolean contains(@Nullable @UnknownSignedness Object o) {
+        public boolean contains(@Readonly KeySet this, @Nullable @UnknownSignedness @Readonly Object o) {
             return containsKey(o);
         }
 
-        public boolean remove(@Nullable @UnknownSignedness Object o) {
+        public boolean remove(@Mutable KeySet this, @Nullable @UnknownSignedness @Readonly Object o) {
             if (containsKey(o)) {
                 WeakHashMap.this.remove(o);
                 return true;
@@ -930,12 +946,12 @@ public class WeakHashMap<K,V>
                 return false;
         }
 
-        public void clear() {
+        public void clear(@Mutable KeySet this) {
             WeakHashMap.this.clear();
         }
 
         @SideEffectFree
-        public Spliterator<K> spliterator() {
+        public Spliterator<K> spliterator(@Readonly KeySet this) {
             return new KeySpliterator<>(WeakHashMap.this, 0, -1, 0, 0);
         }
     }
@@ -954,7 +970,7 @@ public class WeakHashMap<K,V>
      * support the {@code add} or {@code addAll} operations.
      */
     @SideEffectFree
-    public Collection<V> values(@GuardSatisfied WeakHashMap<K, V> this) {
+    public @PolyMutable Collection<V> values(@GuardSatisfied @PolyMutable WeakHashMap<K, V> this) {
         Collection<V> vs = values;
         if (vs == null) {
             vs = new Values();
@@ -963,24 +979,25 @@ public class WeakHashMap<K,V>
         return vs;
     }
 
+    @ReceiverDependentMutable
     private class Values extends AbstractCollection<V> {
         @SideEffectFree
-        public Iterator<V> iterator() {
+        public Iterator<V> iterator(@Readonly Values this) {
             return new ValueIterator();
         }
 
         @Pure
-        public @NonNegative int size() {
+        public @NonNegative int size(@Readonly Values this) {
             return WeakHashMap.this.size();
         }
 
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
-        public boolean contains(@Nullable @UnknownSignedness Object o) {
+        public boolean contains(@Readonly Values this, @Nullable @UnknownSignedness @Readonly Object o) {
             return containsValue(o);
         }
 
-        public void clear() {
+        public void clear(@Mutable Values this) {
             WeakHashMap.this.clear();
         }
 
@@ -1005,41 +1022,42 @@ public class WeakHashMap<K,V>
      * {@code add} or {@code addAll} operations.
      */
     @SideEffectFree
-    public Set<Map.Entry<@KeyFor({"this"}) K,V>> entrySet(@GuardSatisfied WeakHashMap<K, V> this) {
+    public @PolyMutable Set<Map.@PolyMutable Entry<@KeyFor({"this"}) K,V>> entrySet(@GuardSatisfied @PolyMutable WeakHashMap<K, V> this) {
         Set<Map.Entry<K,V>> es = entrySet;
         return es != null ? es : (entrySet = new EntrySet());
     }
 
-    private class EntrySet extends AbstractSet<Map.Entry<K,V>> {
+    @ReceiverDependentMutable
+    private class EntrySet extends AbstractSet<Map.@Readonly Entry<K,V>> {
         @SideEffectFree
-        public Iterator<Map.Entry<K,V>> iterator() {
+        public Iterator<Map.@Readonly Entry<K,V>> iterator(@Readonly EntrySet this) {
             return new EntryIterator();
         }
 
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
-        public boolean contains(@Nullable @UnknownSignedness Object o) {
-            return o instanceof Map.Entry<?, ?> e
+        public boolean contains(@Readonly EntrySet this, @Nullable @UnknownSignedness @Readonly Object o) {
+            return o instanceof Map.@Readonly Entry<?, ?> e
                     && getEntry(e.getKey()) != null
                     && getEntry(e.getKey()).equals(e);
         }
 
-        public boolean remove(@Nullable @UnknownSignedness Object o) {
+        public boolean remove(@Mutable EntrySet this, @Nullable @UnknownSignedness @Readonly Object o) {
             return removeMapping(o);
         }
 
         @Pure
-        public @NonNegative int size() {
+        public @NonNegative int size(@Readonly EntrySet this) {
             return WeakHashMap.this.size();
         }
 
-        public void clear() {
+        public void clear(@Mutable EntrySet this) {
             WeakHashMap.this.clear();
         }
 
-        private List<Map.Entry<K,V>> deepCopy() {
-            List<Map.Entry<K,V>> list = new ArrayList<>(size());
-            for (Map.Entry<K,V> e : this)
+        private List<Map.@Readonly Entry<K,V>> deepCopy() {
+            List<Map.@Readonly Entry<K,V>> list = new ArrayList<>(size());
+            for (Map.@Readonly Entry<K,V> e : this)
                 list.add(new AbstractMap.SimpleEntry<>(e));
             return list;
         }
@@ -1055,14 +1073,14 @@ public class WeakHashMap<K,V>
         }
 
         @SideEffectFree
-        public Spliterator<Map.Entry<K,V>> spliterator() {
+        public Spliterator<Map.@Readonly Entry<K,V>> spliterator() {
             return new EntrySpliterator<>(WeakHashMap.this, 0, -1, 0, 0);
         }
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public void forEach(BiConsumer<? super K, ? super V> action) {
+    public void forEach(@Mutable WeakHashMap<K,V> this, BiConsumer<? super K, ? super V> action) {
         Objects.requireNonNull(action);
         int expectedModCount = modCount;
 
@@ -1084,7 +1102,7 @@ public class WeakHashMap<K,V>
 
     @SuppressWarnings("unchecked")
     @Override
-    public void replaceAll(BiFunction<? super K, ? super V, ? extends V> function) {
+    public void replaceAll(@Mutable WeakHashMap<K,V> this, BiFunction<? super K, ? super V, ? extends V> function) {
         Objects.requireNonNull(function);
         int expectedModCount = modCount;
 
@@ -1108,15 +1126,16 @@ public class WeakHashMap<K,V>
      * Similar form as other hash Spliterators, but skips dead
      * elements.
      */
-    static class WeakHashMapSpliterator<K,V> {
-        final WeakHashMap<K,V> map;
+    @ReceiverDependentMutable
+    static class WeakHashMapSpliterator<K extends @Immutable Object,V> {
+        final @Readonly WeakHashMap<K,V> map;
         WeakHashMap.Entry<K,V> current; // current node
         int index;             // current index, modified on advance/split
         int fence;             // -1 until first use; then one past last index
         int est;               // size estimate
         int expectedModCount;  // for comodification checks
 
-        WeakHashMapSpliterator(WeakHashMap<K,V> m, int origin,
+        WeakHashMapSpliterator(@Readonly WeakHashMap<K,V> m, int origin,
                                int fence, int est,
                                int expectedModCount) {
             this.map = m;
@@ -1126,7 +1145,7 @@ public class WeakHashMap<K,V>
             this.expectedModCount = expectedModCount;
         }
 
-        final int getFence() { // initialize fence and size on first use
+        final int getFence(@Readonly WeakHashMapSpliterator<K,V> this) { // initialize fence and size on first use
             int hi;
             if ((hi = fence) < 0) {
                 WeakHashMap<K,V> m = map;
@@ -1137,28 +1156,29 @@ public class WeakHashMap<K,V>
             return hi;
         }
 
-        public final long estimateSize() {
+        public final long estimateSize(@Readonly WeakHashMapSpliterator<K,V> this) {
             getFence(); // force init
             return (long) est;
         }
     }
 
-    static final class KeySpliterator<K,V>
+    @ReceiverDependentMutable
+    static final class KeySpliterator<K extends @Immutable Object,V>
         extends WeakHashMapSpliterator<K,V>
         implements Spliterator<K> {
-        KeySpliterator(WeakHashMap<K,V> m, int origin, int fence, int est,
+        KeySpliterator(@Readonly WeakHashMap<K,V> m, int origin, int fence, int est,
                        int expectedModCount) {
             super(m, origin, fence, est, expectedModCount);
         }
 
-        public KeySpliterator<K,V> trySplit() {
+        public KeySpliterator<K,V> trySplit(@Mutable KeySpliterator<K,V> this) {
             int hi = getFence(), lo = index, mid = (lo + hi) >>> 1;
             return (lo >= mid) ? null :
                 new KeySpliterator<>(map, lo, index = mid, est >>>= 1,
                                      expectedModCount);
         }
 
-        public void forEachRemaining(Consumer<? super K> action) {
+        public void forEachRemaining(@Mutable KeySpliterator<K,V> this, Consumer<? super K> action) {
             int i, hi, mc;
             if (action == null)
                 throw new NullPointerException();
@@ -1192,7 +1212,7 @@ public class WeakHashMap<K,V>
                 throw new ConcurrentModificationException();
         }
 
-        public boolean tryAdvance(Consumer<? super K> action) {
+        public boolean tryAdvance(@Mutable KeySpliterator<K,V> this, Consumer<? super K> action) {
             int hi;
             if (action == null)
                 throw new NullPointerException();
@@ -1218,27 +1238,28 @@ public class WeakHashMap<K,V>
             return false;
         }
 
-        public int characteristics() {
+        public int characteristics(@Readonly KeySpliterator<K,V> this) {
             return Spliterator.DISTINCT;
         }
     }
 
-    static final class ValueSpliterator<K,V>
+    @ReceiverDependentMutable
+    static final class ValueSpliterator<K extends @Immutable Object,V>
         extends WeakHashMapSpliterator<K,V>
         implements Spliterator<V> {
-        ValueSpliterator(WeakHashMap<K,V> m, int origin, int fence, int est,
+        ValueSpliterator(@Readonly WeakHashMap<K,V> m, int origin, int fence, int est,
                          int expectedModCount) {
             super(m, origin, fence, est, expectedModCount);
         }
 
-        public ValueSpliterator<K,V> trySplit() {
+        public ValueSpliterator<K,V> trySplit(@Mutable ValueSpliterator<K,V> this) {
             int hi = getFence(), lo = index, mid = (lo + hi) >>> 1;
             return (lo >= mid) ? null :
                 new ValueSpliterator<>(map, lo, index = mid, est >>>= 1,
                                        expectedModCount);
         }
 
-        public void forEachRemaining(Consumer<? super V> action) {
+        public void forEachRemaining(@Mutable ValueSpliterator<K,V> this, Consumer<? super V> action) {
             int i, hi, mc;
             if (action == null)
                 throw new NullPointerException();
@@ -1270,7 +1291,7 @@ public class WeakHashMap<K,V>
                 throw new ConcurrentModificationException();
         }
 
-        public boolean tryAdvance(Consumer<? super V> action) {
+        public boolean tryAdvance(@Mutable ValueSpliterator<K,V> this, Consumer<? super V> action) {
             int hi;
             if (action == null)
                 throw new NullPointerException();
@@ -1295,20 +1316,21 @@ public class WeakHashMap<K,V>
             return false;
         }
 
-        public int characteristics() {
+        public int characteristics(@Readonly ValueSpliterator<K,V> this) {
             return 0;
         }
     }
 
-    static final class EntrySpliterator<K,V>
+    @ReceiverDependentMutable
+    static final class EntrySpliterator<K extends @Immutable Object,V>
         extends WeakHashMapSpliterator<K,V>
         implements Spliterator<Map.Entry<K,V>> {
-        EntrySpliterator(WeakHashMap<K,V> m, int origin, int fence, int est,
+        EntrySpliterator(@Readonly WeakHashMap<K,V> m, int origin, int fence, int est,
                        int expectedModCount) {
             super(m, origin, fence, est, expectedModCount);
         }
 
-        public EntrySpliterator<K,V> trySplit() {
+        public EntrySpliterator<K,V> trySplit(@Mutable EntrySpliterator<K,V> this) {
             int hi = getFence(), lo = index, mid = (lo + hi) >>> 1;
             return (lo >= mid) ? null :
                 new EntrySpliterator<>(map, lo, index = mid, est >>>= 1,
@@ -1316,7 +1338,7 @@ public class WeakHashMap<K,V>
         }
 
 
-        public void forEachRemaining(Consumer<? super Map.Entry<K, V>> action) {
+        public void forEachRemaining(@Mutable EntrySpliterator<K,V> this, Consumer<? super Map.Entry<K, V>> action) {
             int i, hi, mc;
             if (action == null)
                 throw new NullPointerException();
@@ -1352,7 +1374,7 @@ public class WeakHashMap<K,V>
                 throw new ConcurrentModificationException();
         }
 
-        public boolean tryAdvance(Consumer<? super Map.Entry<K,V>> action) {
+        public boolean tryAdvance(@Mutable EntrySpliterator<K,V> this, Consumer<? super Map.Entry<K,V>> action) {
             int hi;
             if (action == null)
                 throw new NullPointerException();
@@ -1380,7 +1402,7 @@ public class WeakHashMap<K,V>
             return false;
         }
 
-        public int characteristics() {
+        public int characteristics(@Readonly EntrySpliterator<K,V> this) {
             return Spliterator.DISTINCT;
         }
     }

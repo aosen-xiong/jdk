@@ -119,6 +119,7 @@ import java.io.IOException;
  * @since  1.5
  */
 @AnnotatedFor({"lock", "nullness"})
+@SuppressWarnings("pico") // Not interesting class, fix later
 public interface Formattable {
 
     /**

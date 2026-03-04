@@ -44,6 +44,9 @@ import static java.lang.constant.ConstantUtils.validateMemberName;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
 
+import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.Readonly;
+
 /**
  * A <a href="package-summary.html#nominal">nominal descriptor</a> for a
  * dynamic constant (one described in the constant pool with
@@ -56,11 +59,12 @@ import static java.util.stream.Collectors.joining;
  *
  * @since 12
  */
+@Immutable
 public abstract non-sealed class DynamicConstantDesc<T>
         implements ConstantDesc {
 
     private final DirectMethodHandleDesc bootstrapMethod;
-    private final ConstantDesc[] bootstrapArgs;
+    private final @Readonly ConstantDesc[] bootstrapArgs;
     private final String constantName;
     private final ClassDesc constantType;
 
@@ -85,7 +89,7 @@ public abstract non-sealed class DynamicConstantDesc<T>
     protected DynamicConstantDesc(DirectMethodHandleDesc bootstrapMethod,
                                   String constantName,
                                   ClassDesc constantType,
-                                  ConstantDesc... bootstrapArgs) {
+                                  @Readonly ConstantDesc... bootstrapArgs) {
         this.bootstrapMethod = requireNonNull(bootstrapMethod);
         this.constantName = validateMemberName(requireNonNull(constantName), true);
         this.constantType = requireNonNull(constantType);
@@ -162,7 +166,7 @@ public abstract non-sealed class DynamicConstantDesc<T>
     public static<T> DynamicConstantDesc<T> ofNamed(DirectMethodHandleDesc bootstrapMethod,
                                                     String constantName,
                                                     ClassDesc constantType,
-                                                    ConstantDesc... bootstrapArgs) {
+                                                    @Readonly ConstantDesc... bootstrapArgs) {
         return new AnonymousDynamicConstantDesc<>(bootstrapMethod, constantName, constantType, bootstrapArgs);
     }
 
@@ -382,7 +386,7 @@ public abstract non-sealed class DynamicConstantDesc<T>
     }
 
     private static class AnonymousDynamicConstantDesc<T> extends DynamicConstantDesc<T> {
-        AnonymousDynamicConstantDesc(DirectMethodHandleDesc bootstrapMethod, String constantName, ClassDesc constantType, ConstantDesc... bootstrapArgs) {
+        AnonymousDynamicConstantDesc(DirectMethodHandleDesc bootstrapMethod, String constantName, ClassDesc constantType, @Readonly ConstantDesc... bootstrapArgs) {
             super(bootstrapMethod, constantName, constantType, bootstrapArgs);
         }
     }

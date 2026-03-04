@@ -28,6 +28,8 @@ import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
+import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.checker.optional.qual.EnsuresPresent;
 import org.checkerframework.checker.optional.qual.EnsuresPresentIf;
 import org.checkerframework.checker.optional.qual.OptionalCreator;
@@ -88,6 +90,8 @@ import java.util.stream.Stream;
 @AnnotatedFor({"lock", "nullness", "optional"})
 @Covariant(0)
 @jdk.internal.ValueBased
+@Immutable
+@SuppressWarnings("pico") // Not interesting class, fix later
 public final @NonNull class Optional<T> {
     /**
      * Common instance for {@code empty()}.
@@ -481,7 +485,7 @@ public final @NonNull class Optional<T> {
     @Override
     @Pure
     @EnsuresNonNullIf(expression="#1", result=true)
-    public boolean equals(@Nullable Object obj) {
+    public boolean equals(@Nullable @Readonly Object obj) {
         if (this == obj) {
             return true;
         }

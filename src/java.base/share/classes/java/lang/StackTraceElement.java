@@ -27,6 +27,8 @@ package java.lang;
 
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.checker.signature.qual.FullyQualifiedName;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
@@ -57,7 +59,8 @@ import java.util.Set;
  * @since  1.4
  * @author Josh Bloch
  */
-@AnnotatedFor({"lock", "nullness", "signature"})
+@AnnotatedFor({"lock", "nullness", "pico", "signature"})
+@Immutable
 public final class StackTraceElement implements java.io.Serializable {
 
     // For Throwables and StackWalker, the VM initially sets this field to a
@@ -414,7 +417,7 @@ public final class StackTraceElement implements java.io.Serializable {
      * @revised 9
      */
     @Pure
-    public boolean equals(@GuardSatisfied StackTraceElement this, @GuardSatisfied @Nullable Object obj) {
+    public boolean equals(@GuardSatisfied StackTraceElement this, @GuardSatisfied @Nullable @Readonly Object obj) {
         if (obj==this)
             return true;
         return (obj instanceof StackTraceElement e)
@@ -431,7 +434,7 @@ public final class StackTraceElement implements java.io.Serializable {
      * Returns a hash code value for this stack trace element.
      */
     @Pure
-    public int hashCode(@GuardSatisfied StackTraceElement this) {
+    public int hashCode(@GuardSatisfied @Readonly StackTraceElement this) {
         int result = 31*declaringClass.hashCode() + methodName.hashCode();
         result = 31*result + Objects.hashCode(classLoaderName);
         result = 31*result + Objects.hashCode(moduleName);
@@ -512,10 +515,11 @@ public final class StackTraceElement implements java.io.Serializable {
      * Finds JDK non-upgradeable modules, i.e. the modules that are
      * included in the hashes in java.base.
      */
+    @SuppressWarnings("pico:return.type.incompatible") // cast from @Unique @Mutable to @Immutable
     private static class HashedModules {
-        static Set<String> HASHED_MODULES = hashedModules();
+        static @Immutable Set<String> HASHED_MODULES = hashedModules();
 
-        static Set<String> hashedModules() {
+        static @Immutable Set<String> hashedModules() {
 
             Optional<ResolvedModule> resolvedModule = ModuleLayer.boot()
                     .configuration()
@@ -544,7 +548,7 @@ public final class StackTraceElement implements java.io.Serializable {
      * Returns an array of StackTraceElements of the given depth
      * filled from the backtrace of a given Throwable.
      */
-    static StackTraceElement[] of(Throwable x, int depth) {
+    static StackTraceElement[] of(@Readonly Throwable x, int depth) {
         StackTraceElement[] stackTrace = new StackTraceElement[depth];
         for (int i = 0; i < depth; i++) {
             stackTrace[i] = new StackTraceElement();
@@ -576,7 +580,7 @@ public final class StackTraceElement implements java.io.Serializable {
      * of the given Throwable.
      */
     private static native void initStackTraceElements(StackTraceElement[] elements,
-                                                      Throwable x);
+                                                      @Readonly Throwable x);
     /*
      * Sets the given stack trace element with the given StackFrameInfo
      */

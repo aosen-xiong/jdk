@@ -42,12 +42,15 @@ import java.util.function.DoubleBinaryOperator;
 import java.util.function.IntBinaryOperator;
 import java.util.function.LongBinaryOperator;
 
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 /**
  * ForkJoin tasks to perform Arrays.parallelPrefix operations.
  *
  * @author Doug Lea
  * @since 1.8
  */
+@AnnotatedFor("pico")
 class ArrayPrefixHelpers {
     private ArrayPrefixHelpers() {} // non-instantiable
 

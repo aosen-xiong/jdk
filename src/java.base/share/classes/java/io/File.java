@@ -30,11 +30,13 @@ import org.checkerframework.checker.interning.qual.Interned;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.lock.qual.ReleasesNoLocks;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.checker.regex.qual.Regex;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.framework.qual.AnnotatedFor;
 import org.checkerframework.framework.qual.CFComment;
+import org.checkerframework.framework.qual.DefaultQualifierForUse;
 
 import java.net.URI;
 import java.net.URL;
@@ -162,6 +164,7 @@ import sun.security.action.GetPropertyAction;
 "EnsuresNonNullIf(expression={\"list()\",\"list(FilenameFilter)\",\"listFiles()\",\"listFiles(FilenameFilter)\",\"listFiles(FileFilter)\"}, result=true)\""
 })
 @AnnotatedFor({"index", "initialization", "interning", "lock", "nullness"})
+@ReceiverDependentMutable
 public class File
     implements Serializable, Comparable<File>
 {

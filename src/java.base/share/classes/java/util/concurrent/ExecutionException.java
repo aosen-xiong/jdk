@@ -36,6 +36,7 @@
 package java.util.concurrent;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
@@ -81,7 +82,7 @@ public class ExecutionException extends Exception {
      *         {@link #getCause()} method)
      */
     @SideEffectFree
-    public ExecutionException(@Nullable String message, @Nullable Throwable cause) {
+    public ExecutionException(@Nullable String message, @Nullable @Readonly Throwable cause) {
         super(message, cause);
     }
 
@@ -95,7 +96,7 @@ public class ExecutionException extends Exception {
      *         {@link #getCause()} method)
      */
     @SideEffectFree
-    public ExecutionException(@Nullable Throwable cause) {
+    public ExecutionException(@Nullable @Readonly Throwable cause) {
         super(cause);
     }
 }

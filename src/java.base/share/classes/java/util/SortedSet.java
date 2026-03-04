@@ -28,6 +28,10 @@ package java.util;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nonempty.qual.NonEmpty;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.PolyMutable;
+import org.checkerframework.checker.pico.qual.Mutable;
+import org.checkerframework.checker.pico.qual.Readonly;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.framework.qual.AnnotatedFor;
@@ -114,7 +118,8 @@ import org.checkerframework.framework.qual.CFComment;
  */
 
 @CFComment({"lock/nullness: Subclasses of this interface/class may opt to prohibit null elements"})
-@AnnotatedFor({"lock", "nullness"})
+@AnnotatedFor({"lock", "nullness", "pico"})
+@ReceiverDependentMutable
 public interface SortedSet<E> extends Set<E> {
     /**
      * Returns the comparator used to order the elements in this set,
@@ -126,7 +131,7 @@ public interface SortedSet<E> extends Set<E> {
      *         of its elements
      */
     @Pure
-    @Nullable Comparator<? super E> comparator(@GuardSatisfied SortedSet<E> this);
+    @Nullable Comparator<? super E> comparator(@GuardSatisfied @Readonly SortedSet<E> this);
 
     /**
      * Returns a view of the portion of this set whose elements range
@@ -160,7 +165,7 @@ public interface SortedSet<E> extends Set<E> {
      *         {@code toElement} lies outside the bounds of the range
      */
     @SideEffectFree
-    SortedSet<E> subSet(@GuardSatisfied SortedSet<E> this, @GuardSatisfied E fromElement, @GuardSatisfied E toElement);
+    @PolyMutable SortedSet<E> subSet(@GuardSatisfied @PolyMutable SortedSet<E> this, @GuardSatisfied E fromElement, @GuardSatisfied E toElement);
 
     /**
      * Returns a view of the portion of this set whose elements are
@@ -188,7 +193,7 @@ public interface SortedSet<E> extends Set<E> {
      *         bounds of the range
      */
     @SideEffectFree
-    SortedSet<E> headSet(@GuardSatisfied SortedSet<E> this, E toElement);
+    @PolyMutable SortedSet<E> headSet(@GuardSatisfied @PolyMutable SortedSet<E> this, E toElement);
 
     /**
      * Returns a view of the portion of this set whose elements are
@@ -216,7 +221,7 @@ public interface SortedSet<E> extends Set<E> {
      *         bounds of the range
      */
     @SideEffectFree
-    SortedSet<E> tailSet(@GuardSatisfied SortedSet<E> this, E fromElement);
+    @PolyMutable SortedSet<E> tailSet(@GuardSatisfied @PolyMutable SortedSet<E> this, E fromElement);
 
     /**
      * Returns the first (lowest) element currently in this set.
@@ -225,7 +230,7 @@ public interface SortedSet<E> extends Set<E> {
      * @throws NoSuchElementException if this set is empty
      */
     @SideEffectFree
-    E first(@GuardSatisfied @NonEmpty SortedSet<E> this);
+    E first(@GuardSatisfied @NonEmpty @Readonly SortedSet<E> this);
 
     /**
      * Returns the last (highest) element currently in this set.
@@ -234,7 +239,7 @@ public interface SortedSet<E> extends Set<E> {
      * @throws NoSuchElementException if this set is empty
      */
     @SideEffectFree
-    E last(@GuardSatisfied @NonEmpty SortedSet<E> this);
+    E last(@GuardSatisfied @NonEmpty @Readonly SortedSet<E> this);
 
     /**
      * Creates a {@code Spliterator} over the elements in this sorted set.
@@ -268,7 +273,7 @@ public interface SortedSet<E> extends Set<E> {
      * @since 1.8
      */
     @Override
-    default Spliterator<E> spliterator() {
+    default Spliterator<E> spliterator(@Mutable SortedSet<E> this) {
         return new Spliterators.IteratorSpliterator<E>(
                 this, Spliterator.DISTINCT | Spliterator.SORTED | Spliterator.ORDERED) {
             @Override

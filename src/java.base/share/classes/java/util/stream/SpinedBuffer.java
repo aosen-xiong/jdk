@@ -38,6 +38,8 @@ import java.util.function.IntConsumer;
 import java.util.function.IntFunction;
 import java.util.function.LongConsumer;
 
+import org.checkerframework.checker.pico.qual.Mutable;
+
 /**
  * An ordered collection of elements.  Elements can be added, but not removed.
  * Goes through a building phase, during which elements can be added, and a
@@ -277,7 +279,7 @@ class SpinedBuffer<E>
      * Return a {@link Spliterator} describing the contents of the buffer.
      */
     public Spliterator<E> spliterator() {
-        class Splitr implements Spliterator<E> {
+         class Splitr implements Spliterator<E> {
             // The current spine index
             int splSpineIndex;
 

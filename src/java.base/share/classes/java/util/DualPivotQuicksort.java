@@ -28,6 +28,7 @@ package java.util;
 import org.checkerframework.checker.index.qual.IndexFor;
 import org.checkerframework.checker.index.qual.IndexOrHigh;
 import org.checkerframework.checker.interning.qual.UsesObjectEquals;
+import org.checkerframework.checker.pico.qual.Mutable;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
 import java.util.concurrent.CountedCompleter;
@@ -54,6 +55,7 @@ import java.util.concurrent.RecursiveTask;
  * @since 1.7 * 14
  */
 @AnnotatedFor({"index", "interning"})
+@SuppressWarnings("pico") // Not interesting class, fix later
 final @UsesObjectEquals class DualPivotQuicksort {
 
     /**

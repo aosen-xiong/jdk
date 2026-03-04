@@ -389,6 +389,7 @@ import static sun.security.util.SecurityConstants.GET_CLASSLOADER_PERMISSION;
  * @revised 9
  */
 @AnnotatedFor({"i18n", "i18nformatter", "index", "lock", "nullness", "propkey", "signature"})
+@SuppressWarnings("pico") // Not interesting class, fix later
 public abstract class ResourceBundle {
 
     /** initial size of the bundle cache */

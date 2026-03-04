@@ -96,6 +96,7 @@ import jdk.internal.ref.CleanerFactory;
  */
 
 @AnnotatedFor({"index", "interning", "lock", "nullness"})
+@SuppressWarnings("pico") // Not interesting class, fix later
 public @UsesObjectEquals class Timer {
     /**
      * The timer task queue.  This data structure is shared with the timer
@@ -117,18 +118,18 @@ public @UsesObjectEquals class Timer {
      * and no tasks in the timer queue.
      */
     private static class ThreadReaper implements Runnable {
-        private final TaskQueue queue;
-        private final TimerThread thread;
+        private final TaskQueue queue_h;
+        private final TimerThread thread_h;
 
         ThreadReaper(TaskQueue queue, TimerThread thread) {
-            this.queue = queue;
-            this.thread = thread;
+            this.queue_h = queue;
+            this.thread_h = thread;
         }
 
         public void run() {
-            synchronized(queue) {
-                thread.newTasksMayBeScheduled = false;
-                queue.notify(); // In case queue is empty.
+            synchronized(queue_h) {
+                thread_h.newTasksMayBeScheduled = false;
+                queue_h.notify(); // In case queue is empty.
             }
         }
     }

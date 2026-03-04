@@ -26,6 +26,7 @@
 package java.lang;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.framework.qual.AnnotatedFor;
 import org.checkerframework.common.aliasing.qual.Unique;
@@ -47,7 +48,8 @@ import org.checkerframework.common.aliasing.qual.Unique;
  * @jls 11.2 Compile-Time Checking of Exceptions
  * @since   1.0
  */
-@AnnotatedFor({"aliasing", "nullness"})
+@AnnotatedFor({"aliasing", "nullness", "pico"})
+@ReceiverDependentMutable
 public class Exception extends Throwable {
     @java.io.Serial
     static final long serialVersionUID = -3387516993124229948L;
@@ -90,7 +92,7 @@ public class Exception extends Throwable {
      * @since  1.4
      */
     @SideEffectFree
-    public @Unique Exception(@Nullable String message, @Nullable Throwable cause) {
+    public @Unique Exception(@Nullable String message, @Nullable @ReceiverDependentMutable Throwable cause) {
         super(message, cause);
     }
 
@@ -109,7 +111,7 @@ public class Exception extends Throwable {
      * @since  1.4
      */
     @SideEffectFree
-    public @Unique Exception(@Nullable Throwable cause) {
+    public @Unique Exception(@Nullable @ReceiverDependentMutable Throwable cause) {
         super(cause);
     }
 
@@ -127,7 +129,7 @@ public class Exception extends Throwable {
      *                           be writable
      * @since 1.7
      */
-    protected @Unique Exception(@Nullable String message, @Nullable Throwable cause,
+    protected @Unique Exception(@Nullable String message, @Nullable @ReceiverDependentMutable Throwable cause,
                         boolean enableSuppression,
                         boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);

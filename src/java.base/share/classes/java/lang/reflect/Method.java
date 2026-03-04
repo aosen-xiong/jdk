@@ -28,6 +28,8 @@ package java.lang.reflect;
 import org.checkerframework.checker.interning.qual.Interned;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.common.reflection.qual.Invoke;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
@@ -75,8 +77,9 @@ import java.util.StringJoiner;
  * @author Nakul Saraiya
  * @since 1.1
  */
-@AnnotatedFor({"interning", "lock", "nullness"})
+@AnnotatedFor({"interning", "lock", "nullness", "pico"})
 @SuppressWarnings({"rawtypes"})
+@Immutable
 public final class Method extends Executable {
     @Stable
     private Class<?>            clazz;
@@ -373,7 +376,7 @@ public final class Method extends Executable {
      * and formal parameter types and return type.
      */
     @Pure
-    public boolean equals(@GuardSatisfied Method this, @GuardSatisfied @Nullable Object obj) {
+    public boolean equals(@GuardSatisfied Method this, @GuardSatisfied @Nullable @Readonly Object obj) {
         if (obj instanceof Method other) {
             if ((getDeclaringClass() == other.getDeclaringClass())
                 && (getName() == other.getName())) {
@@ -573,7 +576,7 @@ public final class Method extends Executable {
     @CallerSensitive
     @ForceInline // to ensure Reflection.getCallerClass optimization
     @IntrinsicCandidate
-    public @Nullable Object invoke(Object obj, Object... args)
+    public @Nullable @Readonly Object invoke(@Readonly Object obj, @Readonly Object... args)
         throws IllegalAccessException, IllegalArgumentException,
            InvocationTargetException
     {

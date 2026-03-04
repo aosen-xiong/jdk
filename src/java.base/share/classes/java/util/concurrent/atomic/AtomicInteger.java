@@ -36,6 +36,8 @@
 package java.util.concurrent.atomic;
 
 import org.checkerframework.checker.interning.qual.UsesObjectEquals;
+import org.checkerframework.checker.pico.qual.Assignable;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
 import java.lang.invoke.VarHandle;
@@ -67,7 +69,7 @@ public @UsesObjectEquals class AtomicInteger extends Number implements java.io.S
     private static final long VALUE
         = U.objectFieldOffset(AtomicInteger.class, "value");
 
-    private volatile int value;
+    private volatile @Assignable int value;
 
     /**
      * Creates a new AtomicInteger with the given initial value.
@@ -90,7 +92,7 @@ public @UsesObjectEquals class AtomicInteger extends Number implements java.io.S
      *
      * @return the current value
      */
-    public final int get() {
+    public final int get(@Readonly AtomicInteger this) {
         return value;
     }
 

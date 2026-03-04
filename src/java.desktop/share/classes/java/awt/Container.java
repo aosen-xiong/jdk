@@ -28,6 +28,8 @@ package java.awt;
 import org.checkerframework.checker.guieffect.qual.SafeEffect;
 import org.checkerframework.checker.guieffect.qual.UIType;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Readonly;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.checker.initialization.qual.UnknownInitialization;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
@@ -101,6 +103,7 @@ import sun.util.logging.PlatformLogger;
  * @since     1.0
  */
 @AnnotatedFor({"guieffect", "nullness"})
+@ReceiverDependentMutable
 public @UIType class Container extends Component {
 
     private static final PlatformLogger log = PlatformLogger.getLogger("java.awt.Container");
@@ -1004,7 +1007,7 @@ public @UIType class Container extends Component {
      * @see       LayoutManager
      * @since     1.1
      */
-    public void add(@UnknownInitialization(Container.class) Container this, Component comp, @Nullable Object constraints) {
+    public void add(@UnknownInitialization(Container.class) Container this, @Readonly Component comp, @Nullable @Readonly Object constraints) {
         addImpl(comp, constraints, -1);
     }
 

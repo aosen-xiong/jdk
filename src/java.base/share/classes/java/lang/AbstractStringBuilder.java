@@ -33,6 +33,8 @@ import org.checkerframework.checker.index.qual.Positive;
 import org.checkerframework.checker.interning.qual.UsesObjectEquals;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.framework.qual.AnnotatedFor;
@@ -67,7 +69,7 @@ import static java.lang.String.checkOffset;
  * @author      Ulf Zibis
  * @since       1.5
  */
-@AnnotatedFor({"index", "initialization", "interning", "lock", "nullness"})
+@AnnotatedFor({"index", "initialization", "interning", "lock", "nullness", "pico"})
 abstract @UsesObjectEquals class AbstractStringBuilder implements Appendable, CharSequence {
     /**
      * The value is used for character storage.
@@ -191,7 +193,7 @@ abstract @UsesObjectEquals class AbstractStringBuilder implements Appendable, Ch
      */
     @Pure
     @Override
-    public @NonNegative int length(@GuardSatisfied AbstractStringBuilder this) {
+    public @NonNegative int length(@GuardSatisfied @Readonly AbstractStringBuilder this) {
         return count;
     }
 
@@ -202,7 +204,7 @@ abstract @UsesObjectEquals class AbstractStringBuilder implements Appendable, Ch
      *
      * @return  the current capacity
      */
-    public @NonNegative int capacity() {
+    public @NonNegative int capacity(@Readonly AbstractStringBuilder this) {
         return value.length >> coder;
     }
 
@@ -566,7 +568,7 @@ abstract @UsesObjectEquals class AbstractStringBuilder implements Appendable, Ch
      * @param   obj   an {@code Object}.
      * @return  a reference to this object.
      */
-    public AbstractStringBuilder append(@GuardSatisfied @Nullable Object obj) {
+    public AbstractStringBuilder append(@GuardSatisfied @Nullable @Readonly Object obj) {
         return append(String.valueOf(obj));
     }
 
@@ -628,7 +630,7 @@ abstract @UsesObjectEquals class AbstractStringBuilder implements Appendable, Ch
 
     // Documentation in subclasses because of synchro difference
     @Override
-    public AbstractStringBuilder append(@Nullable CharSequence s) {
+    public AbstractStringBuilder append(@Nullable @Readonly CharSequence s) {
         if (s == null) {
             return appendNull();
         }
@@ -687,7 +689,7 @@ abstract @UsesObjectEquals class AbstractStringBuilder implements Appendable, Ch
      *             {@code end} is greater than {@code s.length()}
      */
     @Override
-    public AbstractStringBuilder append(@Nullable CharSequence s, @IndexOrHigh({"#1"}) int start, @IndexOrHigh({"#1"}) int end) {
+    public AbstractStringBuilder append(@Nullable @Readonly CharSequence s, @IndexOrHigh({"#1"}) int start, @IndexOrHigh({"#1"}) int end) {
         if (s == null) {
             s = "null";
         }
@@ -1062,7 +1064,7 @@ abstract @UsesObjectEquals class AbstractStringBuilder implements Appendable, Ch
      *          or if {@code start} is greater than {@code end}
      */
     @Override
-    public CharSequence subSequence(@NonNegative int start, @NonNegative int end) {
+    public @Immutable CharSequence subSequence(@NonNegative int start, @NonNegative int end) {
         return substring(start, end);
     }
 
@@ -1145,7 +1147,7 @@ abstract @UsesObjectEquals class AbstractStringBuilder implements Appendable, Ch
      * @return     a reference to this object.
      * @throws     StringIndexOutOfBoundsException  if the offset is invalid.
      */
-    public AbstractStringBuilder insert(@NonNegative int offset, @GuardSatisfied @Nullable Object obj) {
+    public AbstractStringBuilder insert(@NonNegative int offset, @GuardSatisfied @Nullable @Readonly Object obj) {
         return insert(offset, String.valueOf(obj));
     }
 
@@ -1248,7 +1250,7 @@ abstract @UsesObjectEquals class AbstractStringBuilder implements Appendable, Ch
      * @return     a reference to this object.
      * @throws     IndexOutOfBoundsException  if the offset is invalid.
      */
-    public AbstractStringBuilder insert(@NonNegative int dstOffset, @Nullable CharSequence s) {
+    public AbstractStringBuilder insert(@NonNegative int dstOffset, @Nullable @Readonly CharSequence s) {
         if (s == null) {
             s = "null";
         }
@@ -1299,7 +1301,7 @@ abstract @UsesObjectEquals class AbstractStringBuilder implements Appendable, Ch
      *              {@code start} is greater than {@code end} or
      *              {@code end} is greater than {@code s.length()}
      */
-    public AbstractStringBuilder insert(@NonNegative int dstOffset, @Nullable CharSequence s,
+    public AbstractStringBuilder insert(@NonNegative int dstOffset, @Nullable @Readonly CharSequence s,
                                         @IndexOrHigh({"#2"}) int start, @IndexOrHigh({"#2"}) int end)
     {
         if (s == null) {
@@ -1714,7 +1716,7 @@ abstract @UsesObjectEquals class AbstractStringBuilder implements Appendable, Ch
         }
     }
 
-    private final void putCharsAt(int index, CharSequence s, int off, int end) {
+    private final void putCharsAt(int index, @Readonly CharSequence s, int off, int end) {
         if (isLatin1()) {
             byte[] val = this.value;
             for (int i = off, j = index; i < end; i++) {
@@ -1743,7 +1745,7 @@ abstract @UsesObjectEquals class AbstractStringBuilder implements Appendable, Ch
         putStringAt(index, str, 0, str.length());
     }
 
-    private final void appendChars(char[] s, int off, int end) {
+    private final void appendChars(char @Readonly [] s, int off, int end) {
         int count = this.count;
         if (isLatin1()) {
             byte[] val = this.value;
@@ -1794,7 +1796,7 @@ abstract @UsesObjectEquals class AbstractStringBuilder implements Appendable, Ch
         count += end - off;
     }
 
-    private final void appendChars(CharSequence s, int off, int end) {
+    private final void appendChars(@Readonly CharSequence s, int off, int end) {
         if (isLatin1()) {
             byte[] val = this.value;
             for (int i = off, j = count; i < end; i++) {

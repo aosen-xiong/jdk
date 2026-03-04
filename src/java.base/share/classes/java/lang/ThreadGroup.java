@@ -62,7 +62,7 @@ import java.util.Arrays;
  * and working off of that snapshot, rather than holding the thread group locked
  * while we work on the children.
  */
-@AnnotatedFor({"index", "interning", "lock", "nullness"})
+@AnnotatedFor({"index", "interning", "lock", "nullness", "pico"})
 public @UsesObjectEquals class ThreadGroup implements Thread.UncaughtExceptionHandler {
     private final ThreadGroup parent;
     String name;

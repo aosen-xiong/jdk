@@ -28,6 +28,9 @@ import java.lang.module.Configuration;
 import java.lang.module.ModuleReference;
 import java.net.URI;
 
+import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 /**
  * A NamedPackage represents a package by name in a specific module.
  *
@@ -40,6 +43,8 @@ import java.net.URI;
  * packages with minimal footprint and avoid constructing Package
  * object.
  */
+@AnnotatedFor("pico")
+@Immutable
 class NamedPackage {
     private final String name;
     private final Module module;

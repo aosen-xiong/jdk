@@ -34,6 +34,9 @@ import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.mustcall.qual.MustCall;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.PolyMutable;
+import org.checkerframework.checker.pico.qual.Readonly;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.checker.signedness.qual.UnknownSignedness;
 import org.checkerframework.checker.tainting.qual.Untainted;
 import org.checkerframework.common.aliasing.qual.Unique;
@@ -53,8 +56,9 @@ import jdk.internal.vm.annotation.IntrinsicCandidate;
  * @see     java.lang.Class
  * @since   1.0
  */
-@AnnotatedFor({"aliasing", "guieffect", "index", "lock", "nullness"})
+@AnnotatedFor({"aliasing", "guieffect", "index", "lock", "nullness", "pico"})
 @PolyUIType
+@ReceiverDependentMutable
 public class Object {
 
     /**
@@ -87,7 +91,7 @@ public class Object {
     @SafeEffect
     @Pure
     @IntrinsicCandidate
-    public final native Class<? extends @MustCall() Object> getClass(@PolyUI @GuardSatisfied @UnknownInitialization @UnknownSignedness Object this);
+    public final native Class<? extends @MustCall() @Readonly Object> getClass(@Readonly @PolyUI @GuardSatisfied @UnknownInitialization @UnknownSignedness Object this);
 
     /**
      * Returns a hash code value for the object. This method is
@@ -124,7 +128,7 @@ public class Object {
      */
     @Pure
     @IntrinsicCandidate
-    public native int hashCode(@GuardSatisfied @UnknownSignedness Object this);
+    public native int hashCode(@Readonly @GuardSatisfied @UnknownSignedness Object this);
 
     /**
      * Indicates whether some other object is "equal to" this one.
@@ -186,7 +190,7 @@ public class Object {
      */
     @Pure
     @EnsuresNonNullIf(expression="#1", result=true)
-    public boolean equals(@GuardSatisfied Object this, @GuardSatisfied @Nullable Object obj) {
+    public boolean equals(@Readonly @GuardSatisfied Object this, @Readonly @GuardSatisfied @Nullable Object obj) {
         return (this == obj);
     }
 
@@ -253,7 +257,8 @@ public class Object {
      */
     @SideEffectFree
     @IntrinsicCandidate
-    protected native Object clone(@GuardSatisfied Object this) throws CloneNotSupportedException;
+    @CFComment("pico: clone is poly because it be implemented as shallow copy?")
+    protected native @PolyMutable Object clone(@GuardSatisfied @PolyMutable Object this) throws CloneNotSupportedException;
 
     /**
      * Returns a string representation of the object.
@@ -284,7 +289,7 @@ public class Object {
     "that differs according to ==, and @Deterministic requires that the results of",
     "two calls of the method are ==."})
     @SideEffectFree
-    public String toString(@GuardSatisfied Object this) {
+    public String toString(@Readonly @GuardSatisfied Object this) {
         return getClass().getName() + "@" + Integer.toHexString(hashCode());
     }
 
@@ -366,7 +371,7 @@ public class Object {
      * @see    #wait(long)
      * @see    #wait(long, int)
      */
-    public final void wait(@UnknownInitialization Object this) throws InterruptedException {
+    public final void wait(@UnknownInitialization @Readonly Object this) throws InterruptedException {
         wait(0L);
     }
 
@@ -391,7 +396,7 @@ public class Object {
      * @see    #wait()
      * @see    #wait(long, int)
      */
-    public final native void wait(@UnknownInitialization Object this, @NonNegative long timeoutMillis) throws InterruptedException;
+    public final native void wait(@UnknownInitialization @Readonly Object this, @NonNegative long timeoutMillis) throws InterruptedException;
 
     /**
      * Causes the current thread to wait until it is awakened, typically
@@ -487,7 +492,7 @@ public class Object {
      * @see    #wait()
      * @see    #wait(long)
      */
-    public final void wait(@UnknownInitialization Object this, long timeoutMillis, @NonNegative int nanos) throws InterruptedException {
+    public final void wait(@UnknownInitialization @Readonly Object this, long timeoutMillis, @NonNegative int nanos) throws InterruptedException {
         if (timeoutMillis < 0) {
             throw new IllegalArgumentException("timeoutMillis value is negative");
         }

@@ -26,6 +26,7 @@
 package java.lang.ref;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.framework.qual.AnnotatedFor;
 import org.checkerframework.framework.qual.CFComment;
 
@@ -49,7 +50,8 @@ import org.checkerframework.framework.qual.CFComment;
  * @since    1.2
  */
 
-@AnnotatedFor({"nullness"})
+@AnnotatedFor({"nullness", "pico"})
+@ReceiverDependentMutable
 public class WeakReference<T> extends Reference<T> {
 
     /**

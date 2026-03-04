@@ -26,6 +26,7 @@
 package java.lang;
 
 import org.checkerframework.checker.interning.qual.UsesObjectEquals;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
 import jdk.internal.vm.annotation.IntrinsicCandidate;
@@ -33,13 +34,13 @@ import jdk.internal.vm.annotation.IntrinsicCandidate;
 /**
  * Utility class for string encoding and decoding.
  */
-@AnnotatedFor({"index", "interning"})
+@AnnotatedFor({"index", "interning", "pico"})
 @UsesObjectEquals class StringCoding {
 
     private StringCoding() { }
 
     @IntrinsicCandidate
-    public static boolean hasNegatives(byte[] ba, int off, int len) {
+    public static boolean hasNegatives(byte @Readonly [] ba, int off, int len) {
         for (int i = off; i < off + len; i++) {
             if (ba[i] < 0) {
                 return true;
@@ -49,7 +50,7 @@ import jdk.internal.vm.annotation.IntrinsicCandidate;
     }
 
     @IntrinsicCandidate
-    public static int implEncodeISOArray(byte[] sa, int sp,
+    public static int implEncodeISOArray(byte @Readonly [] sa, int sp,
                                           byte[] da, int dp, int len) {
         int i = 0;
         for (; i < len; i++) {

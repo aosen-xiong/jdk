@@ -37,7 +37,7 @@ import java.util.zip.InflaterInputStream;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
-@AnnotatedFor({"index", "interning"})
+@AnnotatedFor({"index", "interning", "pico"})
 @UsesObjectEquals class CharacterName {
 
     private static SoftReference<CharacterName> refCharName;

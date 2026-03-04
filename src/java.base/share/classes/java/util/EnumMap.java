@@ -36,6 +36,12 @@ import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
 import org.checkerframework.checker.nullness.qual.RequiresNonNull;
+import org.checkerframework.checker.pico.qual.Assignable;
+import org.checkerframework.checker.pico.qual.LazyFinal;
+import org.checkerframework.checker.pico.qual.Mutable;
+import org.checkerframework.checker.pico.qual.PolyMutable;
+import org.checkerframework.checker.pico.qual.Readonly;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.checker.signedness.qual.UnknownSignedness;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
@@ -93,6 +99,7 @@ import jdk.internal.access.SharedSecrets;
  * @since 1.5
  */
 @AnnotatedFor({"nullness", "index"})
+@ReceiverDependentMutable
 public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
     implements java.io.Serializable, Cloneable
 {
@@ -113,7 +120,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
      * to which universe[i] is currently mapped, or null if it isn't
      * mapped to anything, or NULL if it's mapped to null.
      */
-    private transient @Nullable Object[] vals;
+    private transient @Nullable @Readonly Object[] vals;
 
     /**
      * The number of mappings in this map.
@@ -133,12 +140,13 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
         }
     };
 
-    private Object maskNull(@Nullable Object value) {
+    @SuppressWarnings("pico") // Not precise enough
+    private @PolyMutable Object maskNull(@Readonly EnumMap<K,V> this, @Nullable @PolyMutable Object value) {
         return (value == null ? NULL : value);
     }
 
     @SuppressWarnings("unchecked")
-    private @Nullable V unmaskNull(@Nullable Object value) {
+    private @Nullable V unmaskNull(@Readonly EnumMap<K,V> this, @Nullable @Readonly Object value) {
         return (V)(value == NULL ? null : value);
     }
 
@@ -148,10 +156,11 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
      * @param keyType the class object of the key type for this enum map
      * @throws NullPointerException if {@code keyType} is null
      */
+    @SuppressWarnings("pico") // PICO constructor fix
     public EnumMap(Class<K> keyType) {
         this.keyType = keyType;
         keyUniverse = getKeyUniverse(keyType);
-        vals = new Object[keyUniverse.length];
+        vals = new Object @ReceiverDependentMutable [keyUniverse.length];
     }
 
     /**
@@ -161,7 +170,8 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
      * @param m the enum map from which to initialize this enum map
      * @throws NullPointerException if {@code m} is null
      */
-    public EnumMap(EnumMap<K, ? extends V> m) {
+    @SuppressWarnings("pico:method.invocation.invalid") // array clone
+    public EnumMap(@ReceiverDependentMutable EnumMap<K, ? extends V> m) {
         keyType = m.keyType;
         keyUniverse = m.keyUniverse;
         vals = m.vals.clone();
@@ -180,9 +190,10 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
      *     {@code EnumMap} instance and contains no mappings
      * @throws NullPointerException if {@code m} is null
      */
-    public EnumMap(Map<K, ? extends V> m) {
+    @SuppressWarnings("pico:method.invocation.invalid") // PICO constructor fix
+    public EnumMap(@ReceiverDependentMutable Map<K, ? extends V> m) {
         if (m instanceof EnumMap) {
-            EnumMap<K, ? extends V> em = (EnumMap<K, ? extends V>) m;
+            EnumMap<K, ? extends V> em = (@ReceiverDependentMutable EnumMap<K, ? extends V>) m;
             keyType = em.keyType;
             keyUniverse = em.keyUniverse;
             vals = em.vals.clone();
@@ -192,7 +203,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
                 throw new IllegalArgumentException("Specified map is empty");
             keyType = m.keySet().iterator().next().getDeclaringClass();
             keyUniverse = getKeyUniverse(keyType);
-            vals = new Object[keyUniverse.length];
+            vals = new Object @ReceiverDependentMutable [keyUniverse.length];
             putAll(m);
         }
     }
@@ -205,7 +216,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
      * @return the number of key-value mappings in this map
      */
     @Pure
-    public @NonNegative int size() {
+    public @NonNegative int size(@Readonly EnumMap<K, V> this) {
         return size;
     }
 
@@ -217,7 +228,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
      * @return {@code true} if this map maps one or more keys to this value
      */
     @Pure
-    public boolean containsValue(@GuardSatisfied @Nullable @UnknownSignedness Object value) {
+    public boolean containsValue(@Readonly EnumMap<K, V> this, @GuardSatisfied @Nullable @UnknownSignedness @Readonly Object value) {
         value = maskNull(value);
 
         for (Object val : vals)
@@ -237,11 +248,11 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
      */
     @EnsuresKeyForIf(expression={"#1"}, result=true, map={"this"})
     @Pure
-    public boolean containsKey(@GuardSatisfied @UnknownSignedness Object key) {
+    public boolean containsKey(@Readonly EnumMap<K, V> this, @GuardSatisfied @UnknownSignedness @Readonly Object key) {
         return isValidKey(key) && vals[((Enum<?>)key).ordinal()] != null;
     }
 
-    private boolean containsMapping(@GuardSatisfied @UnknownSignedness Object key, @GuardSatisfied @Nullable @UnknownSignedness Object value) {
+    private boolean containsMapping(@Readonly EnumMap<K, V> this, @GuardSatisfied @UnknownSignedness @Readonly Object key, @GuardSatisfied @Nullable @UnknownSignedness @Readonly Object value) {
         return isValidKey(key) &&
             maskNull(value).equals(vals[((Enum<?>)key).ordinal()]);
     }
@@ -261,7 +272,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
      * The {@link #containsKey containsKey} operation may be used to
      * distinguish these two cases.
      */
-    public @Nullable V get(@UnknownSignedness @Nullable Object key) {
+    public @Nullable V get(@UnknownSignedness @Nullable @Readonly Object key) {
         return (isValidKey(key) ?
                 unmaskNull(vals[((Enum<?>)key).ordinal()]) : null);
     }
@@ -283,7 +294,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
      * @throws NullPointerException if the specified key is null
      */
     @EnsuresKeyFor(value={"#1"}, map={"this"})
-    public @Nullable V put(K key, V value) {
+    public @Nullable V put(@Mutable @UnknownInitialization EnumMap<K, V> this, K key, V value) {
         typeCheck(key);
 
         int index = key.ordinal();
@@ -303,7 +314,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
      *     return can also indicate that the map previously associated
      *     {@code null} with the specified key.)
      */
-    public @Nullable V remove(@GuardSatisfied @UnknownSignedness Object key) {
+    public @Nullable V remove(@Mutable EnumMap<K, V> this, @GuardSatisfied @UnknownSignedness @Readonly Object key) {
         if (!isValidKey(key))
             return null;
         int index = ((Enum<?>)key).ordinal();
@@ -314,7 +325,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
         return unmaskNull(oldValue);
     }
 
-    private boolean removeMapping(@GuardSatisfied @UnknownSignedness Object key, @GuardSatisfied @Nullable @UnknownSignedness Object value) {
+    private boolean removeMapping(@Mutable EnumMap<K, V> this, @GuardSatisfied @UnknownSignedness @Readonly Object key, @GuardSatisfied @Nullable @UnknownSignedness @Readonly Object value) {
         if (!isValidKey(key))
             return false;
         int index = ((Enum<?>)key).ordinal();
@@ -331,7 +342,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
      * enum map.
      */
     @EnsuresNonNullIf(expression={"#1"}, result=true)
-    private boolean isValidKey(@GuardSatisfied @UnknownSignedness Object key) {
+    private boolean isValidKey(@Readonly EnumMap<K, V> this, @GuardSatisfied @UnknownSignedness @Readonly Object key) {
         if (key == null)
             return false;
 
@@ -355,7 +366,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
                 "and vals are private class members for EnumMap and are absent in AbstractMap."})
     @SuppressWarnings({"nullness:contracts.precondition.override.invalid"})
     @RequiresNonNull({"keyUniverse", "vals"})
-    public void putAll(@UnknownInitialization EnumMap<K, V> this, Map<? extends K, ? extends V> m) {
+    public void putAll(@UnknownInitialization @Mutable EnumMap<K, V> this, @Readonly Map<? extends K, ? extends V> m) {
         if (m instanceof EnumMap<?, ?> em) {
             if (em.keyType != keyType) {
                 if (em.isEmpty())
@@ -379,7 +390,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
     /**
      * Removes all mappings from this map.
      */
-    public void clear() {
+    public void clear(@Mutable EnumMap<K, V> this) {
         Arrays.fill(vals, null);
         size = 0;
     }
@@ -391,7 +402,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
      * view the first time this view is requested.  The view is stateless,
      * so there's no reason to create more than one.
      */
-    private transient @Nullable Set<Map.Entry<K,V>> entrySet;
+    private transient @Assignable /* should be @LazyFinal */ @Nullable Set<Map.@ReceiverDependentMutable Entry<K,V>> entrySet;
 
     /**
      * Returns a {@link Set} view of the keys contained in this map.
@@ -402,35 +413,36 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
      *
      * @return a set view of the keys contained in this enum map
      */
-    public Set<K> keySet() {
+    public @PolyMutable Set<K> keySet(@PolyMutable EnumMap<K, V> this) {
         Set<K> ks = keySet;
         if (ks == null) {
-            ks = new KeySet();
+            ks = new @PolyMutable KeySet();
             keySet = ks;
         }
         return ks;
     }
 
+    @ReceiverDependentMutable
     private class KeySet extends AbstractSet<K> {
         @SideEffectFree
-        public Iterator<K> iterator() {
+        public Iterator<K> iterator(@Readonly KeySet this) {
             return new KeyIterator();
         }
         @Pure
-        public @NonNegative int size() {
+        public @NonNegative int size(@Readonly KeySet this) {
             return size;
         }
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
-        public boolean contains(@Nullable @UnknownSignedness Object o) {
+        public boolean contains(@Readonly KeySet this, @Nullable @UnknownSignedness @Readonly Object o) {
             return containsKey(o);
         }
-        public boolean remove(@Nullable @UnknownSignedness Object o) {
+        public boolean remove(@Mutable EnumMap<K,V>. @Mutable KeySet this, @Nullable @UnknownSignedness Object o) {
             int oldSize = size;
             EnumMap.this.remove(o);
             return size != oldSize;
         }
-        public void clear() {
+        public void clear(@Mutable EnumMap<K,V>. @Mutable KeySet this) {
             EnumMap.this.clear();
         }
     }
@@ -445,30 +457,31 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
      *
      * @return a collection view of the values contained in this map
      */
-    public Collection<V> values() {
+    public @PolyMutable Collection<V> values(@PolyMutable EnumMap<K, V> this) {
         Collection<V> vs = values;
         if (vs == null) {
-            vs = new Values();
+            vs = new @PolyMutable Values();
             values = vs;
         }
         return vs;
     }
 
+    @ReceiverDependentMutable
     private class Values extends AbstractCollection<V> {
         @SideEffectFree
-        public Iterator<V> iterator() {
+        public Iterator<V> iterator(@Readonly Values this) {
             return new ValueIterator();
         }
         @Pure
-        public @NonNegative int size() {
+        public @NonNegative int size(@Readonly Values this) {
             return size;
         }
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
-        public boolean contains(@Nullable @UnknownSignedness Object o) {
+        public boolean contains(@Readonly EnumMap<K,V>. @Readonly Values this, @Nullable @UnknownSignedness @Readonly Object o) {
             return containsValue(o);
         }
-        public boolean remove(@Nullable @UnknownSignedness Object o) {
+        public boolean remove(@Mutable EnumMap<K,V>. @Mutable Values this, @Nullable @UnknownSignedness @Readonly Object o) {
             o = maskNull(o);
 
             for (int i = 0; i < vals.length; i++) {
@@ -480,7 +493,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
             }
             return false;
         }
-        public void clear() {
+        public void clear(@Mutable EnumMap<K,V>. @Mutable Values this) {
             EnumMap.this.clear();
         }
     }
@@ -495,39 +508,41 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
      * @return a set view of the mappings contained in this enum map
      */
     @SideEffectFree
-    public Set<Map.Entry<K,V>> entrySet() {
-        Set<Map.Entry<K,V>> es = entrySet;
+    @SuppressWarnings("pico:assignment.type.incompatible") // class polymorphism qualifier
+    public @PolyMutable Set<Map.@PolyMutable Entry<K,V>> entrySet(@PolyMutable EnumMap<K, V> this) {
+        Set<Map.@PolyMutable Entry<K,V>> es = entrySet;
         if (es != null)
             return es;
         else
-            return entrySet = new EntrySet();
+            return entrySet = new @PolyMutable EntrySet();
     }
 
-    private class EntrySet extends AbstractSet<Map.Entry<K,V>> {
+    @ReceiverDependentMutable
+    private class EntrySet extends AbstractSet<Map.@Readonly Entry<K,V>> {
         @SideEffectFree
-        public Iterator<Map.Entry<K,V>> iterator() {
+        public Iterator<Map.Entry<K,V>> iterator(@Readonly EntrySet this) {
             return new EntryIterator();
         }
 
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
-        public boolean contains(@Nullable @UnknownSignedness Object o) {
-            return o instanceof Map.Entry<?, ?> entry
+        public boolean contains(@Readonly EntrySet this, @Nullable @UnknownSignedness @Readonly Object o) {
+            return o instanceof Map.@Readonly Entry<?, ?> entry
                     && containsMapping(entry.getKey(), entry.getValue());
         }
-        public boolean remove(@Nullable @UnknownSignedness Object o) {
-            return o instanceof Map.Entry<?, ?> entry
+        public boolean remove(@Mutable EntrySet this, @Nullable @UnknownSignedness @Readonly Object o) {
+            return o instanceof Map.@Readonly Entry<?, ?> entry
                     && removeMapping(entry.getKey(), entry.getValue());
         }
         @Pure
-        public @NonNegative int size() {
+        public @NonNegative int size(@Readonly EntrySet this) {
             return size;
         }
-        public void clear() {
+        public void clear(@Mutable EnumMap<K,V>. @Mutable EntrySet this) {
             EnumMap.this.clear();
         }
         @SideEffectFree
-        public Object[] toArray() {
+        public @Readonly Object[] toArray() {
             return fillEntryArray(new Object[size]);
         }
         @CFComment({"nullness: 'a' is known to be of array class type",
@@ -550,7 +565,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
         @CFComment({"nullness: Value returned by unmaskNull",
         "will be of type V (not @Nullable V) for mapped value"})
         @SuppressWarnings({"nullness:argument"})
-        private Object[] fillEntryArray(Object[] a) {
+        private @Readonly Object[] fillEntryArray(@Readonly Object[] a) {
             int j = 0;
             for (int i = 0; i < vals.length; i++)
                 if (vals[i] != null)
@@ -560,22 +575,23 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
         }
     }
 
+    @ReceiverDependentMutable
     private abstract class EnumMapIterator<T> implements Iterator<T> {
         // Lower bound on index of next element to return
-        int index = 0;
+        @Assignable int index = 0;
 
         // Index of last returned element, or -1 if none
-        int lastReturnedIndex = -1;
+        @Assignable int lastReturnedIndex = -1;
 
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
-        public boolean hasNext() {
+        public boolean hasNext(@Readonly EnumMapIterator<T> this) {
             while (index < vals.length && vals[index] == null)
                 index++;
             return index != vals.length;
         }
 
-        public void remove() {
+        public void remove(@Mutable EnumMap<K,V>.@Mutable EnumMapIterator<T> this) {
             checkLastReturnedIndex();
 
             if (vals[lastReturnedIndex] != null) {
@@ -585,14 +601,15 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
             lastReturnedIndex = -1;
         }
 
-        private void checkLastReturnedIndex() {
+        private void checkLastReturnedIndex(@Readonly EnumMapIterator<T> this) {
             if (lastReturnedIndex < 0)
                 throw new IllegalStateException();
         }
     }
 
+    @ReceiverDependentMutable
     private class KeyIterator extends EnumMapIterator<K> {
-        public K next(@NonEmpty KeyIterator this) {
+        public K next(@NonEmpty @Readonly KeyIterator this) {
             if (!hasNext())
                 throw new NoSuchElementException();
             lastReturnedIndex = index++;
@@ -600,11 +617,12 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
         }
     }
 
+    @ReceiverDependentMutable
     private class ValueIterator extends EnumMapIterator<V> {
         @CFComment({"nullness: Value returned by unmaskNull",
                     "will be of type V (not @Nullable V) for mapped value"})
         @SuppressWarnings({"nullness:return"})
-        public V next(@NonEmpty ValueIterator this) {
+        public V next(@NonEmpty @Readonly ValueIterator this) {
             if (!hasNext())
                 throw new NoSuchElementException();
             lastReturnedIndex = index++;
@@ -612,17 +630,18 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
         }
     }
 
+    @ReceiverDependentMutable
     private class EntryIterator extends EnumMapIterator<Map.Entry<K,V>> {
-        private Entry lastReturnedEntry;
+        private @Assignable Entry lastReturnedEntry;
 
-        public Map.Entry<K,V> next(@NonEmpty EntryIterator this) {
+        public Map.Entry<K,V> next(@Mutable @NonEmpty EntryIterator this) {
             if (!hasNext())
                 throw new NoSuchElementException();
             lastReturnedEntry = new Entry(index++);
             return lastReturnedEntry;
         }
 
-        public void remove() {
+        public void remove(@Mutable EntryIterator this) {
             lastReturnedIndex =
                 ((null == lastReturnedEntry) ? -1 : lastReturnedEntry.index);
             super.remove();
@@ -630,6 +649,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
             lastReturnedEntry = null;
         }
 
+        @ReceiverDependentMutable
         private class Entry implements Map.Entry<K,V> {
             private int index;
 
@@ -637,7 +657,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
                 this.index = index;
             }
 
-            public K getKey() {
+            public K getKey(@Readonly Entry this) {
                 checkIndexForEntryUse();
                 return keyUniverse[index];
             }
@@ -645,7 +665,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
             @CFComment({"nullness: Value returned by unmaskNull",
                         "will be of type V (not @Nullable V) for mapped value"})
             @SuppressWarnings("nullness:return")
-            public V getValue() {
+            public V getValue(@Readonly Entry this) {
                 checkIndexForEntryUse();
                 return unmaskNull(vals[index]);
             }
@@ -653,18 +673,18 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
             @CFComment({"nullness: Value returned by unmaskNull",
             "will be of type V (not @Nullable V) for mapped value"})
             @SuppressWarnings("nullness:return")
-            public V setValue(V value) {
+            public V setValue(@Mutable Entry this, V value) {
                 checkIndexForEntryUse();
                 V oldValue = unmaskNull(vals[index]);
                 vals[index] = maskNull(value);
                 return oldValue;
             }
 
-            public boolean equals(Object o) {
+            public boolean equals(@Readonly Entry this, @Readonly Object o) {
                 if (index < 0)
                     return o == this;
 
-                if (!(o instanceof Map.Entry<?, ?> e))
+                if (!(o instanceof Map.@Readonly Entry<?, ?> e))
                     return false;
 
                 V ourValue = unmaskNull(vals[index]);
@@ -674,14 +694,14 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
                          (ourValue != null && ourValue.equals(hisValue))));
             }
 
-            public int hashCode() {
+            public int hashCode(@Readonly Entry this) {
                 if (index < 0)
                     return super.hashCode();
 
                 return entryHashCode(index);
             }
 
-            public String toString() {
+            public String toString(@Readonly Entry this) {
                 if (index < 0)
                     return super.toString();
 
@@ -689,7 +709,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
                     + unmaskNull(vals[index]);
             }
 
-            private void checkIndexForEntryUse() {
+            private void checkIndexForEntryUse(@Readonly Entry this) {
                 if (index < 0)
                     throw new IllegalStateException("Entry was removed");
             }
@@ -707,12 +727,12 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
      * @param o the object to be compared for equality with this map
      * @return {@code true} if the specified object is equal to this map
      */
-    public boolean equals(@Nullable Object o) {
+    public boolean equals(@Readonly EnumMap<K,V> this, @Readonly @Nullable Object o) {
         if (this == o)
             return true;
         if (o instanceof EnumMap)
             return equals((EnumMap<?,?>)o);
-        if (!(o instanceof Map<?, ?> m))
+        if (!(o instanceof @Readonly Map<?, ?> m))
             return false;
 
         if (size != m.size())
@@ -735,7 +755,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
         return true;
     }
 
-    private boolean equals(EnumMap<?,?> em) {
+    private boolean equals(@Readonly EnumMap<K,V> this, @Readonly EnumMap<?,?> em) {
         if (em.size != size)
             return false;
 
@@ -757,7 +777,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
      * Returns the hash code value for this map.  The hash code of a map is
      * defined to be the sum of the hash codes of each entry in the map.
      */
-    public int hashCode() {
+    public int hashCode(@Readonly EnumMap<K,V> this) {
         int h = 0;
 
         for (int i = 0; i < keyUniverse.length; i++) {
@@ -771,7 +791,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
 
     @CFComment({"nullness: Private method; Called only for indices with mapped value"})
     @SuppressWarnings({"nullness:dereference.of.nullable"})
-    private int entryHashCode(int index) {
+    private int entryHashCode(@Readonly EnumMap<K,V> this, int index) {
         return (keyUniverse[index].hashCode() ^ vals[index].hashCode());
     }
 
@@ -782,7 +802,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
      * @return a shallow copy of this enum map
      */
     @SuppressWarnings("unchecked")
-    public EnumMap<K, V> clone() {
+    public EnumMap<K, V> clone(@Mutable EnumMap<K,V> this) {
         EnumMap<K, V> result = null;
         try {
             result = (EnumMap<K, V>) super.clone();
@@ -797,7 +817,8 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
     /**
      * Throws an exception if e is not of the correct type for this enum set.
      */
-    private void typeCheck(K key) {
+    // @SuppressWarnings("pico:type.invalid.annotations.on.use") // Aosen: This is a bug in validator
+    private void typeCheck(@Readonly EnumMap<K,V> this, K key) {
         Class<?> keyClass = key.getClass();
         if (keyClass != keyType && keyClass.getSuperclass() != keyType)
             throw new ClassCastException(keyClass + " != " + keyType);
@@ -807,7 +828,8 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
      * Returns all of the values comprising K.
      * The result is uncloned, cached, and shared by all callers.
      */
-    private static <K extends Enum<K>> K[] getKeyUniverse(Class<K> keyType) {
+    @SuppressWarnings("pico:return.type.incompatible") // return type
+    private static <K extends Enum<K>> K @ReceiverDependentMutable [] getKeyUniverse(Class<K> keyType) {
         return SharedSecrets.getJavaLangAccess()
                                         .getEnumConstantsShared(keyType);
     }
@@ -825,7 +847,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
      *             by the enum map.
      */
     @java.io.Serial
-    private void writeObject(java.io.ObjectOutputStream s)
+    private void writeObject(@Mutable EnumMap<K,V> this, java.io.ObjectOutputStream s)
         throws java.io.IOException
     {
         // Write out the key type and any hidden stuff
@@ -849,9 +871,9 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
      * Reconstitute the {@code EnumMap} instance from a stream (i.e.,
      * deserialize it).
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "pico:assignment.type.incompatible"}) // why getKeyUniverse return type not adapted?
     @java.io.Serial
-    private void readObject(java.io.ObjectInputStream s)
+    private void readObject(@Mutable EnumMap<K,V> this, java.io.ObjectInputStream s)
         throws java.io.IOException, ClassNotFoundException
     {
         // Read in the key type and any hidden stuff

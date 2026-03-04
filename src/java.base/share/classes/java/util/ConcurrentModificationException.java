@@ -25,6 +25,9 @@
 
 package java.util;
 
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 /**
  * This exception may be thrown by methods that have detected concurrent
  * modification of an object when such modification is not permissible.
@@ -67,6 +70,8 @@ package java.util;
  * @see     AbstractList
  * @since   1.2
  */
+@AnnotatedFor("pico")
+@ReceiverDependentMutable
 public class ConcurrentModificationException extends RuntimeException {
     @java.io.Serial
     private static final long serialVersionUID = -3666751008965953603L;
@@ -99,7 +104,7 @@ public class ConcurrentModificationException extends RuntimeException {
      *         unknown.)
      * @since  1.7
      */
-    public ConcurrentModificationException(Throwable cause) {
+    public ConcurrentModificationException(@ReceiverDependentMutable Throwable cause) {
         super(cause);
     }
 
@@ -119,7 +124,7 @@ public class ConcurrentModificationException extends RuntimeException {
      *         unknown.)
      * @since 1.7
      */
-    public ConcurrentModificationException(String message, Throwable cause) {
+    public ConcurrentModificationException(String message, @ReceiverDependentMutable Throwable cause) {
         super(message, cause);
     }
 }

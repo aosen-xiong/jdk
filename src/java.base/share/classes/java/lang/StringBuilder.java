@@ -31,6 +31,8 @@ import org.checkerframework.checker.index.qual.LTLengthOf;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.checker.regex.qual.PolyRegex;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
@@ -95,7 +97,7 @@ import java.io.IOException;
  * @see         java.lang.String
  * @since       1.5
  */
-@AnnotatedFor({"lock", "nullness", "index", "regex"})
+@AnnotatedFor({"lock", "nullness", "index", "pico", "regex"})
 public final class StringBuilder
     extends AbstractStringBuilder
     implements java.io.Serializable, Comparable<StringBuilder>, CharSequence
@@ -177,7 +179,7 @@ public final class StringBuilder
     }
 
     @Override
-    public StringBuilder append(@GuardSatisfied @Nullable Object obj) {
+    public StringBuilder append(@Readonly @GuardSatisfied @Nullable Object obj) {
         return append(String.valueOf(obj));
     }
 
@@ -213,7 +215,7 @@ public final class StringBuilder
     }
 
     @Override
-    public StringBuilder append(@Nullable CharSequence s) {
+    public StringBuilder append(@Nullable @Readonly CharSequence s) {
         super.append(s);
         return this;
     }
@@ -222,7 +224,7 @@ public final class StringBuilder
      * @throws     IndexOutOfBoundsException {@inheritDoc}
      */
     @Override
-    public StringBuilder append(@Nullable CharSequence s, @IndexOrHigh({"#1"}) int start, @IndexOrHigh({"#1"}) int end) {
+    public StringBuilder append(@Nullable @Readonly CharSequence s, @IndexOrHigh({"#1"}) int start, @IndexOrHigh({"#1"}) int end) {
         super.append(s, start, end);
         return this;
     }
@@ -331,7 +333,7 @@ public final class StringBuilder
      * @throws StringIndexOutOfBoundsException {@inheritDoc}
      */
     @Override
-    public StringBuilder insert(@NonNegative int offset, @GuardSatisfied @Nullable Object obj) {
+    public StringBuilder insert(@NonNegative int offset, @Readonly @GuardSatisfied @Nullable Object obj) {
             super.insert(offset, obj);
             return this;
     }
@@ -358,7 +360,7 @@ public final class StringBuilder
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
     @Override
-    public StringBuilder insert(@NonNegative int dstOffset, @Nullable CharSequence s) {
+    public StringBuilder insert(@NonNegative int dstOffset, @Nullable @Immutable CharSequence s) {
             super.insert(dstOffset, s);
             return this;
     }
@@ -367,7 +369,7 @@ public final class StringBuilder
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
     @Override
-    public StringBuilder insert(@NonNegative int dstOffset, @Nullable CharSequence s,
+    public StringBuilder insert(@NonNegative int dstOffset, @Nullable @Immutable CharSequence s,
                                 @NonNegative int start, @NonNegative int end)
     {
         super.insert(dstOffset, s, start, end);

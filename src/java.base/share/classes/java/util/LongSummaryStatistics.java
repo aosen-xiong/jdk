@@ -24,6 +24,7 @@
  */
 package java.util;
 
+import org.checkerframework.checker.pico.qual.Mutable;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
 import java.util.function.IntConsumer;
@@ -66,6 +67,7 @@ import java.util.stream.Collector;
  * @since 1.8
  */
 @AnnotatedFor({"lock", "nullness"})
+@SuppressWarnings("pico") // Not interesting class, fix later
 public class LongSummaryStatistics implements LongConsumer, IntConsumer {
     private long count;
     private long sum;

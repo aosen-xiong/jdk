@@ -55,6 +55,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @since 1.4
  */
 @AnnotatedFor({"index", "interning", "lock", "nullness"})
+@SuppressWarnings("pico") // Not interesting class, fix later
 public abstract @UsesObjectEquals class EventListenerProxy<T extends EventListener>
         implements EventListener {
 

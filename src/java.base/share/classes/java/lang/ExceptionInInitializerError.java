@@ -43,7 +43,7 @@ import java.io.ObjectStreamField;
  * @author  Frank Yellin
  * @since   1.1
  */
-@AnnotatedFor({"nullness"})
+@AnnotatedFor({"nullness", "pico"})
 public class ExceptionInInitializerError extends LinkageError {
     /**
      * Use serialVersionUID from JDK 1.1.X for interoperability

@@ -47,6 +47,7 @@ import org.checkerframework.framework.qual.CFComment;
 })
 @AnnotatedFor({"lock", "nullness"})
 @Deprecated(since="9")
+@SuppressWarnings("pico") // Not interesting class, fix later
 public interface Observer {
     /**
      * This method is called whenever the observed object is changed. An

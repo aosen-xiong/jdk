@@ -27,6 +27,8 @@ package jdk.internal.util;
 import jdk.internal.misc.Unsafe;
 import jdk.internal.vm.annotation.IntrinsicCandidate;
 
+import org.checkerframework.checker.pico.qual.Readonly;
+
 /**
  * Utility methods to work with arrays.  This includes a set of methods
  * to find a mismatch between two primitive arrays.  Also included is
@@ -109,8 +111,8 @@ public class ArraysSupport {
      * the tail of the two arrays.
      */
     @IntrinsicCandidate
-    public static int vectorizedMismatch(Object a, long aOffset,
-                                         Object b, long bOffset,
+    public static int vectorizedMismatch(@Readonly Object a, long aOffset,
+                                         @Readonly Object b, long bOffset,
                                          int length,
                                          int log2ArrayIndexScale) {
         // assert a.getClass().isArray();
@@ -163,8 +165,8 @@ public class ArraysSupport {
     // Booleans
     // Each boolean element takes up one byte
 
-    public static int mismatch(boolean[] a,
-                               boolean[] b,
+    public static int mismatch(boolean @Readonly [] a,
+                               boolean @Readonly [] b,
                                int length) {
         int i = 0;
         if (length > 7) {
@@ -185,8 +187,8 @@ public class ArraysSupport {
         return -1;
     }
 
-    public static int mismatch(boolean[] a, int aFromIndex,
-                               boolean[] b, int bFromIndex,
+    public static int mismatch(boolean @Readonly [] a, int aFromIndex,
+                               boolean @Readonly [] b, int bFromIndex,
                                int length) {
         int i = 0;
         if (length > 7) {
@@ -225,8 +227,8 @@ public class ArraysSupport {
      * no mismatch.  The index will be within the range of (inclusive) 0 to
      * (exclusive) the smaller of the two array lengths.
      */
-    public static int mismatch(byte[] a,
-                               byte[] b,
+    public static int mismatch(byte @Readonly [] a,
+                               byte @Readonly [] b,
                                int length) {
         // ISSUE: defer to index receiving methods if performance is good
         // assert length <= a.length
@@ -272,8 +274,8 @@ public class ArraysSupport {
      * otherwise -1 if no mismatch.  The index will be within the range of
      * (inclusive) 0 to (exclusive) the smaller of the two array bounds.
      */
-    public static int mismatch(byte[] a, int aFromIndex,
-                               byte[] b, int bFromIndex,
+    public static int mismatch(byte @Readonly [] a, int aFromIndex,
+                               byte @Readonly [] b, int bFromIndex,
                                int length) {
         // assert 0 <= aFromIndex < a.length
         // assert 0 <= aFromIndex + length <= a.length
@@ -305,8 +307,8 @@ public class ArraysSupport {
 
     // Chars
 
-    public static int mismatch(char[] a,
-                               char[] b,
+    public static int mismatch(char @Readonly [] a,
+                               char @Readonly [] b,
                                int length) {
         int i = 0;
         if (length > 3) {
@@ -327,8 +329,8 @@ public class ArraysSupport {
         return -1;
     }
 
-    public static int mismatch(char[] a, int aFromIndex,
-                               char[] b, int bFromIndex,
+    public static int mismatch(char @Readonly [] a, int aFromIndex,
+                               char @Readonly [] b, int bFromIndex,
                                int length) {
         int i = 0;
         if (length > 3) {
@@ -354,8 +356,8 @@ public class ArraysSupport {
 
     // Shorts
 
-    public static int mismatch(short[] a,
-                               short[] b,
+    public static int mismatch(short @Readonly [] a,
+                               short @Readonly [] b,
                                int length) {
         int i = 0;
         if (length > 3) {
@@ -376,8 +378,8 @@ public class ArraysSupport {
         return -1;
     }
 
-    public static int mismatch(short[] a, int aFromIndex,
-                               short[] b, int bFromIndex,
+    public static int mismatch(short @Readonly [] a, int aFromIndex,
+                               short @Readonly [] b, int bFromIndex,
                                int length) {
         int i = 0;
         if (length > 3) {
@@ -403,8 +405,8 @@ public class ArraysSupport {
 
     // Ints
 
-    public static int mismatch(int[] a,
-                               int[] b,
+    public static int mismatch(int @Readonly [] a,
+                               int @Readonly [] b,
                                int length) {
         int i = 0;
         if (length > 1) {
@@ -425,8 +427,8 @@ public class ArraysSupport {
         return -1;
     }
 
-    public static int mismatch(int[] a, int aFromIndex,
-                               int[] b, int bFromIndex,
+    public static int mismatch(int @Readonly [] a, int aFromIndex,
+                               int @Readonly [] b, int bFromIndex,
                                int length) {
         int i = 0;
         if (length > 1) {
@@ -452,14 +454,14 @@ public class ArraysSupport {
 
     // Floats
 
-    public static int mismatch(float[] a,
-                               float[] b,
+    public static int mismatch(float @Readonly [] a,
+                               float @Readonly [] b,
                                int length) {
         return mismatch(a, 0, b, 0, length);
     }
 
-    public static int mismatch(float[] a, int aFromIndex,
-                               float[] b, int bFromIndex,
+    public static int mismatch(float @Readonly [] a, int aFromIndex,
+                               float @Readonly [] b, int bFromIndex,
                                int length) {
         int i = 0;
         if (length > 1) {
@@ -499,8 +501,8 @@ public class ArraysSupport {
 
     // Long
 
-    public static int mismatch(long[] a,
-                               long[] b,
+    public static int mismatch(long @Readonly [] a,
+                               long @Readonly [] b,
                                int length) {
         if (length == 0) {
             return -1;
@@ -514,8 +516,8 @@ public class ArraysSupport {
         return i >= 0 ? i : -1;
     }
 
-    public static int mismatch(long[] a, int aFromIndex,
-                               long[] b, int bFromIndex,
+    public static int mismatch(long @Readonly [] a, int aFromIndex,
+                               long @Readonly [] b, int bFromIndex,
                                int length) {
         if (length == 0) {
             return -1;
@@ -534,14 +536,14 @@ public class ArraysSupport {
 
     // Double
 
-    public static int mismatch(double[] a,
-                               double[] b,
+    public static int mismatch(double @Readonly [] a,
+                               double @Readonly [] b,
                                int length) {
         return mismatch(a, 0, b, 0, length);
     }
 
-    public static int mismatch(double[] a, int aFromIndex,
-                               double[] b, int bFromIndex,
+    public static int mismatch(double @Readonly [] a, int aFromIndex,
+                               double @Readonly [] b, int bFromIndex,
                                int length) {
         if (length == 0) {
             return -1;

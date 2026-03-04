@@ -32,6 +32,9 @@ import org.checkerframework.checker.nonempty.qual.NonEmpty;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.RequiresNonNull;
+import org.checkerframework.checker.pico.qual.Mutable;
+import org.checkerframework.checker.pico.qual.Readonly;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.checker.signature.qual.BinaryName;
 import org.checkerframework.checker.signature.qual.FullyQualifiedName;
 import org.checkerframework.common.reflection.qual.ForName;
@@ -241,6 +244,7 @@ import sun.security.util.SecurityConstants;
  * @revised 9
  */
 @AnnotatedFor({"interning", "lock", "nullness", "signature"})
+@ReceiverDependentMutable
 public abstract @UsesObjectEquals class ClassLoader {
 
     private static native void registerNatives();
@@ -326,7 +330,7 @@ public abstract @UsesObjectEquals class ClassLoader {
     // The "default" domain. Set as the default ProtectionDomain on newly
     // created classes.
     private final ProtectionDomain defaultDomain =
-        new ProtectionDomain(new CodeSource(null, (Certificate[]) null),
+        new ProtectionDomain(new CodeSource(null, (Certificate @Mutable []) null),
                              null, this, null);
 
     // Invoked by the VM to record every loaded class with this loader.
@@ -398,7 +402,7 @@ public abstract @UsesObjectEquals class ClassLoader {
             parallelLockMap = null;
             assertionLock = this;
         }
-        this.package2certs = new ConcurrentHashMap<>();
+        this.package2certs = new @ReceiverDependentMutable ConcurrentHashMap<>();
         this.nameAndId = nameAndId(this);
     }
 
@@ -501,13 +505,13 @@ public abstract @UsesObjectEquals class ClassLoader {
      *
      * @since 9
      */
-    public @Nullable String getName() {
+    public @Nullable String getName(@Readonly ClassLoader this) {
         return name;
     }
 
     // package-private used by StackTraceElement to avoid
     // calling the overrideable getName method
-    final String name() {
+    final String name(@Readonly ClassLoader this) {
         return name;
     }
 
@@ -2245,7 +2249,7 @@ public abstract @UsesObjectEquals class ClassLoader {
      *
      * @since  9
      */
-    public final Package getDefinedPackage(String name) {
+    public final Package getDefinedPackage(@Readonly ClassLoader this, String name) {
         Objects.requireNonNull(name, "name cannot be null");
 
         NamedPackage p = packages.get(name);
@@ -2317,7 +2321,7 @@ public abstract @UsesObjectEquals class ClassLoader {
      * @revised 9
      */
     @Deprecated(since="9")
-    protected @Nullable Package getPackage(String name) {
+    protected @Nullable Package getPackage(@Readonly ClassLoader this, String name) {
         Package pkg = getDefinedPackage(name);
         if (pkg == null) {
             if (parent != null) {
@@ -2354,7 +2358,7 @@ public abstract @UsesObjectEquals class ClassLoader {
     @CFComment({"nullness: The size of array passed to toArray",
      "method is of exact same size as of the map for which toArray method is invoked"})
     @SuppressWarnings({"nullness:return"})
-    protected Package[] getPackages() {
+    protected Package[] getPackages(@Readonly ClassLoader this) {
         Stream<Package> pkgs = packages();
         ClassLoader ld = parent;
         while (ld != null) {
@@ -2372,7 +2376,8 @@ public abstract @UsesObjectEquals class ClassLoader {
     /**
      * Returns a stream of Packages defined in this class loader
      */
-    Stream<Package> packages() {
+    @SuppressWarnings("pico") // lost can not invoke poly method.
+    Stream<Package> packages(@Readonly ClassLoader this) {
         return packages.values().stream()
                        .map(p -> definePackage(p.packageName(), p.module()));
     }
@@ -2501,7 +2506,7 @@ public abstract @UsesObjectEquals class ClassLoader {
      *
      * @since  1.4
      */
-    public void setDefaultAssertionStatus(boolean enabled) {
+    public void setDefaultAssertionStatus(@Mutable ClassLoader this, boolean enabled) {
         synchronized (assertionLock) {
             if (classAssertionStatus == null)
                 initializeJavaAssertionMaps();
@@ -2547,7 +2552,7 @@ public abstract @UsesObjectEquals class ClassLoader {
      *
      * @since  1.4
      */
-    public void setPackageAssertionStatus(@Nullable String packageName,
+    public void setPackageAssertionStatus(@Mutable ClassLoader this, @Nullable String packageName,
                                           boolean enabled) {
         synchronized (assertionLock) {
             if (packageAssertionStatus == null)
@@ -2579,7 +2584,7 @@ public abstract @UsesObjectEquals class ClassLoader {
      *
      * @since  1.4
      */
-    public void setClassAssertionStatus(String className, boolean enabled) {
+    public void setClassAssertionStatus(@Mutable ClassLoader this, String className, boolean enabled) {
         synchronized (assertionLock) {
             if (classAssertionStatus == null)
                 initializeJavaAssertionMaps();
@@ -2597,7 +2602,7 @@ public abstract @UsesObjectEquals class ClassLoader {
      *
      * @since  1.4
      */
-    public void clearAssertionStatus() {
+    public void clearAssertionStatus(@Mutable ClassLoader this) {
         /*
          * Whether or not "Java assertion maps" are initialized, set
          * them to empty maps, effectively ignoring any present settings.

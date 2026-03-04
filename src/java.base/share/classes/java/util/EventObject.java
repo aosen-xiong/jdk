@@ -42,6 +42,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  */
 
 @AnnotatedFor({"index", "interning", "lock", "nullness"})
+@SuppressWarnings("pico") // Not interesting class, fix later
 public @UsesObjectEquals class EventObject implements java.io.Serializable {
 
     @java.io.Serial

@@ -41,6 +41,8 @@ import org.checkerframework.checker.nonempty.qual.NonEmpty;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
+import org.checkerframework.checker.pico.qual.Mutable;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.checker.signedness.qual.PolySigned;
 import org.checkerframework.checker.signedness.qual.UnknownSignedness;
 import org.checkerframework.dataflow.qual.Pure;
@@ -90,7 +92,7 @@ import java.util.function.Predicate;
  * @param <E> the type of elements held in this queue
  */
 @AnnotatedFor({"nullness"})
-public class LinkedBlockingQueue<E extends Object> extends AbstractQueue<E>
+public class LinkedBlockingQueue<E extends @Readonly Object> extends AbstractQueue<E>
         implements BlockingQueue<E>, java.io.Serializable {
     private static final long serialVersionUID = -6903933977591709194L;
 

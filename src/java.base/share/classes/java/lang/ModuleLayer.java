@@ -52,6 +52,9 @@ import jdk.internal.misc.CDS;
 import jdk.internal.vm.annotation.Stable;
 import sun.security.util.SecurityConstants;
 
+import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.Readonly;
+import org.checkerframework.framework.qual.AnnotatedFor;
 
 /**
  * A layer of modules in the Java virtual machine.
@@ -146,7 +149,8 @@ import sun.security.util.SecurityConstants;
  * @since 9
  * @see Module#getLayer()
  */
-
+@AnnotatedFor("pico")
+@Immutable
 public final class ModuleLayer {
 
     // the empty layer (may be initialized from the CDS archive)
@@ -172,7 +176,7 @@ public final class ModuleLayer {
      * Creates a new module layer from the modules in the given configuration.
      */
     private ModuleLayer(Configuration cf,
-                        List<ModuleLayer> parents,
+                        @Immutable List<ModuleLayer> parents,
                         Function<String, ClassLoader> clf)
     {
         this.cf = cf;
@@ -492,7 +496,7 @@ public final class ModuleLayer {
      * @see #findLoader
      */
     public static Controller defineModulesWithOneLoader(Configuration cf,
-                                                        List<ModuleLayer> parentLayers,
+                                                        @Readonly List<ModuleLayer> parentLayers,
                                                         ClassLoader parentLoader)
     {
         List<ModuleLayer> parents = List.copyOf(parentLayers);
@@ -568,7 +572,7 @@ public final class ModuleLayer {
      * @see #findLoader
      */
     public static Controller defineModulesWithManyLoaders(Configuration cf,
-                                                          List<ModuleLayer> parentLayers,
+                                                          @Immutable List<ModuleLayer> parentLayers,
                                                           ClassLoader parentLoader)
     {
         List<ModuleLayer> parents = List.copyOf(parentLayers);
@@ -652,7 +656,7 @@ public final class ModuleLayer {
      *         the security manager
      */
     public static Controller defineModules(Configuration cf,
-                                           List<ModuleLayer> parentLayers,
+                                           @Immutable List<ModuleLayer> parentLayers,
                                            Function<String, ClassLoader> clf)
     {
         List<ModuleLayer> parents = List.copyOf(parentLayers);
@@ -680,7 +684,7 @@ public final class ModuleLayer {
      * the parent layers.
      */
     private static void checkConfiguration(Configuration cf,
-                                           List<ModuleLayer> parentLayers)
+                                           @Immutable List<ModuleLayer> parentLayers)
     {
         Objects.requireNonNull(cf);
 
@@ -723,7 +727,7 @@ public final class ModuleLayer {
                                               Function<String, ClassLoader> clf)
     {
         // HashMap allows null keys
-        Map<ClassLoader, Set<String>> loaderToPackages = new HashMap<>();
+        Map<@Immutable ClassLoader, Set<String>> loaderToPackages = new HashMap<>();
         for (ResolvedModule resolvedModule : cf.modules()) {
             ModuleDescriptor descriptor = resolvedModule.reference().descriptor();
             ClassLoader loader = clf.apply(descriptor.name());
@@ -745,7 +749,7 @@ public final class ModuleLayer {
      * Creates a LayerInstantiationException with the a message formatted from
      * the given format string and arguments.
      */
-    private static LayerInstantiationException fail(String fmt, Object ... args) {
+    private static LayerInstantiationException fail(String fmt, @Readonly Object ... args) {
         String msg = String.format(fmt, args);
         return new LayerInstantiationException(msg);
     }
@@ -767,7 +771,7 @@ public final class ModuleLayer {
      *
      * @return A possibly-empty unmodifiable list of this layer's parents
      */
-    public List<ModuleLayer> parents() {
+    public @Immutable List<ModuleLayer> parents() {
         return parents;
     }
 
@@ -814,7 +818,7 @@ public final class ModuleLayer {
      *
      * @return A possibly-empty unmodifiable set of the modules in this layer
      */
-    public Set<Module> modules() {
+    public @Immutable Set<Module> modules() {
         Set<Module> modules = this.modules;
         if (modules == null) {
             this.modules = modules = Set.copyOf(nameToModule.values());

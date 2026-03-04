@@ -25,14 +25,13 @@
 
 package java.lang;
 
+import org.checkerframework.checker.interning.qual.UsesObjectEquals;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.framework.qual.AnnotatedFor;
 import org.checkerframework.framework.qual.CFComment;
 
 import jdk.internal.misc.TerminatingThreadLocal;
-
-import org.checkerframework.checker.interning.qual.UsesObjectEquals;
-import org.checkerframework.framework.qual.AnnotatedFor;
 
 import java.lang.ref.WeakReference;
 import java.util.Objects;
@@ -87,7 +86,7 @@ import java.util.function.Supplier;
             "* the subclass needs to suppress a warning:",
             "@SuppressWarnings(\"nullness:type.argument\") // initialValue returns non-null"
         })
-@AnnotatedFor({"interning", "nullness"})
+@AnnotatedFor({"interning", "nullness", "pico"})
 public @UsesObjectEquals class ThreadLocal<@Nullable T> {
     /**
      * ThreadLocals rely on per-thread linear-probe hash maps attached
@@ -343,9 +342,9 @@ public @UsesObjectEquals class ThreadLocal<@Nullable T> {
          */
         static class Entry extends WeakReference<ThreadLocal<?>> {
             /** The value associated with this ThreadLocal. */
-            Object value;
+            @Readonly Object value;
 
-            Entry(ThreadLocal<?> k, Object v) {
+            Entry(ThreadLocal<?> k, @Readonly Object v) {
                 super(k);
                 value = v;
             }
@@ -398,7 +397,7 @@ public @UsesObjectEquals class ThreadLocal<@Nullable T> {
          * ThreadLocalMaps are constructed lazily, so we only create
          * one when we have at least one entry to put in it.
          */
-        ThreadLocalMap(ThreadLocal<?> firstKey, Object firstValue) {
+        ThreadLocalMap(ThreadLocal<?> firstKey, @Readonly Object firstValue) {
             table = new Entry[INITIAL_CAPACITY];
             int i = firstKey.threadLocalHashCode & (INITIAL_CAPACITY - 1);
             table[i] = new Entry(firstKey, firstValue);
@@ -421,7 +420,7 @@ public @UsesObjectEquals class ThreadLocal<@Nullable T> {
             for (Entry e : parentTable) {
                 if (e != null) {
                     @SuppressWarnings("unchecked")
-                    ThreadLocal<Object> key = (ThreadLocal<Object>) e.get();
+                    ThreadLocal<@Readonly Object> key = (ThreadLocal<@Readonly Object>) e.get();
                     if (key != null) {
                         Object value = key.childValue(e.value);
                         Entry c = new Entry(key, value);
@@ -485,7 +484,7 @@ public @UsesObjectEquals class ThreadLocal<@Nullable T> {
          * @param key the thread local object
          * @param value the value to be set
          */
-        private void set(ThreadLocal<?> key, Object value) {
+        private void set(ThreadLocal<?> key, @Readonly Object value) {
 
             // We don't use a fast path as with get() because it is at
             // least as common to use set() to create new entries as
@@ -549,7 +548,7 @@ public @UsesObjectEquals class ThreadLocal<@Nullable T> {
          * @param  staleSlot index of the first stale entry encountered while
          *         searching for key.
          */
-        private void replaceStaleEntry(ThreadLocal<?> key, Object value,
+        private void replaceStaleEntry(ThreadLocal<?> key, @Readonly Object value,
                                        int staleSlot) {
             Entry[] tab = table;
             int len = tab.length;

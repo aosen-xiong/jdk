@@ -27,6 +27,9 @@ package java.lang.ref;
 
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Mutable;
+import org.checkerframework.checker.pico.qual.Readonly;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.framework.qual.AnnotatedFor;
@@ -50,6 +53,7 @@ import jdk.internal.ref.Cleaner;
 
 @AnnotatedFor({"lock", "nullness"})
 @SuppressWarnings({"rawtypes"})
+@ReceiverDependentMutable
 public abstract class Reference<T> {
 
     /* The state of a Reference object is characterized by two attributes.  It
@@ -169,7 +173,7 @@ public abstract class Reference<T> {
      *        dequeued: ReferenceQueue.NULL
      *    unregistered: ReferenceQueue.NULL
      */
-    volatile ReferenceQueue<? super T> queue;
+    volatile @Mutable ReferenceQueue<? super T> queue;
 
     /* The link in a ReferenceQueue's list of Reference objects.
      *
@@ -247,7 +251,7 @@ public abstract class Reference<T> {
      * takes us from the Reference<?> domain of the pending list elements to
      * having a Reference<T> with a correspondingly typed queue.
      */
-    private void enqueueFromPending() {
+    private void enqueueFromPending(@Mutable Reference<T> this) {
         var q = queue;
         if (q != ReferenceQueue.NULL) q.enqueue(this);
     }
@@ -360,7 +364,7 @@ public abstract class Reference<T> {
      */
     @SideEffectFree
     @IntrinsicCandidate
-    public @Nullable T get(@GuardSatisfied Reference<T> this) {
+    public @Nullable T get(@GuardSatisfied @Readonly Reference<T> this) {
         return this.referent;
     }
 
@@ -390,7 +394,7 @@ public abstract class Reference<T> {
      * <p> This method is invoked only by Java code; when the garbage collector
      * clears references it does so directly, without invoking this method.
      */
-    public void clear() {
+    public void clear(@Mutable Reference<T> this) {
         clear0();
     }
 
@@ -398,7 +402,7 @@ public abstract class Reference<T> {
      * assignment of the referent field won't do for some garbage
      * collectors.
      */
-    private native void clear0();
+    private native void clear0(@Mutable Reference<T> this);
 
     /* -- Operations on inactive FinalReferences -- */
 
@@ -476,7 +480,7 @@ public abstract class Reference<T> {
      *           enqueued; {@code false} if it was already enqueued or if
      *           it was not registered with a queue when it was created
      */
-    public boolean enqueue() {
+    public boolean enqueue(@Mutable Reference<T> this) {
         clear0();               // Intentionally clear0() rather than clear()
         return this.queue.enqueue(this);
     }
@@ -619,7 +623,7 @@ public abstract class Reference<T> {
      */
     @ForceInline
     @CFComment("nullness: Docs say the parameter can be null, but in practice, calls pass `this`")
-    public static void reachabilityFence(Object ref) {
+    public static void reachabilityFence(@Readonly Object ref) {
         // Does nothing. This method is annotated with @ForceInline to eliminate
         // most of the overhead that using @DontInline would cause with the
         // HotSpot JVM, when this fence is used in a wide variety of situations.

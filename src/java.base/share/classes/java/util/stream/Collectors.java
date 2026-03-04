@@ -25,6 +25,8 @@
 package java.util.stream;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.framework.qual.AnnotatedFor;
@@ -137,7 +139,7 @@ public final class Collectors {
      * @param v 2nd value to be accumulated/merged
      */
     private static IllegalStateException duplicateKeyException(
-            Object k, Object u, Object v) {
+            @Readonly Object k, @Readonly Object u, @Readonly Object v) {
         return new IllegalStateException(String.format(
             "Duplicate key %s (attempted merging values %s and %s)",
             k, u, v));
@@ -379,8 +381,8 @@ public final class Collectors {
      * @return a {@code Collector} that concatenates the input elements into a
      * {@code String}, in encounter order
      */
-    public static Collector<@Nullable CharSequence, ?, String> joining() {
-        return new CollectorImpl<CharSequence, StringBuilder, String>(
+    public static Collector<@Nullable @Readonly CharSequence, ?, String> joining() {
+        return new CollectorImpl<@Readonly CharSequence, StringBuilder, String>(
                 StringBuilder::new, StringBuilder::append,
                 (r1, r2) -> { r1.append(r2); return r1; },
                 StringBuilder::toString, CH_NOID);
@@ -394,7 +396,7 @@ public final class Collectors {
      * @return A {@code Collector} which concatenates CharSequence elements,
      * separated by the specified delimiter, in encounter order
      */
-    public static Collector<@Nullable CharSequence, ?, String> joining(CharSequence delimiter) {
+    public static Collector<@Nullable @Readonly CharSequence, ?, String> joining(@Readonly CharSequence delimiter) {
         return joining(delimiter, "", "");
     }
 
@@ -411,9 +413,9 @@ public final class Collectors {
      * @return A {@code Collector} which concatenates CharSequence elements,
      * separated by the specified delimiter, in encounter order
      */
-    public static Collector<@Nullable CharSequence, ?, String> joining(CharSequence delimiter,
-                                                             CharSequence prefix,
-                                                             CharSequence suffix) {
+    public static Collector<@Nullable @Readonly CharSequence, ?, String> joining(@Readonly CharSequence delimiter,
+                                                                                 @Readonly CharSequence prefix,
+                                                                                 @Readonly CharSequence suffix) {
         return new CollectorImpl<>(
                 () -> new StringJoiner(delimiter, prefix, suffix),
                 StringJoiner::add, StringJoiner::merge,
@@ -432,7 +434,7 @@ public final class Collectors {
      * {@link Map#merge(Object, Object, BiFunction) Map.merge()}
      * @return a merge function for two maps
      */
-    private static <K, V, M extends Map<K,V>>
+    private static <K extends @Immutable Object, V, M extends Map<K,V>>
     BinaryOperator<M> mapMerger(BinaryOperator<V> mergeFunction) {
         return (m1, m2) -> {
             for (Map.Entry<K,V> e : m2.entrySet())
@@ -1468,7 +1470,7 @@ public final class Collectors {
      * @see #toMap(Function, Function, BinaryOperator, Supplier)
      * @see #toConcurrentMap(Function, Function)
      */
-    public static <T, K, U extends Object>
+    public static <T, K extends @Immutable Object, U extends @Readonly Object>
     Collector<T, ?, Map<K,U>> toMap(Function<? super T, ? extends K> keyMapper,
                                     Function<? super T, ? extends U> valueMapper) {
         return new CollectorImpl<>(HashMap::new,
@@ -1506,7 +1508,7 @@ public final class Collectors {
      * @since 10
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public static <T, K extends Object, U extends Object>
+    public static <T, K extends @Immutable Object, U extends @Readonly Object>
     Collector<T, ?, Map<K,U>> toUnmodifiableMap(Function<? super T, ? extends K> keyMapper,
                                                 Function<? super T, ? extends U> valueMapper) {
         Objects.requireNonNull(keyMapper, "keyMapper");
@@ -1572,7 +1574,7 @@ public final class Collectors {
      * @see #toMap(Function, Function, BinaryOperator, Supplier)
      * @see #toConcurrentMap(Function, Function, BinaryOperator)
      */
-    public static <T, K, U extends Object>
+    public static <T, K extends @Immutable Object, U extends @Readonly Object>
     Collector<T, ?, Map<K,U>> toMap(Function<? super T, ? extends K> keyMapper,
                                     Function<? super T, ? extends U> valueMapper,
                                     BinaryOperator<U> mergeFunction) {
@@ -1612,7 +1614,7 @@ public final class Collectors {
      * @since 10
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public static <T, K extends Object, U extends Object>
+    public static <T, K extends @Immutable Object, U extends @Readonly Object>
     Collector<T, ?, Map<K,U>> toUnmodifiableMap(Function<? super T, ? extends K> keyMapper,
                                                 Function<? super T, ? extends U> valueMapper,
                                                 BinaryOperator<U> mergeFunction) {
@@ -1664,7 +1666,7 @@ public final class Collectors {
      * @see #toMap(Function, Function, BinaryOperator)
      * @see #toConcurrentMap(Function, Function, BinaryOperator, Supplier)
      */
-    public static <T, K, U extends Object, M extends Map<K, U>>
+    public static <T, K extends @Immutable Object, U extends @Readonly Object, M extends Map<K, U>>
     Collector<T, ?, M> toMap(Function<? super T, ? extends K> keyMapper,
                              Function<? super T, ? extends U> valueMapper,
                              BinaryOperator<U> mergeFunction,
@@ -1727,7 +1729,7 @@ public final class Collectors {
      * @see #toConcurrentMap(Function, Function, BinaryOperator)
      * @see #toConcurrentMap(Function, Function, BinaryOperator, Supplier)
      */
-    public static <T, K extends Object, U extends Object>
+    public static <T, K extends @Immutable Object, U extends @Readonly Object>
     Collector<T, ?, ConcurrentMap<K,U>> toConcurrentMap(Function<? super T, ? extends K> keyMapper,
                                                         Function<? super T, ? extends U> valueMapper) {
         return new CollectorImpl<>(ConcurrentHashMap::new,
@@ -1786,7 +1788,7 @@ public final class Collectors {
      * @see #toConcurrentMap(Function, Function, BinaryOperator, Supplier)
      * @see #toMap(Function, Function, BinaryOperator)
      */
-    public static <T, K extends Object, U extends Object>
+    public static <T, K extends @Immutable Object, U extends @Readonly Object>
     Collector<T, ?, ConcurrentMap<K,U>>
     toConcurrentMap(Function<? super T, ? extends K> keyMapper,
                     Function<? super T, ? extends U> valueMapper,
@@ -1828,7 +1830,7 @@ public final class Collectors {
      * @see #toConcurrentMap(Function, Function, BinaryOperator)
      * @see #toMap(Function, Function, BinaryOperator, Supplier)
      */
-    public static <T, K extends Object, U extends Object, M extends ConcurrentMap<K, U>>
+    public static <T, K extends @Immutable Object, U extends @Readonly Object, M extends ConcurrentMap<K, U>>
     Collector<T, ?, M> toConcurrentMap(Function<? super T, ? extends K> keyMapper,
                                        Function<? super T, ? extends U> valueMapper,
                                        BinaryOperator<U> mergeFunction,

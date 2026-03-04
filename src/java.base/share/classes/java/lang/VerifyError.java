@@ -36,7 +36,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  *
  * @since   1.0
  */
-@AnnotatedFor({"nullness"})
+@AnnotatedFor({"nullness", "pico"})
 public class VerifyError extends LinkageError {
     @java.io.Serial
     private static final long serialVersionUID = 7001962396098498785L;

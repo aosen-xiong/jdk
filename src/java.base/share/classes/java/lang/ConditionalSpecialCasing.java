@@ -26,6 +26,7 @@
 package java.lang;
 
 import org.checkerframework.checker.interning.qual.UsesObjectEquals;
+import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
 import java.text.BreakIterator;
@@ -47,7 +48,8 @@ import sun.text.Normalizer;
  * Note that the unconditional case mappings (including 1:M mappings)
  * are handled in {@code Character.toLower/UpperCase()}.
  */
-@AnnotatedFor({"interning"})
+@AnnotatedFor({"interning", "pico"})
+@Immutable
 final @UsesObjectEquals class ConditionalSpecialCasing {
 
     // context conditions.
@@ -65,31 +67,31 @@ final @UsesObjectEquals class ConditionalSpecialCasing {
         //# ================================================================================
         //# Conditional mappings
         //# ================================================================================
-        new Entry(0x03A3, new char[]{0x03C2}, new char[]{0x03A3}, null, FINAL_CASED), // # GREEK CAPITAL LETTER SIGMA
-        new Entry(0x0130, new char[]{0x0069, 0x0307}, new char[]{0x0130}, null, 0), // # LATIN CAPITAL LETTER I WITH DOT ABOVE
+        new Entry(0x03A3, new char @Immutable []{0x03C2}, new char @Immutable []{0x03A3}, null, FINAL_CASED), // # GREEK CAPITAL LETTER SIGMA
+        new Entry(0x0130, new char @Immutable []{0x0069, 0x0307}, new char @Immutable []{0x0130}, null, 0), // # LATIN CAPITAL LETTER I WITH DOT ABOVE
 
         //# ================================================================================
         //# Locale-sensitive mappings
         //# ================================================================================
         //# Lithuanian
-        new Entry(0x0307, new char[]{0x0307}, new char[]{}, "lt",  AFTER_SOFT_DOTTED), // # COMBINING DOT ABOVE
-        new Entry(0x0049, new char[]{0x0069, 0x0307}, new char[]{0x0049}, "lt", MORE_ABOVE), // # LATIN CAPITAL LETTER I
-        new Entry(0x004A, new char[]{0x006A, 0x0307}, new char[]{0x004A}, "lt", MORE_ABOVE), // # LATIN CAPITAL LETTER J
-        new Entry(0x012E, new char[]{0x012F, 0x0307}, new char[]{0x012E}, "lt", MORE_ABOVE), // # LATIN CAPITAL LETTER I WITH OGONEK
-        new Entry(0x00CC, new char[]{0x0069, 0x0307, 0x0300}, new char[]{0x00CC}, "lt", 0), // # LATIN CAPITAL LETTER I WITH GRAVE
-        new Entry(0x00CD, new char[]{0x0069, 0x0307, 0x0301}, new char[]{0x00CD}, "lt", 0), // # LATIN CAPITAL LETTER I WITH ACUTE
-        new Entry(0x0128, new char[]{0x0069, 0x0307, 0x0303}, new char[]{0x0128}, "lt", 0), // # LATIN CAPITAL LETTER I WITH TILDE
+        new Entry(0x0307, new char @Immutable []{0x0307}, new char @Immutable []{}, "lt",  AFTER_SOFT_DOTTED), // # COMBINING DOT ABOVE
+        new Entry(0x0049, new char @Immutable []{0x0069, 0x0307}, new char @Immutable []{0x0049}, "lt", MORE_ABOVE), // # LATIN CAPITAL LETTER I
+        new Entry(0x004A, new char @Immutable []{0x006A, 0x0307}, new char @Immutable []{0x004A}, "lt", MORE_ABOVE), // # LATIN CAPITAL LETTER J
+        new Entry(0x012E, new char @Immutable []{0x012F, 0x0307}, new char @Immutable []{0x012E}, "lt", MORE_ABOVE), // # LATIN CAPITAL LETTER I WITH OGONEK
+        new Entry(0x00CC, new char @Immutable []{0x0069, 0x0307, 0x0300}, new char @Immutable []{0x00CC}, "lt", 0), // # LATIN CAPITAL LETTER I WITH GRAVE
+        new Entry(0x00CD, new char @Immutable []{0x0069, 0x0307, 0x0301}, new char @Immutable []{0x00CD}, "lt", 0), // # LATIN CAPITAL LETTER I WITH ACUTE
+        new Entry(0x0128, new char @Immutable []{0x0069, 0x0307, 0x0303}, new char @Immutable []{0x0128}, "lt", 0), // # LATIN CAPITAL LETTER I WITH TILDE
 
         //# ================================================================================
         //# Turkish and Azeri
-        new Entry(0x0130, new char[]{0x0069}, new char[]{0x0130}, "tr", 0), // # LATIN CAPITAL LETTER I WITH DOT ABOVE
-        new Entry(0x0130, new char[]{0x0069}, new char[]{0x0130}, "az", 0), // # LATIN CAPITAL LETTER I WITH DOT ABOVE
-        new Entry(0x0307, new char[]{}, new char[]{0x0307}, "tr", AFTER_I), // # COMBINING DOT ABOVE
-        new Entry(0x0307, new char[]{}, new char[]{0x0307}, "az", AFTER_I), // # COMBINING DOT ABOVE
-        new Entry(0x0049, new char[]{0x0131}, new char[]{0x0049}, "tr", NOT_BEFORE_DOT), // # LATIN CAPITAL LETTER I
-        new Entry(0x0049, new char[]{0x0131}, new char[]{0x0049}, "az", NOT_BEFORE_DOT), // # LATIN CAPITAL LETTER I
-        new Entry(0x0069, new char[]{0x0069}, new char[]{0x0130}, "tr", 0), // # LATIN SMALL LETTER I
-        new Entry(0x0069, new char[]{0x0069}, new char[]{0x0130}, "az", 0)  // # LATIN SMALL LETTER I
+        new Entry(0x0130, new char @Immutable []{0x0069}, new char @Immutable []{0x0130}, "tr", 0), // # LATIN CAPITAL LETTER I WITH DOT ABOVE
+        new Entry(0x0130, new char @Immutable []{0x0069}, new char @Immutable []{0x0130}, "az", 0), // # LATIN CAPITAL LETTER I WITH DOT ABOVE
+        new Entry(0x0307, new char @Immutable []{}, new char @Immutable []{0x0307}, "tr", AFTER_I), // # COMBINING DOT ABOVE
+        new Entry(0x0307, new char @Immutable []{}, new char @Immutable []{0x0307}, "az", AFTER_I), // # COMBINING DOT ABOVE
+        new Entry(0x0049, new char @Immutable []{0x0131}, new char @Immutable []{0x0049}, "tr", NOT_BEFORE_DOT), // # LATIN CAPITAL LETTER I
+        new Entry(0x0049, new char @Immutable []{0x0131}, new char @Immutable []{0x0049}, "az", NOT_BEFORE_DOT), // # LATIN CAPITAL LETTER I
+        new Entry(0x0069, new char @Immutable []{0x0069}, new char @Immutable []{0x0130}, "tr", 0), // # LATIN SMALL LETTER I
+        new Entry(0x0069, new char @Immutable []{0x0069}, new char @Immutable []{0x0130}, "az", 0)  // # LATIN SMALL LETTER I
     };
 
     // A hash table that contains the above entries
@@ -137,11 +139,11 @@ final @UsesObjectEquals class ConditionalSpecialCasing {
         }
     }
 
-    static char[] toLowerCaseCharArray(String src, int index, Locale locale) {
+    static char @Immutable [] toLowerCaseCharArray(String src, int index, Locale locale) {
         return lookUpTable(src, index, locale, true);
     }
 
-    static char[] toUpperCaseCharArray(String src, int index, Locale locale) {
+    static char @Immutable [] toUpperCaseCharArray(String src, int index, Locale locale) {
         char[] result = lookUpTable(src, index, locale, false);
         if (result != null) {
             return result;
@@ -150,7 +152,7 @@ final @UsesObjectEquals class ConditionalSpecialCasing {
         }
     }
 
-    private static char[] lookUpTable(String src, int index, Locale locale, boolean bLowerCasing) {
+    private static char @Immutable [] lookUpTable(String src, int index, Locale locale, boolean bLowerCasing) {
         HashSet<Entry> set = entryTable.get(src.codePointAt(index));
         char[] ret = null;
 
@@ -426,6 +428,7 @@ final @UsesObjectEquals class ConditionalSpecialCasing {
     /**
      * An internal class that represents an entry in the Special Casing Properties.
      */
+    @Immutable
     static class Entry {
         int ch;
         char [] lower;
@@ -433,7 +436,7 @@ final @UsesObjectEquals class ConditionalSpecialCasing {
         String lang;
         int condition;
 
-        Entry(int ch, char[] lower, char[] upper, String lang, int condition) {
+        Entry(int ch, char @Immutable [] lower, char @Immutable [] upper, String lang, int condition) {
             this.ch = ch;
             this.lower = lower;
             this.upper = upper;
@@ -445,11 +448,11 @@ final @UsesObjectEquals class ConditionalSpecialCasing {
             return ch;
         }
 
-        char[] getLowerCase() {
+        char @Immutable [] getLowerCase() {
             return lower;
         }
 
-        char[] getUpperCase() {
+        char @Immutable [] getUpperCase() {
             return upper;
         }
 

@@ -25,6 +25,7 @@
 
 package sun.nio.cs;
 
+import org.checkerframework.checker.pico.qual.Readonly;
 /*
  * FastPath byte[]->char[] decoder, REPLACE on malformed or
  * unmappable input.
@@ -34,7 +35,7 @@ package sun.nio.cs;
  */
 
 public interface ArrayDecoder {
-    int decode(byte[] src, int off, int len, char[] dst);
+    int decode(byte @Readonly [] src, int off, int len, char[] dst);
 
     default boolean isASCIICompatible() {
         return false;
@@ -46,7 +47,7 @@ public interface ArrayDecoder {
     }
 
     // Decode to internal String Latin1 coding byte[] fastpath for when isLatin1Decodable == true
-    default int decodeToLatin1(byte[] src, int sp, int len, byte[] dst) {
+    default int decodeToLatin1(byte @Readonly [] src, int sp, int len, byte[] dst) {
         return 0;
     }
 }

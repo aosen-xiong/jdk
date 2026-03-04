@@ -26,6 +26,7 @@
 package java.io;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
 /**
@@ -80,7 +81,7 @@ public class IOException extends Exception {
      *
      * @since 1.6
      */
-    public IOException(@Nullable String message, @Nullable Throwable cause) {
+    public IOException(@Nullable String message, @Nullable @Readonly Throwable cause) {
         super(message, cause);
     }
 
@@ -98,7 +99,7 @@ public class IOException extends Exception {
      *
      * @since 1.6
      */
-    public IOException(@Nullable Throwable cause) {
+    public IOException(@Nullable @Readonly Throwable cause) {
         super(cause);
     }
 }

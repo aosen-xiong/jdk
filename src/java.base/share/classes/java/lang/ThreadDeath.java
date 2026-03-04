@@ -25,6 +25,8 @@
 
 package java.lang;
 
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 /**
  * An instance of {@code ThreadDeath} is thrown in the victim thread
  * when the (deprecated) {@link Thread#stop()} method is invoked.
@@ -46,6 +48,7 @@ package java.lang;
  * @since   1.0
  */
 
+@AnnotatedFor("pico")
 public class ThreadDeath extends Error {
     @java.io.Serial
     private static final long serialVersionUID = -4417128565033088268L;

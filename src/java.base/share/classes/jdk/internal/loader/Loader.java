@@ -63,6 +63,8 @@ import java.util.stream.Stream;
 import jdk.internal.access.SharedSecrets;
 import jdk.internal.module.Resources;
 
+import org.checkerframework.checker.pico.qual.Immutable;
+
 /**
  * A class loader that loads classes and resources from a collection of
  * modules, or from a single module where the class loader is a member
@@ -212,7 +214,7 @@ public final class Loader extends SecureClassLoader {
      * @param parentModuleLayers the parent ModuleLayers
      */
     public Loader initRemotePackageMap(Configuration cf,
-                                       List<ModuleLayer> parentModuleLayers)
+                                       @Immutable List<ModuleLayer> parentModuleLayers)
     {
         for (String name : nameToModule.keySet()) {
             ResolvedModule resolvedModule = cf.findModule(name).get();

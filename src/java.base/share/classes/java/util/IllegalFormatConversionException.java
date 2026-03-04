@@ -25,6 +25,9 @@
 
 package java.util;
 
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 /**
  * Unchecked exception thrown when the argument corresponding to the format
  * specifier is of an incompatible type.
@@ -35,6 +38,8 @@ package java.util;
  *
  * @since 1.5
  */
+@AnnotatedFor("pico")
+@ReceiverDependentMutable
 public class IllegalFormatConversionException extends IllegalFormatException {
 
     @java.io.Serial

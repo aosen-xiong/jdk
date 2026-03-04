@@ -26,6 +26,8 @@
 package java.lang;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Readonly;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
@@ -35,7 +37,8 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  *
  * @since   1.0
  */
-@AnnotatedFor({"nullness"})
+@AnnotatedFor({"nullness", "pico"})
+@ReceiverDependentMutable
 public class IllegalArgumentException extends RuntimeException {
     /**
      * Constructs an {@code IllegalArgumentException} with no
@@ -74,7 +77,7 @@ public class IllegalArgumentException extends RuntimeException {
      * @since 1.5
      */
     @SideEffectFree
-    public IllegalArgumentException(@Nullable String message, @Nullable Throwable cause) {
+    public IllegalArgumentException(@Nullable String message, @Nullable @ReceiverDependentMutable Throwable cause) {
         super(message, cause);
     }
 
@@ -93,7 +96,7 @@ public class IllegalArgumentException extends RuntimeException {
      * @since  1.5
      */
     @SideEffectFree
-    public IllegalArgumentException(@Nullable Throwable cause) {
+    public IllegalArgumentException(@Nullable @ReceiverDependentMutable Throwable cause) {
         super(cause);
     }
 

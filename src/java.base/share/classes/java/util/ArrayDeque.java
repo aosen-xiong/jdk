@@ -44,6 +44,10 @@ import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
+import org.checkerframework.checker.pico.qual.Mutable;
+import org.checkerframework.checker.pico.qual.PolyMutable;
+import org.checkerframework.checker.pico.qual.Readonly;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.checker.signedness.qual.PolySigned;
 import org.checkerframework.checker.signedness.qual.UnknownSignedness;
 import org.checkerframework.dataflow.qual.Pure;
@@ -102,8 +106,9 @@ import jdk.internal.access.SharedSecrets;
  * @param <E> the type of elements held in this deque
  * @since   1.6
  */
-@AnnotatedFor({"lock", "nullness", "index"})
-public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
+@AnnotatedFor({"lock", "nullness", "index", "pico"})
+@ReceiverDependentMutable
+public class ArrayDeque<E extends @NonNull @Readonly Object> extends AbstractCollection<E>
                            implements Deque<E>, Cloneable, Serializable
 {
     /*
@@ -124,7 +129,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
      * All array cells not holding deque elements are always null.
      * The array always has at least one null slot (at tail).
      */
-    transient Object[] elements;
+    transient @Readonly Object[] elements;
 
     /**
      * The index of the element at the head of the deque (which is the
@@ -154,7 +159,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
      *
      * @param needed the required minimum extra capacity; must be positive
      */
-    private void grow(int needed) {
+    private void grow(@Mutable ArrayDeque<E> this, int needed) {
         // overflow-conscious code
         final int oldCapacity = elements.length;
         int newCapacity;
@@ -163,7 +168,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
         if (jump < needed
             || (newCapacity = (oldCapacity + jump)) - MAX_ARRAY_SIZE > 0)
             newCapacity = newCapacity(needed, jump);
-        final Object[] es = elements = Arrays.copyOf(elements, newCapacity);
+        final @Readonly Object[] es = elements = Arrays.copyOf(elements, newCapacity);
         // Exceptionally, here tail == head needs to be disambiguated
         if (tail < head || (tail == head && es[head] != null)) {
             // wrap around; slide first leg forward to end of array
@@ -196,7 +201,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
      * sufficient to hold 16 elements.
      */
     public ArrayDeque() {
-        elements = new Object[16 + 1];
+        elements = new Object @ReceiverDependentMutable [16 + 1];
     }
 
     /**
@@ -207,7 +212,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
      */
     public ArrayDeque(@NonNegative int numElements) {
         elements =
-            new Object[(numElements < 1) ? 1 :
+            new Object @ReceiverDependentMutable [(numElements < 1) ? 1 :
                        (numElements == Integer.MAX_VALUE) ? Integer.MAX_VALUE :
                        numElements + 1];
     }
@@ -222,6 +227,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
      * @param c the collection whose elements are to be placed into the deque
      * @throws NullPointerException if the specified collection is null
      */
+    @SuppressWarnings("pico") // PICO RDM constructor call mutable method
     public @PolyNonEmpty ArrayDeque(@PolyNonEmpty Collection<? extends E> c) {
         this(c.size());
         copyElements(c);
@@ -273,7 +279,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
      */
     @SuppressWarnings("unchecked")
     @Pure
-    static final <E> E elementAt(@PolyNull @PolySigned Object[] es, int i) {
+    static final <E> E elementAt(@PolyNull @PolySigned @Readonly Object @Readonly [] es, int i) {
         return (E) es[i];
     }
 
@@ -282,7 +288,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
      * This check doesn't catch all possible comodifications,
      * but does catch ones that corrupt traversal.
      */
-    static final <E> E nonNullElementAt(@PolyNull @PolySigned Object[] es, int i) {
+    static final <E> E nonNullElementAt(@PolyNull @PolySigned @Readonly Object @Readonly [] es, int i) {
         @SuppressWarnings("unchecked") E e = (E) es[i];
         if (e == null)
             throw new ConcurrentModificationException();
@@ -299,10 +305,10 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
      * @param e the element to add
      * @throws NullPointerException if the specified element is null
      */
-    public void addFirst(@GuardSatisfied ArrayDeque<E> this, E e) {
+    public void addFirst(@GuardSatisfied @Mutable ArrayDeque<E> this, E e) {
         if (e == null)
             throw new NullPointerException();
-        final Object[] es = elements;
+        final @Readonly Object[] es = elements;
         es[head = dec(head, es.length)] = e;
         if (head == tail)
             grow(1);
@@ -316,10 +322,10 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
      * @param e the element to add
      * @throws NullPointerException if the specified element is null
      */
-    public void addLast(@GuardSatisfied ArrayDeque<E> this, E e) {
+    public void addLast(@GuardSatisfied @Mutable ArrayDeque<E> this, E e) {
         if (e == null)
             throw new NullPointerException();
-        final Object[] es = elements;
+        final @Readonly Object[] es = elements;
         es[tail] = e;
         if (head == (tail = inc(tail, es.length)))
             grow(1);
@@ -335,7 +341,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
      * @throws NullPointerException if the specified collection or any
      *         of its elements are null
      */
-    public boolean addAll(Collection<? extends E> c) {
+    public boolean addAll(@Mutable ArrayDeque<E> this, @Readonly Collection<? extends E> c) {
         final int s, needed;
         if ((needed = (s = size()) + c.size() + 1 - elements.length) > 0)
             grow(needed);
@@ -343,7 +349,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
         return size() > s;
     }
 
-    private void copyElements(Collection<? extends E> c) {
+    private void copyElements(@Mutable ArrayDeque<E> this, @Readonly Collection<? extends E> c) {
         c.forEach(this::addLast);
     }
 
@@ -354,7 +360,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
      * @return {@code true} (as specified by {@link Deque#offerFirst})
      * @throws NullPointerException if the specified element is null
      */
-    public boolean offerFirst(E e) {
+    public boolean offerFirst(@Mutable ArrayDeque<E> this, E e) {
         addFirst(e);
         return true;
     }
@@ -366,7 +372,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
      * @return {@code true} (as specified by {@link Deque#offerLast})
      * @throws NullPointerException if the specified element is null
      */
-    public boolean offerLast(E e) {
+    public boolean offerLast(@Mutable ArrayDeque<E> this, E e) {
         addLast(e);
         return true;
     }
@@ -374,7 +380,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
     /**
      * @throws NoSuchElementException {@inheritDoc}
      */
-    public E removeFirst(@GuardSatisfied @NonEmpty ArrayDeque<E> this) {
+    public E removeFirst(@GuardSatisfied @NonEmpty @Mutable ArrayDeque<E> this) {
         E e = pollFirst();
         if (e == null)
             throw new NoSuchElementException();
@@ -384,15 +390,15 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
     /**
      * @throws NoSuchElementException {@inheritDoc}
      */
-    public E removeLast(@GuardSatisfied @NonEmpty ArrayDeque<E> this) {
+    public E removeLast(@GuardSatisfied @NonEmpty @Mutable ArrayDeque<E> this) {
         E e = pollLast();
         if (e == null)
             throw new NoSuchElementException();
         return e;
     }
 
-    public @Nullable E pollFirst(@GuardSatisfied ArrayDeque<E> this) {
-        final Object[] es;
+    public @Nullable E pollFirst(@GuardSatisfied @Mutable ArrayDeque<E> this) {
+        final @Readonly Object[] es;
         final int h;
         E e = elementAt(es = elements, h = head);
         if (e != null) {
@@ -402,8 +408,8 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
         return e;
     }
 
-    public @Nullable E pollLast(@GuardSatisfied ArrayDeque<E> this) {
-        final Object[] es;
+    public @Nullable E pollLast(@GuardSatisfied @Mutable ArrayDeque<E> this) {
+        final @Readonly Object[] es;
         final int t;
         E e = elementAt(es = elements, t = dec(tail, es.length));
         if (e != null)
@@ -414,7 +420,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
     /**
      * @throws NoSuchElementException {@inheritDoc}
      */
-    public E getFirst(@GuardSatisfied @NonEmpty ArrayDeque<E> this) {
+    public E getFirst(@GuardSatisfied @NonEmpty @Readonly ArrayDeque<E> this) {
         E e = elementAt(elements, head);
         if (e == null)
             throw new NoSuchElementException();
@@ -424,8 +430,8 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
     /**
      * @throws NoSuchElementException {@inheritDoc}
      */
-    public E getLast(@GuardSatisfied @NonEmpty ArrayDeque<E> this) {
-        final Object[] es = elements;
+    public E getLast(@GuardSatisfied @NonEmpty @Readonly ArrayDeque<E> this) {
+        final @Readonly Object[] es = elements;
         E e = elementAt(es, dec(tail, es.length));
         if (e == null)
             throw new NoSuchElementException();
@@ -433,13 +439,13 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
     }
 
     @Pure
-    public @Nullable E peekFirst() {
+    public @Nullable E peekFirst(@Readonly ArrayDeque<E> this) {
         return elementAt(elements, head);
     }
 
     @Pure
-    public @Nullable E peekLast() {
-        final Object[] es;
+    public @Nullable E peekLast(@Readonly ArrayDeque<E> this) {
+        final @Readonly Object[] es;
         return elementAt(es = elements, dec(tail, es.length));
     }
 
@@ -455,9 +461,9 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
      * @param o element to be removed from this deque, if present
      * @return {@code true} if the deque contained the specified element
      */
-    public boolean removeFirstOccurrence(@GuardSatisfied ArrayDeque<E> this, @Nullable Object o) {
+    public boolean removeFirstOccurrence(@GuardSatisfied @Mutable ArrayDeque<E> this, @Nullable @Readonly Object o) {
         if (o != null) {
-            final Object[] es = elements;
+            final @Readonly Object[] es = elements;
             for (int i = head, end = tail, to = (i <= end) ? end : es.length;
                  ; i = 0, to = end) {
                 for (; i < to; i++)
@@ -483,9 +489,9 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
      * @param o element to be removed from this deque, if present
      * @return {@code true} if the deque contained the specified element
      */
-    public boolean removeLastOccurrence(@GuardSatisfied ArrayDeque<E> this, @Nullable Object o) {
+    public boolean removeLastOccurrence(@GuardSatisfied @Mutable ArrayDeque<E> this, @Nullable @Readonly Object o) {
         if (o != null) {
-            final Object[] es = elements;
+            final @Readonly Object[] es = elements;
             for (int i = tail, end = head, to = (i >= end) ? end : 0;
                  ; i = es.length, to = end) {
                 for (i--; i > to - 1; i--)
@@ -511,7 +517,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
      * @throws NullPointerException if the specified element is null
      */
     @EnsuresNonEmpty("this")
-    public boolean add(@GuardSatisfied ArrayDeque<E> this, E e) {
+    public boolean add(@GuardSatisfied @Mutable ArrayDeque<E> this, E e) {
         addLast(e);
         return true;
     }
@@ -525,7 +531,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
      * @return {@code true} (as specified by {@link Queue#offer})
      * @throws NullPointerException if the specified element is null
      */
-    public boolean offer(@GuardSatisfied ArrayDeque<E> this, E e) {
+    public boolean offer(@GuardSatisfied @Mutable ArrayDeque<E> this, E e) {
         return offerLast(e);
     }
 
@@ -540,7 +546,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
      * @return the head of the queue represented by this deque
      * @throws NoSuchElementException {@inheritDoc}
      */
-    public E remove(@GuardSatisfied @NonEmpty ArrayDeque<E> this) {
+    public E remove(@GuardSatisfied @NonEmpty @Mutable ArrayDeque<E> this) {
         return removeFirst();
     }
 
@@ -554,7 +560,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
      * @return the head of the queue represented by this deque, or
      *         {@code null} if this deque is empty
      */
-    public @Nullable E poll(@GuardSatisfied ArrayDeque<E> this) {
+    public @Nullable E poll(@GuardSatisfied @Mutable ArrayDeque<E> this) {
         return pollFirst();
     }
 
@@ -568,7 +574,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
      * @return the head of the queue represented by this deque
      * @throws NoSuchElementException {@inheritDoc}
      */
-    public E element(@GuardSatisfied @NonEmpty ArrayDeque<E> this) {
+    public E element(@GuardSatisfied @NonEmpty @Readonly ArrayDeque<E> this) {
         return getFirst();
     }
 
@@ -582,7 +588,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
      *         {@code null} if this deque is empty
      */
     @Pure
-    public @Nullable E peek() {
+    public @Nullable E peek(@Readonly ArrayDeque<E> this) {
         return peekFirst();
     }
 
@@ -597,7 +603,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
      * @param e the element to push
      * @throws NullPointerException if the specified element is null
      */
-    public void push(@GuardSatisfied ArrayDeque<E> this, E e) {
+    public void push(@GuardSatisfied @Mutable ArrayDeque<E> this, E e) {
         addFirst(e);
     }
 
@@ -611,7 +617,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
      *         of the stack represented by this deque)
      * @throws NoSuchElementException {@inheritDoc}
      */
-    public E pop(@GuardSatisfied @NonEmpty ArrayDeque<E> this) {
+    public E pop(@GuardSatisfied @NonEmpty @Mutable ArrayDeque<E> this) {
         return removeFirst();
     }
 
@@ -625,8 +631,8 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
      *
      * @return true if elements near tail moved backwards
      */
-    boolean delete(int i) {
-        final Object[] es = elements;
+    boolean delete(@Mutable ArrayDeque<E> this, int i) {
+        final @Readonly Object[] es = elements;
         final int capacity = es.length;
         final int h, t;
         // number of elements before to-be-deleted elt
@@ -668,7 +674,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
      * @return the number of elements in this deque
      */
     @Pure
-    public @NonNegative int size(@GuardSatisfied ArrayDeque<E> this) {
+    public @NonNegative int size(@GuardSatisfied @Readonly ArrayDeque<E> this) {
         return sub(tail, head, elements.length);
     }
 
@@ -680,7 +686,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
     @EnsuresNonNullIf(expression={"peek()", "peekFirst()", "peekLast()", "poll()", "pollFirst()", "pollLast()"}, result=false)
     @Pure
     @EnsuresNonEmptyIf(result = false, expression = "this")
-    public boolean isEmpty(@GuardSatisfied ArrayDeque<E> this) {
+    public boolean isEmpty(@GuardSatisfied @Readonly ArrayDeque<E> this) {
         return head == tail;
     }
 
@@ -693,11 +699,11 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
      * @return an iterator over the elements in this deque
      */
     @SideEffectFree
-    public @PolyNonEmpty Iterator<E> iterator(@PolyNonEmpty ArrayDeque<E> this) {
+    public @PolyNonEmpty Iterator<E> iterator(@PolyNonEmpty @Readonly ArrayDeque<E> this) {
         return new DeqIterator();
     }
 
-    public @PolyNonEmpty Iterator<E> descendingIterator(@PolyNonEmpty ArrayDeque<E> this) {
+    public @PolyNonEmpty Iterator<E> descendingIterator(@PolyNonEmpty @Readonly ArrayDeque<E> this) {
         return new DescendingIterator();
     }
 
@@ -725,7 +731,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
         public E next(@NonEmpty DeqIterator this) {
             if (remaining <= 0)
                 throw new NoSuchElementException();
-            final Object[] es = elements;
+            final @Readonly Object[] es = elements;
             E e = nonNullElementAt(es, cursor);
             cursor = inc(lastRet = cursor, es.length);
             remaining--;
@@ -750,7 +756,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
             if ((r = remaining) <= 0)
                 return;
             remaining = 0;
-            final Object[] es = elements;
+            final @Readonly Object[] es = elements;
             if (es[cursor] == null || sub(tail, cursor, es.length) != r)
                 throw new ConcurrentModificationException();
             for (int i = cursor, end = tail, to = (i <= end) ? end : es.length;
@@ -773,7 +779,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
         public final E next(@NonEmpty DescendingIterator this) {
             if (remaining <= 0)
                 throw new NoSuchElementException();
-            final Object[] es = elements;
+            final @Readonly Object[] es = elements;
             E e = nonNullElementAt(es, cursor);
             cursor = dec(lastRet = cursor, es.length);
             remaining--;
@@ -791,7 +797,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
             if ((r = remaining) <= 0)
                 return;
             remaining = 0;
-            final Object[] es = elements;
+            final @Readonly Object[] es = elements;
             if (es[cursor] == null || sub(cursor, head, es.length) + 1 != r)
                 throw new ConcurrentModificationException();
             for (int i = cursor, end = head, to = (i >= end) ? end : 0;
@@ -854,7 +860,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
         }
 
         public DeqSpliterator trySplit() {
-            final Object[] es = elements;
+            final @Readonly Object[] es = elements;
             final int i, n;
             return ((n = sub(getFence(), i = cursor, es.length) >> 1) <= 0)
                 ? null
@@ -865,7 +871,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
             if (action == null)
                 throw new NullPointerException();
             final int end = getFence(), cursor = this.cursor;
-            final Object[] es = elements;
+            final @Readonly Object[] es = elements;
             if (cursor != end) {
                 this.cursor = end;
                 // null check at both ends of range is sufficient
@@ -882,7 +888,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
 
         public boolean tryAdvance(Consumer<? super E> action) {
             Objects.requireNonNull(action);
-            final Object[] es = elements;
+            final @Readonly Object[] es = elements;
             if (fence < 0) { fence = tail; cursor = head; } // late-binding
             final int i;
             if ((i = cursor) == fence)
@@ -908,9 +914,9 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
     /**
      * @throws NullPointerException {@inheritDoc}
      */
-    public void forEach(Consumer<? super E> action) {
+    public void forEach(@Mutable ArrayDeque<E> this, Consumer<? super E> action) {
         Objects.requireNonNull(action);
-        final Object[] es = elements;
+        final @Readonly Object[] es = elements;
         for (int i = head, end = tail, to = (i <= end) ? end : es.length;
              ; i = 0, to = end) {
             for (; i < to; i++)
@@ -925,7 +931,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
     /**
      * @throws NullPointerException {@inheritDoc}
      */
-    public boolean removeIf(Predicate<? super E> filter) {
+    public boolean removeIf(@Mutable ArrayDeque<E> this, Predicate<? super E> filter) {
         Objects.requireNonNull(filter);
         return bulkRemove(filter);
     }
@@ -933,7 +939,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
     /**
      * @throws NullPointerException {@inheritDoc}
      */
-    public boolean removeAll(Collection<? extends @UnknownSignedness Object> c) {
+    public boolean removeAll(@Mutable ArrayDeque<E> this, @Readonly Collection<? extends @UnknownSignedness Object> c) {
         Objects.requireNonNull(c);
         return bulkRemove(e -> c.contains(e));
     }
@@ -941,14 +947,14 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
     /**
      * @throws NullPointerException {@inheritDoc}
      */
-    public boolean retainAll(Collection<? extends @UnknownSignedness Object> c) {
+    public boolean retainAll(@Mutable ArrayDeque<E> this, @Readonly Collection<? extends @UnknownSignedness Object> c) {
         Objects.requireNonNull(c);
         return bulkRemove(e -> !c.contains(e));
     }
 
     /** Implementation of bulk remove methods. */
-    private boolean bulkRemove(Predicate<? super E> filter) {
-        final Object[] es = elements;
+    private boolean bulkRemove(@Mutable ArrayDeque<E> this, Predicate<? super E> filter) {
+        final @Readonly Object[] es = elements;
         // Optimize for initial run of survivors
         for (int i = head, end = tail, to = (i <= end) ? end : es.length;
              ; i = 0, to = end) {
@@ -984,8 +990,9 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
      * @param beg valid index of first element to be deleted
      */
     private boolean bulkRemoveModified(
+        @Mutable ArrayDeque<E> this,
         Predicate<? super E> filter, final int beg) {
-        final Object[] es = elements;
+        final @Readonly Object[] es = elements;
         final int capacity = es.length;
         final int end = tail;
         final long[] deathRow = nBits(sub(end, beg, capacity));
@@ -1030,9 +1037,9 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
      */
     @Pure
     @EnsuresNonEmptyIf(result = true, expression = "this")
-    public boolean contains(@GuardSatisfied ArrayDeque<E> this, @GuardSatisfied @Nullable @UnknownSignedness Object o) {
+    public boolean contains(@GuardSatisfied @Readonly ArrayDeque<E> this, @GuardSatisfied @Nullable @UnknownSignedness Object o) {
         if (o != null) {
-            final Object[] es = elements;
+            final @Readonly Object[] es = elements;
             for (int i = head, end = tail, to = (i <= end) ? end : es.length;
                  ; i = 0, to = end) {
                 for (; i < to; i++)
@@ -1057,7 +1064,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
      * @param o element to be removed from this deque, if present
      * @return {@code true} if this deque contained the specified element
      */
-    public boolean remove(@GuardSatisfied ArrayDeque<E> this, @GuardSatisfied @Nullable @UnknownSignedness Object o) {
+    public boolean remove(@GuardSatisfied @Mutable ArrayDeque<E> this, @GuardSatisfied @Nullable @UnknownSignedness @Readonly Object o) {
         return removeFirstOccurrence(o);
     }
 
@@ -1065,7 +1072,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
      * Removes all of the elements from this deque.
      * The deque will be empty after this call returns.
      */
-    public void clear(@GuardSatisfied ArrayDeque<E> this) {
+    public void clear(@GuardSatisfied @Mutable ArrayDeque<E> this) {
         circularClear(elements, head, tail);
         head = tail = 0;
     }
@@ -1074,7 +1081,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
      * Nulls out slots starting at array index i, upto index end.
      * Condition i == end means "empty" - nothing to do.
      */
-    private static void circularClear(@PolyNull @PolySigned Object[] es, int i, int end) {
+    private static void circularClear(@PolyNull @PolySigned @Readonly Object[] es, int i, int end) {
         // assert 0 <= i && i < es.length;
         // assert 0 <= end && end < es.length;
         for (int to = (i <= end) ? end : es.length;
@@ -1098,12 +1105,13 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
      * @return an array containing all of the elements in this deque
      */
     @SideEffectFree
-    public @PolyNull @PolySigned Object[] toArray(ArrayDeque<@PolyNull @PolySigned E> this) {
-        return toArray(Object[].class);
+    @SuppressWarnings("pico:argument.type.incompatible") // annotate class literal
+    public @PolyNull @PolySigned @PolyMutable Object[] toArray(@Readonly ArrayDeque<@PolyNull @PolySigned @PolyMutable E> this) {
+        return this.<@PolyMutable Object>toArray(Object[].class);
     }
 
-    private <T> T[] toArray(Class<T[]> klazz) {
-        final Object[] es = elements;
+    private <T> T[] toArray(@Readonly ArrayDeque<E> this, Class<T[]> klazz) {
+        final @Readonly Object @Readonly [] es = elements;
         final T[] a;
         final int head = this.head, tail = this.tail, end;
         if ((end = tail + ((head <= tail) ? 0 : es.length)) >= 0) {
@@ -1157,11 +1165,11 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
      */
     @SideEffectFree
     @SuppressWarnings("unchecked")
-    public <T> @Nullable T[] toArray(@PolyNull T[] a) {
+    public <T> @Nullable T[] toArray(@Readonly ArrayDeque<E> this, @PolyNull T[] a) {
         final int size;
         if ((size = size()) > a.length)
             return toArray((Class<T[]>) a.getClass());
-        final Object[] es = elements;
+        final @Readonly Object[] es = elements;
         for (int i = head, j = 0, len = Math.min(size, es.length - i);
              ; i = 0, len = tail) {
             System.arraycopy(es, i, a, j, len);
@@ -1180,7 +1188,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
      * @return a copy of this deque
      */
     @SideEffectFree
-    public ArrayDeque<E> clone(@GuardSatisfied ArrayDeque<E> this) {
+    public ArrayDeque<E> clone(@GuardSatisfied @Mutable ArrayDeque<E> this) {
         try {
             @SuppressWarnings("unchecked")
             ArrayDeque<E> result = (ArrayDeque<E>) super.clone();
@@ -1204,7 +1212,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
      * first-to-last order.
      */
     @java.io.Serial
-    private void writeObject(java.io.ObjectOutputStream s)
+    private void writeObject(@Mutable ArrayDeque<E> this, java.io.ObjectOutputStream s)
             throws java.io.IOException {
         s.defaultWriteObject();
 
@@ -1212,7 +1220,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
         s.writeInt(size());
 
         // Write out elements in order.
-        final Object[] es = elements;
+        final @Readonly Object[] es = elements;
         for (int i = head, end = tail, to = (i <= end) ? end : es.length;
              ; i = 0, to = end) {
             for (; i < to; i++)
@@ -1229,7 +1237,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
      * @throws java.io.IOException if an I/O error occurs
      */
     @java.io.Serial
-    private void readObject(java.io.ObjectInputStream s)
+    private void readObject(@Mutable ArrayDeque<E> this, java.io.ObjectInputStream s)
             throws java.io.IOException, ClassNotFoundException {
         s.defaultReadObject();
 
@@ -1245,7 +1253,7 @@ public class ArrayDeque<E extends @NonNull Object> extends AbstractCollection<E>
     }
 
     /** debugging */
-    void checkInvariants() {
+    void checkInvariants(@Readonly ArrayDeque<E> this) {
         // Use head and tail fields with empty slot at tail strategy.
         // head == tail disambiguates to "empty".
         try {

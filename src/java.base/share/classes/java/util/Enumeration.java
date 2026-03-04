@@ -28,6 +28,7 @@ package java.util;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nonempty.qual.EnsuresNonEmptyIf;
 import org.checkerframework.checker.nonempty.qual.NonEmpty;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
@@ -67,7 +68,8 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @author  Lee Boynton
  * @since   1.0
  */
-@AnnotatedFor({"lock", "nullness"})
+@AnnotatedFor({"lock", "nullness", "pico"})
+@ReceiverDependentMutable
 public interface Enumeration<E> {
     /**
      * Tests if this enumeration contains more elements.

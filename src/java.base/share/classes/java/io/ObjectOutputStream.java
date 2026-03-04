@@ -30,6 +30,7 @@ import org.checkerframework.checker.index.qual.LTLengthOf;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.checkerframework.checker.mustcall.qual.MustCallAlias;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.checker.signedness.qual.PolySigned;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
@@ -354,7 +355,7 @@ public class ObjectOutputStream
      * @throws  IOException Any exception thrown by the underlying
      *          OutputStream.
      */
-    public final void writeObject(@Nullable Object obj) throws IOException {
+    public final void writeObject(@Readonly @Nullable Object obj) throws IOException {
         if (enableOverride) {
             writeObjectOverride(obj);
             return;

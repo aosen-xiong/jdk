@@ -25,12 +25,15 @@
 
 package java.lang;
 
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 /**
  * Thrown to indicate that a method has been called by an inappropriate caller.
  *
  * @since 9
  * @see StackWalker#getCallerClass
  */
+@AnnotatedFor("pico")
 public class IllegalCallerException extends RuntimeException {
     /**
      * Constructs an IllegalCallerException with no detail message.

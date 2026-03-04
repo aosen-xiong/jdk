@@ -32,6 +32,9 @@ import org.checkerframework.checker.mustcall.qual.MustCall;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
 import org.checkerframework.checker.signedness.qual.PolySigned;
+import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.Mutable;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.dataflow.qual.TerminatesExecution;
@@ -112,7 +115,7 @@ import sun.security.util.SecurityConstants;
  *
  * @since   1.0
  */
-@AnnotatedFor({"index", "interning", "lock", "mustcall", "nullness", "signedness"})
+@AnnotatedFor({"index", "interning", "lock", "mustcall", "nullness", "pico", "signedness"})
 public final @UsesObjectEquals class System {
     /* Register the natives via the static initializer.
      *
@@ -665,8 +668,8 @@ public final @UsesObjectEquals class System {
      */
     @SideEffectFree
     @IntrinsicCandidate
-    public static native void arraycopy(@PolySigned @GuardSatisfied Object src,  @NonNegative int  srcPos,
-                                        @PolySigned @GuardSatisfied Object dest, @NonNegative int destPos,
+    public static native void arraycopy(@PolySigned @GuardSatisfied @Readonly Object src,  @NonNegative int  srcPos,
+                                        @PolySigned @GuardSatisfied @Readonly Object dest, @NonNegative int destPos,
                                         @LTLengthOf(value={"#1", "#3"}, offset={"#2 - 1", "#4 - 1"}) @NonNegative int length);
 
     /**
@@ -684,7 +687,7 @@ public final @UsesObjectEquals class System {
      */
     @Pure
     @IntrinsicCandidate
-    public static native int identityHashCode(@GuardSatisfied @Nullable Object x);
+    public static native int identityHashCode(@GuardSatisfied @Nullable @Readonly Object x);
 
     /**
      * System properties.
@@ -1357,7 +1360,7 @@ public final @UsesObjectEquals class System {
          * @throws NullPointerException if {@code level} is {@code null}.
          */
         public default void log(Level level, String msg) {
-            log(level, (ResourceBundle) null, msg, (Object[]) null);
+            log(level, (ResourceBundle) null, msg, (Object @Mutable []) null);
         }
 
         /**
@@ -1380,7 +1383,7 @@ public final @UsesObjectEquals class System {
         public default void log(Level level, Supplier<String> msgSupplier) {
             Objects.requireNonNull(msgSupplier);
             if (isLoggable(Objects.requireNonNull(level))) {
-                log(level, (ResourceBundle) null, msgSupplier.get(), (Object[]) null);
+                log(level, (ResourceBundle) null, msgSupplier.get(), (Object @Mutable []) null);
             }
         }
 
@@ -1405,7 +1408,7 @@ public final @UsesObjectEquals class System {
         public default void log(Level level, Object obj) {
             Objects.requireNonNull(obj);
             if (isLoggable(Objects.requireNonNull(level))) {
-                this.log(level, (ResourceBundle) null, obj.toString(), (Object[]) null);
+                this.log(level, (ResourceBundle) null, obj.toString(), (Object @Mutable []) null);
             }
         }
 
@@ -2052,7 +2055,7 @@ public final @UsesObjectEquals class System {
     private static void logInitException(boolean printToStderr,
                                          boolean printStackTrace,
                                          String msg,
-                                         Throwable e) {
+                                         @Readonly Throwable e) {
         if (VM.initLevel() < 1) {
             throw new InternalError("system classes not initialized");
         }
@@ -2294,7 +2297,7 @@ public final @UsesObjectEquals class System {
             public AnnotationType getAnnotationType(Class<?> klass) {
                 return klass.getAnnotationType();
             }
-            public Map<Class<? extends Annotation>, Annotation> getDeclaredAnnotationMap(Class<?> klass) {
+            public Map<Class<? extends @Readonly Annotation>, @Readonly Annotation> getDeclaredAnnotationMap(Class<?> klass) {
                 return klass.getDeclaredAnnotationMap();
             }
             public byte[] getRawClassAnnotations(Class<?> klass) {
@@ -2417,7 +2420,7 @@ public final @UsesObjectEquals class System {
                 return String.newStringNoRepl(bytes, cs);
             }
 
-            public byte[] getBytesNoRepl(String s, Charset cs) throws CharacterCodingException {
+            public byte @Immutable [] getBytesNoRepl(String s, Charset cs) throws CharacterCodingException {
                 return String.getBytesNoRepl(s, cs);
             }
 
@@ -2461,7 +2464,7 @@ public final @UsesObjectEquals class System {
                 return String.join(prefix, suffix, delimiter, elements, size);
             }
 
-            public Object classData(Class<?> c) {
+            public @Immutable Object classData(Class<?> c) {
                 return c.getClassData();
             }
 

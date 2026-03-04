@@ -35,6 +35,8 @@ import java.security.ProtectionDomain;
 
 import static jdk.internal.misc.UnsafeConstants.*;
 
+import org.checkerframework.checker.pico.qual.Readonly;
+
 /**
  * A collection of methods for performing low-level, unsafe operations.
  * Although the class and all methods are public, use of this class is
@@ -152,7 +154,7 @@ public final class Unsafe {
      *         {@link NullPointerException}
      */
     @IntrinsicCandidate
-    public native int getInt(Object o, long offset);
+    public native int getInt(@Readonly Object o, long offset);
 
     /**
      * Stores a value into a given Java variable.
@@ -175,14 +177,14 @@ public final class Unsafe {
      *         {@link NullPointerException}
      */
     @IntrinsicCandidate
-    public native void putInt(Object o, long offset, int x);
+    public native void putInt(@Readonly Object o, long offset, int x);
 
     /**
      * Fetches a reference value from a given Java variable.
      * @see #getInt(Object, long)
      */
     @IntrinsicCandidate
-    public native Object getReference(Object o, long offset);
+    public native Object getReference(@Readonly Object o, long offset);
 
     /**
      * Stores a reference value into a given Java variable.
@@ -195,63 +197,63 @@ public final class Unsafe {
      * @see #putInt(Object, long, int)
      */
     @IntrinsicCandidate
-    public native void putReference(Object o, long offset, Object x);
+    public native void putReference(@Readonly Object o, long offset, @Readonly Object x);
 
     /** @see #getInt(Object, long) */
     @IntrinsicCandidate
-    public native boolean getBoolean(Object o, long offset);
+    public native boolean getBoolean(@Readonly Object o, long offset);
 
     /** @see #putInt(Object, long, int) */
     @IntrinsicCandidate
-    public native void    putBoolean(Object o, long offset, boolean x);
+    public native void    putBoolean(@Readonly Object o, long offset, boolean x);
 
     /** @see #getInt(Object, long) */
     @IntrinsicCandidate
-    public native byte    getByte(Object o, long offset);
+    public native byte    getByte(@Readonly Object o, long offset);
 
     /** @see #putInt(Object, long, int) */
     @IntrinsicCandidate
-    public native void    putByte(Object o, long offset, byte x);
+    public native void    putByte(@Readonly Object o, long offset, byte x);
 
     /** @see #getInt(Object, long) */
     @IntrinsicCandidate
-    public native short   getShort(Object o, long offset);
+    public native short   getShort(@Readonly Object o, long offset);
 
     /** @see #putInt(Object, long, int) */
     @IntrinsicCandidate
-    public native void    putShort(Object o, long offset, short x);
+    public native void    putShort(@Readonly Object o, long offset, short x);
 
     /** @see #getInt(Object, long) */
     @IntrinsicCandidate
-    public native char    getChar(Object o, long offset);
+    public native char    getChar(@Readonly Object o, long offset);
 
     /** @see #putInt(Object, long, int) */
     @IntrinsicCandidate
-    public native void    putChar(Object o, long offset, char x);
+    public native void    putChar(@Readonly Object o, long offset, char x);
 
     /** @see #getInt(Object, long) */
     @IntrinsicCandidate
-    public native long    getLong(Object o, long offset);
+    public native long    getLong(@Readonly Object o, long offset);
 
     /** @see #putInt(Object, long, int) */
     @IntrinsicCandidate
-    public native void    putLong(Object o, long offset, long x);
+    public native void    putLong(@Readonly Object o, long offset, long x);
 
     /** @see #getInt(Object, long) */
     @IntrinsicCandidate
-    public native float   getFloat(Object o, long offset);
+    public native float   getFloat(@Readonly Object o, long offset);
 
     /** @see #putInt(Object, long, int) */
     @IntrinsicCandidate
-    public native void    putFloat(Object o, long offset, float x);
+    public native void    putFloat(@Readonly Object o, long offset, float x);
 
     /** @see #getInt(Object, long) */
     @IntrinsicCandidate
-    public native double  getDouble(Object o, long offset);
+    public native double  getDouble(@Readonly Object o, long offset);
 
     /** @see #putInt(Object, long, int) */
     @IntrinsicCandidate
-    public native void    putDouble(Object o, long offset, double x);
+    public native void    putDouble(@Readonly Object o, long offset, double x);
 
     /**
      * Fetches a native pointer from a given memory address.  If the address is
@@ -269,7 +271,7 @@ public final class Unsafe {
      * @see #getInt(Object, long)
      */
     @ForceInline
-    public long getAddress(Object o, long offset) {
+    public long getAddress(@Readonly Object o, long offset) {
         if (ADDRESS_SIZE == 4) {
             return Integer.toUnsignedLong(getInt(o, offset));
         } else {
@@ -289,7 +291,7 @@ public final class Unsafe {
      * @see #putInt(Object, long, int)
      */
     @ForceInline
-    public void putAddress(Object o, long offset, long x) {
+    public void putAddress(@Readonly Object o, long offset, long x) {
         if (ADDRESS_SIZE == 4) {
             putInt(o, offset, (int)x);
         } else {
@@ -501,7 +503,7 @@ public final class Unsafe {
      *         go undetected, which will lead to unpredictable
      *         behavior)
      */
-    private void checkOffset(Object o, long offset) {
+    private void checkOffset(@Readonly Object o, long offset) {
         if (ADDRESS_SIZE == 4) {
             // Note: this will also check for negative offsets
             if (!is32BitClean(offset)) {
@@ -539,7 +541,7 @@ public final class Unsafe {
      *         go undetected, which will lead to unpredictable
      *         behavior)
      */
-    private void checkPointer(Object o, long offset) {
+    private void checkPointer(@Readonly Object o, long offset) {
         if (o == null) {
             checkNativeAddress(offset);
         } else {
@@ -571,7 +573,7 @@ public final class Unsafe {
      *         go undetected, which will lead to unpredictable
      *         behavior)
      */
-    private void checkPrimitivePointer(Object o, long offset) {
+    private void checkPrimitivePointer(@Readonly Object o, long offset) {
         checkPointer(o, offset);
 
         if (o != null) {
@@ -732,7 +734,7 @@ public final class Unsafe {
      *
      * @since 1.7
      */
-    public void setMemory(Object o, long offset, long bytes, byte value) {
+    public void setMemory(@Readonly Object o, long offset, long bytes, byte value) {
         setMemoryChecks(o, offset, bytes, value);
 
         if (bytes == 0) {
@@ -761,7 +763,7 @@ public final class Unsafe {
      *         go undetected, which will lead to unpredictable
      *         behavior)
      */
-    private void setMemoryChecks(Object o, long offset, long bytes, byte value) {
+    private void setMemoryChecks(@Readonly Object o, long offset, long bytes, byte value) {
         checkPrimitivePointer(o, offset);
         checkSize(bytes);
     }
@@ -794,8 +796,8 @@ public final class Unsafe {
      *
      * @since 1.7
      */
-    public void copyMemory(Object srcBase, long srcOffset,
-                           Object destBase, long destOffset,
+    public void copyMemory(@Readonly Object srcBase, long srcOffset,
+                           @Readonly Object destBase, long destOffset,
                            long bytes) {
         copyMemoryChecks(srcBase, srcOffset, destBase, destOffset, bytes);
 
@@ -825,8 +827,8 @@ public final class Unsafe {
      *         go undetected, which will lead to unpredictable
      *         behavior)
      */
-    private void copyMemoryChecks(Object srcBase, long srcOffset,
-                                  Object destBase, long destOffset,
+    private void copyMemoryChecks(@Readonly Object srcBase, long srcOffset,
+                                  @Readonly Object destBase, long destOffset,
                                   long bytes) {
         checkSize(bytes);
         checkPrimitivePointer(srcBase, srcOffset);
@@ -855,8 +857,8 @@ public final class Unsafe {
      *
      * @since 9
      */
-    public void copySwapMemory(Object srcBase, long srcOffset,
-                               Object destBase, long destOffset,
+    public void copySwapMemory(@Readonly Object srcBase, long srcOffset,
+                               @Readonly Object destBase, long destOffset,
                                long bytes, long elemSize) {
         copySwapMemoryChecks(srcBase, srcOffset, destBase, destOffset, bytes, elemSize);
 
@@ -867,8 +869,8 @@ public final class Unsafe {
         copySwapMemory0(srcBase, srcOffset, destBase, destOffset, bytes, elemSize);
     }
 
-    private void copySwapMemoryChecks(Object srcBase, long srcOffset,
-                                      Object destBase, long destOffset,
+    private void copySwapMemoryChecks(@Readonly Object srcBase, long srcOffset,
+                                      @Readonly Object destBase, long destOffset,
                                       long bytes, long elemSize) {
         checkSize(bytes);
 
@@ -1312,7 +1314,7 @@ public final class Unsafe {
      * Tells the VM to define a class, without security checks.  By default, the
      * class loader and protection domain come from the caller's class.
      */
-    public Class<?> defineClass(String name, byte[] b, int off, int len,
+    public Class<?> defineClass(String name, byte @Readonly [] b, int off, int len,
                                 ClassLoader loader,
                                 ProtectionDomain protectionDomain) {
         if (b == null) {
@@ -1325,7 +1327,7 @@ public final class Unsafe {
         return defineClass0(name, b, off, len, loader, protectionDomain);
     }
 
-    public native Class<?> defineClass0(String name, byte[] b, int off, int len,
+    public native Class<?> defineClass0(String name, byte @Readonly [] b, int off, int len,
                                         ClassLoader loader,
                                         ProtectionDomain protectionDomain);
 
@@ -1403,54 +1405,54 @@ public final class Unsafe {
      * @return {@code true} if successful
      */
     @IntrinsicCandidate
-    public final native boolean compareAndSetReference(Object o, long offset,
-                                                       Object expected,
-                                                       Object x);
+    public final native boolean compareAndSetReference(@Readonly Object o, long offset,
+                                                       @Readonly Object expected,
+                                                       @Readonly Object x);
 
     @IntrinsicCandidate
-    public final native Object compareAndExchangeReference(Object o, long offset,
-                                                           Object expected,
-                                                           Object x);
+    public final native Object compareAndExchangeReference(@Readonly Object o, long offset,
+                                                           @Readonly Object expected,
+                                                           @Readonly Object x);
 
     @IntrinsicCandidate
-    public final Object compareAndExchangeReferenceAcquire(Object o, long offset,
-                                                           Object expected,
-                                                           Object x) {
+    public final Object compareAndExchangeReferenceAcquire(@Readonly Object o, long offset,
+                                                           @Readonly Object expected,
+                                                           @Readonly Object x) {
         return compareAndExchangeReference(o, offset, expected, x);
     }
 
     @IntrinsicCandidate
-    public final Object compareAndExchangeReferenceRelease(Object o, long offset,
-                                                           Object expected,
-                                                           Object x) {
+    public final Object compareAndExchangeReferenceRelease(@Readonly Object o, long offset,
+                                                           @Readonly Object expected,
+                                                           @Readonly Object x) {
         return compareAndExchangeReference(o, offset, expected, x);
     }
 
     @IntrinsicCandidate
-    public final boolean weakCompareAndSetReferencePlain(Object o, long offset,
-                                                         Object expected,
-                                                         Object x) {
+    public final boolean weakCompareAndSetReferencePlain(@Readonly Object o, long offset,
+                                                         @Readonly Object expected,
+                                                         @Readonly Object x) {
         return compareAndSetReference(o, offset, expected, x);
     }
 
     @IntrinsicCandidate
-    public final boolean weakCompareAndSetReferenceAcquire(Object o, long offset,
-                                                           Object expected,
-                                                           Object x) {
+    public final boolean weakCompareAndSetReferenceAcquire(@Readonly Object o, long offset,
+                                                           @Readonly Object expected,
+                                                           @Readonly Object x) {
         return compareAndSetReference(o, offset, expected, x);
     }
 
     @IntrinsicCandidate
-    public final boolean weakCompareAndSetReferenceRelease(Object o, long offset,
-                                                           Object expected,
-                                                           Object x) {
+    public final boolean weakCompareAndSetReferenceRelease(@Readonly Object o, long offset,
+                                                           @Readonly Object expected,
+                                                           @Readonly Object x) {
         return compareAndSetReference(o, offset, expected, x);
     }
 
     @IntrinsicCandidate
-    public final boolean weakCompareAndSetReference(Object o, long offset,
-                                                    Object expected,
-                                                    Object x) {
+    public final boolean weakCompareAndSetReference(@Readonly Object o, long offset,
+                                                    @Readonly Object expected,
+                                                    @Readonly Object x) {
         return compareAndSetReference(o, offset, expected, x);
     }
 
@@ -1464,59 +1466,59 @@ public final class Unsafe {
      * @return {@code true} if successful
      */
     @IntrinsicCandidate
-    public final native boolean compareAndSetInt(Object o, long offset,
+    public final native boolean compareAndSetInt(@Readonly Object o, long offset,
                                                  int expected,
                                                  int x);
 
     @IntrinsicCandidate
-    public final native int compareAndExchangeInt(Object o, long offset,
+    public final native int compareAndExchangeInt(@Readonly Object o, long offset,
                                                   int expected,
                                                   int x);
 
     @IntrinsicCandidate
-    public final int compareAndExchangeIntAcquire(Object o, long offset,
+    public final int compareAndExchangeIntAcquire(@Readonly Object o, long offset,
                                                          int expected,
                                                          int x) {
         return compareAndExchangeInt(o, offset, expected, x);
     }
 
     @IntrinsicCandidate
-    public final int compareAndExchangeIntRelease(Object o, long offset,
+    public final int compareAndExchangeIntRelease(@Readonly Object o, long offset,
                                                          int expected,
                                                          int x) {
         return compareAndExchangeInt(o, offset, expected, x);
     }
 
     @IntrinsicCandidate
-    public final boolean weakCompareAndSetIntPlain(Object o, long offset,
+    public final boolean weakCompareAndSetIntPlain(@Readonly Object o, long offset,
                                                    int expected,
                                                    int x) {
         return compareAndSetInt(o, offset, expected, x);
     }
 
     @IntrinsicCandidate
-    public final boolean weakCompareAndSetIntAcquire(Object o, long offset,
+    public final boolean weakCompareAndSetIntAcquire(@Readonly Object o, long offset,
                                                      int expected,
                                                      int x) {
         return compareAndSetInt(o, offset, expected, x);
     }
 
     @IntrinsicCandidate
-    public final boolean weakCompareAndSetIntRelease(Object o, long offset,
+    public final boolean weakCompareAndSetIntRelease(@Readonly Object o, long offset,
                                                      int expected,
                                                      int x) {
         return compareAndSetInt(o, offset, expected, x);
     }
 
     @IntrinsicCandidate
-    public final boolean weakCompareAndSetInt(Object o, long offset,
+    public final boolean weakCompareAndSetInt(@Readonly Object o, long offset,
                                               int expected,
                                               int x) {
         return compareAndSetInt(o, offset, expected, x);
     }
 
     @IntrinsicCandidate
-    public final byte compareAndExchangeByte(Object o, long offset,
+    public final byte compareAndExchangeByte(@Readonly Object o, long offset,
                                              byte expected,
                                              byte x) {
         long wordOffset = offset & ~3;
@@ -1538,56 +1540,56 @@ public final class Unsafe {
     }
 
     @IntrinsicCandidate
-    public final boolean compareAndSetByte(Object o, long offset,
+    public final boolean compareAndSetByte(@Readonly Object o, long offset,
                                            byte expected,
                                            byte x) {
         return compareAndExchangeByte(o, offset, expected, x) == expected;
     }
 
     @IntrinsicCandidate
-    public final boolean weakCompareAndSetByte(Object o, long offset,
+    public final boolean weakCompareAndSetByte(@Readonly Object o, long offset,
                                                byte expected,
                                                byte x) {
         return compareAndSetByte(o, offset, expected, x);
     }
 
     @IntrinsicCandidate
-    public final boolean weakCompareAndSetByteAcquire(Object o, long offset,
+    public final boolean weakCompareAndSetByteAcquire(@Readonly Object o, long offset,
                                                       byte expected,
                                                       byte x) {
         return weakCompareAndSetByte(o, offset, expected, x);
     }
 
     @IntrinsicCandidate
-    public final boolean weakCompareAndSetByteRelease(Object o, long offset,
+    public final boolean weakCompareAndSetByteRelease(@Readonly Object o, long offset,
                                                       byte expected,
                                                       byte x) {
         return weakCompareAndSetByte(o, offset, expected, x);
     }
 
     @IntrinsicCandidate
-    public final boolean weakCompareAndSetBytePlain(Object o, long offset,
+    public final boolean weakCompareAndSetBytePlain(@Readonly Object o, long offset,
                                                     byte expected,
                                                     byte x) {
         return weakCompareAndSetByte(o, offset, expected, x);
     }
 
     @IntrinsicCandidate
-    public final byte compareAndExchangeByteAcquire(Object o, long offset,
+    public final byte compareAndExchangeByteAcquire(@Readonly Object o, long offset,
                                                     byte expected,
                                                     byte x) {
         return compareAndExchangeByte(o, offset, expected, x);
     }
 
     @IntrinsicCandidate
-    public final byte compareAndExchangeByteRelease(Object o, long offset,
+    public final byte compareAndExchangeByteRelease(@Readonly Object o, long offset,
                                                     byte expected,
                                                     byte x) {
         return compareAndExchangeByte(o, offset, expected, x);
     }
 
     @IntrinsicCandidate
-    public final short compareAndExchangeShort(Object o, long offset,
+    public final short compareAndExchangeShort(@Readonly Object o, long offset,
                                                short expected,
                                                short x) {
         if ((offset & 3) == 3) {
@@ -1613,35 +1615,35 @@ public final class Unsafe {
     }
 
     @IntrinsicCandidate
-    public final boolean compareAndSetShort(Object o, long offset,
+    public final boolean compareAndSetShort(@Readonly Object o, long offset,
                                             short expected,
                                             short x) {
         return compareAndExchangeShort(o, offset, expected, x) == expected;
     }
 
     @IntrinsicCandidate
-    public final boolean weakCompareAndSetShort(Object o, long offset,
+    public final boolean weakCompareAndSetShort(@Readonly Object o, long offset,
                                                 short expected,
                                                 short x) {
         return compareAndSetShort(o, offset, expected, x);
     }
 
     @IntrinsicCandidate
-    public final boolean weakCompareAndSetShortAcquire(Object o, long offset,
+    public final boolean weakCompareAndSetShortAcquire(@Readonly Object o, long offset,
                                                        short expected,
                                                        short x) {
         return weakCompareAndSetShort(o, offset, expected, x);
     }
 
     @IntrinsicCandidate
-    public final boolean weakCompareAndSetShortRelease(Object o, long offset,
+    public final boolean weakCompareAndSetShortRelease(@Readonly Object o, long offset,
                                                        short expected,
                                                        short x) {
         return weakCompareAndSetShort(o, offset, expected, x);
     }
 
     @IntrinsicCandidate
-    public final boolean weakCompareAndSetShortPlain(Object o, long offset,
+    public final boolean weakCompareAndSetShortPlain(@Readonly Object o, long offset,
                                                      short expected,
                                                      short x) {
         return weakCompareAndSetShort(o, offset, expected, x);
@@ -1649,14 +1651,14 @@ public final class Unsafe {
 
 
     @IntrinsicCandidate
-    public final short compareAndExchangeShortAcquire(Object o, long offset,
+    public final short compareAndExchangeShortAcquire(@Readonly Object o, long offset,
                                                      short expected,
                                                      short x) {
         return compareAndExchangeShort(o, offset, expected, x);
     }
 
     @IntrinsicCandidate
-    public final short compareAndExchangeShortRelease(Object o, long offset,
+    public final short compareAndExchangeShortRelease(@Readonly Object o, long offset,
                                                     short expected,
                                                     short x) {
         return compareAndExchangeShort(o, offset, expected, x);
@@ -1673,56 +1675,56 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final boolean compareAndSetChar(Object o, long offset,
+    public final boolean compareAndSetChar(@Readonly Object o, long offset,
                                            char expected,
                                            char x) {
         return compareAndSetShort(o, offset, c2s(expected), c2s(x));
     }
 
     @ForceInline
-    public final char compareAndExchangeChar(Object o, long offset,
+    public final char compareAndExchangeChar(@Readonly Object o, long offset,
                                              char expected,
                                              char x) {
         return s2c(compareAndExchangeShort(o, offset, c2s(expected), c2s(x)));
     }
 
     @ForceInline
-    public final char compareAndExchangeCharAcquire(Object o, long offset,
+    public final char compareAndExchangeCharAcquire(@Readonly Object o, long offset,
                                             char expected,
                                             char x) {
         return s2c(compareAndExchangeShortAcquire(o, offset, c2s(expected), c2s(x)));
     }
 
     @ForceInline
-    public final char compareAndExchangeCharRelease(Object o, long offset,
+    public final char compareAndExchangeCharRelease(@Readonly Object o, long offset,
                                             char expected,
                                             char x) {
         return s2c(compareAndExchangeShortRelease(o, offset, c2s(expected), c2s(x)));
     }
 
     @ForceInline
-    public final boolean weakCompareAndSetChar(Object o, long offset,
+    public final boolean weakCompareAndSetChar(@Readonly Object o, long offset,
                                                char expected,
                                                char x) {
         return weakCompareAndSetShort(o, offset, c2s(expected), c2s(x));
     }
 
     @ForceInline
-    public final boolean weakCompareAndSetCharAcquire(Object o, long offset,
+    public final boolean weakCompareAndSetCharAcquire(@Readonly Object o, long offset,
                                                       char expected,
                                                       char x) {
         return weakCompareAndSetShortAcquire(o, offset, c2s(expected), c2s(x));
     }
 
     @ForceInline
-    public final boolean weakCompareAndSetCharRelease(Object o, long offset,
+    public final boolean weakCompareAndSetCharRelease(@Readonly Object o, long offset,
                                                       char expected,
                                                       char x) {
         return weakCompareAndSetShortRelease(o, offset, c2s(expected), c2s(x));
     }
 
     @ForceInline
-    public final boolean weakCompareAndSetCharPlain(Object o, long offset,
+    public final boolean weakCompareAndSetCharPlain(@Readonly Object o, long offset,
                                                     char expected,
                                                     char x) {
         return weakCompareAndSetShortPlain(o, offset, c2s(expected), c2s(x));
@@ -1778,56 +1780,56 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final boolean compareAndSetBoolean(Object o, long offset,
+    public final boolean compareAndSetBoolean(@Readonly Object o, long offset,
                                               boolean expected,
                                               boolean x) {
         return compareAndSetByte(o, offset, bool2byte(expected), bool2byte(x));
     }
 
     @ForceInline
-    public final boolean compareAndExchangeBoolean(Object o, long offset,
+    public final boolean compareAndExchangeBoolean(@Readonly Object o, long offset,
                                                    boolean expected,
                                                    boolean x) {
         return byte2bool(compareAndExchangeByte(o, offset, bool2byte(expected), bool2byte(x)));
     }
 
     @ForceInline
-    public final boolean compareAndExchangeBooleanAcquire(Object o, long offset,
+    public final boolean compareAndExchangeBooleanAcquire(@Readonly Object o, long offset,
                                                     boolean expected,
                                                     boolean x) {
         return byte2bool(compareAndExchangeByteAcquire(o, offset, bool2byte(expected), bool2byte(x)));
     }
 
     @ForceInline
-    public final boolean compareAndExchangeBooleanRelease(Object o, long offset,
+    public final boolean compareAndExchangeBooleanRelease(@Readonly Object o, long offset,
                                                        boolean expected,
                                                        boolean x) {
         return byte2bool(compareAndExchangeByteRelease(o, offset, bool2byte(expected), bool2byte(x)));
     }
 
     @ForceInline
-    public final boolean weakCompareAndSetBoolean(Object o, long offset,
+    public final boolean weakCompareAndSetBoolean(@Readonly Object o, long offset,
                                                   boolean expected,
                                                   boolean x) {
         return weakCompareAndSetByte(o, offset, bool2byte(expected), bool2byte(x));
     }
 
     @ForceInline
-    public final boolean weakCompareAndSetBooleanAcquire(Object o, long offset,
+    public final boolean weakCompareAndSetBooleanAcquire(@Readonly Object o, long offset,
                                                          boolean expected,
                                                          boolean x) {
         return weakCompareAndSetByteAcquire(o, offset, bool2byte(expected), bool2byte(x));
     }
 
     @ForceInline
-    public final boolean weakCompareAndSetBooleanRelease(Object o, long offset,
+    public final boolean weakCompareAndSetBooleanRelease(@Readonly Object o, long offset,
                                                          boolean expected,
                                                          boolean x) {
         return weakCompareAndSetByteRelease(o, offset, bool2byte(expected), bool2byte(x));
     }
 
     @ForceInline
-    public final boolean weakCompareAndSetBooleanPlain(Object o, long offset,
+    public final boolean weakCompareAndSetBooleanPlain(@Readonly Object o, long offset,
                                                        boolean expected,
                                                        boolean x) {
         return weakCompareAndSetBytePlain(o, offset, bool2byte(expected), bool2byte(x));
@@ -1843,7 +1845,7 @@ public final class Unsafe {
      * @return {@code true} if successful
      */
     @ForceInline
-    public final boolean compareAndSetFloat(Object o, long offset,
+    public final boolean compareAndSetFloat(@Readonly Object o, long offset,
                                             float expected,
                                             float x) {
         return compareAndSetInt(o, offset,
@@ -1852,7 +1854,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final float compareAndExchangeFloat(Object o, long offset,
+    public final float compareAndExchangeFloat(@Readonly Object o, long offset,
                                                float expected,
                                                float x) {
         int w = compareAndExchangeInt(o, offset,
@@ -1862,7 +1864,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final float compareAndExchangeFloatAcquire(Object o, long offset,
+    public final float compareAndExchangeFloatAcquire(@Readonly Object o, long offset,
                                                   float expected,
                                                   float x) {
         int w = compareAndExchangeIntAcquire(o, offset,
@@ -1872,7 +1874,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final float compareAndExchangeFloatRelease(Object o, long offset,
+    public final float compareAndExchangeFloatRelease(@Readonly Object o, long offset,
                                                   float expected,
                                                   float x) {
         int w = compareAndExchangeIntRelease(o, offset,
@@ -1882,7 +1884,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final boolean weakCompareAndSetFloatPlain(Object o, long offset,
+    public final boolean weakCompareAndSetFloatPlain(@Readonly Object o, long offset,
                                                      float expected,
                                                      float x) {
         return weakCompareAndSetIntPlain(o, offset,
@@ -1891,7 +1893,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final boolean weakCompareAndSetFloatAcquire(Object o, long offset,
+    public final boolean weakCompareAndSetFloatAcquire(@Readonly Object o, long offset,
                                                        float expected,
                                                        float x) {
         return weakCompareAndSetIntAcquire(o, offset,
@@ -1900,7 +1902,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final boolean weakCompareAndSetFloatRelease(Object o, long offset,
+    public final boolean weakCompareAndSetFloatRelease(@Readonly Object o, long offset,
                                                        float expected,
                                                        float x) {
         return weakCompareAndSetIntRelease(o, offset,
@@ -1909,7 +1911,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final boolean weakCompareAndSetFloat(Object o, long offset,
+    public final boolean weakCompareAndSetFloat(@Readonly Object o, long offset,
                                                 float expected,
                                                 float x) {
         return weakCompareAndSetInt(o, offset,
@@ -1927,7 +1929,7 @@ public final class Unsafe {
      * @return {@code true} if successful
      */
     @ForceInline
-    public final boolean compareAndSetDouble(Object o, long offset,
+    public final boolean compareAndSetDouble(@Readonly Object o, long offset,
                                              double expected,
                                              double x) {
         return compareAndSetLong(o, offset,
@@ -1936,7 +1938,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final double compareAndExchangeDouble(Object o, long offset,
+    public final double compareAndExchangeDouble(@Readonly Object o, long offset,
                                                  double expected,
                                                  double x) {
         long w = compareAndExchangeLong(o, offset,
@@ -1946,7 +1948,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final double compareAndExchangeDoubleAcquire(Object o, long offset,
+    public final double compareAndExchangeDoubleAcquire(@Readonly Object o, long offset,
                                                         double expected,
                                                         double x) {
         long w = compareAndExchangeLongAcquire(o, offset,
@@ -1956,7 +1958,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final double compareAndExchangeDoubleRelease(Object o, long offset,
+    public final double compareAndExchangeDoubleRelease(@Readonly Object o, long offset,
                                                         double expected,
                                                         double x) {
         long w = compareAndExchangeLongRelease(o, offset,
@@ -1966,7 +1968,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final boolean weakCompareAndSetDoublePlain(Object o, long offset,
+    public final boolean weakCompareAndSetDoublePlain(@Readonly Object o, long offset,
                                                       double expected,
                                                       double x) {
         return weakCompareAndSetLongPlain(o, offset,
@@ -1975,7 +1977,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final boolean weakCompareAndSetDoubleAcquire(Object o, long offset,
+    public final boolean weakCompareAndSetDoubleAcquire(@Readonly Object o, long offset,
                                                         double expected,
                                                         double x) {
         return weakCompareAndSetLongAcquire(o, offset,
@@ -1984,7 +1986,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final boolean weakCompareAndSetDoubleRelease(Object o, long offset,
+    public final boolean weakCompareAndSetDoubleRelease(@Readonly Object o, long offset,
                                                         double expected,
                                                         double x) {
         return weakCompareAndSetLongRelease(o, offset,
@@ -1993,7 +1995,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final boolean weakCompareAndSetDouble(Object o, long offset,
+    public final boolean weakCompareAndSetDouble(@Readonly Object o, long offset,
                                                  double expected,
                                                  double x) {
         return weakCompareAndSetLong(o, offset,
@@ -2011,52 +2013,52 @@ public final class Unsafe {
      * @return {@code true} if successful
      */
     @IntrinsicCandidate
-    public final native boolean compareAndSetLong(Object o, long offset,
+    public final native boolean compareAndSetLong(@Readonly Object o, long offset,
                                                   long expected,
                                                   long x);
 
     @IntrinsicCandidate
-    public final native long compareAndExchangeLong(Object o, long offset,
+    public final native long compareAndExchangeLong(@Readonly Object o, long offset,
                                                     long expected,
                                                     long x);
 
     @IntrinsicCandidate
-    public final long compareAndExchangeLongAcquire(Object o, long offset,
+    public final long compareAndExchangeLongAcquire(@Readonly Object o, long offset,
                                                            long expected,
                                                            long x) {
         return compareAndExchangeLong(o, offset, expected, x);
     }
 
     @IntrinsicCandidate
-    public final long compareAndExchangeLongRelease(Object o, long offset,
+    public final long compareAndExchangeLongRelease(@Readonly Object o, long offset,
                                                            long expected,
                                                            long x) {
         return compareAndExchangeLong(o, offset, expected, x);
     }
 
     @IntrinsicCandidate
-    public final boolean weakCompareAndSetLongPlain(Object o, long offset,
+    public final boolean weakCompareAndSetLongPlain(@Readonly Object o, long offset,
                                                     long expected,
                                                     long x) {
         return compareAndSetLong(o, offset, expected, x);
     }
 
     @IntrinsicCandidate
-    public final boolean weakCompareAndSetLongAcquire(Object o, long offset,
+    public final boolean weakCompareAndSetLongAcquire(@Readonly Object o, long offset,
                                                       long expected,
                                                       long x) {
         return compareAndSetLong(o, offset, expected, x);
     }
 
     @IntrinsicCandidate
-    public final boolean weakCompareAndSetLongRelease(Object o, long offset,
+    public final boolean weakCompareAndSetLongRelease(@Readonly Object o, long offset,
                                                       long expected,
                                                       long x) {
         return compareAndSetLong(o, offset, expected, x);
     }
 
     @IntrinsicCandidate
-    public final boolean weakCompareAndSetLong(Object o, long offset,
+    public final boolean weakCompareAndSetLong(@Readonly Object o, long offset,
                                                long expected,
                                                long x) {
         return compareAndSetLong(o, offset, expected, x);
@@ -2067,132 +2069,132 @@ public final class Unsafe {
      * load semantics. Otherwise identical to {@link #getReference(Object, long)}
      */
     @IntrinsicCandidate
-    public native Object getReferenceVolatile(Object o, long offset);
+    public native Object getReferenceVolatile(@Readonly Object o, long offset);
 
     /**
      * Stores a reference value into a given Java variable, with
      * volatile store semantics. Otherwise identical to {@link #putReference(Object, long, Object)}
      */
     @IntrinsicCandidate
-    public native void putReferenceVolatile(Object o, long offset, Object x);
+    public native void putReferenceVolatile(@Readonly Object o, long offset, Object x);
 
     /** Volatile version of {@link #getInt(Object, long)}  */
     @IntrinsicCandidate
-    public native int     getIntVolatile(Object o, long offset);
+    public native int     getIntVolatile(@Readonly Object o, long offset);
 
     /** Volatile version of {@link #putInt(Object, long, int)}  */
     @IntrinsicCandidate
-    public native void    putIntVolatile(Object o, long offset, int x);
+    public native void    putIntVolatile(@Readonly Object o, long offset, int x);
 
     /** Volatile version of {@link #getBoolean(Object, long)}  */
     @IntrinsicCandidate
-    public native boolean getBooleanVolatile(Object o, long offset);
+    public native boolean getBooleanVolatile(@Readonly Object o, long offset);
 
     /** Volatile version of {@link #putBoolean(Object, long, boolean)}  */
     @IntrinsicCandidate
-    public native void    putBooleanVolatile(Object o, long offset, boolean x);
+    public native void    putBooleanVolatile(@Readonly Object o, long offset, boolean x);
 
     /** Volatile version of {@link #getByte(Object, long)}  */
     @IntrinsicCandidate
-    public native byte    getByteVolatile(Object o, long offset);
+    public native byte    getByteVolatile(@Readonly Object o, long offset);
 
     /** Volatile version of {@link #putByte(Object, long, byte)}  */
     @IntrinsicCandidate
-    public native void    putByteVolatile(Object o, long offset, byte x);
+    public native void    putByteVolatile(@Readonly Object o, long offset, byte x);
 
     /** Volatile version of {@link #getShort(Object, long)}  */
     @IntrinsicCandidate
-    public native short   getShortVolatile(Object o, long offset);
+    public native short   getShortVolatile(@Readonly Object o, long offset);
 
     /** Volatile version of {@link #putShort(Object, long, short)}  */
     @IntrinsicCandidate
-    public native void    putShortVolatile(Object o, long offset, short x);
+    public native void    putShortVolatile(@Readonly Object o, long offset, short x);
 
     /** Volatile version of {@link #getChar(Object, long)}  */
     @IntrinsicCandidate
-    public native char    getCharVolatile(Object o, long offset);
+    public native char    getCharVolatile(@Readonly Object o, long offset);
 
     /** Volatile version of {@link #putChar(Object, long, char)}  */
     @IntrinsicCandidate
-    public native void    putCharVolatile(Object o, long offset, char x);
+    public native void    putCharVolatile(@Readonly Object o, long offset, char x);
 
     /** Volatile version of {@link #getLong(Object, long)}  */
     @IntrinsicCandidate
-    public native long    getLongVolatile(Object o, long offset);
+    public native long    getLongVolatile(@Readonly Object o, long offset);
 
     /** Volatile version of {@link #putLong(Object, long, long)}  */
     @IntrinsicCandidate
-    public native void    putLongVolatile(Object o, long offset, long x);
+    public native void    putLongVolatile(@Readonly Object o, long offset, long x);
 
     /** Volatile version of {@link #getFloat(Object, long)}  */
     @IntrinsicCandidate
-    public native float   getFloatVolatile(Object o, long offset);
+    public native float   getFloatVolatile(@Readonly Object o, long offset);
 
     /** Volatile version of {@link #putFloat(Object, long, float)}  */
     @IntrinsicCandidate
-    public native void    putFloatVolatile(Object o, long offset, float x);
+    public native void    putFloatVolatile(@Readonly Object o, long offset, float x);
 
     /** Volatile version of {@link #getDouble(Object, long)}  */
     @IntrinsicCandidate
-    public native double  getDoubleVolatile(Object o, long offset);
+    public native double  getDoubleVolatile(@Readonly Object o, long offset);
 
     /** Volatile version of {@link #putDouble(Object, long, double)}  */
     @IntrinsicCandidate
-    public native void    putDoubleVolatile(Object o, long offset, double x);
+    public native void    putDoubleVolatile(@Readonly Object o, long offset, double x);
 
 
 
     /** Acquire version of {@link #getReferenceVolatile(Object, long)} */
     @IntrinsicCandidate
-    public final Object getReferenceAcquire(Object o, long offset) {
+    public final Object getReferenceAcquire(@Readonly Object o, long offset) {
         return getReferenceVolatile(o, offset);
     }
 
     /** Acquire version of {@link #getBooleanVolatile(Object, long)} */
     @IntrinsicCandidate
-    public final boolean getBooleanAcquire(Object o, long offset) {
+    public final boolean getBooleanAcquire(@Readonly Object o, long offset) {
         return getBooleanVolatile(o, offset);
     }
 
     /** Acquire version of {@link #getByteVolatile(Object, long)} */
     @IntrinsicCandidate
-    public final byte getByteAcquire(Object o, long offset) {
+    public final byte getByteAcquire(@Readonly Object o, long offset) {
         return getByteVolatile(o, offset);
     }
 
     /** Acquire version of {@link #getShortVolatile(Object, long)} */
     @IntrinsicCandidate
-    public final short getShortAcquire(Object o, long offset) {
+    public final short getShortAcquire(@Readonly Object o, long offset) {
         return getShortVolatile(o, offset);
     }
 
     /** Acquire version of {@link #getCharVolatile(Object, long)} */
     @IntrinsicCandidate
-    public final char getCharAcquire(Object o, long offset) {
+    public final char getCharAcquire(@Readonly Object o, long offset) {
         return getCharVolatile(o, offset);
     }
 
     /** Acquire version of {@link #getIntVolatile(Object, long)} */
     @IntrinsicCandidate
-    public final int getIntAcquire(Object o, long offset) {
+    public final int getIntAcquire(@Readonly Object o, long offset) {
         return getIntVolatile(o, offset);
     }
 
     /** Acquire version of {@link #getFloatVolatile(Object, long)} */
     @IntrinsicCandidate
-    public final float getFloatAcquire(Object o, long offset) {
+    public final float getFloatAcquire(@Readonly Object o, long offset) {
         return getFloatVolatile(o, offset);
     }
 
     /** Acquire version of {@link #getLongVolatile(Object, long)} */
     @IntrinsicCandidate
-    public final long getLongAcquire(Object o, long offset) {
+    public final long getLongAcquire(@Readonly Object o, long offset) {
         return getLongVolatile(o, offset);
     }
 
     /** Acquire version of {@link #getDoubleVolatile(Object, long)} */
     @IntrinsicCandidate
-    public final double getDoubleAcquire(Object o, long offset) {
+    public final double getDoubleAcquire(@Readonly Object o, long offset) {
         return getDoubleVolatile(o, offset);
     }
 
@@ -2208,55 +2210,55 @@ public final class Unsafe {
 
     /** Release version of {@link #putReferenceVolatile(Object, long, Object)} */
     @IntrinsicCandidate
-    public final void putReferenceRelease(Object o, long offset, Object x) {
+    public final void putReferenceRelease(@Readonly Object o, long offset, Object x) {
         putReferenceVolatile(o, offset, x);
     }
 
     /** Release version of {@link #putBooleanVolatile(Object, long, boolean)} */
     @IntrinsicCandidate
-    public final void putBooleanRelease(Object o, long offset, boolean x) {
+    public final void putBooleanRelease(@Readonly Object o, long offset, boolean x) {
         putBooleanVolatile(o, offset, x);
     }
 
     /** Release version of {@link #putByteVolatile(Object, long, byte)} */
     @IntrinsicCandidate
-    public final void putByteRelease(Object o, long offset, byte x) {
+    public final void putByteRelease(@Readonly Object o, long offset, byte x) {
         putByteVolatile(o, offset, x);
     }
 
     /** Release version of {@link #putShortVolatile(Object, long, short)} */
     @IntrinsicCandidate
-    public final void putShortRelease(Object o, long offset, short x) {
+    public final void putShortRelease(@Readonly Object o, long offset, short x) {
         putShortVolatile(o, offset, x);
     }
 
     /** Release version of {@link #putCharVolatile(Object, long, char)} */
     @IntrinsicCandidate
-    public final void putCharRelease(Object o, long offset, char x) {
+    public final void putCharRelease(@Readonly Object o, long offset, char x) {
         putCharVolatile(o, offset, x);
     }
 
     /** Release version of {@link #putIntVolatile(Object, long, int)} */
     @IntrinsicCandidate
-    public final void putIntRelease(Object o, long offset, int x) {
+    public final void putIntRelease(@Readonly Object o, long offset, int x) {
         putIntVolatile(o, offset, x);
     }
 
     /** Release version of {@link #putFloatVolatile(Object, long, float)} */
     @IntrinsicCandidate
-    public final void putFloatRelease(Object o, long offset, float x) {
+    public final void putFloatRelease(@Readonly Object o, long offset, float x) {
         putFloatVolatile(o, offset, x);
     }
 
     /** Release version of {@link #putLongVolatile(Object, long, long)} */
     @IntrinsicCandidate
-    public final void putLongRelease(Object o, long offset, long x) {
+    public final void putLongRelease(@Readonly Object o, long offset, long x) {
         putLongVolatile(o, offset, x);
     }
 
     /** Release version of {@link #putDoubleVolatile(Object, long, double)} */
     @IntrinsicCandidate
-    public final void putDoubleRelease(Object o, long offset, double x) {
+    public final void putDoubleRelease(@Readonly Object o, long offset, double x) {
         putDoubleVolatile(o, offset, x);
     }
 
@@ -2264,109 +2266,109 @@ public final class Unsafe {
 
     /** Opaque version of {@link #getReferenceVolatile(Object, long)} */
     @IntrinsicCandidate
-    public final Object getReferenceOpaque(Object o, long offset) {
+    public final Object getReferenceOpaque(@Readonly Object o, long offset) {
         return getReferenceVolatile(o, offset);
     }
 
     /** Opaque version of {@link #getBooleanVolatile(Object, long)} */
     @IntrinsicCandidate
-    public final boolean getBooleanOpaque(Object o, long offset) {
+    public final boolean getBooleanOpaque(@Readonly Object o, long offset) {
         return getBooleanVolatile(o, offset);
     }
 
     /** Opaque version of {@link #getByteVolatile(Object, long)} */
     @IntrinsicCandidate
-    public final byte getByteOpaque(Object o, long offset) {
+    public final byte getByteOpaque(@Readonly Object o, long offset) {
         return getByteVolatile(o, offset);
     }
 
     /** Opaque version of {@link #getShortVolatile(Object, long)} */
     @IntrinsicCandidate
-    public final short getShortOpaque(Object o, long offset) {
+    public final short getShortOpaque(@Readonly Object o, long offset) {
         return getShortVolatile(o, offset);
     }
 
     /** Opaque version of {@link #getCharVolatile(Object, long)} */
     @IntrinsicCandidate
-    public final char getCharOpaque(Object o, long offset) {
+    public final char getCharOpaque(@Readonly Object o, long offset) {
         return getCharVolatile(o, offset);
     }
 
     /** Opaque version of {@link #getIntVolatile(Object, long)} */
     @IntrinsicCandidate
-    public final int getIntOpaque(Object o, long offset) {
+    public final int getIntOpaque(@Readonly Object o, long offset) {
         return getIntVolatile(o, offset);
     }
 
     /** Opaque version of {@link #getFloatVolatile(Object, long)} */
     @IntrinsicCandidate
-    public final float getFloatOpaque(Object o, long offset) {
+    public final float getFloatOpaque(@Readonly Object o, long offset) {
         return getFloatVolatile(o, offset);
     }
 
     /** Opaque version of {@link #getLongVolatile(Object, long)} */
     @IntrinsicCandidate
-    public final long getLongOpaque(Object o, long offset) {
+    public final long getLongOpaque(@Readonly Object o, long offset) {
         return getLongVolatile(o, offset);
     }
 
     /** Opaque version of {@link #getDoubleVolatile(Object, long)} */
     @IntrinsicCandidate
-    public final double getDoubleOpaque(Object o, long offset) {
+    public final double getDoubleOpaque(@Readonly Object o, long offset) {
         return getDoubleVolatile(o, offset);
     }
 
     /** Opaque version of {@link #putReferenceVolatile(Object, long, Object)} */
     @IntrinsicCandidate
-    public final void putReferenceOpaque(Object o, long offset, Object x) {
+    public final void putReferenceOpaque(@Readonly Object o, long offset, Object x) {
         putReferenceVolatile(o, offset, x);
     }
 
     /** Opaque version of {@link #putBooleanVolatile(Object, long, boolean)} */
     @IntrinsicCandidate
-    public final void putBooleanOpaque(Object o, long offset, boolean x) {
+    public final void putBooleanOpaque(@Readonly Object o, long offset, boolean x) {
         putBooleanVolatile(o, offset, x);
     }
 
     /** Opaque version of {@link #putByteVolatile(Object, long, byte)} */
     @IntrinsicCandidate
-    public final void putByteOpaque(Object o, long offset, byte x) {
+    public final void putByteOpaque(@Readonly Object o, long offset, byte x) {
         putByteVolatile(o, offset, x);
     }
 
     /** Opaque version of {@link #putShortVolatile(Object, long, short)} */
     @IntrinsicCandidate
-    public final void putShortOpaque(Object o, long offset, short x) {
+    public final void putShortOpaque(@Readonly Object o, long offset, short x) {
         putShortVolatile(o, offset, x);
     }
 
     /** Opaque version of {@link #putCharVolatile(Object, long, char)} */
     @IntrinsicCandidate
-    public final void putCharOpaque(Object o, long offset, char x) {
+    public final void putCharOpaque(@Readonly Object o, long offset, char x) {
         putCharVolatile(o, offset, x);
     }
 
     /** Opaque version of {@link #putIntVolatile(Object, long, int)} */
     @IntrinsicCandidate
-    public final void putIntOpaque(Object o, long offset, int x) {
+    public final void putIntOpaque(@Readonly Object o, long offset, int x) {
         putIntVolatile(o, offset, x);
     }
 
     /** Opaque version of {@link #putFloatVolatile(Object, long, float)} */
     @IntrinsicCandidate
-    public final void putFloatOpaque(Object o, long offset, float x) {
+    public final void putFloatOpaque(@Readonly Object o, long offset, float x) {
         putFloatVolatile(o, offset, x);
     }
 
     /** Opaque version of {@link #putLongVolatile(Object, long, long)} */
     @IntrinsicCandidate
-    public final void putLongOpaque(Object o, long offset, long x) {
+    public final void putLongOpaque(@Readonly Object o, long offset, long x) {
         putLongVolatile(o, offset, x);
     }
 
     /** Opaque version of {@link #putDoubleVolatile(Object, long, double)} */
     @IntrinsicCandidate
-    public final void putDoubleOpaque(Object o, long offset, double x) {
+    public final void putDoubleOpaque(@Readonly Object o, long offset, double x) {
         putDoubleVolatile(o, offset, x);
     }
 
@@ -2437,7 +2439,7 @@ public final class Unsafe {
      * @since 1.8
      */
     @IntrinsicCandidate
-    public final int getAndAddInt(Object o, long offset, int delta) {
+    public final int getAndAddInt(@Readonly Object o, long offset, int delta) {
         int v;
         do {
             v = getIntVolatile(o, offset);
@@ -2446,7 +2448,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final int getAndAddIntRelease(Object o, long offset, int delta) {
+    public final int getAndAddIntRelease(@Readonly Object o, long offset, int delta) {
         int v;
         do {
             v = getInt(o, offset);
@@ -2455,7 +2457,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final int getAndAddIntAcquire(Object o, long offset, int delta) {
+    public final int getAndAddIntAcquire(@Readonly Object o, long offset, int delta) {
         int v;
         do {
             v = getIntAcquire(o, offset);
@@ -2475,7 +2477,7 @@ public final class Unsafe {
      * @since 1.8
      */
     @IntrinsicCandidate
-    public final long getAndAddLong(Object o, long offset, long delta) {
+    public final long getAndAddLong(@Readonly Object o, long offset, long delta) {
         long v;
         do {
             v = getLongVolatile(o, offset);
@@ -2484,7 +2486,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final long getAndAddLongRelease(Object o, long offset, long delta) {
+    public final long getAndAddLongRelease(@Readonly Object o, long offset, long delta) {
         long v;
         do {
             v = getLong(o, offset);
@@ -2493,7 +2495,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final long getAndAddLongAcquire(Object o, long offset, long delta) {
+    public final long getAndAddLongAcquire(@Readonly Object o, long offset, long delta) {
         long v;
         do {
             v = getLongAcquire(o, offset);
@@ -2502,7 +2504,7 @@ public final class Unsafe {
     }
 
     @IntrinsicCandidate
-    public final byte getAndAddByte(Object o, long offset, byte delta) {
+    public final byte getAndAddByte(@Readonly Object o, long offset, byte delta) {
         byte v;
         do {
             v = getByteVolatile(o, offset);
@@ -2511,7 +2513,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final byte getAndAddByteRelease(Object o, long offset, byte delta) {
+    public final byte getAndAddByteRelease(@Readonly Object o, long offset, byte delta) {
         byte v;
         do {
             v = getByte(o, offset);
@@ -2520,7 +2522,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final byte getAndAddByteAcquire(Object o, long offset, byte delta) {
+    public final byte getAndAddByteAcquire(@Readonly Object o, long offset, byte delta) {
         byte v;
         do {
             v = getByteAcquire(o, offset);
@@ -2529,7 +2531,7 @@ public final class Unsafe {
     }
 
     @IntrinsicCandidate
-    public final short getAndAddShort(Object o, long offset, short delta) {
+    public final short getAndAddShort(@Readonly Object o, long offset, short delta) {
         short v;
         do {
             v = getShortVolatile(o, offset);
@@ -2538,7 +2540,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final short getAndAddShortRelease(Object o, long offset, short delta) {
+    public final short getAndAddShortRelease(@Readonly Object o, long offset, short delta) {
         short v;
         do {
             v = getShort(o, offset);
@@ -2547,7 +2549,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final short getAndAddShortAcquire(Object o, long offset, short delta) {
+    public final short getAndAddShortAcquire(@Readonly Object o, long offset, short delta) {
         short v;
         do {
             v = getShortAcquire(o, offset);
@@ -2556,22 +2558,22 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final char getAndAddChar(Object o, long offset, char delta) {
+    public final char getAndAddChar(@Readonly Object o, long offset, char delta) {
         return (char) getAndAddShort(o, offset, (short) delta);
     }
 
     @ForceInline
-    public final char getAndAddCharRelease(Object o, long offset, char delta) {
+    public final char getAndAddCharRelease(@Readonly Object o, long offset, char delta) {
         return (char) getAndAddShortRelease(o, offset, (short) delta);
     }
 
     @ForceInline
-    public final char getAndAddCharAcquire(Object o, long offset, char delta) {
+    public final char getAndAddCharAcquire(@Readonly Object o, long offset, char delta) {
         return (char) getAndAddShortAcquire(o, offset, (short) delta);
     }
 
     @ForceInline
-    public final float getAndAddFloat(Object o, long offset, float delta) {
+    public final float getAndAddFloat(@Readonly Object o, long offset, float delta) {
         int expectedBits;
         float v;
         do {
@@ -2586,7 +2588,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final float getAndAddFloatRelease(Object o, long offset, float delta) {
+    public final float getAndAddFloatRelease(@Readonly Object o, long offset, float delta) {
         int expectedBits;
         float v;
         do {
@@ -2601,7 +2603,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final float getAndAddFloatAcquire(Object o, long offset, float delta) {
+    public final float getAndAddFloatAcquire(@Readonly Object o, long offset, float delta) {
         int expectedBits;
         float v;
         do {
@@ -2616,7 +2618,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final double getAndAddDouble(Object o, long offset, double delta) {
+    public final double getAndAddDouble(@Readonly Object o, long offset, double delta) {
         long expectedBits;
         double v;
         do {
@@ -2631,7 +2633,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final double getAndAddDoubleRelease(Object o, long offset, double delta) {
+    public final double getAndAddDoubleRelease(@Readonly Object o, long offset, double delta) {
         long expectedBits;
         double v;
         do {
@@ -2646,7 +2648,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final double getAndAddDoubleAcquire(Object o, long offset, double delta) {
+    public final double getAndAddDoubleAcquire(@Readonly Object o, long offset, double delta) {
         long expectedBits;
         double v;
         do {
@@ -2672,7 +2674,7 @@ public final class Unsafe {
      * @since 1.8
      */
     @IntrinsicCandidate
-    public final int getAndSetInt(Object o, long offset, int newValue) {
+    public final int getAndSetInt(@Readonly Object o, long offset, int newValue) {
         int v;
         do {
             v = getIntVolatile(o, offset);
@@ -2681,7 +2683,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final int getAndSetIntRelease(Object o, long offset, int newValue) {
+    public final int getAndSetIntRelease(@Readonly Object o, long offset, int newValue) {
         int v;
         do {
             v = getInt(o, offset);
@@ -2690,7 +2692,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final int getAndSetIntAcquire(Object o, long offset, int newValue) {
+    public final int getAndSetIntAcquire(@Readonly Object o, long offset, int newValue) {
         int v;
         do {
             v = getIntAcquire(o, offset);
@@ -2710,7 +2712,7 @@ public final class Unsafe {
      * @since 1.8
      */
     @IntrinsicCandidate
-    public final long getAndSetLong(Object o, long offset, long newValue) {
+    public final long getAndSetLong(@Readonly Object o, long offset, long newValue) {
         long v;
         do {
             v = getLongVolatile(o, offset);
@@ -2719,7 +2721,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final long getAndSetLongRelease(Object o, long offset, long newValue) {
+    public final long getAndSetLongRelease(@Readonly Object o, long offset, long newValue) {
         long v;
         do {
             v = getLong(o, offset);
@@ -2728,7 +2730,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final long getAndSetLongAcquire(Object o, long offset, long newValue) {
+    public final long getAndSetLongAcquire(@Readonly Object o, long offset, long newValue) {
         long v;
         do {
             v = getLongAcquire(o, offset);
@@ -2748,7 +2750,7 @@ public final class Unsafe {
      * @since 1.8
      */
     @IntrinsicCandidate
-    public final Object getAndSetReference(Object o, long offset, Object newValue) {
+    public final Object getAndSetReference(@Readonly Object o, long offset, Object newValue) {
         Object v;
         do {
             v = getReferenceVolatile(o, offset);
@@ -2757,7 +2759,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final Object getAndSetReferenceRelease(Object o, long offset, Object newValue) {
+    public final Object getAndSetReferenceRelease(@Readonly Object o, long offset, Object newValue) {
         Object v;
         do {
             v = getReference(o, offset);
@@ -2766,7 +2768,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final Object getAndSetReferenceAcquire(Object o, long offset, Object newValue) {
+    public final Object getAndSetReferenceAcquire(@Readonly Object o, long offset, Object newValue) {
         Object v;
         do {
             v = getReferenceAcquire(o, offset);
@@ -2775,7 +2777,7 @@ public final class Unsafe {
     }
 
     @IntrinsicCandidate
-    public final byte getAndSetByte(Object o, long offset, byte newValue) {
+    public final byte getAndSetByte(@Readonly Object o, long offset, byte newValue) {
         byte v;
         do {
             v = getByteVolatile(o, offset);
@@ -2784,7 +2786,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final byte getAndSetByteRelease(Object o, long offset, byte newValue) {
+    public final byte getAndSetByteRelease(@Readonly Object o, long offset, byte newValue) {
         byte v;
         do {
             v = getByte(o, offset);
@@ -2793,7 +2795,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final byte getAndSetByteAcquire(Object o, long offset, byte newValue) {
+    public final byte getAndSetByteAcquire(@Readonly Object o, long offset, byte newValue) {
         byte v;
         do {
             v = getByteAcquire(o, offset);
@@ -2802,22 +2804,22 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final boolean getAndSetBoolean(Object o, long offset, boolean newValue) {
+    public final boolean getAndSetBoolean(@Readonly Object o, long offset, boolean newValue) {
         return byte2bool(getAndSetByte(o, offset, bool2byte(newValue)));
     }
 
     @ForceInline
-    public final boolean getAndSetBooleanRelease(Object o, long offset, boolean newValue) {
+    public final boolean getAndSetBooleanRelease(@Readonly Object o, long offset, boolean newValue) {
         return byte2bool(getAndSetByteRelease(o, offset, bool2byte(newValue)));
     }
 
     @ForceInline
-    public final boolean getAndSetBooleanAcquire(Object o, long offset, boolean newValue) {
+    public final boolean getAndSetBooleanAcquire(@Readonly Object o, long offset, boolean newValue) {
         return byte2bool(getAndSetByteAcquire(o, offset, bool2byte(newValue)));
     }
 
     @IntrinsicCandidate
-    public final short getAndSetShort(Object o, long offset, short newValue) {
+    public final short getAndSetShort(@Readonly Object o, long offset, short newValue) {
         short v;
         do {
             v = getShortVolatile(o, offset);
@@ -2826,7 +2828,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final short getAndSetShortRelease(Object o, long offset, short newValue) {
+    public final short getAndSetShortRelease(@Readonly Object o, long offset, short newValue) {
         short v;
         do {
             v = getShort(o, offset);
@@ -2835,7 +2837,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final short getAndSetShortAcquire(Object o, long offset, short newValue) {
+    public final short getAndSetShortAcquire(@Readonly Object o, long offset, short newValue) {
         short v;
         do {
             v = getShortAcquire(o, offset);
@@ -2844,52 +2846,52 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final char getAndSetChar(Object o, long offset, char newValue) {
+    public final char getAndSetChar(@Readonly Object o, long offset, char newValue) {
         return s2c(getAndSetShort(o, offset, c2s(newValue)));
     }
 
     @ForceInline
-    public final char getAndSetCharRelease(Object o, long offset, char newValue) {
+    public final char getAndSetCharRelease(@Readonly Object o, long offset, char newValue) {
         return s2c(getAndSetShortRelease(o, offset, c2s(newValue)));
     }
 
     @ForceInline
-    public final char getAndSetCharAcquire(Object o, long offset, char newValue) {
+    public final char getAndSetCharAcquire(@Readonly Object o, long offset, char newValue) {
         return s2c(getAndSetShortAcquire(o, offset, c2s(newValue)));
     }
 
     @ForceInline
-    public final float getAndSetFloat(Object o, long offset, float newValue) {
+    public final float getAndSetFloat(@Readonly Object o, long offset, float newValue) {
         int v = getAndSetInt(o, offset, Float.floatToRawIntBits(newValue));
         return Float.intBitsToFloat(v);
     }
 
     @ForceInline
-    public final float getAndSetFloatRelease(Object o, long offset, float newValue) {
+    public final float getAndSetFloatRelease(@Readonly Object o, long offset, float newValue) {
         int v = getAndSetIntRelease(o, offset, Float.floatToRawIntBits(newValue));
         return Float.intBitsToFloat(v);
     }
 
     @ForceInline
-    public final float getAndSetFloatAcquire(Object o, long offset, float newValue) {
+    public final float getAndSetFloatAcquire(@Readonly Object o, long offset, float newValue) {
         int v = getAndSetIntAcquire(o, offset, Float.floatToRawIntBits(newValue));
         return Float.intBitsToFloat(v);
     }
 
     @ForceInline
-    public final double getAndSetDouble(Object o, long offset, double newValue) {
+    public final double getAndSetDouble(@Readonly Object o, long offset, double newValue) {
         long v = getAndSetLong(o, offset, Double.doubleToRawLongBits(newValue));
         return Double.longBitsToDouble(v);
     }
 
     @ForceInline
-    public final double getAndSetDoubleRelease(Object o, long offset, double newValue) {
+    public final double getAndSetDoubleRelease(@Readonly Object o, long offset, double newValue) {
         long v = getAndSetLongRelease(o, offset, Double.doubleToRawLongBits(newValue));
         return Double.longBitsToDouble(v);
     }
 
     @ForceInline
-    public final double getAndSetDoubleAcquire(Object o, long offset, double newValue) {
+    public final double getAndSetDoubleAcquire(@Readonly Object o, long offset, double newValue) {
         long v = getAndSetLongAcquire(o, offset, Double.doubleToRawLongBits(newValue));
         return Double.longBitsToDouble(v);
     }
@@ -2899,53 +2901,53 @@ public final class Unsafe {
     // platforms not supporting native instructions
 
     @ForceInline
-    public final boolean getAndBitwiseOrBoolean(Object o, long offset, boolean mask) {
+    public final boolean getAndBitwiseOrBoolean(@Readonly Object o, long offset, boolean mask) {
         return byte2bool(getAndBitwiseOrByte(o, offset, bool2byte(mask)));
     }
 
     @ForceInline
-    public final boolean getAndBitwiseOrBooleanRelease(Object o, long offset, boolean mask) {
+    public final boolean getAndBitwiseOrBooleanRelease(@Readonly Object o, long offset, boolean mask) {
         return byte2bool(getAndBitwiseOrByteRelease(o, offset, bool2byte(mask)));
     }
 
     @ForceInline
-    public final boolean getAndBitwiseOrBooleanAcquire(Object o, long offset, boolean mask) {
+    public final boolean getAndBitwiseOrBooleanAcquire(@Readonly Object o, long offset, boolean mask) {
         return byte2bool(getAndBitwiseOrByteAcquire(o, offset, bool2byte(mask)));
     }
 
     @ForceInline
-    public final boolean getAndBitwiseAndBoolean(Object o, long offset, boolean mask) {
+    public final boolean getAndBitwiseAndBoolean(@Readonly Object o, long offset, boolean mask) {
         return byte2bool(getAndBitwiseAndByte(o, offset, bool2byte(mask)));
     }
 
     @ForceInline
-    public final boolean getAndBitwiseAndBooleanRelease(Object o, long offset, boolean mask) {
+    public final boolean getAndBitwiseAndBooleanRelease(@Readonly Object o, long offset, boolean mask) {
         return byte2bool(getAndBitwiseAndByteRelease(o, offset, bool2byte(mask)));
     }
 
     @ForceInline
-    public final boolean getAndBitwiseAndBooleanAcquire(Object o, long offset, boolean mask) {
+    public final boolean getAndBitwiseAndBooleanAcquire(@Readonly Object o, long offset, boolean mask) {
         return byte2bool(getAndBitwiseAndByteAcquire(o, offset, bool2byte(mask)));
     }
 
     @ForceInline
-    public final boolean getAndBitwiseXorBoolean(Object o, long offset, boolean mask) {
+    public final boolean getAndBitwiseXorBoolean(@Readonly Object o, long offset, boolean mask) {
         return byte2bool(getAndBitwiseXorByte(o, offset, bool2byte(mask)));
     }
 
     @ForceInline
-    public final boolean getAndBitwiseXorBooleanRelease(Object o, long offset, boolean mask) {
+    public final boolean getAndBitwiseXorBooleanRelease(@Readonly Object o, long offset, boolean mask) {
         return byte2bool(getAndBitwiseXorByteRelease(o, offset, bool2byte(mask)));
     }
 
     @ForceInline
-    public final boolean getAndBitwiseXorBooleanAcquire(Object o, long offset, boolean mask) {
+    public final boolean getAndBitwiseXorBooleanAcquire(@Readonly Object o, long offset, boolean mask) {
         return byte2bool(getAndBitwiseXorByteAcquire(o, offset, bool2byte(mask)));
     }
 
 
     @ForceInline
-    public final byte getAndBitwiseOrByte(Object o, long offset, byte mask) {
+    public final byte getAndBitwiseOrByte(@Readonly Object o, long offset, byte mask) {
         byte current;
         do {
             current = getByteVolatile(o, offset);
@@ -2955,7 +2957,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final byte getAndBitwiseOrByteRelease(Object o, long offset, byte mask) {
+    public final byte getAndBitwiseOrByteRelease(@Readonly Object o, long offset, byte mask) {
         byte current;
         do {
             current = getByte(o, offset);
@@ -2965,7 +2967,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final byte getAndBitwiseOrByteAcquire(Object o, long offset, byte mask) {
+    public final byte getAndBitwiseOrByteAcquire(@Readonly Object o, long offset, byte mask) {
         byte current;
         do {
             // Plain read, the value is a hint, the acquire CAS does the work
@@ -2976,7 +2978,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final byte getAndBitwiseAndByte(Object o, long offset, byte mask) {
+    public final byte getAndBitwiseAndByte(@Readonly Object o, long offset, byte mask) {
         byte current;
         do {
             current = getByteVolatile(o, offset);
@@ -2986,7 +2988,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final byte getAndBitwiseAndByteRelease(Object o, long offset, byte mask) {
+    public final byte getAndBitwiseAndByteRelease(@Readonly Object o, long offset, byte mask) {
         byte current;
         do {
             current = getByte(o, offset);
@@ -2996,7 +2998,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final byte getAndBitwiseAndByteAcquire(Object o, long offset, byte mask) {
+    public final byte getAndBitwiseAndByteAcquire(@Readonly Object o, long offset, byte mask) {
         byte current;
         do {
             // Plain read, the value is a hint, the acquire CAS does the work
@@ -3007,7 +3009,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final byte getAndBitwiseXorByte(Object o, long offset, byte mask) {
+    public final byte getAndBitwiseXorByte(@Readonly Object o, long offset, byte mask) {
         byte current;
         do {
             current = getByteVolatile(o, offset);
@@ -3017,7 +3019,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final byte getAndBitwiseXorByteRelease(Object o, long offset, byte mask) {
+    public final byte getAndBitwiseXorByteRelease(@Readonly Object o, long offset, byte mask) {
         byte current;
         do {
             current = getByte(o, offset);
@@ -3027,7 +3029,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final byte getAndBitwiseXorByteAcquire(Object o, long offset, byte mask) {
+    public final byte getAndBitwiseXorByteAcquire(@Readonly Object o, long offset, byte mask) {
         byte current;
         do {
             // Plain read, the value is a hint, the acquire CAS does the work
@@ -3039,53 +3041,53 @@ public final class Unsafe {
 
 
     @ForceInline
-    public final char getAndBitwiseOrChar(Object o, long offset, char mask) {
+    public final char getAndBitwiseOrChar(@Readonly Object o, long offset, char mask) {
         return s2c(getAndBitwiseOrShort(o, offset, c2s(mask)));
     }
 
     @ForceInline
-    public final char getAndBitwiseOrCharRelease(Object o, long offset, char mask) {
+    public final char getAndBitwiseOrCharRelease(@Readonly Object o, long offset, char mask) {
         return s2c(getAndBitwiseOrShortRelease(o, offset, c2s(mask)));
     }
 
     @ForceInline
-    public final char getAndBitwiseOrCharAcquire(Object o, long offset, char mask) {
+    public final char getAndBitwiseOrCharAcquire(@Readonly Object o, long offset, char mask) {
         return s2c(getAndBitwiseOrShortAcquire(o, offset, c2s(mask)));
     }
 
     @ForceInline
-    public final char getAndBitwiseAndChar(Object o, long offset, char mask) {
+    public final char getAndBitwiseAndChar(@Readonly Object o, long offset, char mask) {
         return s2c(getAndBitwiseAndShort(o, offset, c2s(mask)));
     }
 
     @ForceInline
-    public final char getAndBitwiseAndCharRelease(Object o, long offset, char mask) {
+    public final char getAndBitwiseAndCharRelease(@Readonly Object o, long offset, char mask) {
         return s2c(getAndBitwiseAndShortRelease(o, offset, c2s(mask)));
     }
 
     @ForceInline
-    public final char getAndBitwiseAndCharAcquire(Object o, long offset, char mask) {
+    public final char getAndBitwiseAndCharAcquire(@Readonly Object o, long offset, char mask) {
         return s2c(getAndBitwiseAndShortAcquire(o, offset, c2s(mask)));
     }
 
     @ForceInline
-    public final char getAndBitwiseXorChar(Object o, long offset, char mask) {
+    public final char getAndBitwiseXorChar(@Readonly Object o, long offset, char mask) {
         return s2c(getAndBitwiseXorShort(o, offset, c2s(mask)));
     }
 
     @ForceInline
-    public final char getAndBitwiseXorCharRelease(Object o, long offset, char mask) {
+    public final char getAndBitwiseXorCharRelease(@Readonly Object o, long offset, char mask) {
         return s2c(getAndBitwiseXorShortRelease(o, offset, c2s(mask)));
     }
 
     @ForceInline
-    public final char getAndBitwiseXorCharAcquire(Object o, long offset, char mask) {
+    public final char getAndBitwiseXorCharAcquire(@Readonly Object o, long offset, char mask) {
         return s2c(getAndBitwiseXorShortAcquire(o, offset, c2s(mask)));
     }
 
 
     @ForceInline
-    public final short getAndBitwiseOrShort(Object o, long offset, short mask) {
+    public final short getAndBitwiseOrShort(@Readonly Object o, long offset, short mask) {
         short current;
         do {
             current = getShortVolatile(o, offset);
@@ -3095,7 +3097,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final short getAndBitwiseOrShortRelease(Object o, long offset, short mask) {
+    public final short getAndBitwiseOrShortRelease(@Readonly Object o, long offset, short mask) {
         short current;
         do {
             current = getShort(o, offset);
@@ -3105,7 +3107,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final short getAndBitwiseOrShortAcquire(Object o, long offset, short mask) {
+    public final short getAndBitwiseOrShortAcquire(@Readonly Object o, long offset, short mask) {
         short current;
         do {
             // Plain read, the value is a hint, the acquire CAS does the work
@@ -3116,7 +3118,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final short getAndBitwiseAndShort(Object o, long offset, short mask) {
+    public final short getAndBitwiseAndShort(@Readonly Object o, long offset, short mask) {
         short current;
         do {
             current = getShortVolatile(o, offset);
@@ -3126,7 +3128,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final short getAndBitwiseAndShortRelease(Object o, long offset, short mask) {
+    public final short getAndBitwiseAndShortRelease(@Readonly Object o, long offset, short mask) {
         short current;
         do {
             current = getShort(o, offset);
@@ -3136,7 +3138,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final short getAndBitwiseAndShortAcquire(Object o, long offset, short mask) {
+    public final short getAndBitwiseAndShortAcquire(@Readonly Object o, long offset, short mask) {
         short current;
         do {
             // Plain read, the value is a hint, the acquire CAS does the work
@@ -3147,7 +3149,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final short getAndBitwiseXorShort(Object o, long offset, short mask) {
+    public final short getAndBitwiseXorShort(@Readonly Object o, long offset, short mask) {
         short current;
         do {
             current = getShortVolatile(o, offset);
@@ -3157,7 +3159,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final short getAndBitwiseXorShortRelease(Object o, long offset, short mask) {
+    public final short getAndBitwiseXorShortRelease(@Readonly Object o, long offset, short mask) {
         short current;
         do {
             current = getShort(o, offset);
@@ -3167,7 +3169,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final short getAndBitwiseXorShortAcquire(Object o, long offset, short mask) {
+    public final short getAndBitwiseXorShortAcquire(@Readonly Object o, long offset, short mask) {
         short current;
         do {
             // Plain read, the value is a hint, the acquire CAS does the work
@@ -3179,7 +3181,7 @@ public final class Unsafe {
 
 
     @ForceInline
-    public final int getAndBitwiseOrInt(Object o, long offset, int mask) {
+    public final int getAndBitwiseOrInt(@Readonly Object o, long offset, int mask) {
         int current;
         do {
             current = getIntVolatile(o, offset);
@@ -3189,7 +3191,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final int getAndBitwiseOrIntRelease(Object o, long offset, int mask) {
+    public final int getAndBitwiseOrIntRelease(@Readonly Object o, long offset, int mask) {
         int current;
         do {
             current = getInt(o, offset);
@@ -3199,7 +3201,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final int getAndBitwiseOrIntAcquire(Object o, long offset, int mask) {
+    public final int getAndBitwiseOrIntAcquire(@Readonly Object o, long offset, int mask) {
         int current;
         do {
             // Plain read, the value is a hint, the acquire CAS does the work
@@ -3221,7 +3223,7 @@ public final class Unsafe {
      * @since 9
      */
     @ForceInline
-    public final int getAndBitwiseAndInt(Object o, long offset, int mask) {
+    public final int getAndBitwiseAndInt(@Readonly Object o, long offset, int mask) {
         int current;
         do {
             current = getIntVolatile(o, offset);
@@ -3231,7 +3233,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final int getAndBitwiseAndIntRelease(Object o, long offset, int mask) {
+    public final int getAndBitwiseAndIntRelease(@Readonly Object o, long offset, int mask) {
         int current;
         do {
             current = getInt(o, offset);
@@ -3241,7 +3243,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final int getAndBitwiseAndIntAcquire(Object o, long offset, int mask) {
+    public final int getAndBitwiseAndIntAcquire(@Readonly Object o, long offset, int mask) {
         int current;
         do {
             // Plain read, the value is a hint, the acquire CAS does the work
@@ -3252,7 +3254,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final int getAndBitwiseXorInt(Object o, long offset, int mask) {
+    public final int getAndBitwiseXorInt(@Readonly Object o, long offset, int mask) {
         int current;
         do {
             current = getIntVolatile(o, offset);
@@ -3262,7 +3264,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final int getAndBitwiseXorIntRelease(Object o, long offset, int mask) {
+    public final int getAndBitwiseXorIntRelease(@Readonly Object o, long offset, int mask) {
         int current;
         do {
             current = getInt(o, offset);
@@ -3272,7 +3274,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final int getAndBitwiseXorIntAcquire(Object o, long offset, int mask) {
+    public final int getAndBitwiseXorIntAcquire(@Readonly Object o, long offset, int mask) {
         int current;
         do {
             // Plain read, the value is a hint, the acquire CAS does the work
@@ -3284,7 +3286,7 @@ public final class Unsafe {
 
 
     @ForceInline
-    public final long getAndBitwiseOrLong(Object o, long offset, long mask) {
+    public final long getAndBitwiseOrLong(@Readonly Object o, long offset, long mask) {
         long current;
         do {
             current = getLongVolatile(o, offset);
@@ -3294,7 +3296,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final long getAndBitwiseOrLongRelease(Object o, long offset, long mask) {
+    public final long getAndBitwiseOrLongRelease(@Readonly Object o, long offset, long mask) {
         long current;
         do {
             current = getLong(o, offset);
@@ -3304,7 +3306,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final long getAndBitwiseOrLongAcquire(Object o, long offset, long mask) {
+    public final long getAndBitwiseOrLongAcquire(@Readonly Object o, long offset, long mask) {
         long current;
         do {
             // Plain read, the value is a hint, the acquire CAS does the work
@@ -3315,7 +3317,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final long getAndBitwiseAndLong(Object o, long offset, long mask) {
+    public final long getAndBitwiseAndLong(@Readonly Object o, long offset, long mask) {
         long current;
         do {
             current = getLongVolatile(o, offset);
@@ -3325,7 +3327,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final long getAndBitwiseAndLongRelease(Object o, long offset, long mask) {
+    public final long getAndBitwiseAndLongRelease(@Readonly Object o, long offset, long mask) {
         long current;
         do {
             current = getLong(o, offset);
@@ -3335,7 +3337,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final long getAndBitwiseAndLongAcquire(Object o, long offset, long mask) {
+    public final long getAndBitwiseAndLongAcquire(@Readonly Object o, long offset, long mask) {
         long current;
         do {
             // Plain read, the value is a hint, the acquire CAS does the work
@@ -3346,7 +3348,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final long getAndBitwiseXorLong(Object o, long offset, long mask) {
+    public final long getAndBitwiseXorLong(@Readonly Object o, long offset, long mask) {
         long current;
         do {
             current = getLongVolatile(o, offset);
@@ -3356,7 +3358,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final long getAndBitwiseXorLongRelease(Object o, long offset, long mask) {
+    public final long getAndBitwiseXorLongRelease(@Readonly Object o, long offset, long mask) {
         long current;
         do {
             current = getLong(o, offset);
@@ -3366,7 +3368,7 @@ public final class Unsafe {
     }
 
     @ForceInline
-    public final long getAndBitwiseXorLongAcquire(Object o, long offset, long mask) {
+    public final long getAndBitwiseXorLongAcquire(@Readonly Object o, long offset, long mask) {
         long current;
         do {
             // Plain read, the value is a hint, the acquire CAS does the work
@@ -3510,7 +3512,7 @@ public final class Unsafe {
      * @since 9
      */
     @IntrinsicCandidate
-    public final long getLongUnaligned(Object o, long offset) {
+    public final long getLongUnaligned(@Readonly Object o, long offset) {
         if ((offset & 7) == 0) {
             return getLong(o, offset);
         } else if ((offset & 3) == 0) {
@@ -3543,13 +3545,13 @@ public final class Unsafe {
      * @return the value fetched from the indicated object
      * @since 9
      */
-    public final long getLongUnaligned(Object o, long offset, boolean bigEndian) {
+    public final long getLongUnaligned(@Readonly Object o, long offset, boolean bigEndian) {
         return convEndian(bigEndian, getLongUnaligned(o, offset));
     }
 
     /** @see #getLongUnaligned(Object, long) */
     @IntrinsicCandidate
-    public final int getIntUnaligned(Object o, long offset) {
+    public final int getIntUnaligned(@Readonly Object o, long offset) {
         if ((offset & 3) == 0) {
             return getInt(o, offset);
         } else if ((offset & 1) == 0) {
@@ -3563,13 +3565,13 @@ public final class Unsafe {
         }
     }
     /** @see #getLongUnaligned(Object, long, boolean) */
-    public final int getIntUnaligned(Object o, long offset, boolean bigEndian) {
+    public final int getIntUnaligned(@Readonly Object o, long offset, boolean bigEndian) {
         return convEndian(bigEndian, getIntUnaligned(o, offset));
     }
 
     /** @see #getLongUnaligned(Object, long) */
     @IntrinsicCandidate
-    public final short getShortUnaligned(Object o, long offset) {
+    public final short getShortUnaligned(@Readonly Object o, long offset) {
         if ((offset & 1) == 0) {
             return getShort(o, offset);
         } else {
@@ -3578,13 +3580,13 @@ public final class Unsafe {
         }
     }
     /** @see #getLongUnaligned(Object, long, boolean) */
-    public final short getShortUnaligned(Object o, long offset, boolean bigEndian) {
+    public final short getShortUnaligned(@Readonly Object o, long offset, boolean bigEndian) {
         return convEndian(bigEndian, getShortUnaligned(o, offset));
     }
 
     /** @see #getLongUnaligned(Object, long) */
     @IntrinsicCandidate
-    public final char getCharUnaligned(Object o, long offset) {
+    public final char getCharUnaligned(@Readonly Object o, long offset) {
         if ((offset & 1) == 0) {
             return getChar(o, offset);
         } else {
@@ -3594,7 +3596,7 @@ public final class Unsafe {
     }
 
     /** @see #getLongUnaligned(Object, long, boolean) */
-    public final char getCharUnaligned(Object o, long offset, boolean bigEndian) {
+    public final char getCharUnaligned(@Readonly Object o, long offset, boolean bigEndian) {
         return convEndian(bigEndian, getCharUnaligned(o, offset));
     }
 
@@ -3627,7 +3629,7 @@ public final class Unsafe {
      * @since 9
      */
     @IntrinsicCandidate
-    public final void putLongUnaligned(Object o, long offset, long x) {
+    public final void putLongUnaligned(@Readonly Object o, long offset, long x) {
         if ((offset & 7) == 0) {
             putLong(o, offset, x);
         } else if ((offset & 3) == 0) {
@@ -3664,13 +3666,13 @@ public final class Unsafe {
      *         {@link NullPointerException}
      * @since 9
      */
-    public final void putLongUnaligned(Object o, long offset, long x, boolean bigEndian) {
+    public final void putLongUnaligned(@Readonly Object o, long offset, long x, boolean bigEndian) {
         putLongUnaligned(o, offset, convEndian(bigEndian, x));
     }
 
     /** @see #putLongUnaligned(Object, long, long) */
     @IntrinsicCandidate
-    public final void putIntUnaligned(Object o, long offset, int x) {
+    public final void putIntUnaligned(@Readonly Object o, long offset, int x) {
         if ((offset & 3) == 0) {
             putInt(o, offset, x);
         } else if ((offset & 1) == 0) {
@@ -3686,13 +3688,13 @@ public final class Unsafe {
         }
     }
     /** @see #putLongUnaligned(Object, long, long, boolean) */
-    public final void putIntUnaligned(Object o, long offset, int x, boolean bigEndian) {
+    public final void putIntUnaligned(@Readonly Object o, long offset, int x, boolean bigEndian) {
         putIntUnaligned(o, offset, convEndian(bigEndian, x));
     }
 
     /** @see #putLongUnaligned(Object, long, long) */
     @IntrinsicCandidate
-    public final void putShortUnaligned(Object o, long offset, short x) {
+    public final void putShortUnaligned(@Readonly Object o, long offset, short x) {
         if ((offset & 1) == 0) {
             putShort(o, offset, x);
         } else {
@@ -3702,17 +3704,17 @@ public final class Unsafe {
         }
     }
     /** @see #putLongUnaligned(Object, long, long, boolean) */
-    public final void putShortUnaligned(Object o, long offset, short x, boolean bigEndian) {
+    public final void putShortUnaligned(@Readonly Object o, long offset, short x, boolean bigEndian) {
         putShortUnaligned(o, offset, convEndian(bigEndian, x));
     }
 
     /** @see #putLongUnaligned(Object, long, long) */
     @IntrinsicCandidate
-    public final void putCharUnaligned(Object o, long offset, char x) {
+    public final void putCharUnaligned(@Readonly Object o, long offset, char x) {
         putShortUnaligned(o, offset, (short)x);
     }
     /** @see #putLongUnaligned(Object, long, long, boolean) */
-    public final void putCharUnaligned(Object o, long offset, char x, boolean bigEndian) {
+    public final void putCharUnaligned(@Readonly Object o, long offset, char x, boolean bigEndian) {
         putCharUnaligned(o, offset, convEndian(bigEndian, x));
     }
 
@@ -3762,7 +3764,7 @@ public final class Unsafe {
     // These methods write integers to memory from smaller parts
     // provided by their caller.  The ordering in which these parts
     // are written is the native endianness of this platform.
-    private void putLongParts(Object o, long offset, byte i0, byte i1, byte i2, byte i3, byte i4, byte i5, byte i6, byte i7) {
+    private void putLongParts(@Readonly Object o, long offset, byte i0, byte i1, byte i2, byte i3, byte i4, byte i5, byte i6, byte i7) {
         putByte(o, offset + 0, pick(i0, i7));
         putByte(o, offset + 1, pick(i1, i6));
         putByte(o, offset + 2, pick(i2, i5));
@@ -3772,27 +3774,27 @@ public final class Unsafe {
         putByte(o, offset + 6, pick(i6, i1));
         putByte(o, offset + 7, pick(i7, i0));
     }
-    private void putLongParts(Object o, long offset, short i0, short i1, short i2, short i3) {
+    private void putLongParts(@Readonly Object o, long offset, short i0, short i1, short i2, short i3) {
         putShort(o, offset + 0, pick(i0, i3));
         putShort(o, offset + 2, pick(i1, i2));
         putShort(o, offset + 4, pick(i2, i1));
         putShort(o, offset + 6, pick(i3, i0));
     }
-    private void putLongParts(Object o, long offset, int i0, int i1) {
+    private void putLongParts(@Readonly Object o, long offset, int i0, int i1) {
         putInt(o, offset + 0, pick(i0, i1));
         putInt(o, offset + 4, pick(i1, i0));
     }
-    private void putIntParts(Object o, long offset, short i0, short i1) {
+    private void putIntParts(@Readonly Object o, long offset, short i0, short i1) {
         putShort(o, offset + 0, pick(i0, i1));
         putShort(o, offset + 2, pick(i1, i0));
     }
-    private void putIntParts(Object o, long offset, byte i0, byte i1, byte i2, byte i3) {
+    private void putIntParts(@Readonly Object o, long offset, byte i0, byte i1, byte i2, byte i3) {
         putByte(o, offset + 0, pick(i0, i3));
         putByte(o, offset + 1, pick(i1, i2));
         putByte(o, offset + 2, pick(i2, i1));
         putByte(o, offset + 3, pick(i3, i0));
     }
-    private void putShortParts(Object o, long offset, byte i0, byte i1) {
+    private void putShortParts(@Readonly Object o, long offset, byte i0, byte i1) {
         putByte(o, offset + 0, pick(i0, i1));
         putByte(o, offset + 1, pick(i1, i0));
     }
@@ -3815,7 +3817,7 @@ public final class Unsafe {
     private native long allocateMemory0(long bytes);
     private native long reallocateMemory0(long address, long bytes);
     private native void freeMemory0(long address);
-    private native void setMemory0(Object o, long offset, long bytes, byte value);
+    private native void setMemory0(@Readonly Object o, long offset, long bytes, byte value);
     @IntrinsicCandidate
     private native void copyMemory0(Object srcBase, long srcOffset, Object destBase, long destOffset, long bytes);
     private native void copySwapMemory0(Object srcBase, long srcOffset, Object destBase, long destOffset, long bytes, long elemSize);
@@ -3856,87 +3858,87 @@ public final class Unsafe {
     // The following deprecated methods are used by JSR 166.
 
     @Deprecated(since="12", forRemoval=true)
-    public final Object getObject(Object o, long offset) {
+    public final Object getObject(@Readonly Object o, long offset) {
         return getReference(o, offset);
     }
     @Deprecated(since="12", forRemoval=true)
-    public final Object getObjectVolatile(Object o, long offset) {
+    public final Object getObjectVolatile(@Readonly Object o, long offset) {
         return getReferenceVolatile(o, offset);
     }
     @Deprecated(since="12", forRemoval=true)
-    public final Object getObjectAcquire(Object o, long offset) {
+    public final Object getObjectAcquire(@Readonly Object o, long offset) {
         return getReferenceAcquire(o, offset);
     }
     @Deprecated(since="12", forRemoval=true)
-    public final Object getObjectOpaque(Object o, long offset) {
+    public final Object getObjectOpaque(@Readonly Object o, long offset) {
         return getReferenceOpaque(o, offset);
     }
 
 
     @Deprecated(since="12", forRemoval=true)
-    public final void putObject(Object o, long offset, Object x) {
+    public final void putObject(@Readonly Object o, long offset, Object x) {
         putReference(o, offset, x);
     }
     @Deprecated(since="12", forRemoval=true)
-    public final void putObjectVolatile(Object o, long offset, Object x) {
+    public final void putObjectVolatile(@Readonly Object o, long offset, Object x) {
         putReferenceVolatile(o, offset, x);
     }
     @Deprecated(since="12", forRemoval=true)
-    public final void putObjectOpaque(Object o, long offset, Object x) {
+    public final void putObjectOpaque(@Readonly Object o, long offset, Object x) {
         putReferenceOpaque(o, offset, x);
     }
     @Deprecated(since="12", forRemoval=true)
-    public final void putObjectRelease(Object o, long offset, Object x) {
+    public final void putObjectRelease(@Readonly Object o, long offset, Object x) {
         putReferenceRelease(o, offset, x);
     }
 
 
     @Deprecated(since="12", forRemoval=true)
-    public final Object getAndSetObject(Object o, long offset, Object newValue) {
+    public final Object getAndSetObject(@Readonly Object o, long offset, Object newValue) {
         return getAndSetReference(o, offset, newValue);
     }
     @Deprecated(since="12", forRemoval=true)
-    public final Object getAndSetObjectAcquire(Object o, long offset, Object newValue) {
+    public final Object getAndSetObjectAcquire(@Readonly Object o, long offset, Object newValue) {
         return getAndSetReferenceAcquire(o, offset, newValue);
     }
     @Deprecated(since="12", forRemoval=true)
-    public final Object getAndSetObjectRelease(Object o, long offset, Object newValue) {
+    public final Object getAndSetObjectRelease(@Readonly Object o, long offset, Object newValue) {
         return getAndSetReferenceRelease(o, offset, newValue);
     }
 
 
     @Deprecated(since="12", forRemoval=true)
-    public final boolean compareAndSetObject(Object o, long offset, Object expected, Object x) {
+    public final boolean compareAndSetObject(@Readonly Object o, long offset, Object expected, Object x) {
         return compareAndSetReference(o, offset, expected, x);
     }
     @Deprecated(since="12", forRemoval=true)
-    public final Object compareAndExchangeObject(Object o, long offset, Object expected, Object x) {
+    public final Object compareAndExchangeObject(@Readonly Object o, long offset, Object expected, Object x) {
         return compareAndExchangeReference(o, offset, expected, x);
     }
     @Deprecated(since="12", forRemoval=true)
-    public final Object compareAndExchangeObjectAcquire(Object o, long offset, Object expected, Object x) {
+    public final Object compareAndExchangeObjectAcquire(@Readonly Object o, long offset, Object expected, Object x) {
         return compareAndExchangeReferenceAcquire(o, offset, expected, x);
     }
     @Deprecated(since="12", forRemoval=true)
-    public final Object compareAndExchangeObjectRelease(Object o, long offset, Object expected, Object x) {
+    public final Object compareAndExchangeObjectRelease(@Readonly Object o, long offset, Object expected, Object x) {
         return compareAndExchangeReferenceRelease(o, offset, expected, x);
     }
 
 
     @Deprecated(since="12", forRemoval=true)
-    public final boolean weakCompareAndSetObject(Object o, long offset, Object expected, Object x) {
+    public final boolean weakCompareAndSetObject(@Readonly Object o, long offset, Object expected, Object x) {
         return weakCompareAndSetReference(o, offset, expected, x);
     }
     @Deprecated(since="12", forRemoval=true)
-    public final boolean weakCompareAndSetObjectAcquire(Object o, long offset, Object expected, Object x) {
+    public final boolean weakCompareAndSetObjectAcquire(@Readonly Object o, long offset, Object expected, Object x) {
         return weakCompareAndSetReferenceAcquire(o, offset, expected, x);
     }
     @Deprecated(since="12", forRemoval=true)
-    public final boolean weakCompareAndSetObjectPlain(Object o, long offset, Object expected, Object x) {
+    public final boolean weakCompareAndSetObjectPlain(@Readonly Object o, long offset, Object expected, Object x) {
         return weakCompareAndSetReferencePlain(o, offset, expected, x);
     }
     @Deprecated(since="12", forRemoval=true)
-    public final boolean weakCompareAndSetObjectRelease(Object o, long offset, Object expected, Object x) {
+    public final boolean weakCompareAndSetObjectRelease(@Readonly Object o, long offset, Object expected, Object x) {
         return weakCompareAndSetReferenceRelease(o, offset, expected, x);
     }
 }

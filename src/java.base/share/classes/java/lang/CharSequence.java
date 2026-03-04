@@ -32,9 +32,13 @@ import org.checkerframework.checker.index.qual.SameLen;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nonempty.qual.EnsuresNonEmptyIf;
 import org.checkerframework.checker.nonempty.qual.NonEmpty;
+import org.checkerframework.checker.pico.qual.PolyMutable;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.framework.qual.AnnotatedFor;
+import org.checkerframework.framework.qual.DefaultQualifierForUse;
 
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -67,7 +71,8 @@ import java.util.stream.StreamSupport;
  * @since 1.4
  */
 
-@AnnotatedFor({"lock", "nullness", "index"})
+@AnnotatedFor({"lock", "nullness", "index", "pico"})
+@ReceiverDependentMutable
 public interface CharSequence {
 
     /**
@@ -77,7 +82,7 @@ public interface CharSequence {
      * @return  the number of {@code char}s in this sequence
      */
     @Pure
-    @LengthOf({"this"}) int length(@GuardSatisfied CharSequence this);
+    @LengthOf({"this"}) int length(@GuardSatisfied @Readonly CharSequence this);
 
     /**
      * Returns the {@code char} value at the specified index.  An index ranges from zero
@@ -98,7 +103,7 @@ public interface CharSequence {
      *          {@code length()}
      */
     @Pure
-    char charAt(@IndexFor({"this"}) int index);
+    char charAt(@Readonly CharSequence this, @IndexFor({"this"}) int index);
 
     /**
      * Returns {@code true} if this character sequence is empty.
@@ -113,7 +118,7 @@ public interface CharSequence {
      */
     @Pure
     @EnsuresNonEmptyIf(result = false, expression = "this")
-    default boolean isEmpty() {
+    default boolean isEmpty(@Readonly CharSequence this) {
         return this.length() == 0;
     }
 
@@ -136,7 +141,7 @@ public interface CharSequence {
      *          or if {@code start} is greater than {@code end}
      */
     @SideEffectFree
-    CharSequence subSequence(@IndexOrHigh({"this"}) int start, @IndexOrHigh({"this"}) int end);
+    @PolyMutable CharSequence subSequence(@PolyMutable CharSequence this, @IndexOrHigh({"this"}) int start, @IndexOrHigh({"this"}) int end);
 
     /**
      * Returns a string containing the characters in this sequence in the same
@@ -146,7 +151,7 @@ public interface CharSequence {
      * @return  a string consisting of exactly this sequence of characters
      */
     @SideEffectFree
-    public @SameLen({"this"}) String toString(@GuardSatisfied CharSequence this);
+    public @SameLen({"this"}) String toString(@GuardSatisfied @Readonly CharSequence this);
 
     /**
      * Returns a stream of {@code int} zero-extending the {@code char} values
@@ -305,13 +310,13 @@ public interface CharSequence {
      */
     @SuppressWarnings("unchecked")
     @Pure
-    public static int compare(CharSequence cs1, CharSequence cs2) {
+    public static int compare(@Readonly CharSequence cs1, @Readonly CharSequence cs2) {
         if (Objects.requireNonNull(cs1) == Objects.requireNonNull(cs2)) {
             return 0;
         }
 
         if (cs1.getClass() == cs2.getClass() && cs1 instanceof Comparable) {
-            return ((Comparable<Object>) cs1).compareTo(cs2);
+            return ((Comparable<@Readonly Object>) cs1).compareTo(cs2);
         }
 
         for (int i = 0, len = Math.min(cs1.length(), cs2.length()); i < len; i++) {

@@ -52,7 +52,7 @@ import org.checkerframework.framework.qual.CFComment;
  * @author Josh Bloch
  * @since 1.7
  */
-@AnnotatedFor({"lock", "mustcall", "nullness"})
+@AnnotatedFor({"lock", "mustcall", "nullness", "pico"})
 @CFComment({"MustCall:  Do not write @InheritableMustCall(close) because doing so requires",
   "writing @InheritableMustCall({}) on Stream, and that leads to a `annotations.on.use` error at",
   "every type use like `@MustCall(close) Stream.  Instead, write `@MustCall(close)` on every",

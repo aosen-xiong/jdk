@@ -84,12 +84,12 @@ import jdk.internal.misc.Unsafe;
  * @since   1.0
  */
 @AnnotatedFor({"index", "interning", "lock", "nullness", "signedness"})
-@SuppressWarnings("exports")
 @RandomGeneratorProperties(
         name = "Random",
         i = 48, j = 0, k = 0,
         equidistribution = 0
 )
+@SuppressWarnings("pico") // Not interesting class, fix later
 public @UsesObjectEquals class Random implements RandomGenerator, java.io.Serializable {
     /** use serialVersionUID from JDK 1.1 for interoperability */
     @java.io.Serial

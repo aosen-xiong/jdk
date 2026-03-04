@@ -60,17 +60,17 @@ public @interface DefaultQualifier {
     Class<? extends Annotation> value();
 
     /**
-     * Returns the locations to which the annotation should be applied.
-     *
-     * @return the locations to which the annotation should be applied
-     */
+    * Returns the locations to which the annotation should be applied.
+    *
+    * @return the locations to which the annotation should be applied
+    */
     TypeUseLocation[] locations() default {TypeUseLocation.ALL};
 
     /**
-     * When used on a package, whether the defaults should also apply to subpackages.
-     *
-     * @return whether the default should be inherited by subpackages
-     */
+    * When used on a package, whether the defaults should also apply to subpackages.
+    *
+    * @return whether the default should be inherited by subpackages
+    */
     boolean applyToSubpackages() default true;
 
     /**

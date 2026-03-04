@@ -26,6 +26,7 @@
 package java.lang;
 
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
+import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.common.value.qual.PolyValue;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.framework.qual.AnnotatedFor;
@@ -57,7 +58,8 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @jls 5.1.3 Narrowing Primitive Conversion
  * @since   1.0
  */
-@AnnotatedFor({"lock", "nullness", "value"})
+@AnnotatedFor({"lock", "nullness", "value", "pico"})
+@Immutable
 public abstract class Number implements java.io.Serializable {
     /**
      * Constructor for subclasses to call.

@@ -32,6 +32,11 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
 import org.checkerframework.checker.nullness.qual.UnknownKeyFor;
+import org.checkerframework.checker.pico.qual.Assignable;
+import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.Mutable;
+import org.checkerframework.checker.pico.qual.PolyMutable;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.checker.signature.qual.CanonicalName;
 import org.checkerframework.checker.signature.qual.ClassGetName;
 import org.checkerframework.checker.signature.qual.ClassGetSimpleName;
@@ -223,7 +228,8 @@ import sun.reflect.misc.ReflectUtil;
             "meaning, but are unrelated by the Java type hierarchy.",
             "@Covariant makes Class<@NonNull String> a subtype of Class<@Nullable String>."})
 @AnnotatedFor({"index", "interning", "lock", "nullness", "signature"})
-@Covariant({0})
+@Covariant(0)
+@Immutable
 public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializable,
                               GenericDeclaration,
                               Type,
@@ -244,7 +250,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * This constructor is not used and prevents the default constructor being
      * generated.
      */
-    private Class(ClassLoader loader, Class<?> arrayComponentType) {
+    private Class(@Immutable ClassLoader loader, Class<?> arrayComponentType) {
         // Initialize final field for classLoader.  The initialization value of non-null
         // prevents future JIT optimizations from assuming this final field is null.
         classLoader = loader;
@@ -403,7 +409,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      */
     @ForName
     @CallerSensitive
-    public static Class<? extends Object> forName(@ClassGetName String className)
+    public static Class<? extends @Readonly Object> forName(@ClassGetName String className)
                 throws ClassNotFoundException {
         Class<?> caller = Reflection.getCallerClass();
         return forName0(className, true, ClassLoader.getClassLoader(caller), caller);
@@ -479,7 +485,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * @since     1.2
      */
     @CallerSensitive
-    public static Class<? extends Object> forName(@ClassGetName String name, boolean initialize,
+    public static Class<? extends @Readonly Object> forName(@ClassGetName String name, boolean initialize,
                                    @Nullable ClassLoader loader)
         throws ClassNotFoundException
     {
@@ -556,7 +562,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      */
     @SuppressWarnings("removal")
     @CallerSensitive
-    public static Class<? extends Object> forName(Module module, String name) {
+    public static Class<? extends @Readonly Object> forName(Module module, String name) {
         Objects.requireNonNull(module);
         Objects.requireNonNull(name);
 
@@ -684,7 +690,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
         }
     }
 
-    private transient volatile Constructor<T> cachedConstructor;
+    private transient volatile @Assignable /* should be @LazyFinal */ @Mutable Constructor<T> cachedConstructor;
 
     /**
      * Determines if the specified {@code Object} is assignment-compatible
@@ -719,7 +725,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
     @Pure
     @EnsuresNonNullIf(expression={"#1"}, result=true)
     @IntrinsicCandidate
-    public native boolean isInstance(@GuardSatisfied Class<T> this, @Nullable Object obj);
+    public native boolean isInstance(@GuardSatisfied Class<T> this, @Nullable @Readonly Object obj);
 
 
     /**
@@ -950,7 +956,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
     }
 
     // Package-private to allow ClassLoader access
-    ClassLoader getClassLoader0() { return classLoader; }
+    @Immutable ClassLoader getClassLoader0() { return classLoader; }
 
     /**
      * Returns the module that this class or interface is a member of.
@@ -984,7 +990,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
     private transient Object classData;
 
     // package-private
-    Object getClassData() {
+    @Immutable Object getClassData() {
         return classData;
     }
 
@@ -1137,7 +1143,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
     }
 
     // cached package name
-    private transient String packageName;
+    private transient @Assignable /* should be @LazyFinal */ String packageName;
 
     /**
      * Returns the interfaces directly implemented by the class or interface
@@ -1184,7 +1190,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * @return an array of interfaces directly implemented by this class
      */
     @SideEffectFree
-    public Class<? extends Object>[] getInterfaces(@GuardSatisfied Class<T> this) {
+    public Class<? extends @Readonly Object>[] getInterfaces(@GuardSatisfied Class<T> this) {
         // defensively copy before handing over to user code
         return getInterfaces(true);
     }
@@ -1272,7 +1278,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * @since 1.1
      */
     @Pure
-    public @Nullable Class<? extends Object> getComponentType(@GuardSatisfied Class<T> this) {
+    public @Nullable Class<? extends @Readonly Object> getComponentType(@GuardSatisfied Class<T> this) {
         // Only return for array types. Storage may be reused for Class for instance types.
         if (isArray()) {
             return componentType;
@@ -1547,7 +1553,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * @since 1.5
      */
     @CallerSensitive
-    public @Nullable Constructor<? extends Object> getEnclosingConstructor() throws SecurityException {
+    public @Nullable Constructor<? extends @Readonly Object> getEnclosingConstructor() throws SecurityException {
         EnclosingMethodInfo enclosingInfo = getEnclosingMethodInfo();
 
         if (enclosingInfo == null)
@@ -1613,7 +1619,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * @since 1.1
      */
     @CallerSensitive
-    public @Nullable Class<? extends Object> getDeclaringClass() throws SecurityException {
+    public @Nullable Class<? extends @Readonly Object> getDeclaringClass() throws SecurityException {
         final Class<?> candidate = getDeclaringClass0();
 
         if (candidate != null) {
@@ -1645,7 +1651,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      */
     @Pure
     @CallerSensitive
-    public @Nullable Class<? extends Object> getEnclosingClass() throws SecurityException {
+    public @Nullable Class<? extends @Readonly Object> getEnclosingClass() throws SecurityException {
         // There are five kinds of classes (or interfaces):
         // a) Top level classes
         // b) Nested classes (static member classes)
@@ -2107,7 +2113,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * @since 1.1
      */
     @CallerSensitive
-    public Constructor<? extends Object>[] getConstructors() throws SecurityException {
+    public Constructor<? extends @Readonly Object>[] getConstructors() throws SecurityException {
         @SuppressWarnings("removal")
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
@@ -2369,7 +2375,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * @jls 8.5 Member Type Declarations
      */
     @CallerSensitive
-    public Class<? extends Object>[] getDeclaredClasses() throws SecurityException {
+    public Class<? extends @Readonly Object>[] getDeclaredClasses() throws SecurityException {
         @SuppressWarnings("removal")
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
@@ -3380,7 +3386,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
 
         // Use a linked hash set to ensure order is preserved and
         // fields from common super interfaces are not duplicated
-        LinkedHashSet<Field> fields = new LinkedHashSet<>();
+        LinkedHashSet<@Immutable Field> fields = new LinkedHashSet<>();
 
         // Local fields
         addAll(fields, privateGetDeclaredFields(true));
@@ -3651,7 +3657,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
     // Other helpers and base implementation
     //
 
-    private static boolean arrayContentsEq(Object[] a1, Object[] a2) {
+    private static boolean arrayContentsEq(@Readonly Object[] a1, @Readonly Object[] a2) {
         if (a1 == null) {
             return a2 == null || a2.length == 0;
         }
@@ -3948,13 +3954,13 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      */
     @SuppressWarnings("unchecked")
     @IntrinsicCandidate
-    public @PolyNull @Signed T cast(@PolyNull Object obj) {
+    public @PolyNull @Signed @PolyMutable T cast(@PolyNull @PolyMutable Object obj) {
         if (obj != null && !isInstance(obj))
             throw new ClassCastException(cannotCastMsg(obj));
         return (T) obj;
     }
 
-    private String cannotCastMsg(Object obj) {
+    private String cannotCastMsg(@Readonly Object obj) {
         return "Cannot cast " + obj.getClass().getName() + " to " + getName();
     }
 
@@ -4024,7 +4030,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * @since 1.8
      */
     @Override
-    public <A extends Annotation> A[] getAnnotationsByType(Class<A> annotationClass) {
+    public <A extends @Readonly Annotation> A[] getAnnotationsByType(Class<A> annotationClass) {
         Objects.requireNonNull(annotationClass);
 
         AnnotationData annotationData = annotationData();
@@ -4055,7 +4061,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      */
     @Override
     @SuppressWarnings("unchecked")
-    public <A extends Annotation> @Nullable A getDeclaredAnnotation(Class<A> annotationClass) {
+    public <A extends @Readonly Annotation> @Nullable A getDeclaredAnnotation(Class<A> annotationClass) {
         Objects.requireNonNull(annotationClass);
 
         return (A) annotationData().declaredAnnotations.get(annotationClass);
@@ -4070,7 +4076,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * @since 1.8
      */
     @Override
-    public <A extends Annotation> A[] getDeclaredAnnotationsByType(Class<A> annotationClass) {
+    public <A extends @Readonly Annotation> A[] getDeclaredAnnotationsByType(Class<A> annotationClass) {
         Objects.requireNonNull(annotationClass);
 
         return AnnotationSupport.getDirectlyAndIndirectlyPresent(annotationData().declaredAnnotations,
@@ -4090,15 +4096,16 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
     }
 
     // annotation data that might get invalidated when JVM TI RedefineClasses() is called
+    @Immutable
     private static class AnnotationData {
-        final Map<Class<? extends Annotation>, Annotation> annotations;
-        final Map<Class<? extends Annotation>, Annotation> declaredAnnotations;
+        final Map<Class<? extends @Readonly Annotation>, @Readonly Annotation> annotations;
+        final Map<Class<? extends @Readonly Annotation>, @Readonly Annotation> declaredAnnotations;
 
         // Value of classRedefinedCount when we created this AnnotationData instance
         final int redefinedCount;
 
-        AnnotationData(Map<Class<? extends Annotation>, Annotation> annotations,
-                       Map<Class<? extends Annotation>, Annotation> declaredAnnotations,
+        AnnotationData(Map<Class<? extends @Readonly Annotation>, @Readonly Annotation> annotations,
+                       Map<Class<? extends @Readonly Annotation>, @Readonly Annotation> declaredAnnotations,
                        int redefinedCount) {
             this.annotations = annotations;
             this.declaredAnnotations = declaredAnnotations;
@@ -4129,15 +4136,15 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
     }
 
     private AnnotationData createAnnotationData(int classRedefinedCount) {
-        Map<Class<? extends Annotation>, Annotation> declaredAnnotations =
+        Map<Class<? extends @Readonly Annotation>, @Readonly Annotation> declaredAnnotations =
             AnnotationParser.parseAnnotations(getRawAnnotations(), getConstantPool(), this);
         Class<?> superClass = getSuperclass();
-        Map<Class<? extends Annotation>, Annotation> annotations = null;
+        Map<Class<? extends @Readonly Annotation>, @Readonly Annotation> annotations = null;
         if (superClass != null) {
-            Map<Class<? extends Annotation>, Annotation> superAnnotations =
+            Map<Class<? extends @Readonly Annotation>, @Readonly Annotation> superAnnotations =
                 superClass.annotationData().annotations;
-            for (Map.Entry<Class<? extends Annotation>, Annotation> e : superAnnotations.entrySet()) {
-                Class<? extends Annotation> annotationClass = e.getKey();
+            for (Map.Entry<Class<? extends @Readonly Annotation>, @Readonly Annotation> e : superAnnotations.entrySet()) {
+                Class<? extends @Readonly Annotation> annotationClass = e.getKey();
                 if (AnnotationType.getInstance(annotationClass).isInherited()) {
                     if (annotations == null) { // lazy construction
                         annotations = new LinkedHashMap<>((Math.max(
@@ -4173,7 +4180,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
         return annotationType;
     }
 
-    Map<Class<? extends Annotation>, Annotation> getDeclaredAnnotationMap() {
+    Map<Class<? extends @Readonly Annotation>, @Readonly Annotation> getDeclaredAnnotationMap() {
         return annotationData().declaredAnnotations;
     }
 
@@ -4285,7 +4292,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * @jvms 5.4.4 Access Control
      */
     @CallerSensitive
-    public Class<? extends Object> getNestHost() {
+    public Class<? extends @Readonly Object> getNestHost() {
         if (isPrimitive() || isArray()) {
             return this;
         }
@@ -4377,7 +4384,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * @jvms 4.7.29 The {@code NestMembers} Attribute
      */
     @CallerSensitive
-    public Class<? extends Object>[] getNestMembers() {
+    public Class<? extends @Readonly Object>[] getNestMembers() {
         if (isPrimitive() || isArray()) {
             return new Class<?>[] { this };
         }
@@ -4494,7 +4501,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      */
     @Override
     @Pure
-    public @Nullable Class<? extends Object> componentType() {
+    public @Nullable Class<? extends @Readonly Object> componentType() {
         return isArray() ? componentType : null;
     }
 
@@ -4507,7 +4514,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      */
     @Override
     @Pure
-    public Class<? extends Object> arrayType() {
+    public Class<? extends @Readonly Object> arrayType() {
         return Array.newInstance(this, 0).getClass();
     }
 
@@ -4575,7 +4582,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * @since 17
      */
     @CallerSensitive
-    public Class<? extends Object>[] getPermittedSubclasses() {
+    public Class<? extends @Readonly Object>[] getPermittedSubclasses() {
         Class<?>[] subClasses;
         if (isArray() || isPrimitive() || (subClasses = getPermittedSubclasses0()) == null) {
             return null;

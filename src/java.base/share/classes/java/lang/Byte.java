@@ -32,6 +32,7 @@ import org.checkerframework.checker.interning.qual.Interned;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.lock.qual.NewObject;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.checker.signedness.qual.PolySigned;
 import org.checkerframework.checker.signedness.qual.SignedPositive;
 import org.checkerframework.checker.signedness.qual.UnknownSignedness;
@@ -79,8 +80,9 @@ import static java.lang.constant.ConstantDescs.DEFAULT_NAME;
  * @see     java.lang.Number
  * @since   1.1
  */
-@AnnotatedFor({"index", "interning", "nullness", "signedness", "value"})
+@AnnotatedFor({"index", "interning", "nullness", "pico", "signedness", "value"})
 @jdk.internal.ValueBased
+@Immutable
 public final class Byte extends Number implements Comparable<Byte>, Constable {
 
     /**

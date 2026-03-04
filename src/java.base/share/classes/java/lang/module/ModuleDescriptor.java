@@ -60,6 +60,7 @@ import static java.util.Objects.*;
 import jdk.internal.module.Checks;
 import jdk.internal.module.ModuleInfo;
 
+import org.checkerframework.checker.pico.qual.Immutable;
 
 /**
  * A module descriptor.
@@ -96,6 +97,7 @@ import jdk.internal.module.ModuleInfo;
  * @since 9
  */
 
+@Immutable
 public class ModuleDescriptor
     implements Comparable<ModuleDescriptor>
 {

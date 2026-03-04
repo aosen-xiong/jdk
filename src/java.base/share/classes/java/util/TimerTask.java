@@ -41,6 +41,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  */
 
 @AnnotatedFor({"interning", "lock", "nullness"})
+@SuppressWarnings("pico") // Not interesting class, fix later
 public abstract @UsesObjectEquals class TimerTask implements Runnable {
     /**
      * This object is used to control access to the TimerTask internals.

@@ -28,6 +28,8 @@ package java.util;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 
@@ -57,7 +59,8 @@ import jdk.internal.vm.annotation.Stable;
  * @since 9
  */
 @jdk.internal.ValueBased
-final class KeyValueHolder<K,V> implements Map.Entry<K,V> {
+@Immutable
+final class KeyValueHolder<K extends @Immutable Object,V> implements Map.Entry<K,V> {
     @Stable
     final K key;
     @Stable
@@ -74,7 +77,7 @@ final class KeyValueHolder<K,V> implements Map.Entry<K,V> {
      * @return the key
      */
     @Override
-    public K getKey() {
+    public K getKey(@Readonly KeyValueHolder<K,V> this) {
         return key;
     }
 
@@ -84,7 +87,7 @@ final class KeyValueHolder<K,V> implements Map.Entry<K,V> {
      * @return the value
      */
     @Override
-    public V getValue() {
+    public V getValue(@Readonly KeyValueHolder<K,V> this) {
         return value;
     }
 
@@ -95,7 +98,7 @@ final class KeyValueHolder<K,V> implements Map.Entry<K,V> {
      * @return never returns normally
      */
     @Override
-    public V setValue(V value) {
+    public V setValue(KeyValueHolder<K,V> this, V value) {
         throw new UnsupportedOperationException("not supported");
     }
 
@@ -108,8 +111,8 @@ final class KeyValueHolder<K,V> implements Map.Entry<K,V> {
     @Override
     @Pure
     @EnsuresNonNullIf(expression="#1", result=true)
-    public boolean equals(@Nullable Object o) {
-        return o instanceof Map.Entry<?, ?> e
+    public boolean equals(@Readonly KeyValueHolder<K,V> this, @Nullable @Readonly Object o) {
+        return o instanceof Map.@Readonly Entry<?, ?> e
                 && key.equals(e.getKey())
                 && value.equals(e.getValue());
     }
@@ -120,7 +123,7 @@ final class KeyValueHolder<K,V> implements Map.Entry<K,V> {
      * value are non-null, so hashCode() can be called safely on them.
      */
     @Override
-    public int hashCode() {
+    public int hashCode(@Readonly KeyValueHolder<K,V> this) {
         return key.hashCode() ^ value.hashCode();
     }
 
@@ -133,7 +136,7 @@ final class KeyValueHolder<K,V> implements Map.Entry<K,V> {
      * @return a String representation of this map entry
      */
     @Override
-    public String toString() {
+    public String toString(@Readonly KeyValueHolder<K,V> this) {
         return key + "=" + value;
     }
 }

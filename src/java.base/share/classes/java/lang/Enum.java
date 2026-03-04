@@ -31,6 +31,8 @@ import org.checkerframework.checker.nullness.qual.UnknownKeyFor;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.lock.qual.GuardedByUnknown;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.checker.tainting.qual.Tainted;
 import org.checkerframework.common.value.qual.PolyValue;
 import org.checkerframework.dataflow.qual.Pure;
@@ -83,10 +85,11 @@ import static java.util.Objects.requireNonNull;
  * @jls 8.9.3 Enum Members
  * @since   1.5
  */
-@AnnotatedFor({"lock", "nullness", "index", "value", "tainting"})
+@AnnotatedFor({"lock", "nullness", "index", "pico", "value", "tainting"})
 @Covariant(0)
 @SuppressWarnings("serial") // No serialVersionUID needed due to
                             // special-casing of enum classes.
+@Immutable
 public abstract class Enum<E extends Enum<E>>
         implements Constable, Comparable<E>, Serializable {
     /**
@@ -177,7 +180,7 @@ public abstract class Enum<E extends Enum<E>>
      *          enum constant.
      */
     @Pure
-    public final boolean equals(@GuardSatisfied Enum<E> this, @GuardSatisfied @Nullable Object other) {
+    public final boolean equals(@GuardSatisfied Enum<E> this, @GuardSatisfied @Nullable @Readonly Object other) {
         return this==other;
     }
 
@@ -322,6 +325,7 @@ public abstract class Enum<E extends Enum<E>>
      *
      * @since 12
      */
+    @Immutable
     public static final class EnumDesc<E extends Enum<E>>
             extends DynamicConstantDesc<E> {
 

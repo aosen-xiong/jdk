@@ -25,6 +25,7 @@
 package java.lang.invoke;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Immutable;
 import java.util.List;
 
 /**
@@ -32,6 +33,7 @@ import java.util.List;
  *
  * @since 12
  */
+@Immutable
 public interface TypeDescriptor {
     /**
      * Returns the descriptor string for this {@code TypeDescriptor} object.
@@ -62,6 +64,7 @@ public interface TypeDescriptor {
      * @jvms 4.3.2 Field Descriptors
      * @since 12
      */
+    @Immutable
     interface OfField<F extends TypeDescriptor.OfField<F>> extends TypeDescriptor {
         /**
          * Does this field descriptor describe an array type?

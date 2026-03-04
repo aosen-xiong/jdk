@@ -39,6 +39,8 @@ import jdk.internal.access.SharedSecrets;
 import jdk.internal.access.JavaLangAccess;
 import jdk.internal.reflect.ReflectionFactory;
 
+import org.checkerframework.checker.pico.qual.Readonly;
+
 public final class AnnotationSupport {
     private static final JavaLangAccess LANG_ACCESS = SharedSecrets.getJavaLangAccess();
 
@@ -62,8 +64,8 @@ public final class AnnotationSupport {
      * @return an array of instances of {@code annoClass} or an empty
      *         array if none were found
      */
-    public static <A extends Annotation> A[] getDirectlyAndIndirectlyPresent(
-            Map<Class<? extends Annotation>, Annotation> annotations,
+    public static <A extends @Readonly Annotation> A[] getDirectlyAndIndirectlyPresent(
+            Map<Class<? extends @Readonly Annotation>, @Readonly Annotation> annotations,
             Class<A> annoClass) {
         List<A> result = new ArrayList<>();
 
@@ -95,15 +97,15 @@ public final class AnnotationSupport {
      * @return an array of instances of {@code annoClass} or an empty array if no
      *         indirectly present annotations were found
      */
-    private static <A extends Annotation> A[] getIndirectlyPresent(
-            Map<Class<? extends Annotation>, Annotation> annotations,
+    private static <A extends @Readonly Annotation> A[] getIndirectlyPresent(
+            Map<Class<? extends @Readonly Annotation>, @Readonly Annotation> annotations,
             Class<A> annoClass) {
 
         Repeatable repeatable = annoClass.getDeclaredAnnotation(Repeatable.class);
         if (repeatable == null)
             return null;  // Not repeatable -> no indirectly present annotations
 
-        Class<? extends Annotation> containerClass = repeatable.value();
+        Class<? extends @Readonly Annotation> containerClass = repeatable.value();
 
         Annotation container = annotations.get(containerClass);
         if (container == null)
@@ -124,14 +126,14 @@ public final class AnnotationSupport {
      * @return true if container class is found before containee class when
      *         iterating over annotations.keySet().
      */
-    private static <A extends Annotation> boolean containerBeforeContainee(
-            Map<Class<? extends Annotation>, Annotation> annotations,
+    private static <A extends @Readonly Annotation> boolean containerBeforeContainee(
+            Map<Class<? extends @Readonly Annotation>, @Readonly Annotation> annotations,
             Class<A> annoClass) {
 
-        Class<? extends Annotation> containerClass =
+        Class<? extends @Readonly Annotation> containerClass =
                 annoClass.getDeclaredAnnotation(Repeatable.class).value();
 
-        for (Class<? extends Annotation> c : annotations.keySet()) {
+        for (Class<? extends @Readonly Annotation> c : annotations.keySet()) {
             if (c == containerClass) return true;
             if (c == annoClass) return false;
         }
@@ -156,8 +158,8 @@ public final class AnnotationSupport {
      *
      * @return an array of instances of {@code annoClass} or an empty array if none were found.
      */
-    public static <A extends Annotation> A[] getAssociatedAnnotations(
-            Map<Class<? extends Annotation>, Annotation> declaredAnnotations,
+    public static <A extends @Readonly Annotation> A[] getAssociatedAnnotations(
+            Map<Class<? extends @Readonly Annotation>, @Readonly Annotation> declaredAnnotations,
             Class<?> decl,
             Class<A> annoClass) {
         Objects.requireNonNull(decl);
@@ -182,13 +184,13 @@ public final class AnnotationSupport {
      * (container), cast it to an array of annotations and return the result.
      */
     @SuppressWarnings("removal")
-    private static <A extends Annotation> A[] getValueArray(Annotation container) {
+    private static <A extends @Readonly Annotation> A[] getValueArray(Annotation container) {
         try {
             // According to JLS the container must have an array-valued value
             // method. Get the AnnotationType, get the "value" method and invoke
             // it to get the content.
 
-            Class<? extends Annotation> containerClass = container.annotationType();
+            Class<? extends @Readonly Annotation> containerClass = container.annotationType();
             AnnotationType annoType = AnnotationType.getInstance(containerClass);
             if (annoType == null)
                 throw invalidContainerException(container, null);
@@ -258,7 +260,7 @@ public final class AnnotationSupport {
     }
 
 
-    private static AnnotationFormatError invalidContainerException(Annotation anno,
+    private static AnnotationFormatError invalidContainerException(@Readonly Annotation anno,
                                                                    Throwable cause) {
         return new AnnotationFormatError(
                 anno + " is an invalid container for repeating annotations",
@@ -269,8 +271,8 @@ public final class AnnotationSupport {
     /* Sanity check type of all the annotation instances of type {@code annoClass}
      * from {@code container}.
      */
-    private static <A extends Annotation> void checkTypes(A[] annotations,
-                                                          Annotation container,
+    private static <A extends @Readonly Annotation> void checkTypes(A[] annotations,
+                                                                    @Readonly Annotation container,
                                                           Class<A> annoClass) {
         for (A a : annotations) {
             if (!annoClass.isInstance(a)) {

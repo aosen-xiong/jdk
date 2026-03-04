@@ -24,6 +24,7 @@
  */
 
 package java.io;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 
 /**
  * Serializability of a class is enabled by the class implementing the
@@ -190,5 +191,6 @@ package java.io;
  *      <cite>Java Object Serialization Specification</cite></a>
  * @since   1.1
  */
+@ReceiverDependentMutable
 public interface Serializable {
 }

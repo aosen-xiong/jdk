@@ -32,5 +32,6 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @since 1.1
  */
 @AnnotatedFor({"lock", "nullness"})
+@SuppressWarnings("pico") // Not interesting class, fix later
 public interface EventListener {
 }

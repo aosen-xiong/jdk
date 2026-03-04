@@ -25,6 +25,9 @@
 
 package java.util;
 
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 /**
  * Thrown by methods in the {@code Stack} class to indicate
  * that the stack is empty.
@@ -33,6 +36,8 @@ package java.util;
  * @see     java.util.Stack
  * @since   1.0
  */
+@AnnotatedFor("pico")
+@ReceiverDependentMutable
 public class EmptyStackException extends RuntimeException {
     @java.io.Serial
     private static final long serialVersionUID = 5084686378493302095L;

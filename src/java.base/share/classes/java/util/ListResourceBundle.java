@@ -119,6 +119,7 @@ import sun.util.ResourceBundleEnumeration;
  * @since 1.1
  */
 @AnnotatedFor({"lock", "nullness", "index"})
+@SuppressWarnings("pico") // Not interesting class, fix later
 public abstract class ListResourceBundle extends ResourceBundle {
     /**
      * Sole constructor.  (For invocation by subclass constructors, typically

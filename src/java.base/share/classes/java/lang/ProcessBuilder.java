@@ -194,7 +194,7 @@ import sun.security.action.GetPropertyAction;
  * @since 1.5
  */
 
-@AnnotatedFor({"nullness", "tainting"})
+@AnnotatedFor({"nullness", "pico", "tainting"})
 public final class ProcessBuilder
 {
     private List<String> command;

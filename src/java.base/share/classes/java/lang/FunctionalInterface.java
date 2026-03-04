@@ -27,6 +27,8 @@ package java.lang;
 
 import java.lang.annotation.*;
 
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 /**
  * An informative annotation type used to indicate that an interface
  * type declaration is intended to be a <i>functional interface</i> as
@@ -66,4 +68,5 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
+@AnnotatedFor("pico")
 public @interface FunctionalInterface {}

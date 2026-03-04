@@ -33,6 +33,12 @@ import org.checkerframework.checker.nonempty.qual.PolyNonEmpty;
 import org.checkerframework.checker.nullness.qual.KeyFor;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
+import org.checkerframework.checker.pico.qual.Assignable;
+import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.Mutable;
+import org.checkerframework.checker.pico.qual.PolyMutable;
+import org.checkerframework.checker.pico.qual.Readonly;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.checker.signedness.qual.UnknownSignedness;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
@@ -173,8 +179,9 @@ import java.io.IOException;
  * @see     Hashtable
  * @since   1.4
  */
-@AnnotatedFor({"lock", "nullness", "index"})
-public class LinkedHashMap<K,V>
+@AnnotatedFor({"lock", "nullness", "index", "pico"})
+@ReceiverDependentMutable
+public class LinkedHashMap<K extends @Immutable Object,V>
     extends HashMap<K,V>
     implements Map<K,V>
 {
@@ -203,9 +210,10 @@ public class LinkedHashMap<K,V>
     /**
      * HashMap.Node subclass for normal LinkedHashMap entries.
      */
-    static class Entry<K,V> extends HashMap.Node<K,V> {
-        Entry<K,V> before, after;
-        Entry(int hash, K key, V value, Node<K,V> next) {
+    @ReceiverDependentMutable
+    static class Entry<K extends @Immutable Object,V> extends HashMap.Node<K,V> {
+        @Assignable Entry<K,V> before, after;
+        Entry(int hash, K key, V value, @ReceiverDependentMutable Node<K,V> next) {
             super(hash, key, value, next);
         }
     }
@@ -216,12 +224,12 @@ public class LinkedHashMap<K,V>
     /**
      * The head (eldest) of the doubly linked list.
      */
-    transient LinkedHashMap.Entry<K,V> head;
+    transient @Assignable LinkedHashMap.Entry<K,V> head;
 
     /**
      * The tail (youngest) of the doubly linked list.
      */
-    transient LinkedHashMap.Entry<K,V> tail;
+    transient @Assignable LinkedHashMap.Entry<K,V> tail;
 
     /**
      * The iteration ordering method for this linked hash map: {@code true}
@@ -234,7 +242,7 @@ public class LinkedHashMap<K,V>
     // internal utilities
 
     // link at the end of list
-    private void linkNodeLast(LinkedHashMap.Entry<K,V> p) {
+    private void linkNodeLast(@Mutable LinkedHashMap<K,V> this, LinkedHashMap.Entry<K,V> p) {
         LinkedHashMap.Entry<K,V> last = tail;
         tail = p;
         if (last == null)
@@ -246,7 +254,8 @@ public class LinkedHashMap<K,V>
     }
 
     // apply src's links to dst
-    private void transferLinks(LinkedHashMap.Entry<K,V> src,
+    private void transferLinks(@Mutable LinkedHashMap<K,V> this,
+                               LinkedHashMap.Entry<K,V> src,
                                LinkedHashMap.Entry<K,V> dst) {
         LinkedHashMap.Entry<K,V> b = dst.before = src.before;
         LinkedHashMap.Entry<K,V> a = dst.after = src.after;
@@ -262,19 +271,19 @@ public class LinkedHashMap<K,V>
 
     // overrides of HashMap hook methods
 
-    void reinitialize() {
+    void reinitialize(@Mutable LinkedHashMap<K,V> this) {
         super.reinitialize();
         head = tail = null;
     }
 
-    Node<K,V> newNode(int hash, K key, V value, Node<K,V> e) {
+    Node<K,V> newNode(@Mutable LinkedHashMap<K,V> this, int hash, K key, V value, Node<K,V> e) {
         LinkedHashMap.Entry<K,V> p =
             new LinkedHashMap.Entry<>(hash, key, value, e);
         linkNodeLast(p);
         return p;
     }
 
-    Node<K,V> replacementNode(Node<K,V> p, Node<K,V> next) {
+    Node<K,V> replacementNode(@Mutable LinkedHashMap<K,V> this, @Readonly Node<K,V> p, Node<K,V> next) {
         LinkedHashMap.Entry<K,V> q = (LinkedHashMap.Entry<K,V>)p;
         LinkedHashMap.Entry<K,V> t =
             new LinkedHashMap.Entry<>(q.hash, q.key, q.value, next);
@@ -282,20 +291,20 @@ public class LinkedHashMap<K,V>
         return t;
     }
 
-    TreeNode<K,V> newTreeNode(int hash, K key, V value, Node<K,V> next) {
+    TreeNode<K,V> newTreeNode(@Mutable LinkedHashMap<K,V> this, int hash, K key, V value, Node<K,V> next) {
         TreeNode<K,V> p = new TreeNode<>(hash, key, value, next);
         linkNodeLast(p);
         return p;
     }
 
-    TreeNode<K,V> replacementTreeNode(Node<K,V> p, Node<K,V> next) {
+    TreeNode<K,V> replacementTreeNode(@Mutable LinkedHashMap<K,V> this, Node<K,V> p, Node<K,V> next) {
         LinkedHashMap.Entry<K,V> q = (LinkedHashMap.Entry<K,V>)p;
         TreeNode<K,V> t = new TreeNode<>(q.hash, q.key, q.value, next);
         transferLinks(q, t);
         return t;
     }
 
-    void afterNodeRemoval(Node<K,V> e) { // unlink
+    void afterNodeRemoval(@Mutable LinkedHashMap<K,V> this, Node<K,V> e) { // unlink
         LinkedHashMap.Entry<K,V> p =
             (LinkedHashMap.Entry<K,V>)e, b = p.before, a = p.after;
         p.before = p.after = null;
@@ -309,7 +318,7 @@ public class LinkedHashMap<K,V>
             a.before = b;
     }
 
-    void afterNodeInsertion(boolean evict) { // possibly remove eldest
+    void afterNodeInsertion(@Mutable LinkedHashMap<K,V> this, boolean evict) { // possibly remove eldest
         LinkedHashMap.Entry<K,V> first;
         if (evict && (first = head) != null && removeEldestEntry(first)) {
             K key = first.key;
@@ -317,7 +326,8 @@ public class LinkedHashMap<K,V>
         }
     }
 
-    void afterNodeAccess(Node<K,V> e) { // move node to last
+    @SuppressWarnings("pico") // Still can not type this as readonly
+    void afterNodeAccess(@Readonly LinkedHashMap<K,V> this, @Readonly Node<K,V> e) { // move node to last
         LinkedHashMap.Entry<K,V> last;
         if (accessOrder && (last = tail) != e) {
             LinkedHashMap.Entry<K,V> p =
@@ -393,7 +403,8 @@ public class LinkedHashMap<K,V>
      * @param  m the map whose mappings are to be placed in this map
      * @throws NullPointerException if the specified map is null
      */
-    public @PolyNonEmpty LinkedHashMap(@PolyNonEmpty Map<? extends K, ? extends V> m) {
+    @SuppressWarnings("pico:method.invocation.invalid") // PICO constructor fix
+    public @PolyNonEmpty LinkedHashMap(@PolyNonEmpty @Readonly Map<? extends K, ? extends V> m) {
         super();
         accessOrder = false;
         putMapEntries(m, false);
@@ -427,7 +438,7 @@ public class LinkedHashMap<K,V>
      *         specified value
      */
     @Pure
-    public boolean containsValue(@GuardSatisfied LinkedHashMap<K, V> this, @GuardSatisfied @Nullable @UnknownSignedness Object value) {
+    public boolean containsValue(@GuardSatisfied @Readonly LinkedHashMap<K, V> this, @GuardSatisfied @Nullable @UnknownSignedness @Readonly Object value) {
         for (LinkedHashMap.Entry<K,V> e = head; e != null; e = e.after) {
             V v = e.value;
             if (v == value || (value != null && value.equals(v)))
@@ -452,7 +463,7 @@ public class LinkedHashMap<K,V>
      * distinguish these two cases.
      */
     @Pure
-    public @Nullable V get(@GuardSatisfied LinkedHashMap<K, V> this, @UnknownSignedness @GuardSatisfied @Nullable Object key) {
+    public @Nullable V get(@GuardSatisfied @Readonly LinkedHashMap<K, V> this, @UnknownSignedness @GuardSatisfied @Nullable @Readonly Object key) {
         Node<K,V> e;
         if ((e = getNode(key)) == null)
             return null;
@@ -465,7 +476,7 @@ public class LinkedHashMap<K,V>
      * {@inheritDoc}
      */
     @Pure
-    public V getOrDefault(@Nullable Object key, V defaultValue) {
+    public V getOrDefault(@Readonly LinkedHashMap<K,V> this, @Nullable @Readonly Object key, V defaultValue) {
        Node<K,V> e;
        if ((e = getNode(key)) == null)
            return defaultValue;
@@ -477,7 +488,7 @@ public class LinkedHashMap<K,V>
     /**
      * {@inheritDoc}
      */
-    public void clear(@GuardSatisfied LinkedHashMap<K, V> this) {
+    public void clear(@GuardSatisfied @Mutable LinkedHashMap<K, V> this) {
         super.clear();
         head = tail = null;
     }
@@ -523,7 +534,7 @@ public class LinkedHashMap<K,V>
      * @return   {@code true} if the eldest entry should be removed
      *           from the map; {@code false} if it should be retained.
      */
-    protected boolean removeEldestEntry(@GuardSatisfied LinkedHashMap<K, V> this, Map.Entry<K,V> eldest) {
+    protected boolean removeEldestEntry(@GuardSatisfied @Mutable LinkedHashMap<K, V> this, Map.@Readonly Entry<K,V> eldest) {
         return false;
     }
 
@@ -546,10 +557,10 @@ public class LinkedHashMap<K,V>
      * @return a set view of the keys contained in this map
      */
     @SideEffectFree
-    public Set<@KeyFor({"this"}) K> keySet() {
+    public @PolyMutable Set<@KeyFor({"this"}) K> keySet(@PolyMutable LinkedHashMap<K, V> this) {
         Set<K> ks = keySet;
         if (ks == null) {
-            ks = new LinkedKeySet();
+            ks = new @PolyMutable LinkedKeySet();
             keySet = ks;
         }
         return ks;
@@ -557,7 +568,7 @@ public class LinkedHashMap<K,V>
 
     @Override
     final <T> T[] keysToArray(T[] a) {
-        Object[] r = a;
+        @Readonly Object[] r = a;
         int idx = 0;
         for (LinkedHashMap.Entry<K,V> e = head; e != null; e = e.after) {
             r[idx++] = e.key;
@@ -567,7 +578,7 @@ public class LinkedHashMap<K,V>
 
     @Override
     final <T> T[] valuesToArray(T[] a) {
-        Object[] r = a;
+        @Readonly Object[] r = a;
         int idx = 0;
         for (LinkedHashMap.Entry<K,V> e = head; e != null; e = e.after) {
             r[idx++] = e.value;
@@ -575,18 +586,19 @@ public class LinkedHashMap<K,V>
         return a;
     }
 
+    @ReceiverDependentMutable
     final class LinkedKeySet extends AbstractSet<K> {
         @Pure
-        public final int size()                 { return size; }
-        public final void clear()               { LinkedHashMap.this.clear(); }
+        public final int size(@Readonly LinkedKeySet this)                 { return size; }
+        public final void clear(@Mutable LinkedHashMap<K,V>. @Mutable LinkedKeySet this)               { LinkedHashMap.this.clear(); }
         @SideEffectFree
-        public final Iterator<K> iterator() {
+        public final Iterator<K> iterator(@Readonly LinkedKeySet this) {
             return new LinkedKeyIterator();
         }
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
-        public final boolean contains(@Nullable @UnknownSignedness Object o) { return containsKey(o); }
-        public final boolean remove(@Nullable @UnknownSignedness Object key) {
+        public final boolean contains(@Readonly LinkedKeySet this, @Nullable @UnknownSignedness @Readonly Object o) { return containsKey(o); }
+        public final boolean remove(@Mutable LinkedHashMap<K,V>. @Mutable LinkedKeySet this, @Nullable @UnknownSignedness @Readonly Object key) {
             return removeNode(hash(key), key, null, false, true) != null;
         }
         @SideEffectFree
@@ -633,26 +645,27 @@ public class LinkedHashMap<K,V>
      *
      * @return a view of the values contained in this map
      */
-    public Collection<V> values() {
+    public @PolyMutable Collection<V> values(@PolyMutable LinkedHashMap<K, V> this) {
         Collection<V> vs = values;
         if (vs == null) {
-            vs = new LinkedValues();
+            vs = new @PolyMutable LinkedValues();
             values = vs;
         }
         return vs;
     }
 
+    @ReceiverDependentMutable
     final class LinkedValues extends AbstractCollection<V> {
         @Pure
-        public final int size()                 { return size; }
-        public final void clear()               { LinkedHashMap.this.clear(); }
+        public final int size(@Readonly LinkedValues this)                 { return size; }
+        public final void clear(@Mutable LinkedHashMap<K,V>. @Mutable LinkedValues this)               { LinkedHashMap.this.clear(); }
         @SideEffectFree
-        public final Iterator<V> iterator() {
+        public final Iterator<V> iterator(@Readonly LinkedValues this) {
             return new LinkedValueIterator();
         }
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
-        public final boolean contains(@Nullable @UnknownSignedness Object o) { return containsValue(o); }
+        public final boolean contains(@Readonly LinkedValues this, @Nullable @UnknownSignedness @Readonly Object o) { return containsValue(o); }
         @SideEffectFree
         public final Spliterator<V> spliterator() {
             return Spliterators.spliterator(this, Spliterator.SIZED |
@@ -698,30 +711,32 @@ public class LinkedHashMap<K,V>
      * @return a set view of the mappings contained in this map
      */
     @SideEffectFree
-    public Set<Map.Entry<@KeyFor({"this"}) K,V>> entrySet(@GuardSatisfied LinkedHashMap<K, V> this) {
-        Set<Map.Entry<K,V>> es;
-        return (es = entrySet) == null ? (entrySet = new LinkedEntrySet()) : es;
+    @SuppressWarnings("pico:assignment.type.incompatible") // class polymorphic qualifier
+    public @PolyMutable Set<Map.@PolyMutable Entry<@KeyFor({"this"}) K,V>> entrySet(@GuardSatisfied @PolyMutable LinkedHashMap<K, V> this) {
+        Set<Map.@PolyMutable Entry<K,V>> es;
+        return (es = entrySet) == null ? (entrySet = new @PolyMutable LinkedEntrySet()) : es;
     }
 
-    final class LinkedEntrySet extends AbstractSet<Map.Entry<K,V>> {
+    @ReceiverDependentMutable
+    final class LinkedEntrySet extends AbstractSet<Map.@Readonly Entry<K,V>> {
         @Pure
-        public final int size()                 { return size; }
-        public final void clear()               { LinkedHashMap.this.clear(); }
+        public final int size(@Readonly LinkedEntrySet this)                 { return size; }
+        public final void clear(@Mutable LinkedHashMap<K,V>. @Mutable LinkedEntrySet this)               { LinkedHashMap.this.clear(); }
         @SideEffectFree
-        public final Iterator<Map.Entry<K,V>> iterator() {
+        public final Iterator<Map.Entry<K,V>> iterator(@Readonly LinkedEntrySet this) {
             return new LinkedEntryIterator();
         }
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
-        public final boolean contains(@Nullable @UnknownSignedness Object o) {
-            if (!(o instanceof Map.Entry<?, ?> e))
+        public final boolean contains(@Readonly LinkedEntrySet this, @Nullable @UnknownSignedness @Readonly Object o) {
+            if (!(o instanceof Map.@Readonly Entry<?, ?> e))
                 return false;
             Object key = e.getKey();
             Node<K,V> candidate = getNode(key);
             return candidate != null && candidate.equals(e);
         }
-        public final boolean remove(@Nullable @UnknownSignedness Object o) {
-            if (o instanceof Map.Entry<?, ?> e) {
+        public final boolean remove(@Mutable LinkedHashMap<K,V>. @Mutable LinkedEntrySet this, @Nullable @UnknownSignedness @Readonly Object o) {
+            if (o instanceof Map.@Readonly Entry<?, ?> e) {
                 Object key = e.getKey();
                 Object value = e.getValue();
                 return removeNode(hash(key), key, value, true, true) != null;
@@ -729,7 +744,7 @@ public class LinkedHashMap<K,V>
             return false;
         }
         @SideEffectFree
-        public final Spliterator<Map.Entry<K,V>> spliterator() {
+        public final Spliterator<Map.@Readonly Entry<K,V>> spliterator() {
             return Spliterators.spliterator(this, Spliterator.SIZED |
                                             Spliterator.ORDERED |
                                             Spliterator.DISTINCT);
@@ -757,7 +772,7 @@ public class LinkedHashMap<K,V>
             throw new ConcurrentModificationException();
     }
 
-    public void replaceAll(BiFunction<? super K, ? super V, ? extends V> function) {
+    public void replaceAll(@Mutable LinkedHashMap<K,V> this, BiFunction<? super K, ? super V, ? extends V> function) {
         if (function == null)
             throw new NullPointerException();
         int mc = modCount;
@@ -769,9 +784,10 @@ public class LinkedHashMap<K,V>
 
     // Iterators
 
+    @ReceiverDependentMutable
     abstract class LinkedHashIterator {
-        LinkedHashMap.Entry<K,V> next;
-        LinkedHashMap.Entry<K,V> current;
+        LinkedHashMap.@Readonly Entry<K,V> next;
+        LinkedHashMap.@Readonly Entry<K,V> current;
         int expectedModCount;
 
         LinkedHashIterator() {
@@ -782,11 +798,11 @@ public class LinkedHashMap<K,V>
 
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
-        public final boolean hasNext() {
+        public final boolean hasNext(@Readonly LinkedHashIterator this) {
             return next != null;
         }
 
-        final LinkedHashMap.Entry<K,V> nextNode(@NonEmpty LinkedHashIterator this) {
+        final LinkedHashMap.@Readonly Entry<K,V> nextNode(@NonEmpty @Mutable LinkedHashIterator this) {
             LinkedHashMap.Entry<K,V> e = next;
             if (modCount != expectedModCount)
                 throw new ConcurrentModificationException();
@@ -797,7 +813,7 @@ public class LinkedHashMap<K,V>
             return e;
         }
 
-        public final void remove() {
+        public final void remove(@Mutable LinkedHashMap<K,V>.@Mutable LinkedHashIterator this) {
             Node<K,V> p = current;
             if (p == null)
                 throw new IllegalStateException();
@@ -809,19 +825,22 @@ public class LinkedHashMap<K,V>
         }
     }
 
+    @ReceiverDependentMutable
     final class LinkedKeyIterator extends LinkedHashIterator
         implements Iterator<K> {
-        public final K next(@NonEmpty LinkedKeyIterator this) { return nextNode().getKey(); }
+        public final K next(@NonEmpty @Mutable LinkedKeyIterator this) { return nextNode().getKey(); }
     }
 
+    @ReceiverDependentMutable
     final class LinkedValueIterator extends LinkedHashIterator
         implements Iterator<V> {
-        public final V next(@NonEmpty LinkedValueIterator this) { return nextNode().value; }
+        public final V next(@NonEmpty @Mutable LinkedValueIterator this) { return nextNode().value; }
     }
 
+    @ReceiverDependentMutable
     final class LinkedEntryIterator extends LinkedHashIterator
         implements Iterator<Map.Entry<K,V>> {
-        public final Map.Entry<K,V> next(@NonEmpty LinkedEntryIterator this) { return nextNode(); }
+        public final Map.@Readonly Entry<K,V> next(@NonEmpty @Mutable LinkedEntryIterator this) { return nextNode(); }
     }
 
 

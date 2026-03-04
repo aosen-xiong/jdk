@@ -29,6 +29,10 @@ import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nonempty.qual.NonEmpty;
 import org.checkerframework.checker.nullness.qual.KeyFor;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.PolyMutable;
+import org.checkerframework.checker.pico.qual.Readonly;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.framework.qual.AnnotatedFor;
@@ -121,7 +125,8 @@ import org.checkerframework.framework.qual.CFComment;
 
 @CFComment({"lock/nullness: Subclasses of this interface/class may opt to prohibit null elements"})
 @AnnotatedFor({"lock", "nullness"})
-public interface SortedMap<K,V> extends Map<K,V> {
+@ReceiverDependentMutable
+public interface SortedMap<K extends @Immutable Object,V> extends Map<K,V> {
     /**
      * Returns the comparator used to order the keys in this map, or
      * {@code null} if this map uses the {@linkplain Comparable
@@ -132,7 +137,7 @@ public interface SortedMap<K,V> extends Map<K,V> {
      *         of its keys
      */
     @Pure
-    @Nullable Comparator<? super K> comparator(@GuardSatisfied SortedMap<K, V> this);
+    @Nullable Comparator<? super K> comparator(@GuardSatisfied @Readonly SortedMap<K, V> this);
 
     /**
      * Returns a view of the portion of this map whose keys range from
@@ -164,7 +169,7 @@ public interface SortedMap<K,V> extends Map<K,V> {
      *         outside the bounds of the range
      */
     @SideEffectFree
-    SortedMap<K,V> subMap(@GuardSatisfied SortedMap<K, V> this, @GuardSatisfied K fromKey, @GuardSatisfied K toKey);
+    @PolyMutable SortedMap<K,V> subMap(@GuardSatisfied @PolyMutable SortedMap<K, V> this, @GuardSatisfied K fromKey, @GuardSatisfied K toKey);
 
     /**
      * Returns a view of the portion of this map whose keys are
@@ -192,7 +197,7 @@ public interface SortedMap<K,V> extends Map<K,V> {
      *         bounds of the range
      */
     @SideEffectFree
-    SortedMap<K,V> headMap(@GuardSatisfied SortedMap<K, V> this, K toKey);
+    @PolyMutable SortedMap<K,V> headMap(@GuardSatisfied @PolyMutable SortedMap<K, V> this, K toKey);
 
     /**
      * Returns a view of the portion of this map whose keys are
@@ -220,7 +225,7 @@ public interface SortedMap<K,V> extends Map<K,V> {
      *         bounds of the range
      */
     @SideEffectFree
-    SortedMap<K,V> tailMap(@GuardSatisfied SortedMap<K, V> this, K fromKey);
+    @PolyMutable SortedMap<K,V> tailMap(@GuardSatisfied @PolyMutable SortedMap<K, V> this, K fromKey);
 
     /**
      * Returns the first (lowest) key currently in this map.
@@ -229,7 +234,7 @@ public interface SortedMap<K,V> extends Map<K,V> {
      * @throws NoSuchElementException if this map is empty
      */
     @SideEffectFree
-    @KeyFor("this") K firstKey(@GuardSatisfied @NonEmpty SortedMap<K, V> this);
+    @KeyFor("this") K firstKey(@GuardSatisfied @NonEmpty @Readonly SortedMap<K, V> this);
 
     /**
      * Returns the last (highest) key currently in this map.
@@ -238,7 +243,7 @@ public interface SortedMap<K,V> extends Map<K,V> {
      * @throws NoSuchElementException if this map is empty
      */
     @SideEffectFree
-    @KeyFor("this") K lastKey(@GuardSatisfied @NonEmpty SortedMap<K, V> this);
+    @KeyFor("this") K lastKey(@GuardSatisfied @NonEmpty @Readonly SortedMap<K, V> this);
 
     /**
      * Returns a {@link Set} view of the keys contained in this map.
@@ -258,7 +263,7 @@ public interface SortedMap<K,V> extends Map<K,V> {
      *         ascending order
      */
     @SideEffectFree
-    Set<@KeyFor({"this"}) K> keySet(@GuardSatisfied SortedMap<K, V> this);
+    @PolyMutable Set<@KeyFor({"this"}) K> keySet(@GuardSatisfied @PolyMutable SortedMap<K, V> this);
 
     /**
      * Returns a {@link Collection} view of the values contained in this map.
@@ -279,7 +284,7 @@ public interface SortedMap<K,V> extends Map<K,V> {
      *         sorted in ascending key order
      */
     @SideEffectFree
-    Collection<V> values(@GuardSatisfied SortedMap<K, V> this);
+    @PolyMutable Collection<V> values(@GuardSatisfied @PolyMutable SortedMap<K, V> this);
 
     /**
      * Returns a {@link Set} view of the mappings contained in this map.
@@ -300,5 +305,5 @@ public interface SortedMap<K,V> extends Map<K,V> {
      *         sorted in ascending key order
      */
     @SideEffectFree
-    Set<Map.Entry<@KeyFor({"this"}) K, V>> entrySet(@GuardSatisfied SortedMap<K, V> this);
+    @PolyMutable Set<Map.@PolyMutable Entry<@KeyFor({"this"}) K, V>> entrySet(@PolyMutable SortedMap<K, V> this);
 }

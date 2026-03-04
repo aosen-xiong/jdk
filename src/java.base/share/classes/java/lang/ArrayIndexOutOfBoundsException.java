@@ -35,7 +35,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  *
  * @since 1.0
  */
-@AnnotatedFor({"nullness"})
+@AnnotatedFor({"nullness", "pico"})
 public class ArrayIndexOutOfBoundsException extends IndexOutOfBoundsException {
     @java.io.Serial
     private static final long serialVersionUID = -5116101128118950844L;

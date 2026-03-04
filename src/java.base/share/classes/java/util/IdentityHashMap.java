@@ -26,6 +26,7 @@
 package java.util;
 
 import org.checkerframework.checker.index.qual.NonNegative;
+import org.checkerframework.checker.initialization.qual.UnknownInitialization;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nonempty.qual.EnsuresNonEmptyIf;
 import org.checkerframework.checker.nonempty.qual.NonEmpty;
@@ -34,6 +35,13 @@ import org.checkerframework.checker.nullness.qual.EnsuresKeyForIf;
 import org.checkerframework.checker.nullness.qual.KeyFor;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
+import org.checkerframework.checker.pico.qual.Assignable;
+import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.LazyFinal;
+import org.checkerframework.checker.pico.qual.Mutable;
+import org.checkerframework.checker.pico.qual.PolyMutable;
+import org.checkerframework.checker.pico.qual.Readonly;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.checker.signedness.qual.UnknownSignedness;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
@@ -155,7 +163,8 @@ import jdk.internal.access.SharedSecrets;
 
 @CFComment({"lock/nullness: This collection can only contain null values"})
 @AnnotatedFor({"lock", "nullness", "index"})
-public class IdentityHashMap<K,V>
+@ReceiverDependentMutable
+public class IdentityHashMap<K extends @Immutable Object,V>
     extends AbstractMap<K,V>
     implements Map<K,V>, java.io.Serializable, Cloneable
 {
@@ -189,7 +198,7 @@ public class IdentityHashMap<K,V>
     /**
      * The table, resized as necessary. Length MUST always be a power of two.
      */
-    transient Object[] table; // non-private to simplify nested class access
+    transient @Readonly Object[] table; // non-private to simplify nested class access
 
     /**
      * The number of key-value mappings contained in this identity hash map.
@@ -211,14 +220,14 @@ public class IdentityHashMap<K,V>
     /**
      * Use NULL_KEY for key if it is null.
      */
-    private static Object maskNull(Object key) {
+    private static @Readonly Object maskNull(@Readonly Object key) {
         return (key == null ? NULL_KEY : key);
     }
 
     /**
      * Returns internal representation of null key back to caller as null.
      */
-    static final Object unmaskNull(Object key) {
+    static final @Readonly Object unmaskNull(@Readonly Object key) {
         return (key == NULL_KEY ? null : key);
     }
 
@@ -226,6 +235,7 @@ public class IdentityHashMap<K,V>
      * Constructs a new, empty identity hash map with a default expected
      * maximum size (21).
      */
+    @SuppressWarnings("pico") // PICO constructor fix
     public IdentityHashMap() {
         init(DEFAULT_CAPACITY);
     }
@@ -239,6 +249,7 @@ public class IdentityHashMap<K,V>
      * @param expectedMaxSize the expected maximum size of the map
      * @throws IllegalArgumentException if {@code expectedMaxSize} is negative
      */
+    @SuppressWarnings("pico") // PICO constructor fix
     public IdentityHashMap(@NonNegative int expectedMaxSize) {
         if (expectedMaxSize < 0)
             throw new IllegalArgumentException("expectedMaxSize is negative: "
@@ -266,7 +277,7 @@ public class IdentityHashMap<K,V>
      * capacity, which is assumed to be a power of two between
      * MINIMUM_CAPACITY and MAXIMUM_CAPACITY inclusive.
      */
-    private void init(int initCapacity) {
+    private void init(@Mutable IdentityHashMap<K, V> this, int initCapacity) {
         // assert (initCapacity & -initCapacity) == initCapacity; // power of 2
         // assert initCapacity >= MINIMUM_CAPACITY;
         // assert initCapacity <= MAXIMUM_CAPACITY;
@@ -281,6 +292,7 @@ public class IdentityHashMap<K,V>
      * @param m the map whose mappings are to be placed into this map
      * @throws NullPointerException if the specified map is null
      */
+    @SuppressWarnings("pico") // PICO constructor fix
     public IdentityHashMap(Map<? extends K, ? extends V> m) {
         // Allow for a bit of growth
         this((int) ((1 + m.size()) * 1.1));
@@ -293,7 +305,7 @@ public class IdentityHashMap<K,V>
      * @return the number of key-value mappings in this map
      */
     @Pure
-    public @NonNegative int size(@GuardSatisfied IdentityHashMap<K, V> this) {
+    public @NonNegative int size(@GuardSatisfied @Readonly IdentityHashMap<K, V> this) {
         return size;
     }
 
@@ -306,14 +318,14 @@ public class IdentityHashMap<K,V>
      */
     @Pure
     @EnsuresNonEmptyIf(result = false, expression = "this")
-    public boolean isEmpty(@GuardSatisfied IdentityHashMap<K, V> this) {
+    public boolean isEmpty(@GuardSatisfied @Readonly IdentityHashMap<K, V> this) {
         return size == 0;
     }
 
     /**
      * Returns index for Object x.
      */
-    private static int hash(Object x, int length) {
+    private static int hash(@Readonly Object x, int length) {
         int h = System.identityHashCode(x);
         // Multiply by -254 to use the hash LSB and to ensure index is even
         return ((h << 1) - (h << 8)) & (length - 1);
@@ -345,9 +357,9 @@ public class IdentityHashMap<K,V>
      */
     @Pure
     @SuppressWarnings("unchecked")
-    public @Nullable V get(@GuardSatisfied IdentityHashMap<K, V> this, @UnknownSignedness @GuardSatisfied @Nullable Object key) {
+    public @Nullable V get(@GuardSatisfied @Readonly IdentityHashMap<K, V> this, @UnknownSignedness @GuardSatisfied @Nullable @Readonly Object key) {
         Object k = maskNull(key);
-        Object[] tab = table;
+        @Readonly Object[] tab = table;
         int len = tab.length;
         int i = hash(k, len);
         while (true) {
@@ -371,9 +383,9 @@ public class IdentityHashMap<K,V>
      */
     @EnsuresKeyForIf(expression={"#1"}, result=true, map={"this"})
     @Pure
-    public boolean containsKey(@GuardSatisfied IdentityHashMap<K, V> this, @GuardSatisfied @Nullable @UnknownSignedness Object key) {
+    public boolean containsKey(@GuardSatisfied @Readonly IdentityHashMap<K, V> this, @GuardSatisfied @Nullable @UnknownSignedness @Readonly Object key) {
         Object k = maskNull(key);
-        Object[] tab = table;
+        @Readonly Object[] tab = table;
         int len = tab.length;
         int i = hash(k, len);
         while (true) {
@@ -396,8 +408,8 @@ public class IdentityHashMap<K,V>
      * @see     #containsKey(Object)
      */
     @Pure
-    public boolean containsValue(@GuardSatisfied IdentityHashMap<K, V> this, @GuardSatisfied @Nullable @UnknownSignedness Object value) {
-        Object[] tab = table;
+    public boolean containsValue(@GuardSatisfied @Readonly IdentityHashMap<K, V> this, @GuardSatisfied @Nullable @UnknownSignedness @Readonly Object value) {
+        @Readonly Object[] tab = table;
         for (int i = 1; i < tab.length; i += 2)
             if (tab[i] == value && tab[i - 1] != null)
                 return true;
@@ -413,9 +425,9 @@ public class IdentityHashMap<K,V>
      * @return  {@code true} if and only if the specified key-value
      *          mapping is in the map
      */
-    private boolean containsMapping(@UnknownSignedness @GuardSatisfied @Nullable Object key, @GuardSatisfied @Nullable @UnknownSignedness Object value) {
+    private boolean containsMapping(@Readonly IdentityHashMap<K, V> this, @UnknownSignedness @GuardSatisfied @Nullable @Readonly Object key, @GuardSatisfied @Nullable @UnknownSignedness @Readonly Object value) {
         Object k = maskNull(key);
-        Object[] tab = table;
+        @Readonly Object[] tab = table;
         int len = tab.length;
         int i = hash(k, len);
         while (true) {
@@ -444,11 +456,11 @@ public class IdentityHashMap<K,V>
      * @see     #containsKey(Object)
      */
     @EnsuresKeyFor(value={"#1"}, map={"this"})
-    public @Nullable V put(@GuardSatisfied IdentityHashMap<K, V> this, K key, V value) {
+    public @Nullable V put(@GuardSatisfied @Mutable @UnknownInitialization IdentityHashMap<K, V> this, K key, V value) {
         final Object k = maskNull(key);
 
         retryAfterResize: for (;;) {
-            final Object[] tab = table;
+            final @Readonly Object[] tab = table;
             final int len = tab.length;
             int i = hash(k, len);
 
@@ -482,11 +494,11 @@ public class IdentityHashMap<K,V>
      * @param newCapacity the new capacity, must be a power of two.
      * @return whether a resize did in fact take place
      */
-    private boolean resize(int newCapacity) {
+    private boolean resize(@Mutable @UnknownInitialization IdentityHashMap<K, V> this, int newCapacity) {
         // assert (newCapacity & -newCapacity) == newCapacity; // power of 2
         int newLength = newCapacity * 2;
 
-        Object[] oldTable = table;
+        @Readonly Object[] oldTable = table;
         int oldLength = oldTable.length;
         if (oldLength == 2 * MAXIMUM_CAPACITY) { // can't expand any further
             if (size == MAXIMUM_CAPACITY - 1)
@@ -496,7 +508,7 @@ public class IdentityHashMap<K,V>
         if (oldLength >= newLength)
             return false;
 
-        Object[] newTable = new Object[newLength];
+        @Readonly Object[] newTable = new Object[newLength];
 
         for (int j = 0; j < oldLength; j += 2) {
             Object key = oldTable[j];
@@ -523,7 +535,7 @@ public class IdentityHashMap<K,V>
      * @param m mappings to be stored in this map
      * @throws NullPointerException if the specified map is null
      */
-    public void putAll(@GuardSatisfied IdentityHashMap<K, V> this, Map<? extends K, ? extends V> m) {
+    public void putAll(@GuardSatisfied @Mutable @UnknownInitialization IdentityHashMap<K, V> this, @Readonly Map<? extends K, ? extends V> m) {
         int n = m.size();
         if (n == 0)
             return;
@@ -543,9 +555,9 @@ public class IdentityHashMap<K,V>
      *         (A {@code null} return can also indicate that the map
      *         previously associated {@code null} with {@code key}.)
      */
-    public @Nullable V remove(@GuardSatisfied IdentityHashMap<K, V> this, @GuardSatisfied @Nullable @UnknownSignedness Object key) {
+    public @Nullable V remove(@GuardSatisfied @Mutable IdentityHashMap<K, V> this, @GuardSatisfied @Nullable @UnknownSignedness @Readonly Object key) {
         Object k = maskNull(key);
-        Object[] tab = table;
+        @Readonly Object[] tab = table;
         int len = tab.length;
         int i = hash(k, len);
 
@@ -575,9 +587,9 @@ public class IdentityHashMap<K,V>
      * @return  {@code true} if and only if the specified key-value
      *          mapping was in the map
      */
-    private boolean removeMapping(@UnknownSignedness @GuardSatisfied @Nullable Object key, @GuardSatisfied @Nullable @UnknownSignedness Object value) {
+    private boolean removeMapping(@Mutable IdentityHashMap<K, V> this, @UnknownSignedness @GuardSatisfied @Nullable @Readonly Object key, @GuardSatisfied @Nullable @UnknownSignedness @Readonly Object value) {
         Object k = maskNull(key);
-        Object[] tab = table;
+        @Readonly Object[] tab = table;
         int len = tab.length;
         int i = hash(k, len);
 
@@ -606,9 +618,9 @@ public class IdentityHashMap<K,V>
      *
      * @param d the index of a newly empty deleted slot
      */
-    private void closeDeletion(int d) {
+    private void closeDeletion(@Mutable IdentityHashMap<K,V> this, int d) {
         // Adapted from Knuth Section 6.4 Algorithm R
-        Object[] tab = table;
+        @Readonly Object[] tab = table;
         int len = tab.length;
 
         // Look for items to swap into newly vacated slot
@@ -639,9 +651,9 @@ public class IdentityHashMap<K,V>
      * Removes all of the mappings from this map.
      * The map will be empty after this call returns.
      */
-    public void clear(@GuardSatisfied IdentityHashMap<K, V> this) {
+    public void clear(@GuardSatisfied @Mutable IdentityHashMap<K, V> this) {
         modCount++;
-        Object[] tab = table;
+        @Readonly Object[] tab = table;
         for (int i = 0; i < tab.length; i++)
             tab[i] = null;
         size = 0;
@@ -665,21 +677,21 @@ public class IdentityHashMap<K,V>
      * @see Object#equals(Object)
      */
     @Pure
-    public boolean equals(@GuardSatisfied IdentityHashMap<K, V> this, @GuardSatisfied @Nullable Object o) {
+    public boolean equals(@GuardSatisfied @Readonly IdentityHashMap<K, V> this, @GuardSatisfied @Nullable @Readonly Object o) {
         if (o == this) {
             return true;
-        } else if (o instanceof IdentityHashMap<?, ?> m) {
+        } else if (o instanceof @Readonly IdentityHashMap<?, ?> m) {
             if (m.size() != size)
                 return false;
 
-            Object[] tab = m.table;
+            @Readonly Object[] tab = m.table;
             for (int i = 0; i < tab.length; i+=2) {
                 Object k = tab[i];
                 if (k != null && !containsMapping(k, tab[i + 1]))
                     return false;
             }
             return true;
-        } else if (o instanceof Map<?, ?> m) {
+        } else if (o instanceof @Readonly Map<?, ?> m) {
             return entrySet().equals(m.entrySet());
         } else {
             return false;  // o is not a Map
@@ -706,9 +718,9 @@ public class IdentityHashMap<K,V>
      * @see #equals(Object)
      */
     @Pure
-    public int hashCode(@GuardSatisfied IdentityHashMap<K, V> this) {
+    public int hashCode(@GuardSatisfied @Readonly IdentityHashMap<K, V> this) {
         int result = 0;
-        Object[] tab = table;
+        @Readonly Object[] tab = table;
         for (int i = 0; i < tab.length; i +=2) {
             Object key = tab[i];
             if (key != null) {
@@ -727,7 +739,7 @@ public class IdentityHashMap<K,V>
      * @return a shallow copy of this map
      */
     @SideEffectFree
-    public Object clone(@GuardSatisfied IdentityHashMap<K, V> this) {
+    public Object clone(@GuardSatisfied @Mutable IdentityHashMap<K, V> this) {
         try {
             IdentityHashMap<?,?> m = (IdentityHashMap<?,?>) super.clone();
             m.entrySet = null;
@@ -738,17 +750,19 @@ public class IdentityHashMap<K,V>
         }
     }
 
+    @ReceiverDependentMutable
     private abstract class IdentityHashMapIterator<T> implements Iterator<T> {
-        int index = (size != 0 ? 0 : table.length); // current slot.
+        @Assignable int index = (size != 0 ? 0 : table.length); // current slot.
         int expectedModCount = modCount; // to support fast-fail
         int lastReturnedIndex = -1;      // to allow remove()
-        boolean indexValid; // To avoid unnecessary next computation
-        Object[] traversalTable = table; // reference to main table or copy
+        @Assignable boolean indexValid; // To avoid unnecessary next computation
+        @SuppressWarnings("pico") // Field use from outter class
+        @Readonly Object[] traversalTable = table; // reference to main table or copy
 
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
-        public boolean hasNext() {
-            Object[] tab = traversalTable;
+        public boolean hasNext(@Readonly IdentityHashMapIterator<T> this) {
+            @Readonly Object[] tab = traversalTable;
             for (int i = index; i < tab.length; i+=2) {
                 Object key = tab[i];
                 if (key != null) {
@@ -760,7 +774,7 @@ public class IdentityHashMap<K,V>
             return false;
         }
 
-        protected int nextIndex(@NonEmpty IdentityHashMapIterator<T> this) {
+        protected int nextIndex(@NonEmpty @Mutable IdentityHashMapIterator<T> this) {
             if (modCount != expectedModCount)
                 throw new ConcurrentModificationException();
             if (!indexValid && !hasNext())
@@ -772,7 +786,7 @@ public class IdentityHashMap<K,V>
             return lastReturnedIndex;
         }
 
-        public void remove() {
+        public void remove(@Mutable IdentityHashMap<K,V>.@Mutable IdentityHashMapIterator<T> this) {
             if (lastReturnedIndex == -1)
                 throw new IllegalStateException();
             if (modCount != expectedModCount)
@@ -797,7 +811,7 @@ public class IdentityHashMap<K,V>
             // even in these rare cases, this is not very expensive in
             // time or space.
 
-            Object[] tab = traversalTable;
+            @Readonly Object[] tab = traversalTable;
             int len = tab.length;
 
             int d = deletedSlot;
@@ -833,7 +847,7 @@ public class IdentityHashMap<K,V>
                     if (i < deletedSlot && d >= deletedSlot &&
                         traversalTable == IdentityHashMap.this.table) {
                         int remaining = len - deletedSlot;
-                        Object[] newTable = new Object[remaining];
+                        @Readonly Object[] newTable = new Object[remaining];
                         System.arraycopy(tab, deletedSlot,
                                          newTable, 0, remaining);
                         traversalTable = newTable;
@@ -850,31 +864,35 @@ public class IdentityHashMap<K,V>
         }
     }
 
+    @ReceiverDependentMutable
     private class KeyIterator extends IdentityHashMapIterator<K> {
         @SuppressWarnings("unchecked")
-        public K next(@NonEmpty KeyIterator this) {
+        public K next(@NonEmpty @Mutable KeyIterator this) {
             return (K) unmaskNull(traversalTable[nextIndex()]);
         }
     }
 
+    @ReceiverDependentMutable
     private class ValueIterator extends IdentityHashMapIterator<V> {
         @SuppressWarnings("unchecked")
-        public V next(@NonEmpty ValueIterator this) {
+        public V next(@NonEmpty @Mutable ValueIterator this) {
             return (V) traversalTable[nextIndex() + 1];
         }
     }
 
+    @ReceiverDependentMutable
     private class EntryIterator
-        extends IdentityHashMapIterator<Map.Entry<K,V>>
+        extends IdentityHashMapIterator<Map.@Readonly Entry<K,V>>
     {
-        private Entry lastReturnedEntry;
+        // @SuppressWarnings("pico:initialization.field.uninitialized") // lazy
+        private @Readonly Entry lastReturnedEntry;
 
-        public Map.Entry<K,V> next(@NonEmpty EntryIterator this) {
+        public Map.@Readonly Entry<K,V> next(@NonEmpty @Mutable EntryIterator this) {
             lastReturnedEntry = new Entry(nextIndex());
             return lastReturnedEntry;
         }
 
-        public void remove() {
+        public void remove(@Mutable IdentityHashMap<K,V>.@Mutable EntryIterator this) {
             lastReturnedIndex =
                 ((null == lastReturnedEntry) ? -1 : lastReturnedEntry.index);
             super.remove();
@@ -882,27 +900,28 @@ public class IdentityHashMap<K,V>
             lastReturnedEntry = null;
         }
 
+        @ReceiverDependentMutable
         private class Entry implements Map.Entry<K,V> {
-            private int index;
+            private @Assignable int index;
 
             private Entry(int index) {
                 this.index = index;
             }
 
             @SuppressWarnings("unchecked")
-            public K getKey() {
+            public K getKey(@Readonly Entry this) {
                 checkIndexForEntryUse();
                 return (K) unmaskNull(traversalTable[index]);
             }
 
             @SuppressWarnings("unchecked")
-            public V getValue() {
+            public V getValue(@Readonly Entry this) {
                 checkIndexForEntryUse();
                 return (V) traversalTable[index+1];
             }
 
             @SuppressWarnings("unchecked")
-            public V setValue(V value) {
+            public V setValue(@Mutable Entry this, V value) {
                 checkIndexForEntryUse();
                 V oldValue = (V) traversalTable[index+1];
                 traversalTable[index+1] = value;
@@ -912,16 +931,16 @@ public class IdentityHashMap<K,V>
                 return oldValue;
             }
 
-            public boolean equals(@Nullable Object o) {
+            public boolean equals(@Readonly Entry this, @Nullable @Readonly Object o) {
                 if (index < 0)
                     return super.equals(o);
 
-                return o instanceof Map.Entry<?, ?> e
+                return o instanceof Map.@Readonly Entry<?, ?> e
                         && e.getKey() == unmaskNull(traversalTable[index])
                         && e.getValue() == traversalTable[index+1];
             }
 
-            public int hashCode() {
+            public int hashCode(@Readonly Entry this) {
                 if (lastReturnedIndex < 0)
                     return super.hashCode();
 
@@ -929,7 +948,7 @@ public class IdentityHashMap<K,V>
                        System.identityHashCode(traversalTable[index+1]));
             }
 
-            public String toString() {
+            public String toString(@Readonly Entry this) {
                 if (index < 0)
                     return super.toString();
 
@@ -937,7 +956,7 @@ public class IdentityHashMap<K,V>
                         + traversalTable[index+1]);
             }
 
-            private void checkIndexForEntryUse() {
+            private void checkIndexForEntryUse(@Readonly Entry this) {
                 if (index < 0)
                     throw new IllegalStateException("Entry was removed");
             }
@@ -951,7 +970,7 @@ public class IdentityHashMap<K,V>
      * view the first time this view is requested.  The view is stateless,
      * so there's no reason to create more than one.
      */
-    private transient Set<Map.Entry<K,V>> entrySet;
+    private transient @Assignable /* should be @LazyFinal */ Set<Map.@ReceiverDependentMutable Entry<K,V>> entrySet;
 
     /**
      * Returns an identity-based set view of the keys contained in this map.
@@ -992,30 +1011,31 @@ public class IdentityHashMap<K,V>
      * @see System#identityHashCode(Object)
      */
     @SideEffectFree
-    public Set<@KeyFor({"this"}) K> keySet(@GuardSatisfied IdentityHashMap<K, V> this) {
+    public @PolyMutable Set<@KeyFor({"this"}) K> keySet(@GuardSatisfied @PolyMutable IdentityHashMap<K, V> this) {
         Set<K> ks = keySet;
         if (ks == null) {
-            ks = new KeySet();
+            ks = new @PolyMutable KeySet();
             keySet = ks;
         }
         return ks;
     }
 
+    @ReceiverDependentMutable
     private class KeySet extends AbstractSet<K> {
         @SideEffectFree
-        public Iterator<K> iterator() {
+        public Iterator<K> iterator(@Readonly KeySet this) {
             return new KeyIterator();
         }
         @Pure
-        public @NonNegative int size() {
+        public @NonNegative int size(@Readonly KeySet this) {
             return size;
         }
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
-        public boolean contains(@Nullable @UnknownSignedness Object o) {
+        public boolean contains(@Readonly KeySet this, @Nullable @UnknownSignedness @Readonly Object o) {
             return containsKey(o);
         }
-        public boolean remove(@Nullable @UnknownSignedness Object o) {
+        public boolean remove(@Mutable KeySet this, @Nullable @UnknownSignedness @Readonly Object o) {
             int oldSize = size;
             IdentityHashMap.this.remove(o);
             return size != oldSize;
@@ -1025,7 +1045,7 @@ public class IdentityHashMap<K,V>
          * the former contains an optimization that results in incorrect
          * behavior when c is a smaller "normal" (non-identity-based) Set.
          */
-        public boolean removeAll(Collection<? extends @UnknownSignedness Object> c) {
+        public boolean removeAll(@Mutable KeySet this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) {
             Objects.requireNonNull(c);
             boolean modified = false;
             for (Iterator<K> i = iterator(); i.hasNext(); ) {
@@ -1036,10 +1056,10 @@ public class IdentityHashMap<K,V>
             }
             return modified;
         }
-        public void clear() {
+        public void clear(@Mutable KeySet this) {
             IdentityHashMap.this.clear();
         }
-        public int hashCode() {
+        public int hashCode(@Readonly KeySet this) {
             int result = 0;
             for (K key : this)
                 result += System.identityHashCode(key);
@@ -1056,7 +1076,7 @@ public class IdentityHashMap<K,V>
             int size = size();
             if (a.length < size)
                 a = (T[]) Array.newInstance(a.getClass().getComponentType(), size);
-            Object[] tab = table;
+            @Readonly Object[] tab = table;
             int ti = 0;
             for (int si = 0; si < tab.length; si += 2) {
                 Object key;
@@ -1080,7 +1100,7 @@ public class IdentityHashMap<K,V>
         }
 
         @SideEffectFree
-        public Spliterator<K> spliterator() {
+        public Spliterator<K> spliterator(@Readonly KeySet this) {
             return new KeySpliterator<>(IdentityHashMap.this, 0, -1, 0, 0);
         }
     }
@@ -1106,30 +1126,31 @@ public class IdentityHashMap<K,V>
      * {@code containsAll} methods.</b>
      */
     @SideEffectFree
-    public Collection<V> values(@GuardSatisfied IdentityHashMap<K, V> this) {
+    public @PolyMutable Collection<V> values(@GuardSatisfied @PolyMutable IdentityHashMap<K, V> this) {
         Collection<V> vs = values;
         if (vs == null) {
-            vs = new Values();
+            vs = new @PolyMutable Values();
             values = vs;
         }
         return vs;
     }
 
+    @ReceiverDependentMutable
     private class Values extends AbstractCollection<V> {
         @SideEffectFree
-        public Iterator<V> iterator() {
+        public Iterator<V> iterator(@Readonly Values this) {
             return new ValueIterator();
         }
         @Pure
-        public @NonNegative int size() {
+        public @NonNegative int size(@Readonly Values this) {
             return size;
         }
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
-        public boolean contains(@Nullable @UnknownSignedness Object o) {
+        public boolean contains(@Readonly Values this, @Nullable @UnknownSignedness @Readonly Object o) {
             return containsValue(o);
         }
-        public boolean remove(@Nullable @UnknownSignedness Object o) {
+        public boolean remove(@Mutable Values this, @Nullable @UnknownSignedness @Readonly Object o) {
             for (Iterator<V> i = iterator(); i.hasNext(); ) {
                 if (i.next() == o) {
                     i.remove();
@@ -1138,7 +1159,7 @@ public class IdentityHashMap<K,V>
             }
             return false;
         }
-        public void clear() {
+        public void clear(@Mutable Values this) {
             IdentityHashMap.this.clear();
         }
         @SideEffectFree
@@ -1152,7 +1173,7 @@ public class IdentityHashMap<K,V>
             int size = size();
             if (a.length < size)
                 a = (T[]) Array.newInstance(a.getClass().getComponentType(), size);
-            Object[] tab = table;
+            @Readonly Object[] tab = table;
             int ti = 0;
             for (int si = 0; si < tab.length; si += 2) {
                 if (tab[si] != null) { // key present ?
@@ -1175,7 +1196,7 @@ public class IdentityHashMap<K,V>
         }
 
         @SideEffectFree
-        public Spliterator<V> spliterator() {
+        public Spliterator<V> spliterator(@Readonly Values this) {
             return new ValueSpliterator<>(IdentityHashMap.this, 0, -1, 0, 0);
         }
     }
@@ -1219,34 +1240,36 @@ public class IdentityHashMap<K,V>
      * @return a set view of the identity-mappings contained in this map
      */
     @SideEffectFree
-    public Set<Map.Entry<@KeyFor({"this"}) K,V>> entrySet(@GuardSatisfied IdentityHashMap<K, V> this) {
-        Set<Map.Entry<K,V>> es = entrySet;
+    @SuppressWarnings("pico:assignment.type.incompatible") // polyq on supertype's type argument
+    public @PolyMutable Set<Map.@PolyMutable Entry<@KeyFor({"this"}) K,V>> entrySet(@GuardSatisfied @PolyMutable IdentityHashMap<K, V> this) {
+        Set<Map.@PolyMutable Entry<K,V>> es = entrySet;
         if (es != null)
             return es;
         else
-            return entrySet = new EntrySet();
+            return entrySet = new @PolyMutable EntrySet();
     }
 
-    private class EntrySet extends AbstractSet<Map.Entry<K,V>> {
+    @ReceiverDependentMutable
+    private class EntrySet extends AbstractSet<Map.@Readonly Entry<K,V>> {
         @SideEffectFree
-        public Iterator<Map.Entry<K,V>> iterator() {
+        public Iterator<Map.@Readonly Entry<K,V>> iterator(@Readonly EntrySet this) {
             return new EntryIterator();
         }
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
-        public boolean contains(@Nullable @UnknownSignedness Object o) {
-            return o instanceof Entry<?, ?> entry
+        public boolean contains(@Readonly EntrySet this, @Nullable @UnknownSignedness @Readonly Object o) {
+            return o instanceof @Readonly Entry<?, ?> entry
                     && containsMapping(entry.getKey(), entry.getValue());
         }
-        public boolean remove(@Nullable @UnknownSignedness Object o) {
-            return o instanceof Entry<?, ?> entry
+        public boolean remove(@Mutable EntrySet this, @Nullable @UnknownSignedness @Readonly Object o) {
+            return o instanceof @Readonly Entry<?, ?> entry
                     && removeMapping(entry.getKey(), entry.getValue());
         }
         @Pure
-        public @NonNegative int size() {
+        public @NonNegative int size(@Readonly EntrySet this) {
             return size;
         }
-        public void clear() {
+        public void clear(@Mutable EntrySet this) {
             IdentityHashMap.this.clear();
         }
         /*
@@ -1254,10 +1277,10 @@ public class IdentityHashMap<K,V>
          * the former contains an optimization that results in incorrect
          * behavior when c is a smaller "normal" (non-identity-based) Set.
          */
-        public boolean removeAll(Collection<? extends @UnknownSignedness Object> c) {
+        public boolean removeAll(@Mutable EntrySet this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) {
             Objects.requireNonNull(c);
             boolean modified = false;
-            for (Iterator<Map.Entry<K,V>> i = iterator(); i.hasNext(); ) {
+            for (Iterator<Map.@Readonly Entry<K,V>> i = iterator(); i.hasNext(); ) {
                 if (c.contains(i.next())) {
                     i.remove();
                     modified = true;
@@ -1271,14 +1294,14 @@ public class IdentityHashMap<K,V>
             return toArray(new Object[0]);
         }
 
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({"unchecked", "pico:argument.type.incompatible"}) // overappoximation
         @SideEffectFree
         public <T> @Nullable T[] toArray(@PolyNull T[] a) {
             int expectedModCount = modCount;
             int size = size();
             if (a.length < size)
                 a = (T[]) Array.newInstance(a.getClass().getComponentType(), size);
-            Object[] tab = table;
+            @Readonly Object[] tab = table;
             int ti = 0;
             for (int si = 0; si < tab.length; si += 2) {
                 Object key;
@@ -1287,7 +1310,7 @@ public class IdentityHashMap<K,V>
                     if (ti >= size) {
                         throw new ConcurrentModificationException();
                     }
-                    a[ti++] = (T) new AbstractMap.SimpleEntry<>(unmaskNull(key), tab[si + 1]);
+                    a[ti++] = (T) new AbstractMap.SimpleEntry<@Immutable Object, @Readonly Object>(unmaskNull(key), tab[si + 1]);
                 }
             }
             // fewer elements than expected or concurrent modification from other thread detected
@@ -1302,7 +1325,7 @@ public class IdentityHashMap<K,V>
         }
 
         @SideEffectFree
-        public Spliterator<Map.Entry<K,V>> spliterator() {
+        public Spliterator<Map.Entry<K,V>> spliterator(@Readonly EntrySet this) {
             return new EntrySpliterator<>(IdentityHashMap.this, 0, -1, 0, 0);
         }
     }
@@ -1321,7 +1344,7 @@ public class IdentityHashMap<K,V>
      *          particular order.
      */
     @java.io.Serial
-    private void writeObject(java.io.ObjectOutputStream s)
+    private void writeObject(@Mutable IdentityHashMap<K,V> this, java.io.ObjectOutputStream s)
         throws java.io.IOException  {
         // Write out and any hidden stuff
         s.defaultWriteObject();
@@ -1330,7 +1353,7 @@ public class IdentityHashMap<K,V>
         s.writeInt(size);
 
         // Write out keys and values (alternating)
-        Object[] tab = table;
+        @Readonly Object[] tab = table;
         for (int i = 0; i < tab.length; i += 2) {
             Object key = tab[i];
             if (key != null) {
@@ -1345,7 +1368,7 @@ public class IdentityHashMap<K,V>
      * deserializes it).
      */
     @java.io.Serial
-    private void readObject(java.io.ObjectInputStream s)
+    private void readObject(@Mutable IdentityHashMap<K,V> this, java.io.ObjectInputStream s)
         throws java.io.IOException, ClassNotFoundException  {
         // Read in any hidden stuff
         s.defaultReadObject();
@@ -1373,11 +1396,11 @@ public class IdentityHashMap<K,V>
      * The put method for readObject.  It does not resize the table,
      * update modCount, etc.
      */
-    private void putForCreate(K key, V value)
+    private void putForCreate(@Mutable IdentityHashMap<K,V> this, K key, V value)
         throws java.io.StreamCorruptedException
     {
         Object k = maskNull(key);
-        Object[] tab = table;
+        @Readonly Object[] tab = table;
         int len = tab.length;
         int i = hash(k, len);
 
@@ -1393,11 +1416,11 @@ public class IdentityHashMap<K,V>
 
     @SuppressWarnings("unchecked")
     @Override
-    public void forEach(BiConsumer<? super K, ? super V> action) {
+    public void forEach(@Mutable IdentityHashMap<K,V> this, BiConsumer<? super K, ? super V> action) {
         Objects.requireNonNull(action);
         int expectedModCount = modCount;
 
-        Object[] t = table;
+        @Readonly Object[] t = table;
         for (int index = 0; index < t.length; index += 2) {
             Object k = t[index];
             if (k != null) {
@@ -1412,11 +1435,11 @@ public class IdentityHashMap<K,V>
 
     @SuppressWarnings("unchecked")
     @Override
-    public void replaceAll(BiFunction<? super K, ? super V, ? extends V> function) {
+    public void replaceAll(@Mutable IdentityHashMap<K,V> this, BiFunction<? super K, ? super V, ? extends V> function) {
         Objects.requireNonNull(function);
         int expectedModCount = modCount;
 
-        Object[] t = table;
+        @Readonly Object[] t = table;
         for (int index = 0; index < t.length; index += 2) {
             Object k = t[index];
             if (k != null) {
@@ -1433,14 +1456,15 @@ public class IdentityHashMap<K,V>
      * Similar form as array-based Spliterators, but skips blank elements,
      * and guestimates size as decreasing by half per split.
      */
-    static class IdentityHashMapSpliterator<K,V> {
-        final IdentityHashMap<K,V> map;
+    @ReceiverDependentMutable
+    static class IdentityHashMapSpliterator<K extends @Immutable Object,V> {
+        final @Readonly IdentityHashMap<K,V> map;
         int index;             // current index, modified on advance/split
-        int fence;             // -1 until first use; then one past last index
-        int est;               // size estimate
-        int expectedModCount;  // initialized when fence set
+        @Assignable /* should be @LazyFinal */ int fence;             // -1 until first use; then one past last index
+        @Assignable /* should be @LazyFinal */ int est;               // size estimate
+        @Assignable /* should be @LazyFinal */ int expectedModCount;  // initialized when fence set
 
-        IdentityHashMapSpliterator(IdentityHashMap<K,V> map, int origin,
+        IdentityHashMapSpliterator(@Readonly IdentityHashMap<K,V> map, int origin,
                                    int fence, int est, int expectedModCount) {
             this.map = map;
             this.index = origin;
@@ -1449,7 +1473,7 @@ public class IdentityHashMap<K,V>
             this.expectedModCount = expectedModCount;
         }
 
-        final int getFence() { // initialize fence and size on first use
+        final int getFence(@Readonly IdentityHashMapSpliterator<K,V> this) { // initialize fence and size on first use
             int hi;
             if ((hi = fence) < 0) {
                 est = map.size;
@@ -1459,21 +1483,22 @@ public class IdentityHashMap<K,V>
             return hi;
         }
 
-        public final long estimateSize() {
+        public final long estimateSize(@Readonly IdentityHashMapSpliterator<K,V> this) {
             getFence(); // force init
             return (long) est;
         }
     }
 
-    static final class KeySpliterator<K,V>
+    @ReceiverDependentMutable
+    static final class KeySpliterator<K extends @Immutable Object,V>
         extends IdentityHashMapSpliterator<K,V>
         implements Spliterator<K> {
-        KeySpliterator(IdentityHashMap<K,V> map, int origin, int fence, int est,
+        KeySpliterator(@Readonly IdentityHashMap<K,V> map, int origin, int fence, int est,
                        int expectedModCount) {
             super(map, origin, fence, est, expectedModCount);
         }
 
-        public KeySpliterator<K,V> trySplit() {
+        public KeySpliterator<K,V> trySplit(@Mutable KeySpliterator<K,V> this) {
             int hi = getFence(), lo = index, mid = ((lo + hi) >>> 1) & ~1;
             return (lo >= mid) ? null :
                 new KeySpliterator<>(map, lo, index = mid, est >>>= 1,
@@ -1481,11 +1506,11 @@ public class IdentityHashMap<K,V>
         }
 
         @SuppressWarnings("unchecked")
-        public void forEachRemaining(Consumer<? super K> action) {
+        public void forEachRemaining(@Mutable KeySpliterator<K,V> this, Consumer<? super K> action) {
             if (action == null)
                 throw new NullPointerException();
             int i, hi, mc; Object key;
-            IdentityHashMap<K,V> m; Object[] a;
+            IdentityHashMap<K,V> m; @Readonly Object[] a;
             if ((m = map) != null && (a = m.table) != null &&
                 (i = index) >= 0 && (index = hi = getFence()) <= a.length) {
                 for (; i < hi; i += 2) {
@@ -1499,10 +1524,10 @@ public class IdentityHashMap<K,V>
         }
 
         @SuppressWarnings("unchecked")
-        public boolean tryAdvance(Consumer<? super K> action) {
+        public boolean tryAdvance(@Mutable KeySpliterator<K,V> this, Consumer<? super K> action) {
             if (action == null)
                 throw new NullPointerException();
-            Object[] a = map.table;
+            @Readonly Object[] a = map.table;
             int hi = getFence();
             while (index < hi) {
                 Object key = a[index];
@@ -1517,31 +1542,32 @@ public class IdentityHashMap<K,V>
             return false;
         }
 
-        public int characteristics() {
+        public int characteristics(@Readonly KeySpliterator<K,V> this) {
             return (fence < 0 || est == map.size ? SIZED : 0) | Spliterator.DISTINCT;
         }
     }
 
-    static final class ValueSpliterator<K,V>
+    @ReceiverDependentMutable
+    static final class ValueSpliterator<K extends @Immutable Object,V>
         extends IdentityHashMapSpliterator<K,V>
         implements Spliterator<V> {
-        ValueSpliterator(IdentityHashMap<K,V> m, int origin, int fence, int est,
+        ValueSpliterator(@Readonly IdentityHashMap<K,V> m, int origin, int fence, int est,
                          int expectedModCount) {
             super(m, origin, fence, est, expectedModCount);
         }
 
-        public ValueSpliterator<K,V> trySplit() {
+        public ValueSpliterator<K,V> trySplit(@Mutable ValueSpliterator<K,V> this) {
             int hi = getFence(), lo = index, mid = ((lo + hi) >>> 1) & ~1;
             return (lo >= mid) ? null :
                 new ValueSpliterator<>(map, lo, index = mid, est >>>= 1,
                                        expectedModCount);
         }
 
-        public void forEachRemaining(Consumer<? super V> action) {
+        public void forEachRemaining(@Mutable ValueSpliterator<K,V> this, Consumer<? super V> action) {
             if (action == null)
                 throw new NullPointerException();
             int i, hi, mc;
-            IdentityHashMap<K,V> m; Object[] a;
+            IdentityHashMap<K,V> m; @Readonly Object[] a;
             if ((m = map) != null && (a = m.table) != null &&
                 (i = index) >= 0 && (index = hi = getFence()) <= a.length) {
                 for (; i < hi; i += 2) {
@@ -1556,10 +1582,10 @@ public class IdentityHashMap<K,V>
             throw new ConcurrentModificationException();
         }
 
-        public boolean tryAdvance(Consumer<? super V> action) {
+        public boolean tryAdvance(@Mutable ValueSpliterator<K,V> this, Consumer<? super V> action) {
             if (action == null)
                 throw new NullPointerException();
-            Object[] a = map.table;
+            @Readonly Object[] a = map.table;
             int hi = getFence();
             while (index < hi) {
                 Object key = a[index];
@@ -1575,32 +1601,33 @@ public class IdentityHashMap<K,V>
             return false;
         }
 
-        public int characteristics() {
+        public int characteristics(@Readonly ValueSpliterator<K,V> this) {
             return (fence < 0 || est == map.size ? SIZED : 0);
         }
 
     }
 
-    static final class EntrySpliterator<K,V>
+    @ReceiverDependentMutable
+    static final class EntrySpliterator<K extends @Immutable Object,V>
         extends IdentityHashMapSpliterator<K,V>
         implements Spliterator<Map.Entry<K,V>> {
-        EntrySpliterator(IdentityHashMap<K,V> m, int origin, int fence, int est,
+        EntrySpliterator(@Readonly IdentityHashMap<K,V> m, int origin, int fence, int est,
                          int expectedModCount) {
             super(m, origin, fence, est, expectedModCount);
         }
 
-        public EntrySpliterator<K,V> trySplit() {
+        public EntrySpliterator<K,V> trySplit(@Mutable EntrySpliterator<K,V> this) {
             int hi = getFence(), lo = index, mid = ((lo + hi) >>> 1) & ~1;
             return (lo >= mid) ? null :
                 new EntrySpliterator<>(map, lo, index = mid, est >>>= 1,
                                        expectedModCount);
         }
 
-        public void forEachRemaining(Consumer<? super Map.Entry<K, V>> action) {
+        public void forEachRemaining(@Mutable EntrySpliterator<K,V> this, Consumer<? super Map.@Immutable Entry<K, V>> action) {
             if (action == null)
                 throw new NullPointerException();
             int i, hi, mc;
-            IdentityHashMap<K,V> m; Object[] a;
+            IdentityHashMap<K,V> m; @Readonly Object[] a;
             if ((m = map) != null && (a = m.table) != null &&
                 (i = index) >= 0 && (index = hi = getFence()) <= a.length) {
                 for (; i < hi; i += 2) {
@@ -1620,10 +1647,10 @@ public class IdentityHashMap<K,V>
             throw new ConcurrentModificationException();
         }
 
-        public boolean tryAdvance(Consumer<? super Map.Entry<K,V>> action) {
+        public boolean tryAdvance(@Mutable EntrySpliterator<K,V> this, Consumer<? super Map.@Immutable Entry<K,V>> action) {
             if (action == null)
                 throw new NullPointerException();
-            Object[] a = map.table;
+            @Readonly Object[] a = map.table;
             int hi = getFence();
             while (index < hi) {
                 Object key = a[index];
@@ -1642,7 +1669,7 @@ public class IdentityHashMap<K,V>
             return false;
         }
 
-        public int characteristics() {
+        public int characteristics(@Readonly EntrySpliterator<K,V> this) {
             return (fence < 0 || est == map.size ? SIZED : 0) | Spliterator.DISTINCT;
         }
     }

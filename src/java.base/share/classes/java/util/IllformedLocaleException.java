@@ -32,6 +32,7 @@
 
 package java.util;
 
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
 /**
@@ -41,7 +42,8 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @see Locale
  * @since 1.7
  */
-@AnnotatedFor({"index"})
+@AnnotatedFor({"index", "pico"})
+@ReceiverDependentMutable
 public class IllformedLocaleException extends RuntimeException {
 
     @java.io.Serial

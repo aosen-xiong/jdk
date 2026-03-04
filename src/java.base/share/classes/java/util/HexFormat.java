@@ -134,7 +134,7 @@ import java.nio.charset.StandardCharsets;
  * @since 17
  */
 
-
+@SuppressWarnings("pico") // Not interesting class, fix later
 public final class HexFormat {
 
     // Access to create strings from a byte array.

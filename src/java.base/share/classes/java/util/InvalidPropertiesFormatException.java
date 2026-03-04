@@ -42,7 +42,7 @@ import java.io.IOException;
  * @since   1.5
  * @serial exclude
  */
-
+@SuppressWarnings("pico") // Not interesting class, fix later
 public class InvalidPropertiesFormatException extends IOException {
 
     @java.io.Serial

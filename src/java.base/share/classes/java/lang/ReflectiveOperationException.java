@@ -25,6 +25,8 @@
 
 package java.lang;
 
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 /**
  * Common superclass of exceptions thrown by reflective operations in
  * core reflection.
@@ -32,6 +34,7 @@ package java.lang;
  * @see LinkageError
  * @since 1.7
  */
+@AnnotatedFor({"pico"})
 public class ReflectiveOperationException extends Exception {
     @java.io.Serial
     static final long serialVersionUID = 123456789L;

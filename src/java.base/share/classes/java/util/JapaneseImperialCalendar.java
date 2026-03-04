@@ -100,6 +100,7 @@ import sun.util.calendar.ZoneInfo;
  * @author Masayoshi Okutsu
  * @since 1.6
  */
+@SuppressWarnings("pico") // Not interesting class, fix later
 class JapaneseImperialCalendar extends Calendar {
     /*
      * Implementation Notes

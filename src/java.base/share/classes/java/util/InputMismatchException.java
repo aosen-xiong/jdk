@@ -25,6 +25,9 @@
 
 package java.util;
 
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 /**
  * Thrown by a {@code Scanner} to indicate that the token
  * retrieved does not match the pattern for the expected type, or
@@ -33,6 +36,8 @@ package java.util;
  * @see     java.util.Scanner
  * @since   1.5
  */
+@AnnotatedFor("pico")
+@ReceiverDependentMutable
 public class InputMismatchException extends NoSuchElementException {
     @java.io.Serial
     private static final long serialVersionUID = 8811230760997066428L;

@@ -28,6 +28,7 @@ package java.nio.file;
 import org.checkerframework.checker.interning.qual.UsesObjectEquals;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
+import java.nio.file.WatchEvent;
 /**
  * Defines the <em>standard</em> event kinds.
  *
@@ -48,7 +49,7 @@ public final @UsesObjectEquals class StandardWatchEventKinds {
      *
      * @see WatchService
      */
-    public static final WatchEvent.Kind<Object> OVERFLOW =
+    public static final StdWatchEventKind<Object> OVERFLOW =
         new StdWatchEventKind<Object>("OVERFLOW", Object.class);
 
     /**
@@ -59,7 +60,7 @@ public final @UsesObjectEquals class StandardWatchEventKinds {
      * or renamed into the directory. The event {@link WatchEvent#count count}
      * for this event is always {@code 1}.
      */
-    public static final WatchEvent.Kind<Path> ENTRY_CREATE =
+    public static final StdWatchEventKind<Path> ENTRY_CREATE =
         new StdWatchEventKind<Path>("ENTRY_CREATE", Path.class);
 
     /**
@@ -70,7 +71,7 @@ public final @UsesObjectEquals class StandardWatchEventKinds {
      * the directory. The event {@link WatchEvent#count count} for this event
      * is always {@code 1}.
      */
-    public static final WatchEvent.Kind<Path> ENTRY_DELETE =
+    public static final StdWatchEventKind<Path> ENTRY_DELETE =
         new StdWatchEventKind<Path>("ENTRY_DELETE", Path.class);
 
     /**
@@ -81,7 +82,7 @@ public final @UsesObjectEquals class StandardWatchEventKinds {
      * modified. The event {@link WatchEvent#count count} for this event is
      * {@code 1} or greater.
      */
-    public static final WatchEvent.Kind<Path> ENTRY_MODIFY =
+    public static final StdWatchEventKind<Path> ENTRY_MODIFY =
         new StdWatchEventKind<Path>("ENTRY_MODIFY", Path.class);
 
     private static class StdWatchEventKind<T> implements WatchEvent.Kind<T> {

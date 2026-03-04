@@ -33,6 +33,9 @@ import org.checkerframework.checker.nonempty.qual.NonEmpty;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Mutable;
+import org.checkerframework.checker.pico.qual.Readonly;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.checker.signedness.qual.UnknownSignedness;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
@@ -46,7 +49,8 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @since 1.5
  * @serial exclude
  */
-@AnnotatedFor({"index"})
+@AnnotatedFor({"index", "pico"})
+@ReceiverDependentMutable
 class RegularEnumSet<E extends Enum<E>> extends EnumSet<E> {
     @java.io.Serial
     private static final long serialVersionUID = 3411599620347842686L;
@@ -56,20 +60,20 @@ class RegularEnumSet<E extends Enum<E>> extends EnumSet<E> {
      */
     private long elements = 0L;
 
-    RegularEnumSet(Class<E>elementType, Enum<?>[] universe) {
+    RegularEnumSet(Class<E>elementType, Enum<?> @ReceiverDependentMutable [] universe) {
         super(elementType, universe);
     }
 
-    void addRange(E from, E to) {
+    void addRange(@Mutable RegularEnumSet<E> this, E from, E to) {
         elements = (-1L >>>  (from.ordinal() - to.ordinal() - 1)) << from.ordinal();
     }
 
-    void addAll() {
+    void addAll(@Mutable RegularEnumSet<E> this) {
         if (universe.length != 0)
             elements = -1L >>> -universe.length;
     }
 
-    void complement() {
+    void complement(@Mutable RegularEnumSet<E> this) {
         if (universe.length != 0) {
             elements = ~elements;
             elements &= -1L >>> -universe.length;  // Mask unused bits
@@ -86,10 +90,11 @@ class RegularEnumSet<E extends Enum<E>> extends EnumSet<E> {
      *
      * @return an iterator over the elements contained in this set
      */
-    public Iterator<E> iterator() {
+    public Iterator<E> iterator(@Readonly RegularEnumSet<E> this) {
         return new EnumSetIterator<>();
     }
 
+    @ReceiverDependentMutable
     private class EnumSetIterator<E extends Enum<E>> implements Iterator<E> {
         /**
          * A bit vector representing the elements in the set not yet
@@ -109,12 +114,12 @@ class RegularEnumSet<E extends Enum<E>> extends EnumSet<E> {
 
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
-        public boolean hasNext() {
+        public boolean hasNext(@Readonly EnumSetIterator<E> this) {
             return unseen != 0;
         }
 
         @SuppressWarnings("unchecked")
-        public E next(@NonEmpty EnumSetIterator<E> this) {
+        public E next(@NonEmpty @Mutable EnumSetIterator<E> this) {
             if (unseen == 0)
                 throw new NoSuchElementException();
             lastReturned = unseen & -unseen;
@@ -122,7 +127,7 @@ class RegularEnumSet<E extends Enum<E>> extends EnumSet<E> {
             return (E) universe[Long.numberOfTrailingZeros(lastReturned)];
         }
 
-        public void remove() {
+        public void remove(@Mutable EnumSetIterator<E> this) {
             if (lastReturned == 0)
                 throw new IllegalStateException();
             elements &= ~lastReturned;
@@ -136,7 +141,7 @@ class RegularEnumSet<E extends Enum<E>> extends EnumSet<E> {
      * @return the number of elements in this set
      */
     @Pure
-    public @NonNegative int size() {
+    public @NonNegative int size(@Readonly RegularEnumSet<E> this) {
         return Long.bitCount(elements);
     }
 
@@ -147,7 +152,7 @@ class RegularEnumSet<E extends Enum<E>> extends EnumSet<E> {
      */
     @Pure
     @EnsuresNonEmptyIf(result = false, expression = "this")
-    public boolean isEmpty() {
+    public boolean isEmpty(@Readonly RegularEnumSet<E> this) {
         return elements == 0;
     }
 
@@ -159,7 +164,7 @@ class RegularEnumSet<E extends Enum<E>> extends EnumSet<E> {
      */
     @Pure
     @EnsuresNonEmptyIf(result = true, expression = "this")
-    public boolean contains(@GuardSatisfied @Nullable @UnknownSignedness Object e) {
+    public boolean contains(@Readonly RegularEnumSet<E> this, @GuardSatisfied @Nullable @UnknownSignedness @Readonly Object e) {
         if (e == null)
             return false;
         Class<?> eClass = e.getClass();
@@ -180,7 +185,7 @@ class RegularEnumSet<E extends Enum<E>> extends EnumSet<E> {
      * @throws NullPointerException if {@code e} is null
      */
     @EnsuresNonEmpty("this")
-    public boolean add(E e) {
+    public boolean add(@Mutable RegularEnumSet<E> this, E e) {
         typeCheck(e);
 
         long oldElements = elements;
@@ -194,7 +199,7 @@ class RegularEnumSet<E extends Enum<E>> extends EnumSet<E> {
      * @param e element to be removed from this set, if present
      * @return {@code true} if the set contained the specified element
      */
-    public boolean remove(@GuardSatisfied @Nullable @UnknownSignedness Object e) {
+    public boolean remove(@Mutable RegularEnumSet<E> this, @GuardSatisfied @Nullable @UnknownSignedness @Readonly Object e) {
         if (e == null)
             return false;
         Class<?> eClass = e.getClass();
@@ -218,7 +223,7 @@ class RegularEnumSet<E extends Enum<E>> extends EnumSet<E> {
      * @throws NullPointerException if the specified collection is null
      */
     @Pure
-    public boolean containsAll(Collection<? extends @UnknownSignedness Object> c) {
+    public boolean containsAll(@Readonly RegularEnumSet<E> this, Collection<? extends @UnknownSignedness @Readonly Object> c) {
         if (!(c instanceof RegularEnumSet<?> es))
             return super.containsAll(c);
 
@@ -236,7 +241,7 @@ class RegularEnumSet<E extends Enum<E>> extends EnumSet<E> {
      * @throws NullPointerException if the specified collection or any
      *     of its elements are null
      */
-    public boolean addAll(Collection<? extends E> c) {
+    public boolean addAll(@Mutable RegularEnumSet<E> this, @Readonly Collection<? extends E> c) {
         if (!(c instanceof RegularEnumSet<?> es))
             return super.addAll(c);
 
@@ -261,7 +266,7 @@ class RegularEnumSet<E extends Enum<E>> extends EnumSet<E> {
      * @return {@code true} if this set changed as a result of the call
      * @throws NullPointerException if the specified collection is null
      */
-    public boolean removeAll(Collection<? extends @UnknownSignedness Object> c) {
+    public boolean removeAll(@Mutable RegularEnumSet<E> this, Collection<? extends @UnknownSignedness @Readonly Object> c) {
         if (!(c instanceof RegularEnumSet<?> es))
             return super.removeAll(c);
 
@@ -281,7 +286,7 @@ class RegularEnumSet<E extends Enum<E>> extends EnumSet<E> {
      * @return {@code true} if this set changed as a result of the call
      * @throws NullPointerException if the specified collection is null
      */
-    public boolean retainAll(Collection<? extends @UnknownSignedness Object> c) {
+    public boolean retainAll(@Mutable RegularEnumSet<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) {
         if (!(c instanceof RegularEnumSet<?> es))
             return super.retainAll(c);
 
@@ -299,7 +304,7 @@ class RegularEnumSet<E extends Enum<E>> extends EnumSet<E> {
     /**
      * Removes all of the elements from this set.
      */
-    public void clear() {
+    public void clear(@Mutable RegularEnumSet<E> this) {
         elements = 0;
     }
 
@@ -314,7 +319,7 @@ class RegularEnumSet<E extends Enum<E>> extends EnumSet<E> {
      */
     @Pure
     @EnsuresNonNullIf(expression="#1", result=true)
-    public boolean equals(@Nullable Object o) {
+    public boolean equals(@Readonly RegularEnumSet<E> this, @Nullable @Readonly Object o) {
         if (!(o instanceof RegularEnumSet<?> es))
             return super.equals(o);
 

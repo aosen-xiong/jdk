@@ -27,6 +27,7 @@
 package java.util;
 
 import org.checkerframework.checker.interning.qual.UsesObjectEquals;
+import org.checkerframework.checker.pico.qual.Mutable;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
 /**
@@ -63,6 +64,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @author Josh Bloch
  */
 @AnnotatedFor({"index", "interning"})
+@SuppressWarnings("pico") // Not interesting class, fix later
 @UsesObjectEquals class TimSort<T> {
     /**
      * This is the minimum sized sequence that will be merged.  Shorter

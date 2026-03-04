@@ -38,7 +38,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  *
  * @since   1.0
  */
-@AnnotatedFor({"nullness"})
+@AnnotatedFor({"nullness", "pico"})
 public class AbstractMethodError extends IncompatibleClassChangeError {
     @java.io.Serial
     private static final long serialVersionUID = -1654391082989018462L;

@@ -37,6 +37,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @since  1.5
  */
 @AnnotatedFor({"interning", "lock", "nullness"})
+@SuppressWarnings("pico") // Not interesting class, fix later
 public @UsesObjectEquals class FormattableFlags {
 
     // Explicit instantiation of this class is prohibited.

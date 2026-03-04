@@ -36,6 +36,11 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import org.checkerframework.checker.pico.qual.Immutable;
+import org.checkerframework.checker.pico.qual.Mutable;
+import org.checkerframework.checker.pico.qual.Readonly;
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 /**
  * A stack walker.
  *
@@ -88,6 +93,9 @@ import java.util.stream.Stream;
  *
  * @since 9
  */
+
+@AnnotatedFor("pico")
+@Immutable
 public final class StackWalker {
     /**
      * A {@code StackFrame} object represents a method invocation returned by
@@ -290,7 +298,7 @@ public final class StackWalker {
         LOCALS_AND_OPERANDS
     };
 
-    static final EnumSet<Option> DEFAULT_EMPTY_OPTION = EnumSet.noneOf(Option.class);
+    static final @Mutable EnumSet<Option> DEFAULT_EMPTY_OPTION = EnumSet.noneOf(Option.class);
 
     private static final StackWalker DEFAULT_WALKER =
         new StackWalker(DEFAULT_EMPTY_OPTION);
@@ -418,7 +426,7 @@ public final class StackWalker {
         this.retainClassRef = hasOption(Option.RETAIN_CLASS_REFERENCE);
     }
 
-    private static void checkPermission(Set<Option> options) {
+    private static void checkPermission(@Readonly Set<Option> options) {
         Objects.requireNonNull(options);
         @SuppressWarnings("removal")
         SecurityManager sm = System.getSecurityManager();
@@ -432,7 +440,7 @@ public final class StackWalker {
     /*
      * Returns a defensive copy
      */
-    private static EnumSet<Option> toEnumSet(Set<Option> options) {
+    private static EnumSet<Option> toEnumSet(@Readonly Set<Option> options) {
         Objects.requireNonNull(options);
         if (options.isEmpty()) {
             return DEFAULT_EMPTY_OPTION;
@@ -605,7 +613,7 @@ public final class StackWalker {
 
     // ---- package access ----
 
-    static StackWalker newInstance(Set<Option> options, ExtendedOption extendedOption) {
+    static StackWalker newInstance(@Readonly Set<Option> options, ExtendedOption extendedOption) {
         EnumSet<Option> optionSet = toEnumSet(options);
         checkPermission(optionSet);
         return new StackWalker(optionSet, 0, extendedOption);

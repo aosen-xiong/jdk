@@ -36,7 +36,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  *
  * @since   1.0
  */
-@AnnotatedFor({"nullness"})
+@AnnotatedFor({"nullness", "pico"})
 public class ClassFormatError extends LinkageError {
     @java.io.Serial
     private static final long serialVersionUID = -8420114879011949195L;

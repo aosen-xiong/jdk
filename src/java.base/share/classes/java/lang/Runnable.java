@@ -57,7 +57,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @see     java.util.concurrent.Callable
  * @since   1.0
  */
-@AnnotatedFor({"guieffect", "nullness"})
+@AnnotatedFor({"guieffect", "nullness", "pico"})
 @PolyUIType
 @FunctionalInterface
 public interface Runnable {

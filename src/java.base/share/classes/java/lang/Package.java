@@ -28,6 +28,8 @@ package java.lang;
 import org.checkerframework.checker.interning.qual.UsesObjectEquals;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Assignable;
+import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.checker.signature.qual.DotSeparatedIdentifiers;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
@@ -124,7 +126,8 @@ import jdk.internal.reflect.Reflection;
  * @since 1.2
  * @revised 9
  */
-@AnnotatedFor({"interning", "lock", "nullness", "signature"})
+@AnnotatedFor({"interning", "lock", "nullness", "pico", "signature"})
+@Immutable
 public @UsesObjectEquals class Package extends NamedPackage implements java.lang.reflect.AnnotatedElement {
     /**
      * Return the name of this package.
@@ -582,6 +585,7 @@ public @UsesObjectEquals class Package extends NamedPackage implements java.lang
     /*
      * Versioning information.  Only for packages in unnamed modules.
      */
+    @Immutable
     static class VersionInfo {
         static final VersionInfo NULL_VERSION_INFO
             = new VersionInfo(null, null, null, null, null, null, null);
@@ -625,5 +629,5 @@ public @UsesObjectEquals class Package extends NamedPackage implements java.lang
     }
 
     private final VersionInfo versionInfo;
-    private Class<?> packageInfo;
+    private @Assignable /* should be @LazyFinal */ Class<?> packageInfo;
 }

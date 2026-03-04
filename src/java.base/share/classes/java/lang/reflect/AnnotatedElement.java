@@ -27,6 +27,7 @@ package java.lang.reflect;
 
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Immutable;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
@@ -275,6 +276,7 @@ import sun.reflect.annotation.AnnotationType;
  * @author Josh Bloch
  */
 @AnnotatedFor({"lock", "nullness"})
+@Immutable
 public interface AnnotatedElement {
     /**
      * Returns true if an annotation for the specified type

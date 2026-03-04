@@ -31,6 +31,7 @@ import org.checkerframework.checker.nonempty.qual.EnsuresNonEmptyIf;
 import org.checkerframework.checker.nonempty.qual.NonEmpty;
 import org.checkerframework.checker.regex.qual.PolyRegex;
 import org.checkerframework.checker.regex.qual.Regex;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.checker.signedness.qual.SignedPositive;
 import org.checkerframework.common.value.qual.MinLen;
 import org.checkerframework.dataflow.qual.Pure;
@@ -1132,7 +1133,7 @@ public final @UsesObjectEquals class Pattern
      * @since 1.5
      */
     @Pure
-    public String toString(@GuardSatisfied Pattern this) {
+    public String toString(@GuardSatisfied @Readonly Pattern this) {
         return pattern;
     }
 
@@ -1145,7 +1146,7 @@ public final @UsesObjectEquals class Pattern
      * @return  A new matcher for this pattern
      */
     @SideEffectFree
-    public @PolyRegex Matcher matcher(@PolyRegex Pattern this, CharSequence input) {
+    public @PolyRegex Matcher matcher(@PolyRegex Pattern this, @Readonly CharSequence input) {
         if (!compiled) {
             synchronized(this) {
                 if (!compiled)
@@ -1193,7 +1194,7 @@ public final @UsesObjectEquals class Pattern
      *          If the expression's syntax is invalid
      */
     @Pure
-    public static boolean matches(@Regex String regex, CharSequence input) {
+    public static boolean matches(@Regex String regex, @Readonly CharSequence input) {
         Pattern p = Pattern.compile(regex);
         Matcher m = p.matcher(input);
         return m.matches();
@@ -1279,7 +1280,7 @@ public final @UsesObjectEquals class Pattern
      *          around matches of this pattern
      */
     @Pure
-    public String @MinLen(1) [] split(CharSequence input, int limit) {
+    public String @MinLen(1) [] split(@Readonly CharSequence input, int limit) {
         int index = 0;
         boolean matchLimited = limit > 0;
         ArrayList<String> matchList = new ArrayList<>();
@@ -1356,7 +1357,7 @@ public final @UsesObjectEquals class Pattern
      *          around matches of this pattern
      */
     @Pure
-    public String @MinLen(1) [] split(CharSequence input) {
+    public String @MinLen(1) [] split(@Readonly CharSequence input) {
         return split(input, 0);
     }
 

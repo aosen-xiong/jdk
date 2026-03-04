@@ -39,7 +39,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @see     java.lang.Thread#suspend()
  * @since   1.0
  */
-@AnnotatedFor({"nullness"})
+@AnnotatedFor({"nullness", "pico"})
 public class IllegalThreadStateException extends IllegalArgumentException {
     @java.io.Serial
     private static final long serialVersionUID = -7626246362397460174L;

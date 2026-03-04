@@ -336,6 +336,7 @@ import sun.util.calendar.ZoneInfo;
  * @since 1.1
  */
 @AnnotatedFor({"lock", "nullness", "index"})
+@SuppressWarnings("pico") // Not interesting class, fix later
 public class GregorianCalendar extends Calendar {
     /*
      * Implementation Notes

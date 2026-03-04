@@ -27,6 +27,7 @@ package java.lang.ref;
 
 import org.checkerframework.checker.interning.qual.UsesObjectEquals;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
 import java.util.function.Consumer;
@@ -42,6 +43,7 @@ import jdk.internal.misc.VM;
 
 @AnnotatedFor({"interning", "nullness"})
 @SuppressWarnings({"rawtypes"})
+@ReceiverDependentMutable
 public @UsesObjectEquals class ReferenceQueue<T> {
 
     /**

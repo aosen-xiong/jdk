@@ -28,6 +28,8 @@ package java.lang;
 import org.checkerframework.checker.index.qual.IndexOrHigh;
 import org.checkerframework.checker.index.qual.LessThan;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Readonly;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
 import java.io.IOException;
@@ -53,7 +55,8 @@ import java.io.IOException;
  *
  * @since 1.5
  */
-@AnnotatedFor({"nullness", "index"})
+@AnnotatedFor({"nullness", "index", "pico"})
+@ReceiverDependentMutable
 public interface Appendable {
 
     /**
@@ -74,7 +77,7 @@ public interface Appendable {
      * @throws  IOException
      *          If an I/O error occurs
      */
-    Appendable append(@Nullable CharSequence csq) throws IOException;
+    Appendable append(@Nullable @Readonly CharSequence csq) throws IOException;
 
     /**
      * Appends a subsequence of the specified character sequence to this
@@ -110,7 +113,7 @@ public interface Appendable {
      * @throws  IOException
      *          If an I/O error occurs
      */
-    Appendable append(@Nullable CharSequence csq, @IndexOrHigh({"#1"}) @LessThan({"#3 + 1"}) int start, @IndexOrHigh({"#1"}) int end) throws IOException;
+    Appendable append(@Nullable @Readonly CharSequence csq, @IndexOrHigh({"#1"}) @LessThan({"#3 + 1"}) int start, @IndexOrHigh({"#1"}) int end) throws IOException;
 
     /**
      * Appends the specified character to this {@code Appendable}.

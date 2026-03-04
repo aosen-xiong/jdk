@@ -69,6 +69,7 @@ import java.util.stream.IntStream;
  */
 @AnnotatedFor({"lock", "nullness", "optional"})
 @jdk.internal.ValueBased
+@SuppressWarnings("pico") // Not interesting class, fix later
 public final @NonNull class OptionalInt {
     /**
      * Common instance for {@code empty()}.

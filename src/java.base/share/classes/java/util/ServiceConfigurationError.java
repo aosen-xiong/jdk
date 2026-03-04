@@ -34,7 +34,7 @@ package java.util;
  * @since 1.6
  * @see ServiceLoader
  */
-
+@SuppressWarnings("pico") // Not interesting class, fix later
 public class ServiceConfigurationError
     extends Error
 {

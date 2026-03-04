@@ -30,6 +30,9 @@ import jdk.internal.access.SharedSecrets;
 import java.lang.StackWalker.StackFrame;
 import java.lang.invoke.MethodType;
 
+import org.checkerframework.framework.qual.AnnotatedFor;
+
+@AnnotatedFor("pico")
 class StackFrameInfo implements StackFrame {
     private static final JavaLangInvokeAccess JLIA =
         SharedSecrets.getJavaLangInvokeAccess();

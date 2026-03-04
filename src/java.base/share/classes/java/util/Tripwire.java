@@ -45,6 +45,7 @@ import java.security.PrivilegedAction;
  *
  * @since 1.8
  */
+@SuppressWarnings("pico") // Not interesting class, fix later
 final class Tripwire {
     private static final String TRIPWIRE_PROPERTY = "org.openjdk.java.util.stream.tripwire";
 

@@ -42,6 +42,8 @@ import sun.reflect.generics.factory.CoreReflectionFactory;
 import sun.reflect.generics.visitor.Reifier;
 import sun.reflect.generics.scope.ClassScope;
 
+import org.checkerframework.checker.pico.qual.Readonly;
+
 /**
  * Parser for Java programming language annotations.  Translates
  * annotation byte streams emitted by compiler into annotation objects.
@@ -62,7 +64,7 @@ public class AnnotationParser {
      * @throws AnnotationFormatError if an annotation is found to be
      *         malformed.
      */
-    public static Map<Class<? extends Annotation>, Annotation> parseAnnotations(
+    public static Map<Class<? extends @Readonly Annotation>, @Readonly Annotation> parseAnnotations(
                 byte[] rawAnnotations,
                 ConstantPool constPool,
                 Class<?> container) {
@@ -90,11 +92,11 @@ public class AnnotationParser {
      */
     @SafeVarargs
     @SuppressWarnings("varargs") // selectAnnotationClasses is used safely
-    static Map<Class<? extends Annotation>, Annotation> parseSelectAnnotations(
+    static Map<Class<? extends @Readonly Annotation>, Annotation> parseSelectAnnotations(
                 byte[] rawAnnotations,
                 ConstantPool constPool,
                 Class<?> container,
-                Class<? extends Annotation> ... selectAnnotationClasses) {
+                Class<? extends @Readonly Annotation> ... selectAnnotationClasses) {
         if (rawAnnotations == null)
             return Collections.emptyMap();
 
@@ -108,19 +110,19 @@ public class AnnotationParser {
         }
     }
 
-    private static Map<Class<? extends Annotation>, Annotation> parseAnnotations2(
+    private static Map<Class<? extends @Readonly Annotation>, @Readonly Annotation> parseAnnotations2(
                 byte[] rawAnnotations,
                 ConstantPool constPool,
                 Class<?> container,
-                Class<? extends Annotation>[] selectAnnotationClasses) {
-        Map<Class<? extends Annotation>, Annotation> result =
-            new LinkedHashMap<Class<? extends Annotation>, Annotation>();
+                Class<? extends @Readonly Annotation>[] selectAnnotationClasses) {
+        Map<Class<? extends @Readonly Annotation>, Annotation> result =
+            new LinkedHashMap<Class<? extends @Readonly Annotation>, @Readonly Annotation>();
         ByteBuffer buf = ByteBuffer.wrap(rawAnnotations);
         int numAnnotations = buf.getShort() & 0xFFFF;
         for (int i = 0; i < numAnnotations; i++) {
             Annotation a = parseAnnotation2(buf, constPool, container, false, selectAnnotationClasses);
             if (a != null) {
-                Class<? extends Annotation> klass = a.annotationType();
+                Class<? extends @Readonly Annotation> klass = a.annotationType();
                 if (AnnotationType.getInstance(klass).retention() == RetentionPolicy.RUNTIME &&
                     result.put(klass, a) != null) {
                         throw new AnnotationFormatError(
@@ -232,13 +234,13 @@ public class AnnotationParser {
                                               ConstantPool constPool,
                                               Class<?> container,
                                               boolean exceptionOnMissingAnnotationClass,
-                                              Class<? extends Annotation>[] selectAnnotationClasses) {
+                                              Class<? extends @Readonly Annotation>[] selectAnnotationClasses) {
         int typeIndex = buf.getShort() & 0xFFFF;
-        Class<? extends Annotation> annotationClass = null;
+        Class<? extends @Readonly Annotation> annotationClass = null;
         String sig = "[unknown]";
         try {
             sig = constPool.getUTF8At(typeIndex);
-            annotationClass = (Class<? extends Annotation>)parseSig(sig, container);
+            annotationClass = (Class<? extends @Readonly Annotation>)parseSig(sig, container);
         } catch (NoClassDefFoundError e) {
             if (exceptionOnMissingAnnotationClass)
                 // note: at this point sig is "[unknown]" or VM-style
@@ -294,7 +296,7 @@ public class AnnotationParser {
      * member {@literal ->} value map.
      */
     @SuppressWarnings("removal")
-    public static Annotation annotationForMap(final Class<? extends Annotation> type,
+    public static Annotation annotationForMap(final Class<? extends @Readonly Annotation> type,
                                               final Map<String, Object> memberValues)
     {
         return AccessController.doPrivileged(new PrivilegedAction<Annotation>() {
@@ -529,7 +531,7 @@ public class AnnotationParser {
             return parseEnumArray(length, (Class<? extends Enum<?>>)componentType, buf,
                                   constPool, container);
         } else if (componentType.isAnnotation()) {
-            return parseAnnotationArray(length, (Class <? extends Annotation>)componentType, buf,
+            return parseAnnotationArray(length, (Class <? extends @Readonly Annotation>)componentType, buf,
                                         constPool, container);
         } else {
             return parseUnknownArray(length, buf);
@@ -724,7 +726,7 @@ public class AnnotationParser {
     }
 
     private static Object parseAnnotationArray(int length,
-                                               Class<? extends Annotation> annotationType,
+                                               Class<? extends @Readonly Annotation> annotationType,
                                                ByteBuffer buf,
                                                ConstantPool constPool,
                                                Class<?> container) {
@@ -856,7 +858,7 @@ public class AnnotationParser {
      * it is needed.
      */
     private static final Annotation[] EMPTY_ANNOTATION_ARRAY = new Annotation[0];
-    public static Annotation[] toArray(Map<Class<? extends Annotation>, Annotation> annotations) {
+    public static Annotation[] toArray(Map<Class<? extends @Readonly Annotation>, @Readonly Annotation> annotations) {
         return annotations.values().toArray(EMPTY_ANNOTATION_ARRAY);
     }
 

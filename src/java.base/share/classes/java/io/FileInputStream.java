@@ -31,6 +31,8 @@ import org.checkerframework.checker.index.qual.LTEqLengthOf;
 import org.checkerframework.checker.index.qual.LTLengthOf;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.checkerframework.checker.mustcall.qual.MustCallAlias;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
 import java.nio.channels.FileChannel;
@@ -70,6 +72,7 @@ import sun.nio.ch.FileChannelImpl;
  * @since   1.0
  */
 @AnnotatedFor({"index", "initialization", "mustcall", "nullness"})
+@ReceiverDependentMutable
 public class FileInputStream extends InputStream
 {
     private static final int DEFAULT_BUFFER_SIZE = 8192;
@@ -147,7 +150,7 @@ public class FileInputStream extends InputStream
      * @see        java.io.File#getPath()
      * @see        java.lang.SecurityManager#checkRead(java.lang.String)
      */
-    public FileInputStream(File file) throws FileNotFoundException {
+    public @ReceiverDependentMutable FileInputStream(@Readonly File file) throws FileNotFoundException {
         String name = (file != null ? file.getPath() : null);
         @SuppressWarnings("removal")
         SecurityManager security = System.getSecurityManager();

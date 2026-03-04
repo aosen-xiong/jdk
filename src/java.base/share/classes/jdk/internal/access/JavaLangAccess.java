@@ -48,6 +48,8 @@ import jdk.internal.reflect.ConstantPool;
 import sun.reflect.annotation.AnnotationType;
 import sun.nio.ch.Interruptible;
 
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
+
 public interface JavaLangAccess {
 
     /**
@@ -102,7 +104,7 @@ public interface JavaLangAccess {
      * Class object does not represent an enum type;
      * the result is uncloned, cached, and shared by all callers.
      */
-    <E extends Enum<E>> E[] getEnumConstantsShared(Class<E> klass);
+    <E extends Enum<E>> E @ReceiverDependentMutable [] getEnumConstantsShared(Class<E> klass);
 
     /**
      * Set current thread's blocker field.

@@ -27,6 +27,8 @@ package java.lang;
 
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.framework.qual.AnnotatedFor;
 import org.checkerframework.framework.qual.CFComment;
@@ -109,8 +111,9 @@ import java.util.*;
  * @see java.util.Comparator
  * @since 1.2
  */
-@AnnotatedFor({"lock", "nullness", "index"})
-public interface Comparable<T extends @NonNull Object> {
+@AnnotatedFor({"lock", "nullness", "index", "pico"})
+@ReceiverDependentMutable
+public interface Comparable<T extends @NonNull @Readonly Object> {
     /**
      * Compares this object with the specified object for order.  Returns a
      * negative integer, zero, or a positive integer as this object is less
@@ -148,5 +151,5 @@ public interface Comparable<T extends @NonNull Object> {
      */
     @CFComment("nullness: arguments may NOT be null")
     @Pure
-    public int compareTo(@GuardSatisfied Comparable<T> this, @NonNull T o);
+    public int compareTo(@Readonly @GuardSatisfied Comparable<T> this, @NonNull T o);
 }

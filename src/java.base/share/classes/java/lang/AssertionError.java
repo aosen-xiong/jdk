@@ -26,6 +26,7 @@
 package java.lang;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Readonly;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
@@ -44,7 +45,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  *
  * @since   1.4
  */
-@AnnotatedFor({"nullness"})
+@AnnotatedFor({"nullness", "pico"})
 public class AssertionError extends Error {
     @java.io.Serial
     private static final long serialVersionUID = -5013299493970297370L;
@@ -79,7 +80,7 @@ public class AssertionError extends Error {
      * @see   Throwable#getCause()
      */
     @SideEffectFree
-    public AssertionError(@Nullable Object detailMessage) {
+    public AssertionError(@Nullable @Readonly Object detailMessage) {
         this(String.valueOf(detailMessage));
         if (detailMessage instanceof Throwable)
             initCause((Throwable) detailMessage);

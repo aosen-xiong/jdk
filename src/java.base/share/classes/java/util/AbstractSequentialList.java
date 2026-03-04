@@ -26,6 +26,10 @@
 package java.util;
 
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
+import org.checkerframework.checker.pico.qual.Mutable;
+import org.checkerframework.checker.pico.qual.PolyMutable;
+import org.checkerframework.checker.pico.qual.Readonly;
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.framework.qual.AnnotatedFor;
@@ -73,7 +77,8 @@ import org.checkerframework.framework.qual.CFComment;
  */
 
 @CFComment("lock/nullness: Subclasses of this interface/class may opt to prohibit null elements")
-@AnnotatedFor({"lock", "nullness"})
+@AnnotatedFor({"lock", "nullness", "pico"})
+@ReceiverDependentMutable
 public abstract class AbstractSequentialList<E> extends AbstractList<E> {
     /**
      * Sole constructor.  (For invocation by subclass constructors, typically
@@ -92,7 +97,7 @@ public abstract class AbstractSequentialList<E> extends AbstractList<E> {
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
     @Pure
-    public E get(@GuardSatisfied AbstractSequentialList<E> this, int index) {
+    public E get(@GuardSatisfied @Readonly AbstractSequentialList<E> this, int index) {
         try {
             return listIterator(index).next();
         } catch (NoSuchElementException exc) {
@@ -119,7 +124,7 @@ public abstract class AbstractSequentialList<E> extends AbstractList<E> {
      * @throws IllegalArgumentException      {@inheritDoc}
      * @throws IndexOutOfBoundsException     {@inheritDoc}
      */
-    public E set(@GuardSatisfied AbstractSequentialList<E> this, int index, E element) {
+    public E set(@GuardSatisfied @Mutable AbstractSequentialList<E> this, int index, E element) {
         try {
             ListIterator<E> e = listIterator(index);
             E oldVal = e.next();
@@ -150,7 +155,7 @@ public abstract class AbstractSequentialList<E> extends AbstractList<E> {
      * @throws IllegalArgumentException      {@inheritDoc}
      * @throws IndexOutOfBoundsException     {@inheritDoc}
      */
-    public void add(@GuardSatisfied AbstractSequentialList<E> this, int index, E element) {
+    public void add(@GuardSatisfied @Mutable AbstractSequentialList<E> this, int index, E element) {
         try {
             listIterator(index).add(element);
         } catch (NoSuchElementException exc) {
@@ -175,7 +180,7 @@ public abstract class AbstractSequentialList<E> extends AbstractList<E> {
      * @throws UnsupportedOperationException {@inheritDoc}
      * @throws IndexOutOfBoundsException     {@inheritDoc}
      */
-    public E remove(@GuardSatisfied AbstractSequentialList<E> this, int index) {
+    public E remove(@GuardSatisfied @Mutable AbstractSequentialList<E> this, int index) {
         try {
             ListIterator<E> e = listIterator(index);
             E outCast = e.next();
@@ -218,7 +223,7 @@ public abstract class AbstractSequentialList<E> extends AbstractList<E> {
      * @throws IllegalArgumentException      {@inheritDoc}
      * @throws IndexOutOfBoundsException     {@inheritDoc}
      */
-    public boolean addAll(@GuardSatisfied AbstractSequentialList<E> this, int index, Collection<? extends E> c) {
+    public boolean addAll(@GuardSatisfied @Mutable AbstractSequentialList<E> this, int index, @Readonly Collection<? extends E> c) {
         try {
             boolean modified = false;
             ListIterator<E> e1 = listIterator(index);
@@ -244,7 +249,7 @@ public abstract class AbstractSequentialList<E> extends AbstractList<E> {
      * @return an iterator over the elements in this list (in proper sequence)
      */
     @SideEffectFree
-    public Iterator<E> iterator() {
+    public Iterator<E> iterator(@Readonly AbstractSequentialList<E> this) {
         return listIterator();
     }
 
@@ -258,5 +263,5 @@ public abstract class AbstractSequentialList<E> extends AbstractList<E> {
      *         sequence)
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
-    public abstract ListIterator<E> listIterator(int index);
+    public abstract ListIterator<E> listIterator(@Readonly AbstractSequentialList<E> this, int index);
 }

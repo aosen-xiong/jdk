@@ -25,6 +25,9 @@
 
 package java.util;
 
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 /**
  * Thrown by various accessor methods to indicate that the element being requested
  * does not exist.
@@ -33,6 +36,8 @@ package java.util;
  * @see     java.util.Iterator#next()
  * @since   1.0
  */
+@AnnotatedFor("pico")
+@ReceiverDependentMutable
 public class NoSuchElementException extends RuntimeException {
     @java.io.Serial
     private static final long serialVersionUID = 6769829250639411880L;
@@ -54,7 +59,7 @@ public class NoSuchElementException extends RuntimeException {
      *              {@link #getCause()} method), or null
      * @since 15
      */
-    public NoSuchElementException(String s, Throwable cause) {
+    public NoSuchElementException(String s, @ReceiverDependentMutable Throwable cause) {
         super(s, cause);
     }
 
@@ -68,7 +73,7 @@ public class NoSuchElementException extends RuntimeException {
      *              {@link #getCause()} method)
      * @since 15
      */
-    public NoSuchElementException(Throwable cause) {
+    public NoSuchElementException(@ReceiverDependentMutable Throwable cause) {
         super(cause);
     }
 

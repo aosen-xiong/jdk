@@ -25,6 +25,9 @@
 
 package java.util;
 
+import org.checkerframework.checker.pico.qual.ReceiverDependentMutable;
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 /**
  * <p>
  * The {@code  TooManyListenersException } Exception is used as part of
@@ -46,7 +49,8 @@ package java.util;
  * @author Laurence P. G. Cable
  * @since  1.1
  */
-
+@AnnotatedFor("pico")
+@ReceiverDependentMutable
 public class TooManyListenersException extends Exception {
     @java.io.Serial
     private static final long serialVersionUID = 5074640544770687831L;

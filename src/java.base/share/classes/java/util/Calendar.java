@@ -41,6 +41,7 @@ package java.util;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.pico.qual.Mutable;
 import org.checkerframework.common.value.qual.IntRange;
 import org.checkerframework.common.value.qual.IntVal;
 import org.checkerframework.dataflow.qual.Pure;
@@ -326,6 +327,7 @@ import sun.util.spi.CalendarProvider;
  * @since 1.1
  */
 @AnnotatedFor({"lock", "nullness", "index"})
+@SuppressWarnings("pico") // Not interesting class, fix later
 public abstract class Calendar implements Serializable, Cloneable, Comparable<Calendar> {
 
     // Data flow in Calendar
