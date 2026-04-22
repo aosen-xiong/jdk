@@ -1119,7 +1119,7 @@ public final @UsesObjectEquals class Pattern
      * @return  The source of this pattern
      */
     @Pure
-    public String pattern() {
+    public @PolyRegex String pattern(@PolyRegex Pattern this) {
         return pattern;
     }
 
@@ -1132,7 +1132,7 @@ public final @UsesObjectEquals class Pattern
      * @since 1.5
      */
     @Pure
-    public String toString(@GuardSatisfied Pattern this) {
+    public @PolyRegex String toString(@GuardSatisfied @PolyRegex Pattern this) {
         return pattern;
     }
 
