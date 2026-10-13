@@ -1414,7 +1414,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
 
     @SuppressWarnings("unchecked")
     @Override
-    public void forEach(@Mutable IdentityHashMap<K,V> this, BiConsumer<? super K, ? super V> action) {
+    public void forEach(@Readonly IdentityHashMap<K,V> this, BiConsumer<? super K, ? super V> action) {
         Objects.requireNonNull(action);
         int expectedModCount = modCount;
 

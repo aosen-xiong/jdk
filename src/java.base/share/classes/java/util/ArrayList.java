@@ -453,7 +453,7 @@ import jdk.internal.util.ArraysSupport;
     }
 
     @SuppressWarnings("unchecked")
-    static <E> E elementAt(@Readonly Object[] es, int index) {
+    static <E> E elementAt(@Readonly Object @Readonly [] es, int index) {
         return (E) es[index];
     }
 
@@ -1561,7 +1561,7 @@ import jdk.internal.util.ArraysSupport;
      * @throws NullPointerException {@inheritDoc}
      */
     @Override
-    public void forEach(@Mutable ArrayList<E> this, Consumer<? super E> action) {
+    public void forEach(@Readonly ArrayList<E> this, Consumer<? super E> action) {
         Objects.requireNonNull(action);
         final int expectedModCount = modCount;
         final @Readonly Object[] es = elementData;

@@ -2230,7 +2230,7 @@ public class Collections {
         }
         // Override default methods in Collection
         @Override
-        public void forEach(@Mutable SynchronizedCollection<E> this, Consumer<? super E> consumer) {
+        public void forEach(@Readonly SynchronizedCollection<E> this, Consumer<? super E> consumer) {
             synchronized (mutex) {c.forEach(consumer);}
         }
         @Override
@@ -2848,7 +2848,7 @@ public class Collections {
             synchronized (mutex) {return m.getOrDefault(k, defaultValue);}
         }
         @Override
-        public void forEach(@Mutable SynchronizedMap<K,V> this, BiConsumer<? super K, ? super V> action) {
+        public void forEach(@Readonly SynchronizedMap<K,V> this, BiConsumer<? super K, ? super V> action) {
             synchronized (mutex) {m.forEach(action);}
         }
         @Override
@@ -3091,7 +3091,7 @@ public class Collections {
                         { synchronized (mutex) { return nm.ceilingKey(key); } }
         public @Immutable Entry<K, V> higherEntry(@Readonly SynchronizedNavigableMap<K,V> this, K key)
                        { synchronized (mutex) { return nm.higherEntry(key); } }
-        public K higherKey(@Mutable SynchronizedNavigableMap<K,V> this, K key)
+        public K higherKey(@Readonly SynchronizedNavigableMap<K,V> this, K key)
                          { synchronized (mutex) { return nm.higherKey(key); } }
         public @Immutable Entry<K, V> firstEntry(@Readonly SynchronizedNavigableMap<K,V> this)
                            { synchronized (mutex) { return nm.firstEntry(); } }
@@ -3366,7 +3366,7 @@ public class Collections {
 
         // Override default methods in Collection
         @Override
-        public void forEach(@Mutable CheckedCollection<E> this, Consumer<? super E> action) {c.forEach(action);}
+        public void forEach(@Readonly CheckedCollection<E> this, Consumer<? super E> action) {c.forEach(action);}
         @Override
         public boolean removeIf(@Mutable CheckedCollection<E> this, Predicate<? super E> filter) {
             return c.removeIf(filter);
@@ -3434,7 +3434,7 @@ public class Collections {
         @Pure
         public int hashCode(@Readonly CheckedQueue<E> this)           {return c.hashCode();}
         @Pure
-        public E peek(@Mutable CheckedQueue<E> this)                 {return queue.peek();}
+        public E peek(@Readonly CheckedQueue<E> this)                 {return queue.peek();}
         public E poll(@Mutable CheckedQueue<E> this)                 {return queue.poll();}
         public E remove(@Mutable CheckedQueue<E> this)               {return queue.remove();}
         public boolean offer(@Mutable CheckedQueue<E> this, E e)       {return queue.offer(typeCheck(e));}
@@ -3932,7 +3932,7 @@ public class Collections {
 
         // Override default methods in Map
         @Override
-        public void forEach(@Mutable CheckedMap<K,V> this, BiConsumer<? super K, ? super V> action) {
+        public void forEach(@Readonly CheckedMap<K,V> this, BiConsumer<? super K, ? super V> action) {
             m.forEach(action);
         }
 
@@ -4034,7 +4034,7 @@ public class Collections {
                 throw new UnsupportedOperationException();
             }
 
-            public Iterator<Map.Entry<K,V>> iterator(@Mutable CheckedEntrySet<K,V> this) {
+            public Iterator<Map.Entry<K,V>> iterator(@Readonly CheckedEntrySet<K,V> this) {
                 final Iterator<Map.Entry<K, V>> i = s.iterator();
 
                 return new @Mutable Iterator<Map.Entry<K,V>>() {
@@ -4055,7 +4055,7 @@ public class Collections {
             }
 
             @SuppressWarnings({"unchecked", "mutability:type.arguments.not.inferred"}) // Aosen: not sure how to fix this
-            public Object[] toArray(@Mutable CheckedEntrySet<K,V> this) {
+            public Object[] toArray(@Readonly CheckedEntrySet<K,V> this) {
                 Object[] source = s.toArray();
 
                 /*
@@ -5966,7 +5966,7 @@ public class Collections {
 
         // Override default methods in Collection
         @Override
-        public void forEach(@Mutable SetFromMap<E> this, Consumer<? super E> action) {
+        public void forEach(@Readonly SetFromMap<E> this, Consumer<? super E> action) {
             s.forEach(action);
         }
         @Override
@@ -6061,7 +6061,7 @@ public class Collections {
 
         // Override default methods in Collection
         @Override
-        public void forEach(@Mutable AsLIFOQueue<E> this, Consumer<? super E> action) {q.forEach(action);}
+        public void forEach(@Readonly AsLIFOQueue<E> this, Consumer<? super E> action) {q.forEach(action);}
         @Override
         public boolean removeIf(@Mutable AsLIFOQueue<E> this, Predicate<? super E> filter) {
             return q.removeIf(filter);

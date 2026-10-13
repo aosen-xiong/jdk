@@ -947,7 +947,7 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
 
     @SuppressWarnings("unchecked")
     @Override
-    public synchronized void forEach(@Mutable Hashtable<K,V> this, BiConsumer<? super K, ? super V> action) {
+    public synchronized void forEach(@Readonly Hashtable<K,V> this, BiConsumer<? super K, ? super V> action) {
         Objects.requireNonNull(action);     // explicit check required in case
                                             // table is empty.
         final int expectedModCount = modCount;

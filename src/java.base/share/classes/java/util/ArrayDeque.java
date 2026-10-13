@@ -914,7 +914,7 @@ public class ArrayDeque<E extends @NonNull @Readonly Object> extends AbstractCol
     /**
      * @throws NullPointerException {@inheritDoc}
      */
-    public void forEach(@Mutable ArrayDeque<E> this, Consumer<? super E> action) {
+    public void forEach(@Readonly ArrayDeque<E> this, Consumer<? super E> action) {
         Objects.requireNonNull(action);
         final @Readonly Object[] es = elements;
         for (int i = head, end = tail, to = (i <= end) ? end : es.length;

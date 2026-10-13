@@ -1041,7 +1041,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
             return keysToArray(prepareArray(a));
         }
 
-        public final void forEach(@Mutable KeySet this, Consumer<? super K> action) {
+        public final void forEach(@Readonly KeySet this, Consumer<? super K> action) {
             Node<K,V>[] tab;
             if (action == null)
                 throw new NullPointerException();
@@ -1105,7 +1105,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
             return valuesToArray(prepareArray(a));
         }
 
-        public final void forEach(@Mutable Values this, Consumer<? super V> action) {
+        public final void forEach(@Readonly Values this, Consumer<? super V> action) {
             Node<K,V>[] tab;
             if (action == null)
                 throw new NullPointerException();
@@ -1472,12 +1472,12 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
 
     @Override
     public void forEach(@Mutable HashMap<K, V> this, BiConsumer<? super K, ? super V> action) {
-        Node<K,V>[] tab;
+        @Readonly Node<K,V> @Readonly [] tab;
         if (action == null)
             throw new NullPointerException();
         if (size > 0 && (tab = table) != null) {
             int mc = modCount;
-            for (Node<K,V> e : tab) {
+            for (@Readonly Node<K,V> e : tab) {
                 for (; e != null; e = e.next)
                     action.accept(e.key, e.value);
             }
