@@ -1150,7 +1150,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
         public final @NonNegative int size(@Readonly EntrySet this)                 { return size; }
         public final void clear(@Mutable HashMap<K,V>.@Mutable EntrySet this)               { HashMap.this.clear(); }
         @SideEffectFree
-        public final Iterator<Map.@Readonly Entry<K,V>> iterator(@Readonly EntrySet this) {
+        public final Iterator<Map.@ReceiverDependentMutable Entry<K,V>> iterator(@ReceiverDependentMutable HashMap<K,V>.@Readonly EntrySet this) {
             return new EntryIterator();
         }
         @Pure
@@ -1174,13 +1174,13 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
         public final Spliterator<Map.@Readonly Entry<K,V>> spliterator(@Readonly EntrySet this) {
             return new EntrySpliterator<>(HashMap.this, 0, -1, 0, 0);
         }
-        public final void forEach(@Mutable EntrySet this, Consumer<? super Map.Entry<K,V>> action) {
-            Node<K,V>[] tab;
+        public final void forEach(@ReceiverDependentMutable HashMap<K,V>.@Mutable EntrySet this, Consumer<? super Map.@ReceiverDependentMutable Entry<K,V>> action) {
+            @ReceiverDependentMutable Node<K,V>[] tab;
             if (action == null)
                 throw new NullPointerException();
             if (size > 0 && (tab = table) != null) {
                 int mc = modCount;
-                for (Node<K,V> e : tab) {
+                for (@ReceiverDependentMutable Node<K,V> e : tab) {
                     for (; e != null; e = e.next)
                         action.accept(e);
                 }
@@ -1678,8 +1678,8 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
 
     @ReceiverDependentMutable
     final class EntryIterator extends HashIterator
-        implements Iterator<Map.Entry<K,V>> {
-        public final Map.Entry<K,V> next(@NonEmpty @Mutable EntryIterator this) { return nextNode(); }
+        implements Iterator<Map.@ReceiverDependentMutable Entry<K,V>> {
+        public final Map.@ReceiverDependentMutable Entry<K,V> next(@NonEmpty @ReceiverDependentMutable HashMap<K,V>.@Mutable EntryIterator this) { return nextNode(); }
     }
 
     /* ------------------------------------------------------------ */
