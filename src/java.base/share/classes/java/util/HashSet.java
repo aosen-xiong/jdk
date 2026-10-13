@@ -284,11 +284,11 @@ import jdk.internal.access.SharedSecrets;
      */
     @SideEffectFree
     @SuppressWarnings("unchecked")
-    public Object clone(@GuardSatisfied @Mutable HashSet<E> this) {
+    public @PolyMutable Object clone(@GuardSatisfied @PolyMutable HashSet<E> this) {
         try {
             HashSet<E> newSet = (HashSet<E>) super.clone();
             newSet.map = (HashMap<E, @Readonly Object>) map.clone();
-            return newSet;
+            return (@PolyMutable Object) newSet;
         } catch (CloneNotSupportedException e) {
             throw new InternalError(e);
         }

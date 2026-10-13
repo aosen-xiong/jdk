@@ -377,12 +377,12 @@ import jdk.internal.util.ArraysSupport;
      * @return a clone of this {@code ArrayList} instance
      */
     @SideEffectFree
-    public Object clone(@GuardSatisfied @Mutable ArrayList<E> this) {
+    public @PolyMutable Object clone(@GuardSatisfied @PolyMutable ArrayList<E> this) {
         try {
             ArrayList<?> v = (ArrayList<?>) super.clone();
             v.elementData = Arrays.copyOf(elementData, size);
             v.modCount = 0;
-            return v;
+            return (@PolyMutable ArrayList<?>) v;
         } catch (CloneNotSupportedException e) {
             // this shouldn't happen, since we are Cloneable
             throw new InternalError(e);

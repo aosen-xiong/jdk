@@ -1515,7 +1515,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
     @SideEffectFree
     @SuppressWarnings("unchecked")
     @Override
-    public Object clone(@GuardSatisfied @Mutable HashMap<K, V> this) {
+    public @PolyMutable Object clone(@GuardSatisfied @PolyMutable HashMap<K, V> this) {
         HashMap<K,V> result;
         try {
             result = (HashMap<K,V>)super.clone();
@@ -1525,7 +1525,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
         }
         result.reinitialize();
         result.putMapEntries(this, false);
-        return result;
+        return (@PolyMutable Object) result;
     }
 
     // These methods are also used when serializing HashSets

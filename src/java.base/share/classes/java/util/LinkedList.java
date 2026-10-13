@@ -1057,9 +1057,9 @@ public class LinkedList<E>
     }
 
     @SuppressWarnings("unchecked")
-    private LinkedList<E> superClone(@Mutable LinkedList<E> this) {
+    private @PolyMutable LinkedList<E> superClone(@PolyMutable LinkedList<E> this) {
         try {
-            return (LinkedList<E>) super.clone();
+            return (@PolyMutable LinkedList<E>) super.clone();
         } catch (CloneNotSupportedException e) {
             throw new InternalError(e);
         }
@@ -1072,8 +1072,8 @@ public class LinkedList<E>
      * @return a shallow copy of this {@code LinkedList} instance
      */
     @SideEffectFree
-    public Object clone(@GuardSatisfied @Mutable LinkedList<E> this) {
-        LinkedList<E> clone = superClone();
+    public @PolyMutable Object clone(@GuardSatisfied @PolyMutable LinkedList<E> this) {
+        @Mutable LinkedList<E> clone = (@Mutable LinkedList<E>) superClone();
 
         // Put clone into "virgin" state
         clone.first = clone.last = null;
@@ -1084,7 +1084,7 @@ public class LinkedList<E>
         for (Node<E> x = first; x != null; x = x.next)
             clone.add(x.item);
 
-        return clone;
+        return (@PolyMutable Object) clone;
     }
 
     /**

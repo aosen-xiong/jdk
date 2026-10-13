@@ -699,13 +699,13 @@ public class Vector<E>
      * @return  a clone of this vector
      */
     @SideEffectFree
-    public synchronized Object clone(@GuardSatisfied Vector<E> this) {
+    public synchronized @PolyMutable Object clone(@GuardSatisfied @PolyMutable Vector<E> this) {
         try {
             @SuppressWarnings("unchecked")
             Vector<E> v = (Vector<E>) super.clone();
             v.elementData = Arrays.copyOf(elementData, elementCount);
             v.modCount = 0;
-            return v;
+            return (@PolyMutable Object) v;
         } catch (CloneNotSupportedException e) {
             // this shouldn't happen, since we are Cloneable
             throw new InternalError(e);

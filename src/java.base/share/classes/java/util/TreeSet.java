@@ -511,7 +511,7 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      */
     @SideEffectFree
     @SuppressWarnings("unchecked")
-    public Object clone(@GuardSatisfied @Mutable TreeSet<E> this) {
+    public @PolyMutable Object clone(@GuardSatisfied @PolyMutable TreeSet<E> this) {
         TreeSet<E> clone;
         try {
             clone = (TreeSet<E>) super.clone();
@@ -520,7 +520,7 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
         }
 
         clone.m = new TreeMap<E, @Readonly Object>(m);
-        return clone;
+        return (@PolyMutable Object) clone;
     }
 
     /**

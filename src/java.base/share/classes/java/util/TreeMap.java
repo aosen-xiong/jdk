@@ -936,7 +936,7 @@ public class TreeMap<K extends @Immutable Object,V>
      *
      * @return a shallow copy of this map
      */
-    public Object clone(@GuardSatisfied @Mutable TreeMap<K, V> this) {
+    public @PolyMutable Object clone(@GuardSatisfied @PolyMutable TreeMap<K, V> this) {
         TreeMap<?,?> clone;
         try {
             clone = (TreeMap<?,?>) super.clone();
@@ -958,7 +958,7 @@ public class TreeMap<K extends @Immutable Object,V>
         } catch (java.io.IOException | ClassNotFoundException cannotHappen) {
         }
 
-        return clone;
+        return (@PolyMutable Object) clone;
     }
 
     // NavigableMap API methods

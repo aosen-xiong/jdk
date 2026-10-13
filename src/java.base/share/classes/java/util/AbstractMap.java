@@ -620,11 +620,11 @@ public abstract class AbstractMap<K extends @Immutable Object,V> implements Map<
      *
      * @return a shallow copy of this map
      */
-    protected Object clone(@Mutable AbstractMap<K,V> this) throws CloneNotSupportedException {
+    protected @PolyMutable Object clone(@PolyMutable AbstractMap<K,V> this) throws CloneNotSupportedException {
         AbstractMap<?,?> result = (AbstractMap<?,?>)super.clone();
         result.keySet = null;
         result.values = null;
-        return result;
+        return (@PolyMutable Object) result;
     }
 
     /**

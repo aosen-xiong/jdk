@@ -32,6 +32,7 @@ import org.checkerframework.checker.nonempty.qual.NonEmpty;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.mutability.qual.PolyMutable;
 import org.checkerframework.checker.mutability.qual.Mutable;
 import org.checkerframework.checker.signedness.qual.UnknownSignedness;
 import org.checkerframework.dataflow.qual.Pure;
@@ -395,9 +396,9 @@ class JumboEnumSet<E extends Enum<E>> extends EnumSet<E> {
         return size != oldSize;
     }
 
-    public EnumSet<E> clone() {
+    public @PolyMutable EnumSet<E> clone(@PolyMutable JumboEnumSet<E> this) {
         JumboEnumSet<E> result = (JumboEnumSet<E>) super.clone();
         result.elements = result.elements.clone();
-        return result;
+        return (@PolyMutable EnumSet<E>) result;
     }
 }

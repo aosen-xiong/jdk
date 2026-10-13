@@ -737,12 +737,12 @@ public class IdentityHashMap<K extends @Immutable Object,V>
      * @return a shallow copy of this map
      */
     @SideEffectFree
-    public Object clone(@GuardSatisfied @Mutable IdentityHashMap<K, V> this) {
+    public @PolyMutable Object clone(@GuardSatisfied @PolyMutable IdentityHashMap<K, V> this) {
         try {
             IdentityHashMap<?,?> m = (IdentityHashMap<?,?>) super.clone();
             m.entrySet = null;
             m.table = table.clone();
-            return m;
+            return (@PolyMutable Object) m;
         } catch (CloneNotSupportedException e) {
             throw new InternalError(e);
         }

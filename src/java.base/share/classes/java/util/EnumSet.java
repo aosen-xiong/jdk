@@ -386,7 +386,7 @@ public abstract class EnumSet<E extends Enum<E>> extends AbstractSet<E>
      * @return a copy of this set
      */
     @SuppressWarnings("unchecked")
-    public @ReceiverDependentMutable EnumSet<E> clone(@ReceiverDependentMutable EnumSet<E> this) {
+    public @PolyMutable EnumSet<E> clone(@PolyMutable EnumSet<E> this) {
         try {
             return (@PolyMutable EnumSet<E>) super.clone();
         } catch(CloneNotSupportedException e) {

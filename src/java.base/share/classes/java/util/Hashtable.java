@@ -598,8 +598,8 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
      * @return  a clone of the hashtable
      */
     @SideEffectFree
-    public synchronized Object clone(@GuardSatisfied @Mutable Hashtable<K, V> this) {
-        Hashtable<?,?> t = cloneHashtable();
+    public synchronized @PolyMutable Object clone(@GuardSatisfied @PolyMutable Hashtable<K, V> this) {
+        @Mutable Hashtable<?,?> t = (@Mutable Hashtable<?,?>) cloneHashtable();
         t.table = new Entry<?,?>[table.length];
         for (int i = table.length ; i-- > 0 ; ) {
             t.table[i] = (table[i] != null)
@@ -609,13 +609,13 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
         t.entrySet = null;
         t.values = null;
         t.modCount = 0;
-        return t;
+        return (@PolyMutable Object) t;
     }
 
     /** Calls super.clone() */
-    final Hashtable<?,?> cloneHashtable(@Mutable Hashtable<K, V> this) {
+    final @PolyMutable Hashtable<?,?> cloneHashtable(@PolyMutable Hashtable<K, V> this) {
         try {
-            return (Hashtable<?,?>)super.clone();
+            return (@PolyMutable Hashtable<?,?>)super.clone();
         } catch (CloneNotSupportedException e) {
             // this shouldn't happen, since we are Cloneable
             throw new InternalError(e);
@@ -1431,9 +1431,9 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
 
         @SideEffectFree
         @SuppressWarnings("unchecked")
-        protected Object clone(@Mutable Entry<K,V> this) {
-            return new Entry<K,V>(hash, key, value,
-                                  (next==null ? null : (Entry<K,V>) next.clone()));
+        protected @PolyMutable Object clone(@PolyMutable Entry<K,V> this) {
+            return new @PolyMutable Entry<K,V>(hash, key, value,
+                                  (next==null ? null : (@PolyMutable Entry<K,V>) next.clone()));
         }
 
         // Map.Entry Ops

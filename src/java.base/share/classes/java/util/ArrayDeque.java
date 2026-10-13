@@ -1188,12 +1188,12 @@ public class ArrayDeque<E extends @NonNull @Readonly Object> extends AbstractCol
      * @return a copy of this deque
      */
     @SideEffectFree
-    public ArrayDeque<E> clone(@GuardSatisfied @Mutable ArrayDeque<E> this) {
+    public @PolyMutable ArrayDeque<E> clone(@GuardSatisfied @PolyMutable ArrayDeque<E> this) {
         try {
             @SuppressWarnings("unchecked")
             ArrayDeque<E> result = (ArrayDeque<E>) super.clone();
             result.elements = Arrays.copyOf(elements, elements.length);
-            return result;
+            return (@PolyMutable ArrayDeque<E>) result;
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
         }

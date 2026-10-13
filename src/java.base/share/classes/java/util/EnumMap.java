@@ -801,7 +801,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
      * @return a shallow copy of this enum map
      */
     @SuppressWarnings("unchecked")
-    public EnumMap<K, V> clone(@Mutable EnumMap<K,V> this) {
+    public @PolyMutable EnumMap<K, V> clone(@PolyMutable EnumMap<K,V> this) {
         EnumMap<K, V> result = null;
         try {
             result = (EnumMap<K, V>) super.clone();
@@ -810,7 +810,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
         }
         result.vals = result.vals.clone();
         result.entrySet = null;
-        return result;
+        return (@PolyMutable EnumMap<K, V>) result;
     }
 
     /**
