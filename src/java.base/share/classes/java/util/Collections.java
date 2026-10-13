@@ -1698,17 +1698,17 @@ public class Collections {
             }
 
             static <K extends @Immutable Object, V> Consumer<Map.@Readonly Entry<? extends K, ? extends V>> entryConsumer(
-                    Consumer<? super @Readonly Entry<K, V>> action) {
+                    Consumer<? super Map.@Immutable Entry<K, V>> action) {
                 return e -> action.accept(new UnmodifiableEntry<>(e));
             }
 
-            public void forEach(Consumer<? super @Readonly Entry<K, V>> action) {
+            public void forEach(Consumer<? super Map.@Immutable Entry<K, V>> action) {
                 Objects.requireNonNull(action);
                 c.forEach(entryConsumer(action));
             }
 
             static final class UnmodifiableEntrySetSpliterator<K extends @Immutable Object, V>
-                    implements Spliterator<@Readonly Entry<K,V>> {
+                    implements Spliterator<Map.@Immutable Entry<K,V>> {
                 final Spliterator<Map.@Readonly Entry<K, V>> s;
 
                 UnmodifiableEntrySetSpliterator(Spliterator<@Readonly Entry<K, V>> s) {
@@ -1716,19 +1716,19 @@ public class Collections {
                 }
 
                 @Override
-                public boolean tryAdvance(Consumer<? super @Readonly Entry<K, V>> action) {
+                public boolean tryAdvance(Consumer<? super Map.@Immutable Entry<K, V>> action) {
                     Objects.requireNonNull(action);
                     return s.tryAdvance(entryConsumer(action));
                 }
 
                 @Override
-                public void forEachRemaining(Consumer<? super @Readonly Entry<K, V>> action) {
+                public void forEachRemaining(Consumer<? super Map.@Immutable Entry<K, V>> action) {
                     Objects.requireNonNull(action);
                     s.forEachRemaining(entryConsumer(action));
                 }
 
                 @Override
-                public Spliterator<@Readonly Entry<K, V>> trySplit() {
+                public Spliterator<Map.@Immutable Entry<K, V>> trySplit() {
                     Spliterator<@Readonly Entry<K, V>> split = s.trySplit();
                     return split == null
                            ? null
@@ -4035,7 +4035,7 @@ public class Collections {
             }
 
             public Iterator<Map.Entry<K,V>> iterator(@ReceiverDependentMutable CheckedEntrySet<K,V> this) {
-                final Iterator<Map.Entry<K, V>> i = s.iterator();
+                final Iterator<Map.@ReceiverDependentMutable Entry<K, V>> i = s.iterator();
 
                 return new @Mutable Iterator<Map.Entry<K,V>>() {
                     @Pure
@@ -4056,7 +4056,7 @@ public class Collections {
 
             @SuppressWarnings({"unchecked", "mutability:type.arguments.not.inferred"}) // Aosen: not sure how to fix this
             public Object[] toArray(@Readonly CheckedEntrySet<K,V> this) {
-                Object[] source = s.toArray();
+                @ReceiverDependentMutable Object[] source = s.toArray();
 
                 /*
                  * Ensure that we don't get an ArrayStoreException even if

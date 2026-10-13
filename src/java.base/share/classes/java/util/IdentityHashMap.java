@@ -1240,7 +1240,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
     @SideEffectFree
     @SuppressWarnings("mutability:assignment.type.incompatible") // polyq on supertype's type argument
     public @ReceiverDependentMutable Set<Map.@ReceiverDependentMutable Entry<@KeyFor({"this"}) K,V>> entrySet(@GuardSatisfied @ReceiverDependentMutable IdentityHashMap<K, V> this) {
-        Set<Map.@PolyMutable Entry<K,V>> es = entrySet;
+        Set<Map.@ReceiverDependentMutable Entry<K,V>> es = entrySet;
         if (es != null)
             return es;
         else
@@ -1323,7 +1323,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
         }
 
         @SideEffectFree
-        public Spliterator<Map.Entry<K,V>> spliterator(@Readonly EntrySet this) {
+        public Spliterator<Map.@Immutable Entry<K,V>> spliterator(@Readonly EntrySet this) {
             return new EntrySpliterator<>(IdentityHashMap.this, 0, -1, 0, 0);
         }
     }

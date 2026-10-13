@@ -595,7 +595,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
      * @return the node, or null if none
      */
     final @ReceiverDependentMutable Node<K,V> getNode(@ReceiverDependentMutable HashMap<K,V> this, @Nullable @Readonly Object key) {
-        @PolyMutable Node<K,V>[] tab; Node<K,V> first, e; int n, hash; K k;
+        @ReceiverDependentMutable Node<K,V>[] tab; @ReceiverDependentMutable Node<K,V> first, e; int n, hash; K k;
         if ((tab = table) != null && (n = tab.length) > 0 &&
             (first = tab[(n - 1) & (hash = hash(key))]) != null) {
             if (first.hash == hash && // always check first node
@@ -603,7 +603,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
                 return first;
             if ((e = first.next) != null) {
                 if (first instanceof TreeNode)
-                    return ((@PolyMutable TreeNode<K,V>)first).getTreeNode(hash, key);
+                    return ((@ReceiverDependentMutable TreeNode<K,V>)first).getTreeNode(hash, key);
                 do {
                     if (e.hash == hash &&
                         ((k = e.key) == key || (key != null && key.equals(k))))
@@ -1140,7 +1140,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
     @SideEffectFree
     @SuppressWarnings("mutability:assignment.type.incompatible") // class polymorphism qualifier
     public @ReceiverDependentMutable Set<Map.@ReceiverDependentMutable Entry<@KeyFor({"this"}) K,V>> entrySet(@ReceiverDependentMutable @GuardSatisfied HashMap<K, V> this) {
-        Set<Map.@PolyMutable Entry<K,V>> es;
+        Set<Map.@ReceiverDependentMutable Entry<K,V>> es;
         return (es = entrySet) == null ? (entrySet = new @ReceiverDependentMutable EntrySet()) : es;
     }
 

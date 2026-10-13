@@ -713,7 +713,7 @@ public class LinkedHashMap<K extends @Immutable Object,V>
     @SideEffectFree
     @SuppressWarnings("mutability:assignment.type.incompatible") // class polymorphic qualifier
     public @ReceiverDependentMutable Set<Map.@ReceiverDependentMutable Entry<@KeyFor({"this"}) K,V>> entrySet(@GuardSatisfied @ReceiverDependentMutable LinkedHashMap<K, V> this) {
-        Set<Map.@PolyMutable Entry<K,V>> es;
+        Set<Map.@ReceiverDependentMutable Entry<K,V>> es;
         return (es = entrySet) == null ? (entrySet = new @ReceiverDependentMutable LinkedEntrySet()) : es;
     }
 

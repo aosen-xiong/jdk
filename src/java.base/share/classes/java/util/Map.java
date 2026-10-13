@@ -575,7 +575,7 @@ public interface Map<K extends @Immutable Object, V> {
         @Pure
         @SuppressWarnings("mutability") // covariant
         public static <K extends @Immutable Comparable<? super K>, V> @Readonly Comparator<Map.@Readonly Entry<K, V>> comparingByKey() {
-            return (Comparator<Map.Entry<K, V>> & Serializable)
+            return (@Readonly Comparator<Map.@Readonly Entry<K, V>> & Serializable)
                 (c1, c2) -> c1.getKey().compareTo(c2.getKey());
         }
 
@@ -613,7 +613,7 @@ public interface Map<K extends @Immutable Object, V> {
         @Pure
         public static <K extends @Immutable Object, V> @Readonly Comparator<Map.@Readonly Entry<K, V>> comparingByKey(@Readonly Comparator<? super K> cmp) {
             Objects.requireNonNull(cmp);
-            return (@Readonly Comparator<Map.Entry<K, V>> & Serializable)
+            return (@Readonly Comparator<Map.@Readonly Entry<K, V>> & Serializable)
                 (c1, c2) -> cmp.compare(c1.getKey(), c2.getKey());
         }
 
