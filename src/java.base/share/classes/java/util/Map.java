@@ -400,7 +400,7 @@ public interface Map<K extends @Immutable Object, V> {
      * @return a set view of the keys contained in this map
      */
     @SideEffectFree
-    @PolyNonEmpty @PolyMutable Set<@KeyFor({"this"}) K> keySet(@GuardSatisfied @PolyNonEmpty @PolyMutable Map<K, V> this);
+    @PolyNonEmpty @ReceiverDependentMutable Set<@KeyFor({"this"}) K> keySet(@GuardSatisfied @PolyNonEmpty @ReceiverDependentMutable Map<K, V> this);
 
     /**
      * Returns a {@link Collection} view of the values contained in this map.
@@ -418,7 +418,7 @@ public interface Map<K extends @Immutable Object, V> {
      * @return a collection view of the values contained in this map
      */
     @SideEffectFree
-    @PolyNonEmpty @PolyMutable Collection<V> values(@GuardSatisfied @PolyNonEmpty @PolyMutable Map<K, V> this);
+    @PolyNonEmpty @ReceiverDependentMutable Collection<V> values(@GuardSatisfied @PolyNonEmpty @ReceiverDependentMutable Map<K, V> this);
 
     /**
      * Returns a {@link Set} view of the mappings contained in this map.
@@ -437,7 +437,7 @@ public interface Map<K extends @Immutable Object, V> {
      * @return a set view of the mappings contained in this map
      */
     @SideEffectFree
-    @PolyNonEmpty @PolyMutable Set<Map.@PolyMutable Entry<@KeyFor({"this"}) K, V>> entrySet(@GuardSatisfied @PolyNonEmpty @PolyMutable Map<K, V> this);
+    @PolyNonEmpty @ReceiverDependentMutable Set<Map.@ReceiverDependentMutable Entry<@KeyFor({"this"}) K, V>> entrySet(@GuardSatisfied @PolyNonEmpty @ReceiverDependentMutable Map<K, V> this);
 
     /**
      * A map entry (key-value pair). The Entry may be unmodifiable, or the

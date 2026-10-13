@@ -964,9 +964,9 @@ import jdk.internal.util.ArraysSupport;
      *
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
-    public @PolyMutable ListIterator<E> listIterator(@PolyMutable ArrayList<E> this, @NonNegative int index) {
+    public @ReceiverDependentMutable ListIterator<E> listIterator(@ReceiverDependentMutable ArrayList<E> this, @NonNegative int index) {
         rangeCheckForAdd(index);
-        return new @PolyMutable ListItr(index);
+        return new @ReceiverDependentMutable ListItr(index);
     }
 
     /**
@@ -1155,9 +1155,9 @@ import jdk.internal.util.ArraysSupport;
      * @throws IndexOutOfBoundsException {@inheritDoc}
      * @throws IllegalArgumentException {@inheritDoc}
      */
-    public @PolyMutable List<E> subList(@PolyMutable ArrayList<E> this, @NonNegative int fromIndex, @NonNegative int toIndex) {
+    public @ReceiverDependentMutable List<E> subList(@ReceiverDependentMutable ArrayList<E> this, @NonNegative int fromIndex, @NonNegative int toIndex) {
         subListRangeCheck(fromIndex, toIndex, size);
-        return new @PolyMutable SubList<>(this, fromIndex, toIndex);
+        return new @ReceiverDependentMutable SubList<>(this, fromIndex, toIndex);
     }
 
     @ReceiverDependentMutable
@@ -1454,9 +1454,9 @@ import jdk.internal.util.ArraysSupport;
             };
         }
 
-        public @PolyMutable List<E> subList(@PolyMutable SubList<E> this, int fromIndex, int toIndex) {
+        public @ReceiverDependentMutable List<E> subList(@ReceiverDependentMutable SubList<E> this, int fromIndex, int toIndex) {
             subListRangeCheck(fromIndex, toIndex, size);
-            return new @PolyMutable SubList<>(this, fromIndex, toIndex);
+            return new @ReceiverDependentMutable SubList<>(this, fromIndex, toIndex);
         }
 
         private void rangeCheckForAdd(@Readonly SubList<E> this, @NonNegative int index) {

@@ -787,7 +787,7 @@ public interface List<E> extends Collection<E> {
      *         fromIndex > toIndex})
      */
     @SideEffectFree
-    @PolyMutable List<E> subList(@GuardSatisfied @PolyMutable List<E> this, @IndexOrHigh({"this"}) int fromIndex, @IndexOrHigh({"this"}) int toIndex);
+    @ReceiverDependentMutable List<E> subList(@GuardSatisfied @ReceiverDependentMutable List<E> this, @IndexOrHigh({"this"}) int fromIndex, @IndexOrHigh({"this"}) int toIndex);
 
     /**
      * Creates a {@link Spliterator} over the elements in this list.

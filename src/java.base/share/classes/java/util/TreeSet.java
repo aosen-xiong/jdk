@@ -221,8 +221,8 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
     /**
      * @since 1.6
      */
-    public @PolyMutable NavigableSet<E> descendingSet(@PolyMutable TreeSet<E> this) {
-        return new @PolyMutable TreeSet<>(m.descendingMap());
+    public @ReceiverDependentMutable NavigableSet<E> descendingSet(@ReceiverDependentMutable TreeSet<E> this) {
+        return new @ReceiverDependentMutable TreeSet<>(m.descendingMap());
     }
 
     /**
@@ -352,9 +352,9 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      * @since 1.6
      */
     @SideEffectFree
-    public @PolyMutable NavigableSet<E> subSet(@GuardSatisfied @PolyMutable TreeSet<E> this, @GuardSatisfied E fromElement, boolean fromInclusive,
+    public @ReceiverDependentMutable NavigableSet<E> subSet(@GuardSatisfied @ReceiverDependentMutable TreeSet<E> this, @GuardSatisfied E fromElement, boolean fromInclusive,
                                   @GuardSatisfied E toElement,   boolean toInclusive) {
-        return new @PolyMutable TreeSet<>(m.subMap(fromElement, fromInclusive,
+        return new @ReceiverDependentMutable TreeSet<>(m.subMap(fromElement, fromInclusive,
                                        toElement,   toInclusive));
     }
 
@@ -367,8 +367,8 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      * @since 1.6
      */
     @SideEffectFree
-    public @PolyMutable NavigableSet<E> headSet(@GuardSatisfied @PolyMutable TreeSet<E> this, @GuardSatisfied E toElement, boolean inclusive) {
-        return new @PolyMutable TreeSet<>(m.headMap(toElement, inclusive));
+    public @ReceiverDependentMutable NavigableSet<E> headSet(@GuardSatisfied @ReceiverDependentMutable TreeSet<E> this, @GuardSatisfied E toElement, boolean inclusive) {
+        return new @ReceiverDependentMutable TreeSet<>(m.headMap(toElement, inclusive));
     }
 
     /**
@@ -380,8 +380,8 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      * @since 1.6
      */
     @SideEffectFree
-    public @PolyMutable NavigableSet<E> tailSet(@GuardSatisfied @PolyMutable TreeSet<E> this, @GuardSatisfied E fromElement, boolean inclusive) {
-        return new @PolyMutable TreeSet<>(m.tailMap(fromElement, inclusive));
+    public @ReceiverDependentMutable NavigableSet<E> tailSet(@GuardSatisfied @ReceiverDependentMutable TreeSet<E> this, @GuardSatisfied E fromElement, boolean inclusive) {
+        return new @ReceiverDependentMutable TreeSet<>(m.tailMap(fromElement, inclusive));
     }
 
     /**
@@ -392,7 +392,7 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      * @throws IllegalArgumentException {@inheritDoc}
      */
     @SideEffectFree
-    public @PolyMutable SortedSet<E> subSet(@GuardSatisfied @PolyMutable TreeSet<E> this, @GuardSatisfied E fromElement, @GuardSatisfied E toElement) {
+    public @ReceiverDependentMutable SortedSet<E> subSet(@GuardSatisfied @ReceiverDependentMutable TreeSet<E> this, @GuardSatisfied E fromElement, @GuardSatisfied E toElement) {
         return subSet(fromElement, true, toElement, false);
     }
 
@@ -404,7 +404,7 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      * @throws IllegalArgumentException {@inheritDoc}
      */
     @SideEffectFree
-    public @PolyMutable SortedSet<E> headSet(@GuardSatisfied @PolyMutable TreeSet<E> this, E toElement) {
+    public @ReceiverDependentMutable SortedSet<E> headSet(@GuardSatisfied @ReceiverDependentMutable TreeSet<E> this, E toElement) {
         return headSet(toElement, false);
     }
 
@@ -416,7 +416,7 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      * @throws IllegalArgumentException {@inheritDoc}
      */
     @SideEffectFree
-    public @PolyMutable SortedSet<E> tailSet(@GuardSatisfied @PolyMutable TreeSet<E> this, E fromElement) {
+    public @ReceiverDependentMutable SortedSet<E> tailSet(@GuardSatisfied @ReceiverDependentMutable TreeSet<E> this, E fromElement) {
         return tailSet(fromElement, true);
     }
 

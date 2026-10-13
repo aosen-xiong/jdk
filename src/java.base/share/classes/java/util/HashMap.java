@@ -594,7 +594,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
      * @param key the key
      * @return the node, or null if none
      */
-    final @PolyMutable Node<K,V> getNode(@PolyMutable HashMap<K,V> this, @Nullable @Readonly Object key) {
+    final @ReceiverDependentMutable Node<K,V> getNode(@ReceiverDependentMutable HashMap<K,V> this, @Nullable @Readonly Object key) {
         @PolyMutable Node<K,V>[] tab; Node<K,V> first, e; int n, hash; K k;
         if ((tab = table) != null && (n = tab.length) > 0 &&
             (first = tab[(n - 1) & (hash = hash(key))]) != null) {
@@ -938,10 +938,10 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
      * @return a set view of the keys contained in this map
      */
     @SideEffectFree
-    public @PolyMutable Set<@KeyFor({"this"}) K> keySet(@GuardSatisfied @PolyMutable HashMap<K, V> this) {
+    public @ReceiverDependentMutable Set<@KeyFor({"this"}) K> keySet(@GuardSatisfied @ReceiverDependentMutable HashMap<K, V> this) {
         Set<K> ks = keySet;
         if (ks == null) {
-            ks = new @PolyMutable KeySet();
+            ks = new @ReceiverDependentMutable KeySet();
             keySet = ks;
         }
         return ks;
@@ -1073,10 +1073,10 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
      * @return a view of the values contained in this map
      */
     @SideEffectFree
-    public @PolyMutable Collection<V> values(@GuardSatisfied @PolyMutable HashMap<K, V> this) {
+    public @ReceiverDependentMutable Collection<V> values(@GuardSatisfied @ReceiverDependentMutable HashMap<K, V> this) {
         Collection<V> vs = values;
         if (vs == null) {
-            vs = new @PolyMutable Values();
+            vs = new @ReceiverDependentMutable Values();
             values = vs;
         }
         return vs;
@@ -1139,9 +1139,9 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
      */
     @SideEffectFree
     @SuppressWarnings("mutability:assignment.type.incompatible") // class polymorphism qualifier
-    public @PolyMutable Set<Map.@PolyMutable Entry<@KeyFor({"this"}) K,V>> entrySet(@PolyMutable @GuardSatisfied HashMap<K, V> this) {
+    public @ReceiverDependentMutable Set<Map.@ReceiverDependentMutable Entry<@KeyFor({"this"}) K,V>> entrySet(@ReceiverDependentMutable @GuardSatisfied HashMap<K, V> this) {
         Set<Map.@PolyMutable Entry<K,V>> es;
-        return (es = entrySet) == null ? (entrySet = new @PolyMutable EntrySet()) : es;
+        return (es = entrySet) == null ? (entrySet = new @ReceiverDependentMutable EntrySet()) : es;
     }
 
     @ReceiverDependentMutable
@@ -1639,7 +1639,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
         }
 
         @SuppressWarnings("mutability:return.type.incompatible") // field depends on outer class
-        final @PolyMutable Node<K,V> nextNode(@PolyMutable HashMap<K,V>.@NonEmpty @Mutable HashIterator this) {
+        final @ReceiverDependentMutable Node<K,V> nextNode(@ReceiverDependentMutable HashMap<K,V>.@NonEmpty @Mutable HashIterator this) {
             @PolyMutable Node<K,V>[] t;
             Node<K,V> e = next;
             if (modCount != expectedModCount)
@@ -2021,7 +2021,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
         /**
          * Returns root of tree containing this node.
          */
-        final @PolyMutable TreeNode<K,V> root(@PolyMutable TreeNode<K,V> this) {
+        final @ReceiverDependentMutable TreeNode<K,V> root(@ReceiverDependentMutable TreeNode<K,V> this) {
             for (TreeNode<K,V> r = this, p;;) {
                 if ((p = r.parent) == null)
                     return r;
@@ -2059,7 +2059,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
          * The kc argument caches comparableClassFor(key) upon first use
          * comparing keys.
          */
-        final @PolyMutable TreeNode<K,V> find(@PolyMutable TreeNode<K,V> this, int h, @Readonly Object k, Class<?> kc) {
+        final @ReceiverDependentMutable TreeNode<K,V> find(@ReceiverDependentMutable TreeNode<K,V> this, int h, @Readonly Object k, Class<?> kc) {
             TreeNode<K,V> p = this;
             do {
                 int ph, dir; K pk;
@@ -2089,7 +2089,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
         /**
          * Calls find for root node.
          */
-        final @PolyMutable TreeNode<K,V> getTreeNode(@PolyMutable TreeNode<K,V> this, int h, @Readonly Object k) {
+        final @ReceiverDependentMutable TreeNode<K,V> getTreeNode(@ReceiverDependentMutable TreeNode<K,V> this, int h, @Readonly Object k) {
             return ((parent != null) ? root() : this).find(h, k, null);
         }
 

@@ -526,11 +526,11 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
      *         {@code (fromIndex > toIndex)}
      */
     @SideEffectFree
-    public @PolyMutable List<E> subList(@GuardSatisfied @PolyMutable AbstractList<E> this, @IndexOrHigh({"this"}) int fromIndex, @IndexOrHigh({"this"}) int toIndex) {
+    public @ReceiverDependentMutable List<E> subList(@GuardSatisfied @ReceiverDependentMutable AbstractList<E> this, @IndexOrHigh({"this"}) int fromIndex, @IndexOrHigh({"this"}) int toIndex) {
         subListRangeCheck(fromIndex, toIndex, size());
         return (this instanceof RandomAccess ?
-                new @PolyMutable RandomAccessSubList<>(this, fromIndex, toIndex) :
-                new @PolyMutable SubList<>(this, fromIndex, toIndex));
+                new @ReceiverDependentMutable RandomAccessSubList<>(this, fromIndex, toIndex) :
+                new @ReceiverDependentMutable SubList<>(this, fromIndex, toIndex));
     }
 
     static void subListRangeCheck(int fromIndex, int toIndex, int size) {
@@ -927,9 +927,9 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
             };
         }
 
-        public @PolyMutable List<E> subList(@PolyMutable SubList<E> this, int fromIndex, int toIndex) {
+        public @ReceiverDependentMutable List<E> subList(@ReceiverDependentMutable SubList<E> this, int fromIndex, int toIndex) {
             subListRangeCheck(fromIndex, toIndex, size);
-            return new @PolyMutable SubList<>(this, fromIndex, toIndex);
+            return new @ReceiverDependentMutable SubList<>(this, fromIndex, toIndex);
         }
 
         private void rangeCheckForAdd(int index) {
@@ -976,9 +976,9 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
             super(parent, fromIndex, toIndex);
         }
 
-        public @PolyMutable List<E> subList(@PolyMutable RandomAccessSubList<E> this, int fromIndex, int toIndex) {
+        public @ReceiverDependentMutable List<E> subList(@ReceiverDependentMutable RandomAccessSubList<E> this, int fromIndex, int toIndex) {
             subListRangeCheck(fromIndex, toIndex, size);
-            return new @PolyMutable RandomAccessSubList<>(this, fromIndex, toIndex);
+            return new @ReceiverDependentMutable RandomAccessSubList<>(this, fromIndex, toIndex);
         }
     }
 }

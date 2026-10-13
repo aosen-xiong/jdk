@@ -1164,7 +1164,7 @@ public class Vector<E>
      *         {@code (fromIndex > toIndex)}
      */
     @SideEffectFree
-    public synchronized @PolyMutable List<E> subList(@GuardSatisfied @PolyMutable Vector<E> this, int fromIndex, int toIndex) {
+    public synchronized @ReceiverDependentMutable List<E> subList(@GuardSatisfied @ReceiverDependentMutable Vector<E> this, int fromIndex, int toIndex) {
         return Collections.synchronizedList(super.subList(fromIndex, toIndex),
                                             this);
     }

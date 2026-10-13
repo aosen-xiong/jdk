@@ -380,10 +380,10 @@ public abstract class AbstractMap<K extends @Immutable Object,V> implements Map<
      */
     @SuppressWarnings("mutability") // receiver in anonymous class not denotable, see typetool#2433
     @SideEffectFree
-    public @PolyMutable Set<@KeyFor({"this"}) K> keySet(@GuardSatisfied @PolyMutable AbstractMap<K, V> this) {
+    public @ReceiverDependentMutable Set<@KeyFor({"this"}) K> keySet(@GuardSatisfied @ReceiverDependentMutable AbstractMap<K, V> this) {
         Set<K> ks = keySet;
         if (ks == null) {
-            ks = new @PolyMutable AbstractSet<K>() {
+            ks = new @ReceiverDependentMutable AbstractSet<K>() {
                 public Iterator<K> iterator() {
                     return new Iterator<K>() {
                         private Iterator<Entry<K,V>> i = entrySet().iterator();
@@ -447,10 +447,10 @@ public abstract class AbstractMap<K extends @Immutable Object,V> implements Map<
      */
     @SuppressWarnings("mutability") // receiver in anonymous class not denotable, see typetool#2433
     @SideEffectFree
-    public @PolyMutable Collection<V> values(@GuardSatisfied @PolyMutable AbstractMap<K, V> this) {
+    public @ReceiverDependentMutable Collection<V> values(@GuardSatisfied @ReceiverDependentMutable AbstractMap<K, V> this) {
         Collection<V> vals = values;
         if (vals == null) {
-            vals = new @PolyMutable AbstractCollection<V>() {
+            vals = new @ReceiverDependentMutable AbstractCollection<V>() {
                 public Iterator<V> iterator() {
                     return new Iterator<V>() {
                         private Iterator<Entry<K,V>> i = entrySet().iterator();
@@ -497,7 +497,7 @@ public abstract class AbstractMap<K extends @Immutable Object,V> implements Map<
     }
 
     @SideEffectFree
-    public abstract @PolyMutable Set<@PolyMutable Entry<@KeyFor({"this"}) K,V>> entrySet(@GuardSatisfied @PolyMutable AbstractMap<K, V> this);
+    public abstract @ReceiverDependentMutable Set<@ReceiverDependentMutable Entry<@KeyFor({"this"}) K,V>> entrySet(@GuardSatisfied @ReceiverDependentMutable AbstractMap<K, V> this);
 
 
     // Comparison and hashing

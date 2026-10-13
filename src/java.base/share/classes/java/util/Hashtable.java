@@ -699,9 +699,9 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
      * @since 1.2
      */
     @SideEffectFree
-    public @PolyMutable Set<@KeyFor({"this"}) K> keySet(@GuardSatisfied @PolyMutable Hashtable<K, V> this) {
+    public @ReceiverDependentMutable Set<@KeyFor({"this"}) K> keySet(@GuardSatisfied @ReceiverDependentMutable Hashtable<K, V> this) {
         if (keySet == null)
-            keySet = Collections.synchronizedSet(new @PolyMutable KeySet(), this);
+            keySet = Collections.synchronizedSet(new @ReceiverDependentMutable KeySet(), this);
         return keySet;
     }
 
@@ -746,9 +746,9 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
      */
     @SideEffectFree
     @SuppressWarnings("mutability:argument.type.incompatible") // Aosen: class polymorphism qualifier
-    public @PolyMutable Set<Map.@PolyMutable Entry<@KeyFor({"this"}) K,V>> entrySet(@GuardSatisfied @PolyMutable Hashtable<K, V> this) {
+    public @ReceiverDependentMutable Set<Map.@ReceiverDependentMutable Entry<@KeyFor({"this"}) K,V>> entrySet(@GuardSatisfied @ReceiverDependentMutable Hashtable<K, V> this) {
         if (entrySet==null)
-            entrySet = Collections.synchronizedSet(new @PolyMutable EntrySet(), this);
+            entrySet = Collections.synchronizedSet(new @ReceiverDependentMutable EntrySet(), this);
         return entrySet;
     }
 
@@ -832,9 +832,9 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
      * @since 1.2
      */
     @SideEffectFree
-    public @PolyMutable Collection<V> values(@GuardSatisfied @PolyMutable Hashtable<K, V> this) {
+    public @ReceiverDependentMutable Collection<V> values(@GuardSatisfied @ReceiverDependentMutable Hashtable<K, V> this) {
         if (values==null)
-            values = Collections.synchronizedCollection(new @PolyMutable ValueCollection(),
+            values = Collections.synchronizedCollection(new @ReceiverDependentMutable ValueCollection(),
                                                         this);
         return values;
     }

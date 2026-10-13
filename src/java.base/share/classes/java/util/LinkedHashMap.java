@@ -557,10 +557,10 @@ public class LinkedHashMap<K extends @Immutable Object,V>
      * @return a set view of the keys contained in this map
      */
     @SideEffectFree
-    public @PolyMutable Set<@KeyFor({"this"}) K> keySet(@PolyMutable LinkedHashMap<K, V> this) {
+    public @ReceiverDependentMutable Set<@KeyFor({"this"}) K> keySet(@ReceiverDependentMutable LinkedHashMap<K, V> this) {
         Set<K> ks = keySet;
         if (ks == null) {
-            ks = new @PolyMutable LinkedKeySet();
+            ks = new @ReceiverDependentMutable LinkedKeySet();
             keySet = ks;
         }
         return ks;
@@ -645,10 +645,10 @@ public class LinkedHashMap<K extends @Immutable Object,V>
      *
      * @return a view of the values contained in this map
      */
-    public @PolyMutable Collection<V> values(@PolyMutable LinkedHashMap<K, V> this) {
+    public @ReceiverDependentMutable Collection<V> values(@ReceiverDependentMutable LinkedHashMap<K, V> this) {
         Collection<V> vs = values;
         if (vs == null) {
-            vs = new @PolyMutable LinkedValues();
+            vs = new @ReceiverDependentMutable LinkedValues();
             values = vs;
         }
         return vs;
@@ -712,9 +712,9 @@ public class LinkedHashMap<K extends @Immutable Object,V>
      */
     @SideEffectFree
     @SuppressWarnings("mutability:assignment.type.incompatible") // class polymorphic qualifier
-    public @PolyMutable Set<Map.@PolyMutable Entry<@KeyFor({"this"}) K,V>> entrySet(@GuardSatisfied @PolyMutable LinkedHashMap<K, V> this) {
+    public @ReceiverDependentMutable Set<Map.@ReceiverDependentMutable Entry<@KeyFor({"this"}) K,V>> entrySet(@GuardSatisfied @ReceiverDependentMutable LinkedHashMap<K, V> this) {
         Set<Map.@PolyMutable Entry<K,V>> es;
-        return (es = entrySet) == null ? (entrySet = new @PolyMutable LinkedEntrySet()) : es;
+        return (es = entrySet) == null ? (entrySet = new @ReceiverDependentMutable LinkedEntrySet()) : es;
     }
 
     @ReceiverDependentMutable

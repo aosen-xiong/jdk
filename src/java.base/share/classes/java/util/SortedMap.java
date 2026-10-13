@@ -169,7 +169,7 @@ public interface SortedMap<K extends @Immutable Object,V> extends Map<K,V> {
      *         outside the bounds of the range
      */
     @SideEffectFree
-    @PolyMutable SortedMap<K,V> subMap(@GuardSatisfied @PolyMutable SortedMap<K, V> this, @GuardSatisfied K fromKey, @GuardSatisfied K toKey);
+    @ReceiverDependentMutable SortedMap<K,V> subMap(@GuardSatisfied @ReceiverDependentMutable SortedMap<K, V> this, @GuardSatisfied K fromKey, @GuardSatisfied K toKey);
 
     /**
      * Returns a view of the portion of this map whose keys are
@@ -197,7 +197,7 @@ public interface SortedMap<K extends @Immutable Object,V> extends Map<K,V> {
      *         bounds of the range
      */
     @SideEffectFree
-    @PolyMutable SortedMap<K,V> headMap(@GuardSatisfied @PolyMutable SortedMap<K, V> this, K toKey);
+    @ReceiverDependentMutable SortedMap<K,V> headMap(@GuardSatisfied @ReceiverDependentMutable SortedMap<K, V> this, K toKey);
 
     /**
      * Returns a view of the portion of this map whose keys are
@@ -225,7 +225,7 @@ public interface SortedMap<K extends @Immutable Object,V> extends Map<K,V> {
      *         bounds of the range
      */
     @SideEffectFree
-    @PolyMutable SortedMap<K,V> tailMap(@GuardSatisfied @PolyMutable SortedMap<K, V> this, K fromKey);
+    @ReceiverDependentMutable SortedMap<K,V> tailMap(@GuardSatisfied @ReceiverDependentMutable SortedMap<K, V> this, K fromKey);
 
     /**
      * Returns the first (lowest) key currently in this map.
@@ -263,7 +263,7 @@ public interface SortedMap<K extends @Immutable Object,V> extends Map<K,V> {
      *         ascending order
      */
     @SideEffectFree
-    @PolyMutable Set<@KeyFor({"this"}) K> keySet(@GuardSatisfied @PolyMutable SortedMap<K, V> this);
+    @ReceiverDependentMutable Set<@KeyFor({"this"}) K> keySet(@GuardSatisfied @ReceiverDependentMutable SortedMap<K, V> this);
 
     /**
      * Returns a {@link Collection} view of the values contained in this map.
@@ -284,7 +284,7 @@ public interface SortedMap<K extends @Immutable Object,V> extends Map<K,V> {
      *         sorted in ascending key order
      */
     @SideEffectFree
-    @PolyMutable Collection<V> values(@GuardSatisfied @PolyMutable SortedMap<K, V> this);
+    @ReceiverDependentMutable Collection<V> values(@GuardSatisfied @ReceiverDependentMutable SortedMap<K, V> this);
 
     /**
      * Returns a {@link Set} view of the mappings contained in this map.
@@ -305,5 +305,5 @@ public interface SortedMap<K extends @Immutable Object,V> extends Map<K,V> {
      *         sorted in ascending key order
      */
     @SideEffectFree
-    @PolyMutable Set<Map.@PolyMutable Entry<@KeyFor({"this"}) K, V>> entrySet(@PolyMutable SortedMap<K, V> this);
+    @ReceiverDependentMutable Set<Map.@ReceiverDependentMutable Entry<@KeyFor({"this"}) K, V>> entrySet(@ReceiverDependentMutable SortedMap<K, V> this);
 }

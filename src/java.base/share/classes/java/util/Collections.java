@@ -2387,20 +2387,20 @@ public class Collections {
             synchronized (mutex) {return ss.comparator();}
         }
 
-        public @PolyMutable SortedSet<E> subSet(@PolyMutable SynchronizedSortedSet<E> this, E fromElement, E toElement) {
+        public @ReceiverDependentMutable SortedSet<E> subSet(@ReceiverDependentMutable SynchronizedSortedSet<E> this, E fromElement, E toElement) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedSortedSet<>(
+                return new @ReceiverDependentMutable SynchronizedSortedSet<>(
                     ss.subSet(fromElement, toElement), mutex);
             }
         }
-        public @PolyMutable SortedSet<E> headSet(@PolyMutable SynchronizedSortedSet<E> this, E toElement) {
+        public @ReceiverDependentMutable SortedSet<E> headSet(@ReceiverDependentMutable SynchronizedSortedSet<E> this, E toElement) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedSortedSet<>(ss.headSet(toElement), mutex);
+                return new @ReceiverDependentMutable SynchronizedSortedSet<>(ss.headSet(toElement), mutex);
             }
         }
-        public @PolyMutable SortedSet<E> tailSet(@PolyMutable SynchronizedSortedSet<E> this, E fromElement) {
+        public @ReceiverDependentMutable SortedSet<E> tailSet(@ReceiverDependentMutable SynchronizedSortedSet<E> this, E fromElement) {
             synchronized (mutex) {
-               return new @PolyMutable SynchronizedSortedSet<>(ss.tailSet(fromElement),mutex);
+               return new @ReceiverDependentMutable SynchronizedSortedSet<>(ss.tailSet(fromElement),mutex);
             }
         }
 
@@ -2487,46 +2487,46 @@ public class Collections {
         public E pollFirst(@Mutable SynchronizedNavigableSet<E> this)  { synchronized (mutex) {return ns.pollFirst();} }
         public E pollLast(@Mutable SynchronizedNavigableSet<E> this)    { synchronized (mutex) {return ns.pollLast();} }
 
-        public @PolyMutable NavigableSet<E> descendingSet(@PolyMutable SynchronizedNavigableSet<E> this) {
+        public @ReceiverDependentMutable NavigableSet<E> descendingSet(@ReceiverDependentMutable SynchronizedNavigableSet<E> this) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedNavigableSet<>(ns.descendingSet(), mutex);
+                return new @ReceiverDependentMutable SynchronizedNavigableSet<>(ns.descendingSet(), mutex);
             }
         }
 
         public Iterator<E> descendingIterator(@Readonly SynchronizedNavigableSet<E> this)
                  { synchronized (mutex) { return descendingSet().iterator(); } }
 
-        public @PolyMutable NavigableSet<E> subSet(@PolyMutable SynchronizedNavigableSet<E> this, E fromElement, E toElement) {
+        public @ReceiverDependentMutable NavigableSet<E> subSet(@ReceiverDependentMutable SynchronizedNavigableSet<E> this, E fromElement, E toElement) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedNavigableSet<>(ns.subSet(fromElement, true, toElement, false), mutex);
+                return new @ReceiverDependentMutable SynchronizedNavigableSet<>(ns.subSet(fromElement, true, toElement, false), mutex);
             }
         }
-        public @PolyMutable NavigableSet<E> headSet(@PolyMutable SynchronizedNavigableSet<E> this, E toElement) {
+        public @ReceiverDependentMutable NavigableSet<E> headSet(@ReceiverDependentMutable SynchronizedNavigableSet<E> this, E toElement) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedNavigableSet<>(ns.headSet(toElement, false), mutex);
+                return new @ReceiverDependentMutable SynchronizedNavigableSet<>(ns.headSet(toElement, false), mutex);
             }
         }
-        public @PolyMutable NavigableSet<E> tailSet(@PolyMutable SynchronizedNavigableSet<E> this, E fromElement) {
+        public @ReceiverDependentMutable NavigableSet<E> tailSet(@ReceiverDependentMutable SynchronizedNavigableSet<E> this, E fromElement) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedNavigableSet<>(ns.tailSet(fromElement, true), mutex);
-            }
-        }
-
-        public @PolyMutable NavigableSet<E> subSet(@PolyMutable SynchronizedNavigableSet<E> this, E fromElement, boolean fromInclusive, E toElement, boolean toInclusive) {
-            synchronized (mutex) {
-                return new @PolyMutable SynchronizedNavigableSet<>(ns.subSet(fromElement, fromInclusive, toElement, toInclusive), mutex);
+                return new @ReceiverDependentMutable SynchronizedNavigableSet<>(ns.tailSet(fromElement, true), mutex);
             }
         }
 
-        public @PolyMutable NavigableSet<E> headSet(@PolyMutable SynchronizedNavigableSet<E> this, E toElement, boolean inclusive) {
+        public @ReceiverDependentMutable NavigableSet<E> subSet(@ReceiverDependentMutable SynchronizedNavigableSet<E> this, E fromElement, boolean fromInclusive, E toElement, boolean toInclusive) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedNavigableSet<>(ns.headSet(toElement, inclusive), mutex);
+                return new @ReceiverDependentMutable SynchronizedNavigableSet<>(ns.subSet(fromElement, fromInclusive, toElement, toInclusive), mutex);
             }
         }
 
-        public @PolyMutable NavigableSet<E> tailSet(@PolyMutable SynchronizedNavigableSet<E> this, E fromElement, boolean inclusive) {
+        public @ReceiverDependentMutable NavigableSet<E> headSet(@ReceiverDependentMutable SynchronizedNavigableSet<E> this, E toElement, boolean inclusive) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedNavigableSet<>(ns.tailSet(fromElement, inclusive), mutex);
+                return new @ReceiverDependentMutable SynchronizedNavigableSet<>(ns.headSet(toElement, inclusive), mutex);
+            }
+        }
+
+        public @ReceiverDependentMutable NavigableSet<E> tailSet(@ReceiverDependentMutable SynchronizedNavigableSet<E> this, E fromElement, boolean inclusive) {
+            synchronized (mutex) {
+                return new @ReceiverDependentMutable SynchronizedNavigableSet<>(ns.tailSet(fromElement, inclusive), mutex);
             }
         }
     }
@@ -2633,9 +2633,9 @@ public class Collections {
             return list.listIterator(index); // Must be manually synched by user
         }
 
-        public @PolyMutable List<E> subList(@PolyMutable SynchronizedList<E> this, int fromIndex, int toIndex) {
+        public @ReceiverDependentMutable List<E> subList(@ReceiverDependentMutable SynchronizedList<E> this, int fromIndex, int toIndex) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedList<>(list.subList(fromIndex, toIndex),
+                return new @ReceiverDependentMutable SynchronizedList<>(list.subList(fromIndex, toIndex),
                                             mutex);
             }
         }
@@ -2685,9 +2685,9 @@ public class Collections {
             super(list, mutex);
         }
 
-        public @PolyMutable List<E> subList(@PolyMutable SynchronizedRandomAccessList<E> this, int fromIndex, int toIndex) {
+        public @ReceiverDependentMutable List<E> subList(@ReceiverDependentMutable SynchronizedRandomAccessList<E> this, int fromIndex, int toIndex) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedRandomAccessList<>(
+                return new @ReceiverDependentMutable SynchronizedRandomAccessList<>(
                     list.subList(fromIndex, toIndex), mutex);
             }
         }
@@ -2804,27 +2804,27 @@ public class Collections {
         private transient @Assignable /* should be @LazyFinal */ Set<Map.@ReceiverDependentMutable Entry<K,V>> entrySet;
         private transient @Assignable /* should be @LazyFinal */ Collection<V> values;
 
-        public @PolyMutable Set<K> keySet(@PolyMutable SynchronizedMap<K,V> this) {
+        public @ReceiverDependentMutable Set<K> keySet(@ReceiverDependentMutable SynchronizedMap<K,V> this) {
             synchronized (mutex) {
                 if (keySet==null)
-                    keySet = new @PolyMutable SynchronizedSet<>(m.keySet(), mutex);
+                    keySet = new @ReceiverDependentMutable SynchronizedSet<>(m.keySet(), mutex);
                 return keySet;
             }
         }
 
         @SideEffectFree
-        public @PolyMutable Set<Map.@PolyMutable Entry<K,V>> entrySet(@PolyMutable SynchronizedMap<K,V> this) {
+        public @ReceiverDependentMutable Set<Map.@ReceiverDependentMutable Entry<K,V>> entrySet(@ReceiverDependentMutable SynchronizedMap<K,V> this) {
             synchronized (mutex) {
                 if (entrySet==null)
-                    entrySet = new @PolyMutable SynchronizedSet<>(m.entrySet(), mutex);
+                    entrySet = new @ReceiverDependentMutable SynchronizedSet<>(m.entrySet(), mutex);
                 return entrySet;
             }
         }
 
-        public @PolyMutable Collection<V> values(@PolyMutable SynchronizedMap<K,V> this) {
+        public @ReceiverDependentMutable Collection<V> values(@ReceiverDependentMutable SynchronizedMap<K,V> this) {
             synchronized (mutex) {
                 if (values==null)
-                    values = new @PolyMutable SynchronizedCollection<>(m.values(), mutex);
+                    values = new @ReceiverDependentMutable SynchronizedCollection<>(m.values(), mutex);
                 return values;
             }
         }
@@ -2975,22 +2975,22 @@ public class Collections {
         }
 
         @SideEffectFree
-        public @PolyMutable SortedMap<K,V> subMap(@PolyMutable SynchronizedSortedMap<K,V> this, K fromKey, K toKey) {
+        public @ReceiverDependentMutable SortedMap<K,V> subMap(@ReceiverDependentMutable SynchronizedSortedMap<K,V> this, K fromKey, K toKey) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedSortedMap<>(
+                return new @ReceiverDependentMutable SynchronizedSortedMap<>(
                     sm.subMap(fromKey, toKey), mutex);
             }
         }
         @SideEffectFree
-        public @PolyMutable SortedMap<K,V> headMap(@PolyMutable SynchronizedSortedMap<K,V> this, K toKey) {
+        public @ReceiverDependentMutable SortedMap<K,V> headMap(@ReceiverDependentMutable SynchronizedSortedMap<K,V> this, K toKey) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedSortedMap<>(sm.headMap(toKey), mutex);
+                return new @ReceiverDependentMutable SynchronizedSortedMap<>(sm.headMap(toKey), mutex);
             }
         }
         @SideEffectFree
-        public @PolyMutable SortedMap<K,V> tailMap(@PolyMutable SynchronizedSortedMap<K,V> this, K fromKey) {
+        public @ReceiverDependentMutable SortedMap<K,V> tailMap(@ReceiverDependentMutable SynchronizedSortedMap<K,V> this, K fromKey) {
             synchronized (mutex) {
-               return new @PolyMutable SynchronizedSortedMap<>(sm.tailMap(fromKey),mutex);
+               return new @ReceiverDependentMutable SynchronizedSortedMap<>(sm.tailMap(fromKey),mutex);
             }
         }
 
@@ -3077,25 +3077,25 @@ public class Collections {
             nm = m;
         }
 
-        public @PolyMutable Entry<K, V> lowerEntry(@PolyMutable SynchronizedNavigableMap<K,V> this, K key)
+        public @ReceiverDependentMutable Entry<K, V> lowerEntry(@ReceiverDependentMutable SynchronizedNavigableMap<K,V> this, K key)
                         { synchronized (mutex) { return nm.lowerEntry(key); } }
         public K lowerKey(@Readonly SynchronizedNavigableMap<K,V> this, K key)
                           { synchronized (mutex) { return nm.lowerKey(key); } }
-        public @PolyMutable Entry<K, V> floorEntry(@PolyMutable SynchronizedNavigableMap<K,V> this, K key)
+        public @ReceiverDependentMutable Entry<K, V> floorEntry(@ReceiverDependentMutable SynchronizedNavigableMap<K,V> this, K key)
                         { synchronized (mutex) { return nm.floorEntry(key); } }
         public K floorKey(@Readonly SynchronizedNavigableMap<K,V> this, K key)
                           { synchronized (mutex) { return nm.floorKey(key); } }
-        public @PolyMutable Entry<K, V> ceilingEntry(@PolyMutable SynchronizedNavigableMap<K,V> this, K key)
+        public @ReceiverDependentMutable Entry<K, V> ceilingEntry(@ReceiverDependentMutable SynchronizedNavigableMap<K,V> this, K key)
                       { synchronized (mutex) { return nm.ceilingEntry(key); } }
         public K ceilingKey(@Readonly SynchronizedNavigableMap<K,V> this, K key)
                         { synchronized (mutex) { return nm.ceilingKey(key); } }
-        public @PolyMutable Entry<K, V> higherEntry(@PolyMutable SynchronizedNavigableMap<K,V> this, K key)
+        public @ReceiverDependentMutable Entry<K, V> higherEntry(@ReceiverDependentMutable SynchronizedNavigableMap<K,V> this, K key)
                        { synchronized (mutex) { return nm.higherEntry(key); } }
         public K higherKey(@Mutable SynchronizedNavigableMap<K,V> this, K key)
                          { synchronized (mutex) { return nm.higherKey(key); } }
-        public @PolyMutable Entry<K, V> firstEntry(@PolyMutable SynchronizedNavigableMap<K,V> this)
+        public @ReceiverDependentMutable Entry<K, V> firstEntry(@ReceiverDependentMutable SynchronizedNavigableMap<K,V> this)
                            { synchronized (mutex) { return nm.firstEntry(); } }
-        public @PolyMutable Entry<K, V> lastEntry(@PolyMutable SynchronizedNavigableMap<K,V> this)
+        public @ReceiverDependentMutable Entry<K, V> lastEntry(@ReceiverDependentMutable SynchronizedNavigableMap<K,V> this)
                             { synchronized (mutex) { return nm.lastEntry(); } }
         public Entry<K, V> pollFirstEntry(@Mutable SynchronizedNavigableMap<K,V> this)
                        { synchronized (mutex) { return nm.pollFirstEntry(); } }
@@ -3103,72 +3103,72 @@ public class Collections {
                         { synchronized (mutex) { return nm.pollLastEntry(); } }
 
         @SideEffectFree
-        public @PolyMutable NavigableMap<K, V> descendingMap(@PolyMutable SynchronizedNavigableMap<K,V> this) {
+        public @ReceiverDependentMutable NavigableMap<K, V> descendingMap(@ReceiverDependentMutable SynchronizedNavigableMap<K,V> this) {
             synchronized (mutex) {
                 return
-                    new @PolyMutable SynchronizedNavigableMap<>(nm.descendingMap(), mutex);
+                    new @ReceiverDependentMutable SynchronizedNavigableMap<>(nm.descendingMap(), mutex);
             }
         }
 
-        public @PolyMutable NavigableSet<K> keySet(@PolyMutable SynchronizedNavigableMap<K,V> this) {
+        public @ReceiverDependentMutable NavigableSet<K> keySet(@ReceiverDependentMutable SynchronizedNavigableMap<K,V> this) {
             return navigableKeySet();
         }
 
         @SideEffectFree
-        public @PolyMutable NavigableSet<K> navigableKeySet(@PolyMutable SynchronizedNavigableMap<K,V> this) {
+        public @ReceiverDependentMutable NavigableSet<K> navigableKeySet(@ReceiverDependentMutable SynchronizedNavigableMap<K,V> this) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedNavigableSet<>(nm.navigableKeySet(), mutex);
+                return new @ReceiverDependentMutable SynchronizedNavigableSet<>(nm.navigableKeySet(), mutex);
             }
         }
 
         @SideEffectFree
-        public @PolyMutable NavigableSet<K> descendingKeySet(@PolyMutable SynchronizedNavigableMap<K,V> this) {
+        public @ReceiverDependentMutable NavigableSet<K> descendingKeySet(@ReceiverDependentMutable SynchronizedNavigableMap<K,V> this) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedNavigableSet<>(nm.descendingKeySet(), mutex);
+                return new @ReceiverDependentMutable SynchronizedNavigableSet<>(nm.descendingKeySet(), mutex);
             }
         }
 
 
         @SideEffectFree
-        public @PolyMutable SortedMap<K,V> subMap(@PolyMutable SynchronizedNavigableMap<K,V> this, K fromKey, K toKey) {
+        public @ReceiverDependentMutable SortedMap<K,V> subMap(@ReceiverDependentMutable SynchronizedNavigableMap<K,V> this, K fromKey, K toKey) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedNavigableMap<>(
+                return new @ReceiverDependentMutable SynchronizedNavigableMap<>(
                     nm.subMap(fromKey, true, toKey, false), mutex);
             }
         }
         @SideEffectFree
-        public @PolyMutable SortedMap<K,V> headMap(@PolyMutable SynchronizedNavigableMap<K,V> this, K toKey) {
+        public @ReceiverDependentMutable SortedMap<K,V> headMap(@ReceiverDependentMutable SynchronizedNavigableMap<K,V> this, K toKey) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedNavigableMap<>(nm.headMap(toKey, false), mutex);
+                return new @ReceiverDependentMutable SynchronizedNavigableMap<>(nm.headMap(toKey, false), mutex);
             }
         }
         @SideEffectFree
-        public @PolyMutable SortedMap<K,V> tailMap(@PolyMutable SynchronizedNavigableMap<K,V> this, K fromKey) {
+        public @ReceiverDependentMutable SortedMap<K,V> tailMap(@ReceiverDependentMutable SynchronizedNavigableMap<K,V> this, K fromKey) {
             synchronized (mutex) {
-        return new @PolyMutable SynchronizedNavigableMap<>(nm.tailMap(fromKey, true),mutex);
+        return new @ReceiverDependentMutable SynchronizedNavigableMap<>(nm.tailMap(fromKey, true),mutex);
             }
         }
 
         @SideEffectFree
-        public @PolyMutable NavigableMap<K, V> subMap(@PolyMutable SynchronizedNavigableMap<K,V> this, K fromKey, boolean fromInclusive, K toKey, boolean toInclusive) {
+        public @ReceiverDependentMutable NavigableMap<K, V> subMap(@ReceiverDependentMutable SynchronizedNavigableMap<K,V> this, K fromKey, boolean fromInclusive, K toKey, boolean toInclusive) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedNavigableMap<>(
+                return new @ReceiverDependentMutable SynchronizedNavigableMap<>(
                     nm.subMap(fromKey, fromInclusive, toKey, toInclusive), mutex);
             }
         }
 
         @SideEffectFree
-        public @PolyMutable NavigableMap<K, V> headMap(@PolyMutable SynchronizedNavigableMap<K,V> this, K toKey, boolean inclusive) {
+        public @ReceiverDependentMutable NavigableMap<K, V> headMap(@ReceiverDependentMutable SynchronizedNavigableMap<K,V> this, K toKey, boolean inclusive) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedNavigableMap<>(
+                return new @ReceiverDependentMutable SynchronizedNavigableMap<>(
                         nm.headMap(toKey, inclusive), mutex);
             }
         }
 
         @SideEffectFree
-        public @PolyMutable NavigableMap<K, V> tailMap(@PolyMutable SynchronizedNavigableMap<K,V> this, K fromKey, boolean inclusive) {
+        public @ReceiverDependentMutable NavigableMap<K, V> tailMap(@ReceiverDependentMutable SynchronizedNavigableMap<K,V> this, K fromKey, boolean inclusive) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedNavigableMap<>(
+                return new @ReceiverDependentMutable SynchronizedNavigableMap<>(
                     nm.tailMap(fromKey, inclusive), mutex);
             }
         }
@@ -3541,13 +3541,13 @@ public class Collections {
         public E first(@Readonly CheckedSortedSet<E> this)                   { return ss.first(); }
         public E last(@Readonly CheckedSortedSet<E> this)                    { return ss.last(); }
 
-        public @PolyMutable SortedSet<E> subSet(@PolyMutable CheckedSortedSet<E> this, E fromElement, E toElement) {
+        public @ReceiverDependentMutable SortedSet<E> subSet(@ReceiverDependentMutable CheckedSortedSet<E> this, E fromElement, E toElement) {
             return checkedSortedSet(ss.subSet(fromElement,toElement), type);
         }
-        public @PolyMutable SortedSet<E> headSet(@PolyMutable CheckedSortedSet<E> this, E toElement) {
+        public @ReceiverDependentMutable SortedSet<E> headSet(@ReceiverDependentMutable CheckedSortedSet<E> this, E toElement) {
             return checkedSortedSet(ss.headSet(toElement), type);
         }
-        public @PolyMutable SortedSet<E> tailSet(@PolyMutable CheckedSortedSet<E> this, E fromElement) {
+        public @ReceiverDependentMutable SortedSet<E> tailSet(@ReceiverDependentMutable CheckedSortedSet<E> this, E fromElement) {
             return checkedSortedSet(ss.tailSet(fromElement), type);
         }
     }
@@ -3608,31 +3608,31 @@ public class Collections {
         public E higher(@Readonly CheckedNavigableSet<E> this, E e)                           { return ns.higher(e); }
         public E pollFirst(@Mutable CheckedNavigableSet<E> this)                         { return ns.pollFirst(); }
         public E pollLast(@Mutable CheckedNavigableSet<E> this)                            {return ns.pollLast(); }
-        public @PolyMutable NavigableSet<E> descendingSet(@PolyMutable CheckedNavigableSet<E> this)
+        public @ReceiverDependentMutable NavigableSet<E> descendingSet(@ReceiverDependentMutable CheckedNavigableSet<E> this)
                       { return checkedNavigableSet(ns.descendingSet(), type); }
         @SuppressWarnings("mutability") // lost can not invoke poly method.
         public Iterator<E> descendingIterator(@Readonly CheckedNavigableSet<E> this)
             {return checkedNavigableSet(ns.descendingSet(), type).iterator(); }
 
-        public @PolyMutable NavigableSet<E> subSet(@PolyMutable CheckedNavigableSet<E> this, E fromElement, E toElement) {
+        public @ReceiverDependentMutable NavigableSet<E> subSet(@ReceiverDependentMutable CheckedNavigableSet<E> this, E fromElement, E toElement) {
             return checkedNavigableSet(ns.subSet(fromElement, true, toElement, false), type);
         }
-        public @PolyMutable NavigableSet<E> headSet(@PolyMutable CheckedNavigableSet<E> this, E toElement) {
+        public @ReceiverDependentMutable NavigableSet<E> headSet(@ReceiverDependentMutable CheckedNavigableSet<E> this, E toElement) {
             return checkedNavigableSet(ns.headSet(toElement, false), type);
         }
-        public @PolyMutable NavigableSet<E> tailSet(@PolyMutable CheckedNavigableSet<E> this, E fromElement) {
+        public @ReceiverDependentMutable NavigableSet<E> tailSet(@ReceiverDependentMutable CheckedNavigableSet<E> this, E fromElement) {
             return checkedNavigableSet(ns.tailSet(fromElement, true), type);
         }
 
-        public @PolyMutable NavigableSet<E> subSet(@PolyMutable CheckedNavigableSet<E> this, E fromElement, boolean fromInclusive, E toElement, boolean toInclusive) {
+        public @ReceiverDependentMutable NavigableSet<E> subSet(@ReceiverDependentMutable CheckedNavigableSet<E> this, E fromElement, boolean fromInclusive, E toElement, boolean toInclusive) {
             return checkedNavigableSet(ns.subSet(fromElement, fromInclusive, toElement, toInclusive), type);
         }
 
-        public @PolyMutable NavigableSet<E> headSet(@PolyMutable CheckedNavigableSet<E> this, E toElement, boolean inclusive) {
+        public @ReceiverDependentMutable NavigableSet<E> headSet(@ReceiverDependentMutable CheckedNavigableSet<E> this, E toElement, boolean inclusive) {
             return checkedNavigableSet(ns.headSet(toElement, inclusive), type);
         }
 
-        public @PolyMutable NavigableSet<E> tailSet(@PolyMutable CheckedNavigableSet<E> this, E fromElement, boolean inclusive) {
+        public @ReceiverDependentMutable NavigableSet<E> tailSet(@ReceiverDependentMutable CheckedNavigableSet<E> this, E fromElement, boolean inclusive) {
             return checkedNavigableSet(ns.tailSet(fromElement, inclusive), type);
         }
     }
@@ -3737,8 +3737,8 @@ public class Collections {
             };
         }
 
-        public @PolyMutable List<E> subList(@PolyMutable CheckedList<E> this, int fromIndex, int toIndex) {
-            return new @PolyMutable CheckedList<>(list.subList(fromIndex, toIndex), type);
+        public @ReceiverDependentMutable List<E> subList(@ReceiverDependentMutable CheckedList<E> this, int fromIndex, int toIndex) {
+            return new @ReceiverDependentMutable CheckedList<>(list.subList(fromIndex, toIndex), type);
         }
 
         /**
@@ -3774,8 +3774,8 @@ public class Collections {
             super(list, type);
         }
 
-        public @PolyMutable List<E> subList(@PolyMutable CheckedRandomAccessList<E> this, int fromIndex, int toIndex) {
-            return new @PolyMutable CheckedRandomAccessList<>(
+        public @ReceiverDependentMutable List<E> subList(@ReceiverDependentMutable CheckedRandomAccessList<E> this, int fromIndex, int toIndex) {
+            return new @ReceiverDependentMutable CheckedRandomAccessList<>(
                     list.subList(fromIndex, toIndex), type);
         }
     }
@@ -3887,8 +3887,8 @@ public class Collections {
         public V get(@Readonly CheckedMap<K,V> this, @Readonly Object key)               { return m.get(key); }
         public V remove(@Mutable CheckedMap<K,V> this, @Readonly Object key)            { return m.remove(key); }
         public void clear(@Mutable CheckedMap<K,V> this)                    { m.clear(); }
-        public @PolyMutable Set<K> keySet(@PolyMutable CheckedMap<K,V> this)                 { return m.keySet(); }
-        public @PolyMutable Collection<V> values(@PolyMutable CheckedMap<K,V> this)          { return m.values(); }
+        public @ReceiverDependentMutable Set<K> keySet(@ReceiverDependentMutable CheckedMap<K,V> this)                 { return m.keySet(); }
+        public @ReceiverDependentMutable Collection<V> values(@ReceiverDependentMutable CheckedMap<K,V> this)          { return m.values(); }
         public boolean equals(@Readonly CheckedMap<K,V> this, @Readonly Object o)        { return o == this || m.equals(o); }
         public int hashCode(@Readonly CheckedMap<K,V> this)                  { return m.hashCode(); }
         public String toString(@Readonly CheckedMap<K,V> this)               { return m.toString(); }
@@ -3924,9 +3924,9 @@ public class Collections {
 
         @SideEffectFree
         @SuppressWarnings("mutability:assignment.type.incompatible") // polyq on supertype's type argument
-        public @PolyMutable Set<Map.@PolyMutable Entry<K,V>> entrySet(@PolyMutable CheckedMap<K,V> this) {
+        public @ReceiverDependentMutable Set<Map.@ReceiverDependentMutable Entry<K,V>> entrySet(@ReceiverDependentMutable CheckedMap<K,V> this) {
             if (entrySet==null)
-                entrySet = new @PolyMutable CheckedEntrySet<>(m.entrySet(), valueType);
+                entrySet = new @ReceiverDependentMutable CheckedEntrySet<>(m.entrySet(), valueType);
             return entrySet;
         }
 
@@ -4266,16 +4266,16 @@ public class Collections {
         public K lastKey(@Readonly CheckedSortedMap<K,V> this)                        { return sm.lastKey(); }
 
         @SideEffectFree
-        public @PolyMutable SortedMap<K,V> subMap(@PolyMutable CheckedSortedMap<K,V> this, K fromKey, K toKey) {
+        public @ReceiverDependentMutable SortedMap<K,V> subMap(@ReceiverDependentMutable CheckedSortedMap<K,V> this, K fromKey, K toKey) {
             return checkedSortedMap(sm.subMap(fromKey, toKey),
                                     keyType, valueType);
         }
         @SideEffectFree
-        public @PolyMutable SortedMap<K,V> headMap(@PolyMutable CheckedSortedMap<K,V> this, K toKey) {
+        public @ReceiverDependentMutable SortedMap<K,V> headMap(@ReceiverDependentMutable CheckedSortedMap<K,V> this, K toKey) {
             return checkedSortedMap(sm.headMap(toKey), keyType, valueType);
         }
         @SideEffectFree
-        public @PolyMutable SortedMap<K,V> tailMap(@PolyMutable CheckedSortedMap<K,V> this, K fromKey) {
+        public @ReceiverDependentMutable SortedMap<K,V> tailMap(@ReceiverDependentMutable CheckedSortedMap<K,V> this, K fromKey) {
             return checkedSortedMap(sm.tailMap(fromKey), keyType, valueType);
         }
     }
@@ -4344,53 +4344,53 @@ public class Collections {
         public K firstKey(@Readonly CheckedNavigableMap<K,V> this)                           { return nm.firstKey(); }
         public K lastKey(@Readonly CheckedNavigableMap<K,V> this)                             { return nm.lastKey(); }
 
-        public @PolyMutable Entry<K, V> lowerEntry(@PolyMutable CheckedNavigableMap<K,V> this, K key) {
+        public @ReceiverDependentMutable Entry<K, V> lowerEntry(@ReceiverDependentMutable CheckedNavigableMap<K,V> this, K key) {
             Entry<K,V> lower = nm.lowerEntry(key);
             return (null != lower)
-                ? new CheckedMap.CheckedEntrySet.@PolyMutable CheckedEntry<>(lower, valueType)
+                ? new CheckedMap.CheckedEntrySet.@ReceiverDependentMutable CheckedEntry<>(lower, valueType)
                 : null;
         }
 
         public K lowerKey(@Readonly CheckedNavigableMap<K,V> this, K key)                   { return nm.lowerKey(key); }
 
-        public @PolyMutable Entry<K, V> floorEntry(@PolyMutable CheckedNavigableMap<K,V> this, K key) {
+        public @ReceiverDependentMutable Entry<K, V> floorEntry(@ReceiverDependentMutable CheckedNavigableMap<K,V> this, K key) {
             Entry<K,V> floor = nm.floorEntry(key);
             return (null != floor)
-                ? new CheckedMap.CheckedEntrySet.@PolyMutable CheckedEntry<>(floor, valueType)
+                ? new CheckedMap.CheckedEntrySet.@ReceiverDependentMutable CheckedEntry<>(floor, valueType)
                 : null;
         }
 
         public K floorKey(@Readonly CheckedNavigableMap<K,V> this, K key)                   { return nm.floorKey(key); }
 
-        public @PolyMutable Entry<K, V> ceilingEntry(@PolyMutable CheckedNavigableMap<K,V> this, K key) {
+        public @ReceiverDependentMutable Entry<K, V> ceilingEntry(@ReceiverDependentMutable CheckedNavigableMap<K,V> this, K key) {
             Entry<K,V> ceiling = nm.ceilingEntry(key);
             return (null != ceiling)
-                ? new CheckedMap.CheckedEntrySet.@PolyMutable CheckedEntry<>(ceiling, valueType)
+                ? new CheckedMap.CheckedEntrySet.@ReceiverDependentMutable CheckedEntry<>(ceiling, valueType)
                 : null;
         }
 
         public K ceilingKey(@Readonly CheckedNavigableMap<K,V> this, K key)               { return nm.ceilingKey(key); }
 
-        public @PolyMutable Entry<K, V> higherEntry(@PolyMutable CheckedNavigableMap<K,V> this, K key) {
+        public @ReceiverDependentMutable Entry<K, V> higherEntry(@ReceiverDependentMutable CheckedNavigableMap<K,V> this, K key) {
             Entry<K,V> higher = nm.higherEntry(key);
             return (null != higher)
-                ? new CheckedMap.CheckedEntrySet.@PolyMutable CheckedEntry<>(higher, valueType)
+                ? new CheckedMap.CheckedEntrySet.@ReceiverDependentMutable CheckedEntry<>(higher, valueType)
                 : null;
         }
 
         public K higherKey(@Readonly CheckedNavigableMap<K,V> this, K key)                 { return nm.higherKey(key); }
 
-        public @PolyMutable Entry<K, V> firstEntry(@PolyMutable CheckedNavigableMap<K,V> this) {
+        public @ReceiverDependentMutable Entry<K, V> firstEntry(@ReceiverDependentMutable CheckedNavigableMap<K,V> this) {
             Entry<K,V> first = nm.firstEntry();
             return (null != first)
-                ? new CheckedMap.CheckedEntrySet.@PolyMutable CheckedEntry<>(first, valueType)
+                ? new CheckedMap.CheckedEntrySet.@ReceiverDependentMutable CheckedEntry<>(first, valueType)
                 : null;
         }
 
-        public @PolyMutable Entry<K, V> lastEntry(@PolyMutable CheckedNavigableMap<K,V> this) {
+        public @ReceiverDependentMutable Entry<K, V> lastEntry(@ReceiverDependentMutable CheckedNavigableMap<K,V> this) {
             Entry<K,V> last = nm.lastEntry();
             return (null != last)
-                ? new CheckedMap.CheckedEntrySet.@PolyMutable CheckedEntry<>(last, valueType)
+                ? new CheckedMap.CheckedEntrySet.@ReceiverDependentMutable CheckedEntry<>(last, valueType)
                 : null;
         }
 
@@ -4409,55 +4409,55 @@ public class Collections {
         }
 
         @SideEffectFree
-        public @PolyMutable NavigableMap<K, V> descendingMap(@PolyMutable CheckedNavigableMap<K,V> this) {
+        public @ReceiverDependentMutable NavigableMap<K, V> descendingMap(@ReceiverDependentMutable CheckedNavigableMap<K,V> this) {
             return checkedNavigableMap(nm.descendingMap(), keyType, valueType);
         }
 
-        public @PolyMutable NavigableSet<K> keySet(@PolyMutable CheckedNavigableMap<K,V> this) {
+        public @ReceiverDependentMutable NavigableSet<K> keySet(@ReceiverDependentMutable CheckedNavigableMap<K,V> this) {
             return navigableKeySet();
         }
 
         @SideEffectFree
-        public @PolyMutable NavigableSet<K> navigableKeySet(@PolyMutable CheckedNavigableMap<K,V> this) {
+        public @ReceiverDependentMutable NavigableSet<K> navigableKeySet(@ReceiverDependentMutable CheckedNavigableMap<K,V> this) {
             return checkedNavigableSet(nm.navigableKeySet(), keyType);
         }
 
         @SideEffectFree
-        public @PolyMutable NavigableSet<K> descendingKeySet(@PolyMutable CheckedNavigableMap<K,V> this) {
+        public @ReceiverDependentMutable NavigableSet<K> descendingKeySet(@ReceiverDependentMutable CheckedNavigableMap<K,V> this) {
             return checkedNavigableSet(nm.descendingKeySet(), keyType);
         }
 
         @Override
         @SideEffectFree
-        public @PolyMutable NavigableMap<K,V> subMap(@PolyMutable CheckedNavigableMap<K,V> this, K fromKey, K toKey) {
+        public @ReceiverDependentMutable NavigableMap<K,V> subMap(@ReceiverDependentMutable CheckedNavigableMap<K,V> this, K fromKey, K toKey) {
             return checkedNavigableMap(nm.subMap(fromKey, true, toKey, false),
                                     keyType, valueType);
         }
 
         @Override
         @SideEffectFree
-        public @PolyMutable NavigableMap<K,V> headMap(@PolyMutable CheckedNavigableMap<K,V> this, K toKey) {
+        public @ReceiverDependentMutable NavigableMap<K,V> headMap(@ReceiverDependentMutable CheckedNavigableMap<K,V> this, K toKey) {
             return checkedNavigableMap(nm.headMap(toKey, false), keyType, valueType);
         }
 
         @Override
         @SideEffectFree
-        public @PolyMutable NavigableMap<K,V> tailMap(@PolyMutable CheckedNavigableMap<K,V> this, K fromKey) {
+        public @ReceiverDependentMutable NavigableMap<K,V> tailMap(@ReceiverDependentMutable CheckedNavigableMap<K,V> this, K fromKey) {
             return checkedNavigableMap(nm.tailMap(fromKey, true), keyType, valueType);
         }
 
         @SideEffectFree
-        public @PolyMutable NavigableMap<K, V> subMap(@PolyMutable CheckedNavigableMap<K,V> this, K fromKey, boolean fromInclusive, K toKey, boolean toInclusive) {
+        public @ReceiverDependentMutable NavigableMap<K, V> subMap(@ReceiverDependentMutable CheckedNavigableMap<K,V> this, K fromKey, boolean fromInclusive, K toKey, boolean toInclusive) {
             return checkedNavigableMap(nm.subMap(fromKey, fromInclusive, toKey, toInclusive), keyType, valueType);
         }
 
         @SideEffectFree
-        public @PolyMutable NavigableMap<K, V> headMap(@PolyMutable CheckedNavigableMap<K,V> this, K toKey, boolean inclusive) {
+        public @ReceiverDependentMutable NavigableMap<K, V> headMap(@ReceiverDependentMutable CheckedNavigableMap<K,V> this, K toKey, boolean inclusive) {
             return checkedNavigableMap(nm.headMap(toKey, inclusive), keyType, valueType);
         }
 
         @SideEffectFree
-        public @PolyMutable NavigableMap<K, V> tailMap(@PolyMutable CheckedNavigableMap<K,V> this, K fromKey, boolean inclusive) {
+        public @ReceiverDependentMutable NavigableMap<K, V> tailMap(@ReceiverDependentMutable CheckedNavigableMap<K,V> this, K fromKey, boolean inclusive) {
             return checkedNavigableMap(nm.tailMap(fromKey, inclusive), keyType, valueType);
         }
     }

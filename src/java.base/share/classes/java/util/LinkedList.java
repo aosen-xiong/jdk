@@ -601,7 +601,7 @@ public class LinkedList<E>
     /**
      * Returns the (non-null) Node at the specified element index.
      */
-    @PolyMutable Node<E> node(@PolyMutable LinkedList<E> this, @NonNegative int index) {
+    @ReceiverDependentMutable Node<E> node(@ReceiverDependentMutable LinkedList<E> this, @NonNegative int index) {
         // assert isElementIndex(index);
 
         if (index < (size >> 1)) {
