@@ -159,7 +159,7 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      *        If {@code null}, the {@linkplain Comparable natural
      *        ordering} of the elements will be used.
      */
-    public TreeSet(@Nullable Comparator<? super E> comparator) {
+    public TreeSet(@Nullable @Readonly Comparator<? super E> comparator) {
         this(new @ReceiverDependentMutable TreeMap<E, @Readonly Object>(comparator));
     }
 
@@ -421,7 +421,7 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
     }
 
     @Pure
-    public @Nullable Comparator<? super E> comparator(@GuardSatisfied @Readonly TreeSet<E> this) {
+    public @Nullable @Readonly Comparator<? super E> comparator(@GuardSatisfied @Readonly TreeSet<E> this) {
         return m.comparator();
     }
 

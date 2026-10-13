@@ -478,7 +478,7 @@ public interface Spliterator<T> {
      *         a characteristic of {@code SORTED}.
      */
     @Pure
-    default @Nullable Comparator<? super T> getComparator(@Readonly Spliterator<T> this) {
+    default @Nullable @Readonly Comparator<? super T> getComparator(@Readonly Spliterator<T> this) {
         throw new IllegalStateException();
     }
 

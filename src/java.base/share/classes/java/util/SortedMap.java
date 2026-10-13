@@ -137,7 +137,7 @@ public interface SortedMap<K extends @Immutable Object,V> extends Map<K,V> {
      *         of its keys
      */
     @Pure
-    @Nullable Comparator<? super K> comparator(@GuardSatisfied @Readonly SortedMap<K, V> this);
+    @Nullable @Readonly Comparator<? super K> comparator(@GuardSatisfied @Readonly SortedMap<K, V> this);
 
     /**
      * Returns a view of the portion of this map whose keys range from

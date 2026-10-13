@@ -146,7 +146,7 @@ public class TreeMap<K extends @Immutable Object,V>
      * @serial
      */
     @SuppressWarnings("serial") // Conditionally serializable
-    private final @Mutable Comparator<? super K> comparator;
+    private final @Readonly Comparator<? super K> comparator;
 
     private transient @Assignable Entry<K,V> root;
 
@@ -190,7 +190,7 @@ public class TreeMap<K extends @Immutable Object,V>
      *        If {@code null}, the {@linkplain Comparable natural
      *        ordering} of the keys will be used.
      */
-    public TreeMap(@Nullable Comparator<? super K> comparator) {
+    public TreeMap(@Nullable @Readonly Comparator<? super K> comparator) {
         this.comparator = comparator;
     }
 
@@ -313,7 +313,7 @@ public class TreeMap<K extends @Immutable Object,V>
     }
 
     @Pure
-    public @Nullable Comparator<? super K> comparator(@GuardSatisfied @Readonly TreeMap<K, V> this) {
+    public @Nullable @Readonly Comparator<? super K> comparator(@GuardSatisfied @Readonly TreeMap<K, V> this) {
         return comparator;
     }
 
@@ -1388,7 +1388,7 @@ public class TreeMap<K extends @Immutable Object,V>
     @ReceiverDependentMutable
     class EntrySet extends AbstractSet<Map.@Readonly Entry<K,V>> {
         @SideEffectFree
-        public Iterator<Map.Entry<K,V>> iterator() {
+        public Iterator<Map.@Readonly Entry<K,V>> iterator() {
             return new EntryIterator(getFirstEntry());
         }
 
@@ -1424,7 +1424,7 @@ public class TreeMap<K extends @Immutable Object,V>
         }
 
         @SideEffectFree
-        public Spliterator<Map.Entry<K,V>> spliterator() {
+        public Spliterator<Map.@Readonly Entry<K,V>> spliterator() {
             return new EntrySpliterator<>(TreeMap.this, null, null, 0, -1, 0);
         }
     }
@@ -1480,7 +1480,7 @@ public class TreeMap<K extends @Immutable Object,V>
         public E higher(@Readonly KeySet<E> this, E e) { return m.higherKey(e); }
         public E first(@Readonly KeySet<E> this) { return m.firstKey(); }
         public E last(@Readonly KeySet<E> this) { return m.lastKey(); }
-        public Comparator<? super E> comparator(@Readonly KeySet<E> this) { return m.comparator(); }
+        public @Readonly Comparator<? super E> comparator(@Readonly KeySet<E> this) { return m.comparator(); }
         public E pollFirst(@Mutable KeySet<E> this) {
             Map.Entry<E,?> e = m.pollFirstEntry();
             return (e == null) ? null : e.getKey();
@@ -1582,7 +1582,7 @@ public class TreeMap<K extends @Immutable Object,V>
     }
 
     @ReceiverDependentMutable
-    final class EntryIterator extends PrivateEntryIterator<Map.Entry<K,V>> {
+    final class EntryIterator extends PrivateEntryIterator<Map.@Readonly Entry<K,V>> {
         EntryIterator(@Readonly Entry<K,V> first) {
             super(first);
         }
@@ -2151,7 +2151,7 @@ public class TreeMap<K extends @Immutable Object,V>
         }
 
         @ReceiverDependentMutable
-        final class SubMapEntryIterator extends SubMapIterator<Map.Entry<K,V>> {
+        final class SubMapEntryIterator extends SubMapIterator<Map.@Readonly Entry<K,V>> {
             SubMapEntryIterator(TreeMap.@Readonly Entry<K,V> first,
                                 TreeMap.@Readonly Entry<K,V> fence) {
                 super(first, fence);
@@ -2165,7 +2165,7 @@ public class TreeMap<K extends @Immutable Object,V>
         }
 
         @ReceiverDependentMutable
-        final class DescendingSubMapEntryIterator extends SubMapIterator<Map.Entry<K,V>> {
+        final class DescendingSubMapEntryIterator extends SubMapIterator<Map.@Readonly Entry<K,V>> {
             DescendingSubMapEntryIterator(TreeMap.Entry<K,V> last,
                                           TreeMap.Entry<K,V> fence) {
                 super(last, fence);
@@ -2214,7 +2214,7 @@ public class TreeMap<K extends @Immutable Object,V>
                 return Spliterator.DISTINCT | Spliterator.ORDERED |
                     Spliterator.SORTED;
             }
-            public final Comparator<? super K>  getComparator(@Readonly SubMapKeyIterator this) {
+            public final @Readonly Comparator<? super K>  getComparator(@Readonly SubMapKeyIterator this) {
                 return NavigableSubMap.this.comparator();
             }
         }
@@ -2269,7 +2269,7 @@ public class TreeMap<K extends @Immutable Object,V>
             super(m, fromStart, lo, loInclusive, toEnd, hi, hiInclusive);
         }
 
-        public Comparator<? super K> comparator(@Readonly AscendingSubMap<K,V> this) {
+        public @Readonly Comparator<? super K> comparator(@Readonly AscendingSubMap<K,V> this) {
             return m.comparator();
         }
 
@@ -2328,7 +2328,7 @@ public class TreeMap<K extends @Immutable Object,V>
 
         @ReceiverDependentMutable
         final class AscendingEntrySetView extends EntrySetView {
-            public Iterator<Map.Entry<K,V>> iterator(@Readonly AscendingEntrySetView this) {
+            public Iterator<Map.@Readonly Entry<K,V>> iterator(@Readonly AscendingEntrySetView this) {
                 return new SubMapEntryIterator(absLowest(), absHighFence());
             }
         }
@@ -2424,7 +2424,7 @@ public class TreeMap<K extends @Immutable Object,V>
 
         @ReceiverDependentMutable
         final class DescendingEntrySetView extends EntrySetView {
-            public Iterator<Map.Entry<K,V>> iterator(@Readonly DescendingEntrySetView this) {
+            public Iterator<Map.@Readonly Entry<K,V>> iterator(@Readonly DescendingEntrySetView this) {
                 return new DescendingSubMapEntryIterator(absHighest(), absLowFence());
             }
         }
@@ -2470,15 +2470,15 @@ public class TreeMap<K extends @Immutable Object,V>
                                          toEnd, toKey, false);
         }
         @SideEffectFree
-        public Set<Map.Entry<K,V>> entrySet() { throw new InternalError(); }
+        public @ReceiverDependentMutable Set<Map.@ReceiverDependentMutable Entry<K,V>> entrySet() { throw new InternalError(); }
         public K lastKey() { throw new InternalError(); }
         public K firstKey() { throw new InternalError(); }
         @SideEffectFree
-        public SortedMap<K,V> subMap(K fromKey, K toKey) { throw new InternalError(); }
+        public @ReceiverDependentMutable SortedMap<K,V> subMap(K fromKey, K toKey) { throw new InternalError(); }
         @SideEffectFree
-        public SortedMap<K,V> headMap(K toKey) { throw new InternalError(); }
+        public @ReceiverDependentMutable SortedMap<K,V> headMap(K toKey) { throw new InternalError(); }
         @SideEffectFree
-        public SortedMap<K,V> tailMap(K fromKey) { throw new InternalError(); }
+        public @ReceiverDependentMutable SortedMap<K,V> tailMap(K fromKey) { throw new InternalError(); }
         public Comparator<? super K> comparator() { throw new InternalError(); }
     }
 
@@ -3219,7 +3219,7 @@ public class TreeMap<K extends @Immutable Object,V>
                 Spliterator.DISTINCT | Spliterator.SORTED | Spliterator.ORDERED;
         }
 
-        public final Comparator<? super K>  getComparator() {
+        public final @Readonly Comparator<? super K>  getComparator() {
             return tree.comparator;
         }
 
@@ -3443,13 +3443,13 @@ public class TreeMap<K extends @Immutable Object,V>
         }
 
         @Override
-        public Comparator<Map.Entry<K, V>> getComparator() {
+        public @Readonly Comparator<? super Map.@Readonly Entry<K, V>> getComparator() {
             // Adapt or create a key-based comparator
             if (tree.comparator != null) {
                 return Map.Entry.comparingByKey(tree.comparator);
             }
             else {
-                return (Comparator<Map.Entry<K, V>> & Serializable) (e1, e2) -> {
+                return (@Readonly Comparator<Map.Entry<K, V>> & Serializable) (e1, e2) -> {
                     @SuppressWarnings("unchecked")
                     Comparable<? super K> k1 = (Comparable<? super K>) e1.getKey();
                     return k1.compareTo(e2.getKey());

@@ -723,7 +723,7 @@ public class LinkedHashMap<K extends @Immutable Object,V>
         public final int size(@Readonly LinkedEntrySet this)                 { return size; }
         public final void clear(@Mutable LinkedHashMap<K,V>. @Mutable LinkedEntrySet this)               { LinkedHashMap.this.clear(); }
         @SideEffectFree
-        public final Iterator<Map.Entry<K,V>> iterator(@Readonly LinkedEntrySet this) {
+        public final Iterator<Map.@Readonly Entry<K,V>> iterator(@Readonly LinkedEntrySet this) {
             return new LinkedEntryIterator();
         }
         @Pure
@@ -839,7 +839,7 @@ public class LinkedHashMap<K extends @Immutable Object,V>
 
     @ReceiverDependentMutable
     final class LinkedEntryIterator extends LinkedHashIterator
-        implements Iterator<Map.Entry<K,V>> {
+        implements Iterator<Map.@Readonly Entry<K,V>> {
         public final Map.@Readonly Entry<K,V> next(@NonEmpty @Mutable LinkedEntryIterator this) { return nextNode(); }
     }
 

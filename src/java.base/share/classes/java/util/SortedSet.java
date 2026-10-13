@@ -131,7 +131,7 @@ public interface SortedSet<E> extends Set<E> {
      *         of its elements
      */
     @Pure
-    @Nullable Comparator<? super E> comparator(@GuardSatisfied @Readonly SortedSet<E> this);
+    @Nullable @Readonly Comparator<? super E> comparator(@GuardSatisfied @Readonly SortedSet<E> this);
 
     /**
      * Returns a view of the portion of this set whose elements range
@@ -277,7 +277,7 @@ public interface SortedSet<E> extends Set<E> {
         return new Spliterators.IteratorSpliterator<E>(
                 this, Spliterator.DISTINCT | Spliterator.SORTED | Spliterator.ORDERED) {
             @Override
-            public Comparator<? super E> getComparator() {
+            public @Readonly Comparator<? super E> getComparator() {
                 return SortedSet.this.comparator();
             }
         };

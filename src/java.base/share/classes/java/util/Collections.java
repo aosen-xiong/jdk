@@ -1244,7 +1244,7 @@ public class Collections {
 
         UnmodifiableSortedSet(@Readonly SortedSet<E> s) {super(s); ss = s;}
 
-        public Comparator<? super E> comparator() {return ss.comparator();}
+        public @Readonly Comparator<? super E> comparator() {return ss.comparator();}
 
         public @Immutable SortedSet<E> subSet(E fromElement, E toElement) {
             return new UnmodifiableSortedSet<>(ss.subSet(fromElement,toElement));
@@ -1587,24 +1587,24 @@ public class Collections {
             throw new UnsupportedOperationException();
         }
 
-        private transient @Assignable /* should be @LazyFinal */ @Readonly Set<K> keySet;
-        private transient @Assignable /* should be @LazyFinal */ @Readonly Set<Map.@Readonly Entry<K,V>> entrySet;
-        private transient @Assignable /* should be @LazyFinal */ @Readonly Collection<V> values;
+        private transient @Assignable /* should be @LazyFinal */ @Immutable Set<K> keySet;
+        private transient @Assignable /* should be @LazyFinal */ @Immutable Set<Map.@Immutable Entry<K,V>> entrySet;
+        private transient @Assignable /* should be @LazyFinal */ @Immutable Collection<V> values;
 
-        public @Readonly Set<K> keySet() {
+        public @Immutable Set<K> keySet() {
             if (keySet==null)
                 keySet = unmodifiableSet(m.keySet());
             return keySet;
         }
 
         @SideEffectFree
-        public @Readonly Set<Map.@Readonly Entry<K,V>> entrySet() {
+        public @Immutable Set<Map.@Immutable Entry<K,V>> entrySet() {
             if (entrySet==null)
-                entrySet = new UnmodifiableEntrySet<>(m.entrySet());
+                entrySet = new @Immutable UnmodifiableEntrySet<>(m.entrySet());
             return entrySet;
         }
 
-        public @Readonly Collection<V> values() {
+        public @Immutable Collection<V> values() {
             if (values==null)
                 values = unmodifiableCollection(m.values());
             return values;
@@ -1687,7 +1687,7 @@ public class Collections {
          */
         @Immutable
         static class UnmodifiableEntrySet<K extends @Immutable Object,V>
-            extends UnmodifiableSet<Map.@Readonly Entry<K,V>> {
+            extends UnmodifiableSet<Map.@Immutable Entry<K,V>> {
             @java.io.Serial
             private static final long serialVersionUID = 7854390611657943733L;
 
@@ -1756,29 +1756,29 @@ public class Collections {
                 }
 
                 @Override
-                public Comparator<? super Entry<K, V>> getComparator() {
+                public @Readonly Comparator<? super Map.@Readonly Entry<K, V>> getComparator() {
                     return s.getComparator();
                 }
             }
 
             @SuppressWarnings("unchecked")
-            public Spliterator<@Readonly Entry<K,V>> spliterator() {
+            public Spliterator<Map.@Immutable Entry<K,V>> spliterator() {
                 return new UnmodifiableEntrySetSpliterator<>(
                         (Spliterator<Map.@Readonly Entry<K, V>>) c.spliterator());
             }
 
             @Override
-            public Stream<@Readonly Entry<K,V>> stream() {
+            public Stream<Map.@Immutable Entry<K,V>> stream() {
                 return StreamSupport.stream(spliterator(), false);
             }
 
             @Override
-            public Stream<@Readonly Entry<K,V>> parallelStream() {
+            public Stream<Map.@Immutable Entry<K,V>> parallelStream() {
                 return StreamSupport.stream(spliterator(), true);
             }
 
-            public Iterator<Map.Entry<K,V>> iterator() {
-                return new @Mutable Iterator<Map.Entry<K,V>>() {
+            public Iterator<Map.@Immutable Entry<K,V>> iterator() {
+                return new @Mutable Iterator<Map.@Immutable Entry<K,V>>() {
                     private final Iterator<? extends Map.@Readonly Entry<? extends K, ? extends V>> i = c.iterator();
 
                     @Pure
@@ -1786,13 +1786,13 @@ public class Collections {
                     public boolean hasNext() {
                         return i.hasNext();
                     }
-                    public Map.@Readonly Entry<K,V> next(/*@NonEmpty Iterator<Map.Entry<K,V>> this*/) {
+                    public Map.@Immutable Entry<K,V> next(/*@NonEmpty Iterator<Map.Entry<K,V>> this*/) {
                         return new UnmodifiableEntry<>(i.next());
                     }
                     public void remove() {
                         throw new UnsupportedOperationException();
                     }
-                    public void forEachRemaining(Consumer<? super Map.@Readonly Entry<K, V>> action) {
+                    public void forEachRemaining(Consumer<? super Map.@Immutable Entry<K, V>> action) {
                         i.forEachRemaining(entryConsumer(action));
                     }
                 };
@@ -1932,7 +1932,7 @@ public class Collections {
         private final @Readonly SortedMap<K, ? extends V> sm;
 
         UnmodifiableSortedMap(@Readonly SortedMap<K, ? extends V> m) {super(m); sm = m; }
-        public Comparator<? super K> comparator()   { return sm.comparator(); }
+        public @Readonly Comparator<? super K> comparator()   { return sm.comparator(); }
         @SideEffectFree
         public @Immutable SortedMap<K,V> subMap(K fromKey, K toKey)
              { return new UnmodifiableSortedMap<>(sm.subMap(fromKey, toKey)); }
@@ -2383,7 +2383,7 @@ public class Collections {
             ss = s;
         }
 
-        public Comparator<? super E> comparator(@Readonly SynchronizedSortedSet<E> this) {
+        public @Readonly Comparator<? super E> comparator(@Readonly SynchronizedSortedSet<E> this) {
             synchronized (mutex) {return ss.comparator();}
         }
 
@@ -2970,7 +2970,7 @@ public class Collections {
             sm = m;
         }
 
-        public Comparator<? super K> comparator() {
+        public @Readonly Comparator<? super K> comparator() {
             synchronized (mutex) {return sm.comparator();}
         }
 
@@ -3537,7 +3537,7 @@ public class Collections {
             ss = s;
         }
 
-        public Comparator<? super E> comparator(@Readonly CheckedSortedSet<E> this) { return ss.comparator(); }
+        public @Readonly Comparator<? super E> comparator(@Readonly CheckedSortedSet<E> this) { return ss.comparator(); }
         public E first(@Readonly CheckedSortedSet<E> this)                   { return ss.first(); }
         public E last(@Readonly CheckedSortedSet<E> this)                    { return ss.last(); }
 
@@ -4261,7 +4261,7 @@ public class Collections {
             sm = m;
         }
 
-        public Comparator<? super K> comparator(@Readonly CheckedSortedMap<K,V> this) { return sm.comparator(); }
+        public @Readonly Comparator<? super K> comparator(@Readonly CheckedSortedMap<K,V> this) { return sm.comparator(); }
         public K firstKey(@Readonly CheckedSortedMap<K,V> this)                       { return sm.firstKey(); }
         public K lastKey(@Readonly CheckedSortedMap<K,V> this)                        { return sm.lastKey(); }
 
@@ -4340,7 +4340,7 @@ public class Collections {
             nm = m;
         }
 
-        public Comparator<? super K> comparator(@Readonly CheckedNavigableMap<K,V> this)   { return nm.comparator(); }
+        public @Readonly Comparator<? super K> comparator(@Readonly CheckedNavigableMap<K,V> this)   { return nm.comparator(); }
         public K firstKey(@Readonly CheckedNavigableMap<K,V> this)                           { return nm.firstKey(); }
         public K lastKey(@Readonly CheckedNavigableMap<K,V> this)                             { return nm.lastKey(); }
 
@@ -5032,8 +5032,8 @@ public class Collections {
     }
 
     @SuppressWarnings("mutability") // receiver in anonymous class not denotable, see typetool#2433
-    static <E> @Immutable Iterator<E> singletonIterator(final E e) {
-        return new @Immutable Iterator<E>() {
+    static <E> @Mutable Iterator<E> singletonIterator(final E e) {
+        return new @Mutable Iterator<E>() {
             private boolean hasNext = true;
             @Pure
             @EnsuresNonEmptyIf(result = true, expression = "this")
@@ -5123,7 +5123,7 @@ public class Collections {
         SingletonSet(E e) {element = e;}
 
         @SideEffectFree
-        public @Immutable Iterator<E> iterator() {
+        public @Mutable Iterator<E> iterator() {
             return singletonIterator(element);
         }
 
@@ -5185,7 +5185,7 @@ public class Collections {
         SingletonList(E obj)                {element = obj;}
 
         @SideEffectFree
-        public @Immutable Iterator<E> iterator() {
+        public @Mutable Iterator<E> iterator() {
             return singletonIterator(element);
         }
 

@@ -1365,8 +1365,8 @@ class ImmutableCollections {
 
         @Override
         @SideEffectFree
-        public Set<Map.@Immutable Entry<K,V>> entrySet() {
-            return new @Mutable AbstractSet<>() {
+        public @Immutable Set<Map.@Immutable Entry<K,V>> entrySet() {
+            return new @Immutable AbstractSet<Map.@Immutable Entry<K,V>>() {
                 @Override
                 @Pure
                 public int size() {

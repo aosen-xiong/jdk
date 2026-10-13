@@ -1039,7 +1039,7 @@ public final class Spliterators {
         }
 
         @Override
-        public Comparator<? super T> getComparator() {
+        public @Readonly Comparator<? super T> getComparator() {
             if (hasCharacteristics(Spliterator.SORTED))
                 return null;
             throw new IllegalStateException();
@@ -1897,7 +1897,7 @@ public final class Spliterators {
         public int characteristics() { return characteristics; }
 
         @Override
-        public Comparator<? super T> getComparator() {
+        public @Readonly Comparator<? super T> getComparator() {
             if (hasCharacteristics(Spliterator.SORTED))
                 return null;
             throw new IllegalStateException();

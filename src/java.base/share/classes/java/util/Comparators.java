@@ -91,7 +91,7 @@ class Comparators {
         }
 
         @Override
-        public @Readonly Comparator<T> thenComparing(@Readonly Comparator<? super T> other) {
+        public Comparator<T> thenComparing(@Readonly Comparator<? super T> other) {
             Objects.requireNonNull(other);
             return new NullComparator<>(nullFirst, real == null ? other : real.thenComparing(other));
         }
