@@ -1949,22 +1949,22 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
      */
 
     // Create a regular (non-tree) node
-    Node<K,V> newNode(int hash, K key, V value, Node<K,V> next) {
+    Node<K,V> newNode(@Mutable HashMap<K,V> this, int hash, K key, V value, Node<K,V> next) {
         return new Node<>(hash, key, value, next);
     }
 
     // For conversion from TreeNodes to plain nodes
-    Node<K,V> replacementNode(Node<K,V> p, Node<K,V> next) {
+    Node<K,V> replacementNode(@Mutable HashMap<K,V> this, Node<K,V> p, Node<K,V> next) {
         return new Node<>(p.hash, p.key, p.value, next);
     }
 
     // Create a tree bin node
-    TreeNode<K,V> newTreeNode(int hash, K key, V value, Node<K,V> next) {
+    TreeNode<K,V> newTreeNode(@Mutable HashMap<K,V> this, int hash, K key, V value, Node<K,V> next) {
         return new TreeNode<>(hash, key, value, next);
     }
 
     // For treeifyBin
-    TreeNode<K,V> replacementTreeNode(Node<K,V> p, Node<K,V> next) {
+    TreeNode<K,V> replacementTreeNode(@Mutable HashMap<K,V> this, Node<K,V> p, Node<K,V> next) {
         return new TreeNode<>(p.hash, p.key, p.value, next);
     }
 
@@ -1983,8 +1983,8 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
 
     // Callbacks to allow LinkedHashMap post-actions
     void afterNodeAccess(Node<K,V> p) { }
-    void afterNodeInsertion(boolean evict) { }
-    void afterNodeRemoval(Node<K,V> p) { }
+    void afterNodeInsertion(@Mutable HashMap<K,V> this, boolean evict) { }
+    void afterNodeRemoval(@Mutable HashMap<K,V> this, Node<K,V> p) { }
 
     // Called only from writeObject, to ensure compatible ordering.
     void internalWriteEntries(@Mutable HashMap<K,V> this, java.io.ObjectOutputStream s) throws IOException {

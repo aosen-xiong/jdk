@@ -397,7 +397,7 @@ public abstract class EnumSet<E extends Enum<E>> extends AbstractSet<E>
     /**
      * Complements the contents of this enum set.
      */
-    abstract void complement();
+    abstract void complement(@Mutable EnumSet<E> this);
 
     /**
      * Throws an exception if e is not of the correct type for this enum set.
