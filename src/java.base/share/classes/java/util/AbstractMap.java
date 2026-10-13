@@ -108,7 +108,7 @@ public abstract class AbstractMap<K extends @Immutable Object,V> implements Map<
      * This implementation returns {@code entrySet().size()}.
      */
     @Pure
-    public @NonNegative int size(@GuardSatisfied @Readonly AbstractMap<K, V> this) {
+    public @NonNegative int size(@GuardSatisfied @ReceiverDependentMutable AbstractMap<K, V> this) {
         return entrySet().size();
     }
 
@@ -138,7 +138,7 @@ public abstract class AbstractMap<K extends @Immutable Object,V> implements Map<
      * @throws NullPointerException {@inheritDoc}
      */
     @Pure
-    public boolean containsValue(@GuardSatisfied @Readonly AbstractMap<K, V> this, @GuardSatisfied @UnknownSignedness @Readonly Object value) {
+    public boolean containsValue(@GuardSatisfied @ReceiverDependentMutable AbstractMap<K, V> this, @GuardSatisfied @UnknownSignedness @Readonly Object value) {
         Iterator<@Readonly Entry<K,V>> i = entrySet().iterator();
         if (value==null) {
             while (i.hasNext()) {
@@ -172,7 +172,7 @@ public abstract class AbstractMap<K extends @Immutable Object,V> implements Map<
      */
     @EnsuresKeyForIf(expression={"#1"}, result=true, map={"this"})
     @Pure
-    public boolean containsKey(@GuardSatisfied @Readonly AbstractMap<K, V> this, @GuardSatisfied @UnknownSignedness @Readonly Object key) {
+    public boolean containsKey(@GuardSatisfied @ReceiverDependentMutable AbstractMap<K, V> this, @GuardSatisfied @UnknownSignedness @Readonly Object key) {
         Iterator<Map.@Readonly Entry<K,V>> i = entrySet().iterator();
         if (key==null) {
             while (i.hasNext()) {
@@ -205,7 +205,7 @@ public abstract class AbstractMap<K extends @Immutable Object,V> implements Map<
      * @throws NullPointerException          {@inheritDoc}
      */
     @Pure
-    public @Nullable V get(@GuardSatisfied @Readonly AbstractMap<K, V> this, @UnknownSignedness @GuardSatisfied @Readonly Object key) {
+    public @Nullable V get(@GuardSatisfied @ReceiverDependentMutable AbstractMap<K, V> this, @UnknownSignedness @GuardSatisfied @Readonly Object key) {
         Iterator<@Readonly Entry<K,V>> i = entrySet().iterator();
         if (key==null) {
             while (i.hasNext()) {
@@ -594,7 +594,7 @@ public abstract class AbstractMap<K extends @Immutable Object,V> implements Map<
      * @return a string representation of this map
      */
     @SideEffectFree
-    public String toString(@GuardSatisfied @Readonly AbstractMap<K, V> this) {
+    public String toString(@GuardSatisfied @ReceiverDependentMutable AbstractMap<K, V> this) {
         Iterator<@Readonly Entry<K,V>> i = entrySet().iterator();
         if (! i.hasNext())
             return "{}";

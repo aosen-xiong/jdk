@@ -4018,12 +4018,12 @@ public class Collections {
             }
 
             @Pure
-            public int size(@Readonly CheckedEntrySet<K,V> this)        { return s.size(); }
+            public int size(@ReceiverDependentMutable CheckedEntrySet<K,V> this)        { return s.size(); }
             @Pure
             @EnsuresNonEmptyIf(result = false, expression = "this")
-            public boolean isEmpty(@Readonly CheckedEntrySet<K,V> this) { return s.isEmpty(); }
+            public boolean isEmpty(@ReceiverDependentMutable CheckedEntrySet<K,V> this) { return s.isEmpty(); }
             public String toString(@Readonly CheckedEntrySet<K,V> this) { return s.toString(); }
-            public int hashCode(@Readonly CheckedEntrySet<K,V> this)    { return s.hashCode(); }
+            public int hashCode(@ReceiverDependentMutable CheckedEntrySet<K,V> this)    { return s.hashCode(); }
             public void clear(@Mutable CheckedEntrySet<K,V> this)      {        s.clear(); }
 
             @EnsuresNonEmpty("this")
@@ -4034,7 +4034,7 @@ public class Collections {
                 throw new UnsupportedOperationException();
             }
 
-            public Iterator<Map.Entry<K,V>> iterator(@Readonly CheckedEntrySet<K,V> this) {
+            public Iterator<Map.Entry<K,V>> iterator(@ReceiverDependentMutable CheckedEntrySet<K,V> this) {
                 final Iterator<Map.Entry<K, V>> i = s.iterator();
 
                 return new @Mutable Iterator<Map.Entry<K,V>>() {
@@ -4099,7 +4099,7 @@ public class Collections {
              */
             @Pure
             @EnsuresNonEmptyIf(result = true, expression = "this")
-            public boolean contains(@Readonly CheckedEntrySet<K,V> this, @UnknownSignedness @Readonly Object o) {
+            public boolean contains(@ReceiverDependentMutable CheckedEntrySet<K,V> this, @UnknownSignedness @Readonly Object o) {
                 return o instanceof Map.@Readonly Entry<?, ?> e
                         && s.contains((e instanceof CheckedEntry) ? e : checkedEntry(e, valueType));
             }
@@ -4143,7 +4143,7 @@ public class Collections {
                 return modified;
             }
 
-            public boolean equals(@Readonly CheckedEntrySet<K,V> this, @Readonly Object o) {
+            public boolean equals(@ReceiverDependentMutable CheckedEntrySet<K,V> this, @Readonly Object o) {
                 if (o == this)
                     return true;
                 return o instanceof @Readonly Set<?> that

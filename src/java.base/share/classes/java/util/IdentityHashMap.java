@@ -675,7 +675,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
      * @see Object#equals(Object)
      */
     @Pure
-    public boolean equals(@GuardSatisfied @Readonly IdentityHashMap<K, V> this, @GuardSatisfied @Nullable @Readonly Object o) {
+    public boolean equals(@GuardSatisfied @ReceiverDependentMutable IdentityHashMap<K, V> this, @GuardSatisfied @Nullable @Readonly Object o) {
         if (o == this) {
             return true;
         } else if (o instanceof @Readonly IdentityHashMap<?, ?> m) {

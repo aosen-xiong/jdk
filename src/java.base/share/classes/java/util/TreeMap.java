@@ -1853,12 +1853,12 @@ public class TreeMap<K extends @Immutable Object,V>
 
         @Pure
         @EnsuresNonEmptyIf(result = false, expression = "this")
-        public boolean isEmpty(@Readonly NavigableSubMap<K,V> this) {
+        public boolean isEmpty(@ReceiverDependentMutable NavigableSubMap<K,V> this) {
             return (fromStart && toEnd) ? m.isEmpty() : entrySet().isEmpty();
         }
 
         @Pure
-        public @NonNegative int size(@Readonly NavigableSubMap<K,V> this) {
+        public @NonNegative int size(@ReceiverDependentMutable NavigableSubMap<K,V> this) {
             return (fromStart && toEnd) ? m.size() : entrySet().size();
         }
 

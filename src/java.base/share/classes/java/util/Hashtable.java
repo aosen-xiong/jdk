@@ -632,7 +632,7 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
      *
      * @return  a string representation of this hashtable
      */
-    public synchronized String toString(@GuardSatisfied @Readonly Hashtable<K, V> this) {
+    public synchronized String toString(@GuardSatisfied @ReceiverDependentMutable Hashtable<K, V> this) {
         int max = size() - 1;
         if (max == -1)
             return "{}";
