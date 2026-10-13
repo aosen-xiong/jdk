@@ -112,7 +112,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
     /**
      * All of the values comprising K.  (Cached for performance.)
      */
-    private transient K[] keyUniverse;
+    private transient K @Readonly [] keyUniverse;
 
     /**
      * Array representation of this map.  The ith element is the value
@@ -828,7 +828,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
      * The result is uncloned, cached, and shared by all callers.
      */
     @SuppressWarnings("mutability:return.type.incompatible") // return type
-    private static <K extends Enum<K>> K @ReceiverDependentMutable [] getKeyUniverse(Class<K> keyType) {
+    private static <K extends Enum<K>> K @Readonly [] getKeyUniverse(Class<K> keyType) {
         return SharedSecrets.getJavaLangAccess()
                                         .getEnumConstantsShared(keyType);
     }

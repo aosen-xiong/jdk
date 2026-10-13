@@ -373,7 +373,7 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
         /**
          * Index of element to be returned by subsequent call to next.
          */
-        int cursor = 0;
+        @Assignable int cursor = 0;
 
         /**
          * Index of element returned by most recent call to next or
