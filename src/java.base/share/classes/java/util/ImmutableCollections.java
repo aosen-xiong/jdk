@@ -860,7 +860,7 @@ class ImmutableCollections {
 
         @Override
         public Iterator<E> iterator() {
-            return new Iterator<E>() {
+            return new @Mutable Iterator<E>() {
                 private int idx = (e1 == EMPTY) ? 1 : 2;
 
                 @Override
@@ -1366,7 +1366,7 @@ class ImmutableCollections {
         @Override
         @SideEffectFree
         public Set<Map.@Immutable Entry<K,V>> entrySet() {
-            return new AbstractSet<>() {
+            return new @Mutable AbstractSet<>() {
                 @Override
                 @Pure
                 public int size() {

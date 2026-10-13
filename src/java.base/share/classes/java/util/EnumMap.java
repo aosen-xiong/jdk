@@ -129,7 +129,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
     /**
      * Distinguished non-null value for representing null values.
      */
-    private static final Object NULL = new Object() {
+    private static final Object NULL = new @Mutable Object() {
         public int hashCode() {
             return 0;
         }

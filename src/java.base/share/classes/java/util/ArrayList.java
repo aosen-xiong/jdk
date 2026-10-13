@@ -1048,7 +1048,7 @@ import jdk.internal.util.ArraysSupport;
             if (i < size) {
                 final @Readonly Object[] es = elementData;
                 if (i >= es.length)
-                    throw new ConcurrentModificationException();
+                    throw new @Mutable ConcurrentModificationException();
                 for (; i < size && modCount == expectedModCount; i++)
                     action.accept(elementAt(es, i));
                 // update once at end to reduce heap write traffic
@@ -1340,7 +1340,7 @@ import jdk.internal.util.ArraysSupport;
             checkForComodification();
             rangeCheckForAdd(index);
 
-            return new ListIterator<E>() {
+            return new @Mutable ListIterator<E>() {
                 int cursor = index;
                 int lastRet = -1;
                 int expectedModCount = SubList.this.modCount;
@@ -1359,7 +1359,7 @@ import jdk.internal.util.ArraysSupport;
                         throw new NoSuchElementException();
                     @Readonly Object[] elementData = root.elementData;
                     if (offset + i >= elementData.length)
-                        throw new ConcurrentModificationException();
+                        throw new @Mutable ConcurrentModificationException();
                     cursor = i + 1;
                     return (E) elementData[offset + (lastRet = i)];
                 }
@@ -1388,7 +1388,7 @@ import jdk.internal.util.ArraysSupport;
                     if (i < size) {
                         final @Readonly Object[] es = root.elementData;
                         if (offset + i >= es.length)
-                            throw new ConcurrentModificationException();
+                            throw new @Mutable ConcurrentModificationException();
                         for (; i < size && root.modCount == expectedModCount; i++)
                             action.accept(elementAt(es, offset + i));
                         // update once at end to reduce heap write traffic
@@ -1487,7 +1487,7 @@ import jdk.internal.util.ArraysSupport;
             checkForComodification();
 
             // ArrayListSpliterator not used here due to late-binding
-            return new Spliterator<E>() {
+            return new @Mutable Spliterator<E>() {
                 private int index = offset; // current index, modified on advance/split
                 private int fence = -1; // -1 until used; then one past last index
                 private int expectedModCount; // initialized when fence set

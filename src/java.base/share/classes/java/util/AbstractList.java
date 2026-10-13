@@ -872,7 +872,7 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
             checkForComodification();
             rangeCheckForAdd(index);
 
-            return new ListIterator<E>() {
+            return new @Mutable ListIterator<E>() {
                 private final ListIterator<E> i =
                         root.listIterator(offset + index);
 
@@ -886,7 +886,7 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
                     if (hasNext())
                         return i.next();
                     else
-                        throw new NoSuchElementException();
+                        throw new @Mutable NoSuchElementException();
                 }
 
                 @Pure
@@ -898,7 +898,7 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
                     if (hasPrevious())
                         return i.previous();
                     else
-                        throw new NoSuchElementException();
+                        throw new @Mutable NoSuchElementException();
                 }
 
                 @Pure

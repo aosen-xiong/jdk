@@ -1098,7 +1098,7 @@ public class Collections {
 
         @SideEffectFree
         public @PolyNonEmpty Iterator<E> iterator(@PolyNonEmpty UnmodifiableCollection<E> this) {
-            return new Iterator<E>() {
+            return new @Mutable Iterator<E>() {
                 private final Iterator<? extends E> i = c.iterator();
 
                 @Pure
@@ -1434,7 +1434,7 @@ public class Collections {
         public @PolyNonEmpty ListIterator<E> listIterator(@PolyNonEmpty @Readonly UnmodifiableList<E> this)   {return listIterator(0);}
 
         public ListIterator<E> listIterator(@Readonly UnmodifiableList<E> this, final int index) {
-            return new ListIterator<E>() {
+            return new @Mutable ListIterator<E>() {
                 private final ListIterator<? extends E> i
                     = list.listIterator(index);
 
@@ -1778,7 +1778,7 @@ public class Collections {
             }
 
             public Iterator<Map.Entry<K,V>> iterator() {
-                return new Iterator<Map.Entry<K,V>>() {
+                return new @Mutable Iterator<Map.Entry<K,V>>() {
                     private final Iterator<? extends Map.@Readonly Entry<? extends K, ? extends V>> i = c.iterator();
 
                     @Pure
@@ -3310,7 +3310,7 @@ public class Collections {
             // JDK-6363904 - unwrapped iterator could be typecast to
             // ListIterator with unsafe set()
             final Iterator<E> it = c.iterator();
-            return new Iterator<E>() {
+            return new @Mutable Iterator<E>() {
                 @Pure
                 @EnsuresNonEmptyIf(result = true, expression = "this")
                 public boolean hasNext() { return it.hasNext(); }
@@ -4037,7 +4037,7 @@ public class Collections {
             public Iterator<Map.Entry<K,V>> iterator(@Mutable CheckedEntrySet<K,V> this) {
                 final Iterator<Map.Entry<K, V>> i = s.iterator();
 
-                return new Iterator<Map.Entry<K,V>>() {
+                return new @Mutable Iterator<Map.Entry<K,V>>() {
                     @Pure
                     @EnsuresNonEmptyIf(result = true, expression = "this")
                     public boolean hasNext() { return i.hasNext(); }
@@ -5068,7 +5068,7 @@ public class Collections {
      * @return A singleton {@code Spliterator}
      */
     static <T> Spliterator<T> singletonSpliterator(final T element) {
-        return new Spliterator<T>() {
+        return new @Mutable Spliterator<T>() {
             long est = 1;
 
             @Override
