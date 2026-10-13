@@ -1866,7 +1866,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
 
     static final class EntrySpliterator<K extends @Immutable Object,V>
         extends HashMapSpliterator<K,V>
-        implements Spliterator<Map.Entry<K,V>> {
+        implements Spliterator<Map.@Readonly Entry<K,V>> {
         EntrySpliterator(@Readonly HashMap<K,V> m, int origin, int fence, int est,
                          int expectedModCount) {
             super(m, origin, fence, est, expectedModCount);

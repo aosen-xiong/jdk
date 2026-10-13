@@ -3372,7 +3372,7 @@ public class TreeMap<K extends @Immutable Object,V>
 
     static final class EntrySpliterator<K extends @Immutable Object,V>
         extends TreeMapSpliterator<K,V>
-        implements Spliterator<Map.Entry<K,V>> {
+        implements Spliterator<Map.@Readonly Entry<K,V>> {
         EntrySpliterator(@Readonly TreeMap<K,V> tree,
                          TreeMap.@Readonly Entry<K,V> origin, TreeMap.@Readonly Entry<K,V> fence,
                          int side, int est, int expectedModCount) {

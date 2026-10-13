@@ -1608,7 +1608,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
     @ReceiverDependentMutable
     static final class EntrySpliterator<K extends @Immutable Object,V>
         extends IdentityHashMapSpliterator<K,V>
-        implements Spliterator<Map.Entry<K,V>> {
+        implements Spliterator<Map.@Immutable Entry<K,V>> {
         EntrySpliterator(@Readonly IdentityHashMap<K,V> m, int origin, int fence, int est,
                          int expectedModCount) {
             super(m, origin, fence, est, expectedModCount);
