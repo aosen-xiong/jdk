@@ -165,12 +165,12 @@ class ImmutableCollections {
         @Override
         @EnsuresNonEmpty("this")
         public boolean add(E e) { throw uoe(); }
-        @Override public boolean addAll(Collection<? extends E> c) { throw uoe(); }
+        @Override public boolean addAll(@Readonly Collection<? extends E> c) { throw uoe(); }
         @Override public void    clear() { throw uoe(); }
         @Override public boolean remove(@UnknownSignedness @Readonly Object o) { throw uoe(); }
-        @Override public boolean removeAll(Collection<? extends @UnknownSignedness @Readonly Object> c) { throw uoe(); }
+        @Override public boolean removeAll(@Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) { throw uoe(); }
         @Override public boolean removeIf(Predicate<? super E> filter) { throw uoe(); }
-        @Override public boolean retainAll(Collection<? extends @UnknownSignedness @Readonly Object> c) { throw uoe(); }
+        @Override public boolean retainAll(@Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) { throw uoe(); }
     }
 
     // ---------- List Static Factory Methods ----------
@@ -276,7 +276,7 @@ class ImmutableCollections {
 
         // all mutating methods throw UnsupportedOperationException
         @Override public void    add(int index, E element) { throw uoe(); }
-        @Override public boolean addAll(int index, Collection<? extends E> c) { throw uoe(); }
+        @Override public boolean addAll(int index, @Readonly Collection<? extends E> c) { throw uoe(); }
         @Override public E       remove(int index) { throw uoe(); }
         @Override public void    replaceAll(UnaryOperator<E> operator) { throw uoe(); }
         @Override public E       set(int index, E element) { throw uoe(); }
@@ -1123,10 +1123,10 @@ class ImmutableCollections {
         @Override public @PolyNull V computeIfPresent(K key, BiFunction<? super K,? super V,? extends @PolyNull V> rf) { throw uoe(); }
         @Override public @PolyNull V merge(K key, @NonNull V value, BiFunction<? super @NonNull V,? super @NonNull V,? extends @PolyNull V> rf) { throw uoe(); }
         @Override public V put(AbstractImmutableMap<K,V> this, K key, V value) { throw uoe(); }
-        @Override public void putAll(AbstractImmutableMap<K,V> this, Map<? extends K,? extends V> m) { throw uoe(); }
+        @Override public void putAll(AbstractImmutableMap<K,V> this, @Readonly Map<? extends K,? extends V> m) { throw uoe(); }
         @Override public V putIfAbsent(K key, V value) { throw uoe(); }
-        @Override public V remove(Object key) { throw uoe(); }
-        @Override public boolean remove(@UnknownSignedness Object key, @UnknownSignedness Object value) { throw uoe(); }
+        @Override public V remove(@Readonly Object key) { throw uoe(); }
+        @Override public boolean remove(@UnknownSignedness @Readonly Object key, @UnknownSignedness @Readonly Object value) { throw uoe(); }
         @Override public V replace(K key, V value) { throw uoe(); }
         @Override public boolean replace(K key, V oldValue, V newValue) { throw uoe(); }
         @Override public void replaceAll(BiFunction<? super K,? super V,? extends V> f) { throw uoe(); }
@@ -1138,7 +1138,7 @@ class ImmutableCollections {
          * value should be returned.
          */
         @Override
-        public V getOrDefault(Object key, V defaultValue) {
+        public V getOrDefault(@Readonly Object key, V defaultValue) {
             V v;
             return ((v = get(key)) != null)
                     ? v
@@ -1288,7 +1288,7 @@ class ImmutableCollections {
 
         @Override
         @SuppressWarnings("unchecked")
-        public V get(Object o) {
+        public V get(@Readonly Object o) {
             if (size == 0) {
                 Objects.requireNonNull(o);
                 return null;

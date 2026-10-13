@@ -275,7 +275,7 @@ public interface List<E> extends Collection<E> {
      * @throws NullPointerException if the specified array is null
      */
     @SideEffectFree
-    <T extends @UnknownSignedness @Readonly Object> @Nullable T @PolyMutable [] toArray(@Readonly List<E> this, @PolyNull T @PolyMutable [] a);
+    <T extends @UnknownSignedness @Readonly Object> @Nullable T[] toArray(@Readonly List<E> this, @PolyNull T[] a);
 
 
     // Modification Operations
@@ -351,7 +351,7 @@ public interface List<E> extends Collection<E> {
      * @see #contains(Object)
      */
     @Pure
-    boolean containsAll(@GuardSatisfied @Readonly List<E> this, @Readonly Collection<? extends @UnknownSignedness Object> c);
+    boolean containsAll(@GuardSatisfied @Readonly List<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c);
 
     /**
      * Appends all of the elements in the specified collection to the end of

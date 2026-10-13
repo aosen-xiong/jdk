@@ -389,7 +389,7 @@ public class LinkedList<E>
      * @return {@code true} if this list contained the specified element
      */
     @ReleasesNoLocks
-    public boolean remove(@GuardSatisfied @Mutable LinkedList<E> this, @GuardSatisfied @Nullable @UnknownSignedness Object o) {
+    public boolean remove(@GuardSatisfied @Mutable LinkedList<E> this, @GuardSatisfied @Nullable @UnknownSignedness @Readonly Object o) {
         if (o == null) {
             for (Node<E> x = first; x != null; x = x.next) {
                 if (x.item == null) {
@@ -853,7 +853,7 @@ public class LinkedList<E>
      * @return {@code true} if the list contained the specified element
      * @since 1.6
      */
-    public boolean removeFirstOccurrence(@GuardSatisfied @Mutable LinkedList<E> this, @Nullable Object o) {
+    public boolean removeFirstOccurrence(@GuardSatisfied @Mutable LinkedList<E> this, @Nullable @Readonly Object o) {
         return remove(o);
     }
 
@@ -866,7 +866,7 @@ public class LinkedList<E>
      * @return {@code true} if the list contained the specified element
      * @since 1.6
      */
-    public boolean removeLastOccurrence(@GuardSatisfied @Mutable LinkedList<E> this, @Nullable Object o) {
+    public boolean removeLastOccurrence(@GuardSatisfied @Mutable LinkedList<E> this, @Nullable @Readonly Object o) {
         if (o == null) {
             for (Node<E> x = last; x != null; x = x.prev) {
                 if (x.item == null) {

@@ -207,7 +207,7 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
      * @throws NullPointerException {@inheritDoc}
      */
     @Pure
-    public @GTENegativeOne int indexOf(@GuardSatisfied AbstractList<E> this, @GuardSatisfied @UnknownSignedness Object o) {
+    public @GTENegativeOne int indexOf(@GuardSatisfied AbstractList<E> this, @GuardSatisfied @UnknownSignedness @Readonly Object o) {
         ListIterator<E> it = listIterator();
         if (o==null) {
             while (it.hasNext())
@@ -234,7 +234,7 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
      * @throws NullPointerException {@inheritDoc}
      */
     @Pure
-    public @GTENegativeOne int lastIndexOf(@GuardSatisfied AbstractList<E> this, @GuardSatisfied @UnknownSignedness Object o) {
+    public @GTENegativeOne int lastIndexOf(@GuardSatisfied AbstractList<E> this, @GuardSatisfied @UnknownSignedness @Readonly Object o) {
         ListIterator<E> it = listIterator(size());
         if (o==null) {
             while (it.hasPrevious())

@@ -992,7 +992,7 @@ public class Vector<E>
      *         or if the specified collection is null
      * @since 1.2
      */
-    public boolean retainAll(@Mutable @GuardSatisfied Vector<E> this, Collection<? extends @UnknownSignedness @Readonly Object> c) {
+    public boolean retainAll(@Mutable @GuardSatisfied Vector<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) {
         Objects.requireNonNull(c);
         return bulkRemove(e -> !c.contains(e));
     }

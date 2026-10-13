@@ -747,7 +747,7 @@ public abstract class AbstractMap<K extends @Immutable Object,V> implements Map<
          * @see    #hashCode
          */
         @Pure
-        public boolean equals(AbstractMap.@GuardSatisfied SimpleEntry<K, V> this, @GuardSatisfied @Nullable Object o) {
+        public boolean equals(AbstractMap.@GuardSatisfied SimpleEntry<K, V> this, @GuardSatisfied @Nullable @Readonly Object o) {
             return o instanceof Map.Entry<?, ?> e
                     && eq(key, e.getKey())
                     && eq(value, e.getValue());

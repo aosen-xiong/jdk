@@ -436,7 +436,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
         public boolean contains(@Readonly KeySet this, @Nullable @UnknownSignedness @Readonly Object o) {
             return containsKey(o);
         }
-        public boolean remove(@Mutable EnumMap<K,V>. @Mutable KeySet this, @Nullable @UnknownSignedness Object o) {
+        public boolean remove(@Mutable EnumMap<K,V>. @Mutable KeySet this, @Nullable @UnknownSignedness @Readonly Object o) {
             int oldSize = size;
             EnumMap.this.remove(o);
             return size != oldSize;

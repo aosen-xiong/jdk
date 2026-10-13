@@ -1087,7 +1087,7 @@ public class Collections {
         public boolean isEmpty()                   {return c.isEmpty();}
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
-        public boolean contains(@UnknownSignedness Object o)          {return c.contains(o);}
+        public boolean contains(@UnknownSignedness @Readonly Object o)          {return c.contains(o);}
         @SideEffectFree
         @SuppressWarnings("mutability:return.type.incompatible") // poly does not work on field's type argument
         public @PolyNull @PolySigned @PolyMutable Object[] toArray(Collections.UnmodifiableCollection<@PolyNull @PolySigned @PolyMutable E> this)                  {return c.toArray();}
@@ -1120,21 +1120,21 @@ public class Collections {
         public boolean add(E e) {
             throw new UnsupportedOperationException();
         }
-        public boolean remove(@UnknownSignedness Object o) {
+        public boolean remove(@UnknownSignedness @Readonly Object o) {
             throw new UnsupportedOperationException();
         }
 
         @Pure
-        public boolean containsAll(Collection<? extends @UnknownSignedness @Readonly Object> coll) {
+        public boolean containsAll(@Readonly Collection<? extends @UnknownSignedness @Readonly Object> coll) {
             return c.containsAll(coll);
         }
-        public boolean addAll(Collection<? extends E> coll) {
+        public boolean addAll(@Readonly Collection<? extends E> coll) {
             throw new UnsupportedOperationException();
         }
-        public boolean removeAll(Collection<? extends @UnknownSignedness Object> coll) {
+        public boolean removeAll(@Readonly Collection<? extends @UnknownSignedness @Readonly Object> coll) {
             throw new UnsupportedOperationException();
         }
-        public boolean retainAll(Collection<? extends @UnknownSignedness Object> coll) {
+        public boolean retainAll(@Readonly Collection<? extends @UnknownSignedness @Readonly Object> coll) {
             throw new UnsupportedOperationException();
         }
         public void clear() {
@@ -1416,9 +1416,9 @@ public class Collections {
         public E remove(int index) {
             throw new UnsupportedOperationException();
         }
-        public int indexOf(Object o)            {return list.indexOf(o);}
-        public int lastIndexOf(Object o)        {return list.lastIndexOf(o);}
-        public boolean addAll(int index, Collection<? extends E> c) {
+        public int indexOf(@Readonly Object o)            {return list.indexOf(o);}
+        public int lastIndexOf(@Readonly Object o)        {return list.lastIndexOf(o);}
+        public boolean addAll(int index, @Readonly Collection<? extends E> c) {
             throw new UnsupportedOperationException();
         }
 
@@ -1571,16 +1571,16 @@ public class Collections {
         public boolean containsKey(@UnknownSignedness @Readonly Object key)   {return m.containsKey(key);}
         @Pure
         public boolean containsValue(@UnknownSignedness @Readonly Object val) {return m.containsValue(val);}
-        public V get(Object key)                 {return m.get(key);}
+        public V get(@Readonly Object key)                 {return m.get(key);}
 
         @EnsuresKeyFor(value={"#1"}, map={"this"})
         public V put(K key, V value) {
             throw new UnsupportedOperationException();
         }
-        public V remove(Object key) {
+        public V remove(@Readonly Object key) {
             throw new UnsupportedOperationException();
         }
-        public void putAll(Map<? extends K, ? extends V> m) {
+        public void putAll(@Readonly Map<? extends K, ? extends V> m) {
             throw new UnsupportedOperationException();
         }
         public void clear() {
@@ -2210,16 +2210,16 @@ public class Collections {
         }
 
         @Pure
-        public boolean containsAll(@Readonly SynchronizedCollection<E> this, @Readonly Collection<? extends @UnknownSignedness Object> coll) {
+        public boolean containsAll(@Readonly SynchronizedCollection<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> coll) {
             synchronized (mutex) {return c.containsAll(coll);}
         }
         public boolean addAll(@Mutable SynchronizedCollection<E> this, @Readonly Collection<? extends E> coll) {
             synchronized (mutex) {return c.addAll(coll);}
         }
-        public boolean removeAll(@Mutable SynchronizedCollection<E> this, @Readonly Collection<? extends @UnknownSignedness Object> coll) {
+        public boolean removeAll(@Mutable SynchronizedCollection<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> coll) {
             synchronized (mutex) {return c.removeAll(coll);}
         }
-        public boolean retainAll(@Mutable SynchronizedCollection<E> this, @Readonly Collection<? extends @UnknownSignedness Object> coll) {
+        public boolean retainAll(@Mutable SynchronizedCollection<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> coll) {
             synchronized (mutex) {return c.retainAll(coll);}
         }
         public void clear(@Mutable SynchronizedCollection<E> this) {
@@ -4639,9 +4639,9 @@ public class Collections {
 
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
-        public boolean contains(@UnknownSignedness Object obj) {return false;}
+        public boolean contains(@UnknownSignedness @Readonly Object obj) {return false;}
         @Pure
-        public boolean containsAll(Collection<? extends @UnknownSignedness Object> c) { return c.isEmpty(); }
+        public boolean containsAll(@Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) { return c.isEmpty(); }
 
         @SideEffectFree
         public @PolyNull @PolySigned Object[] toArray(Collections.EmptySet<@PolyNull @PolySigned E> this) { return new Object[0]; }
@@ -4785,7 +4785,7 @@ public class Collections {
         @EnsuresNonEmptyIf(result = true, expression = "this")
         public boolean contains(@UnknownSignedness @Readonly Object obj) {return false;}
         @Pure
-        public boolean containsAll(Collection<? extends @UnknownSignedness Object> c) { return c.isEmpty(); }
+        public boolean containsAll(@Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) { return c.isEmpty(); }
 
         @SideEffectFree
         public @PolyNull @PolySigned Object[] toArray(Collections.EmptyList<@PolyNull @PolySigned E> this) { return new Object[0]; }
@@ -4932,10 +4932,10 @@ public class Collections {
         public void clear()                        {}
         @Pure
         @EnsuresKeyForIf(expression={"#1"}, result=true, map={"this"})
-        public boolean containsKey(@UnknownSignedness Object key)     {return false;}
+        public boolean containsKey(@UnknownSignedness @Readonly Object key)     {return false;}
         @Pure
-        public boolean containsValue(@UnknownSignedness Object value) {return false;}
-        public V get(Object key)                   {return null;}
+        public boolean containsValue(@UnknownSignedness @Readonly Object value) {return false;}
+        public V get(@Readonly Object key)                   {return null;}
         public @Immutable Set<K> keySet()                     {return emptySet();}
         public @Immutable Collection<V> values()              {return emptySet();}
         @SideEffectFree
@@ -4951,7 +4951,7 @@ public class Collections {
         @Override
         @SuppressWarnings("unchecked")
         @Pure
-        public V getOrDefault(Object k, V defaultValue) {
+        public V getOrDefault(@Readonly Object k, V defaultValue) {
             return defaultValue;
         }
 
@@ -4972,7 +4972,7 @@ public class Collections {
         }
 
         @Override
-        public boolean remove(@UnknownSignedness Object key, @UnknownSignedness Object value) {
+        public boolean remove(@UnknownSignedness @Readonly Object key, @UnknownSignedness @Readonly Object value) {
             throw new UnsupportedOperationException();
         }
 
@@ -5132,7 +5132,7 @@ public class Collections {
 
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
-        public boolean contains(@UnknownSignedness Object o) {return eq(o, element);}
+        public boolean contains(@UnknownSignedness @Readonly Object o) {return eq(o, element);}
 
         // Override default methods for Collection
         @Override
@@ -5194,7 +5194,7 @@ public class Collections {
 
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
-        public boolean contains(@UnknownSignedness Object obj) {return eq(obj, element);}
+        public boolean contains(@UnknownSignedness @Readonly Object obj) {return eq(obj, element);}
 
         public E get(int index) {
             if (index != 0)
@@ -5303,7 +5303,7 @@ public class Collections {
         // Override default methods in Map
         @Override
         @Pure
-        public V getOrDefault(Object key, V defaultValue) {
+        public V getOrDefault(@Readonly Object key, V defaultValue) {
             return eq(key, k) ? v : defaultValue;
         }
 
@@ -5324,7 +5324,7 @@ public class Collections {
         }
 
         @Override
-        public boolean remove(@UnknownSignedness Object key, @UnknownSignedness Object value) {
+        public boolean remove(@UnknownSignedness @Readonly Object key, @UnknownSignedness @Readonly Object value) {
             throw new UnsupportedOperationException();
         }
 
@@ -5655,7 +5655,7 @@ public class Collections {
             return cmp.compare(t2, t1);
         }
 
-        public boolean equals(Object o) {
+        public boolean equals(@Readonly Object o) {
             return (o == this) ||
                 (o instanceof ReverseComparator2 &&
                  cmp.equals(((ReverseComparator2)o).cmp));
@@ -5959,9 +5959,9 @@ public class Collections {
         public int hashCode(@Readonly SetFromMap<E> this)             { return s.hashCode(); }
         public boolean equals(@Readonly SetFromMap<E> this, @Readonly Object o)   { return o == this || s.equals(o); }
         @Pure
-        public boolean containsAll(@Readonly SetFromMap<E> this, @Readonly Collection<? extends @UnknownSignedness Object> c) {return s.containsAll(c);}
-        public boolean removeAll(@Mutable SetFromMap<E> this, @Readonly Collection<? extends @UnknownSignedness Object> c)   {return s.removeAll(c);}
-        public boolean retainAll(@Mutable SetFromMap<E> this, Collection<? extends @UnknownSignedness Object> c)   {return s.retainAll(c);}
+        public boolean containsAll(@Readonly SetFromMap<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) {return s.containsAll(c);}
+        public boolean removeAll(@Mutable SetFromMap<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c)   {return s.removeAll(c);}
+        public boolean retainAll(@Mutable SetFromMap<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c)   {return s.retainAll(c);}
         // addAll is the only inherited implementation
 
         // Override default methods in Collection

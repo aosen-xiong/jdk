@@ -1361,11 +1361,11 @@ public class TreeMap<K extends @Immutable Object,V>
 
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
-        public boolean contains(@UnknownSignedness Object o) {
+        public boolean contains(@UnknownSignedness @Readonly Object o) {
             return TreeMap.this.containsValue(o);
         }
 
-        public boolean remove(@UnknownSignedness Object o) {
+        public boolean remove(@UnknownSignedness @Readonly Object o) {
             for (Entry<K,V> e = getFirstEntry(); e != null; e = successor(e)) {
                 if (valEquals(e.getValue(), o)) {
                     deleteEntry(e);

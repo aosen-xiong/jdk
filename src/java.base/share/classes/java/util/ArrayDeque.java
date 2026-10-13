@@ -939,7 +939,7 @@ public class ArrayDeque<E extends @NonNull @Readonly Object> extends AbstractCol
     /**
      * @throws NullPointerException {@inheritDoc}
      */
-    public boolean removeAll(@Mutable ArrayDeque<E> this, @Readonly Collection<? extends @UnknownSignedness Object> c) {
+    public boolean removeAll(@Mutable ArrayDeque<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) {
         Objects.requireNonNull(c);
         return bulkRemove(e -> c.contains(e));
     }
@@ -947,7 +947,7 @@ public class ArrayDeque<E extends @NonNull @Readonly Object> extends AbstractCol
     /**
      * @throws NullPointerException {@inheritDoc}
      */
-    public boolean retainAll(@Mutable ArrayDeque<E> this, @Readonly Collection<? extends @UnknownSignedness Object> c) {
+    public boolean retainAll(@Mutable ArrayDeque<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) {
         Objects.requireNonNull(c);
         return bulkRemove(e -> !c.contains(e));
     }
@@ -1037,7 +1037,7 @@ public class ArrayDeque<E extends @NonNull @Readonly Object> extends AbstractCol
      */
     @Pure
     @EnsuresNonEmptyIf(result = true, expression = "this")
-    public boolean contains(@GuardSatisfied @Readonly ArrayDeque<E> this, @GuardSatisfied @Nullable @UnknownSignedness Object o) {
+    public boolean contains(@GuardSatisfied @Readonly ArrayDeque<E> this, @GuardSatisfied @Nullable @UnknownSignedness @Readonly Object o) {
         if (o != null) {
             final @Readonly Object[] es = elements;
             for (int i = head, end = tail, to = (i <= end) ? end : es.length;
