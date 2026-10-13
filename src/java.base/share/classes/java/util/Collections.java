@@ -2075,9 +2075,9 @@ public class Collections {
                 : null;
         }
 
-        public Entry<K, V> pollFirstEntry()
+        public @Immutable Entry<K, V> pollFirstEntry()
                                  { throw new UnsupportedOperationException(); }
-        public Entry<K, V> pollLastEntry()
+        public @Immutable Entry<K, V> pollLastEntry()
                                  { throw new UnsupportedOperationException(); }
         @SideEffectFree
         public @Immutable NavigableMap<K, V> descendingMap()
@@ -3077,29 +3077,29 @@ public class Collections {
             nm = m;
         }
 
-        public @ReceiverDependentMutable Entry<K, V> lowerEntry(@ReceiverDependentMutable SynchronizedNavigableMap<K,V> this, K key)
+        public @Immutable Entry<K, V> lowerEntry(@Readonly SynchronizedNavigableMap<K,V> this, K key)
                         { synchronized (mutex) { return nm.lowerEntry(key); } }
         public K lowerKey(@Readonly SynchronizedNavigableMap<K,V> this, K key)
                           { synchronized (mutex) { return nm.lowerKey(key); } }
-        public @ReceiverDependentMutable Entry<K, V> floorEntry(@ReceiverDependentMutable SynchronizedNavigableMap<K,V> this, K key)
+        public @Immutable Entry<K, V> floorEntry(@Readonly SynchronizedNavigableMap<K,V> this, K key)
                         { synchronized (mutex) { return nm.floorEntry(key); } }
         public K floorKey(@Readonly SynchronizedNavigableMap<K,V> this, K key)
                           { synchronized (mutex) { return nm.floorKey(key); } }
-        public @ReceiverDependentMutable Entry<K, V> ceilingEntry(@ReceiverDependentMutable SynchronizedNavigableMap<K,V> this, K key)
+        public @Immutable Entry<K, V> ceilingEntry(@Readonly SynchronizedNavigableMap<K,V> this, K key)
                       { synchronized (mutex) { return nm.ceilingEntry(key); } }
         public K ceilingKey(@Readonly SynchronizedNavigableMap<K,V> this, K key)
                         { synchronized (mutex) { return nm.ceilingKey(key); } }
-        public @ReceiverDependentMutable Entry<K, V> higherEntry(@ReceiverDependentMutable SynchronizedNavigableMap<K,V> this, K key)
+        public @Immutable Entry<K, V> higherEntry(@Readonly SynchronizedNavigableMap<K,V> this, K key)
                        { synchronized (mutex) { return nm.higherEntry(key); } }
         public K higherKey(@Mutable SynchronizedNavigableMap<K,V> this, K key)
                          { synchronized (mutex) { return nm.higherKey(key); } }
-        public @ReceiverDependentMutable Entry<K, V> firstEntry(@ReceiverDependentMutable SynchronizedNavigableMap<K,V> this)
+        public @Immutable Entry<K, V> firstEntry(@Readonly SynchronizedNavigableMap<K,V> this)
                            { synchronized (mutex) { return nm.firstEntry(); } }
-        public @ReceiverDependentMutable Entry<K, V> lastEntry(@ReceiverDependentMutable SynchronizedNavigableMap<K,V> this)
+        public @Immutable Entry<K, V> lastEntry(@Readonly SynchronizedNavigableMap<K,V> this)
                             { synchronized (mutex) { return nm.lastEntry(); } }
-        public Entry<K, V> pollFirstEntry(@Mutable SynchronizedNavigableMap<K,V> this)
+        public @Immutable Entry<K, V> pollFirstEntry(@Mutable SynchronizedNavigableMap<K,V> this)
                        { synchronized (mutex) { return nm.pollFirstEntry(); } }
-        public Entry<K, V> pollLastEntry(@Mutable SynchronizedNavigableMap<K,V> this)
+        public @Immutable Entry<K, V> pollLastEntry(@Mutable SynchronizedNavigableMap<K,V> this)
                         { synchronized (mutex) { return nm.pollLastEntry(); } }
 
         @SideEffectFree
@@ -4344,68 +4344,68 @@ public class Collections {
         public K firstKey(@Readonly CheckedNavigableMap<K,V> this)                           { return nm.firstKey(); }
         public K lastKey(@Readonly CheckedNavigableMap<K,V> this)                             { return nm.lastKey(); }
 
-        public @ReceiverDependentMutable Entry<K, V> lowerEntry(@ReceiverDependentMutable CheckedNavigableMap<K,V> this, K key) {
+        public @Immutable Entry<K, V> lowerEntry(@Readonly CheckedNavigableMap<K,V> this, K key) {
             Entry<K,V> lower = nm.lowerEntry(key);
             return (null != lower)
-                ? new CheckedMap.CheckedEntrySet.@ReceiverDependentMutable CheckedEntry<>(lower, valueType)
+                ? new CheckedMap.CheckedEntrySet.@Immutable CheckedEntry<>(lower, valueType)
                 : null;
         }
 
         public K lowerKey(@Readonly CheckedNavigableMap<K,V> this, K key)                   { return nm.lowerKey(key); }
 
-        public @ReceiverDependentMutable Entry<K, V> floorEntry(@ReceiverDependentMutable CheckedNavigableMap<K,V> this, K key) {
+        public @Immutable Entry<K, V> floorEntry(@Readonly CheckedNavigableMap<K,V> this, K key) {
             Entry<K,V> floor = nm.floorEntry(key);
             return (null != floor)
-                ? new CheckedMap.CheckedEntrySet.@ReceiverDependentMutable CheckedEntry<>(floor, valueType)
+                ? new CheckedMap.CheckedEntrySet.@Immutable CheckedEntry<>(floor, valueType)
                 : null;
         }
 
         public K floorKey(@Readonly CheckedNavigableMap<K,V> this, K key)                   { return nm.floorKey(key); }
 
-        public @ReceiverDependentMutable Entry<K, V> ceilingEntry(@ReceiverDependentMutable CheckedNavigableMap<K,V> this, K key) {
+        public @Immutable Entry<K, V> ceilingEntry(@Readonly CheckedNavigableMap<K,V> this, K key) {
             Entry<K,V> ceiling = nm.ceilingEntry(key);
             return (null != ceiling)
-                ? new CheckedMap.CheckedEntrySet.@ReceiverDependentMutable CheckedEntry<>(ceiling, valueType)
+                ? new CheckedMap.CheckedEntrySet.@Immutable CheckedEntry<>(ceiling, valueType)
                 : null;
         }
 
         public K ceilingKey(@Readonly CheckedNavigableMap<K,V> this, K key)               { return nm.ceilingKey(key); }
 
-        public @ReceiverDependentMutable Entry<K, V> higherEntry(@ReceiverDependentMutable CheckedNavigableMap<K,V> this, K key) {
+        public @Immutable Entry<K, V> higherEntry(@Readonly CheckedNavigableMap<K,V> this, K key) {
             Entry<K,V> higher = nm.higherEntry(key);
             return (null != higher)
-                ? new CheckedMap.CheckedEntrySet.@ReceiverDependentMutable CheckedEntry<>(higher, valueType)
+                ? new CheckedMap.CheckedEntrySet.@Immutable CheckedEntry<>(higher, valueType)
                 : null;
         }
 
         public K higherKey(@Readonly CheckedNavigableMap<K,V> this, K key)                 { return nm.higherKey(key); }
 
-        public @ReceiverDependentMutable Entry<K, V> firstEntry(@ReceiverDependentMutable CheckedNavigableMap<K,V> this) {
+        public @Immutable Entry<K, V> firstEntry(@Readonly CheckedNavigableMap<K,V> this) {
             Entry<K,V> first = nm.firstEntry();
             return (null != first)
-                ? new CheckedMap.CheckedEntrySet.@ReceiverDependentMutable CheckedEntry<>(first, valueType)
+                ? new CheckedMap.CheckedEntrySet.@Immutable CheckedEntry<>(first, valueType)
                 : null;
         }
 
-        public @ReceiverDependentMutable Entry<K, V> lastEntry(@ReceiverDependentMutable CheckedNavigableMap<K,V> this) {
+        public @Immutable Entry<K, V> lastEntry(@Readonly CheckedNavigableMap<K,V> this) {
             Entry<K,V> last = nm.lastEntry();
             return (null != last)
-                ? new CheckedMap.CheckedEntrySet.@ReceiverDependentMutable CheckedEntry<>(last, valueType)
+                ? new CheckedMap.CheckedEntrySet.@Immutable CheckedEntry<>(last, valueType)
                 : null;
         }
 
-        public Entry<K, V> pollFirstEntry(@Mutable CheckedNavigableMap<K,V> this) {
+        public @Immutable Entry<K, V> pollFirstEntry(@Mutable CheckedNavigableMap<K,V> this) {
             Entry<K,V> entry = nm.pollFirstEntry();
             return (null == entry)
                 ? null
-                : new CheckedMap.CheckedEntrySet.CheckedEntry<>(entry, valueType);
+                : new CheckedMap.CheckedEntrySet.@Immutable CheckedEntry<>(entry, valueType);
         }
 
-        public Entry<K, V> pollLastEntry(@Mutable CheckedNavigableMap<K,V> this) {
+        public @Immutable Entry<K, V> pollLastEntry(@Mutable CheckedNavigableMap<K,V> this) {
             Entry<K,V> entry = nm.pollLastEntry();
             return (null == entry)
                 ? null
-                : new CheckedMap.CheckedEntrySet.CheckedEntry<>(entry, valueType);
+                : new CheckedMap.CheckedEntrySet.@Immutable CheckedEntry<>(entry, valueType);
         }
 
         @SideEffectFree
