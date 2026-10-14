@@ -283,7 +283,7 @@ import jdk.internal.access.SharedSecrets;
      * @return a shallow copy of this set
      */
     @SideEffectFree
-    @SuppressWarnings({"unchecked", "mutability:return.type.incompatible"})
+    @SuppressWarnings({"unchecked", "mutability:return.type.incompatible", "mutability:mutability.lost.receiver"}) // fresh unaliased copy: the body replaces every field it shared; its own state shares this's one poly
     public @PolyMutable Object clone(@GuardSatisfied @PolyMutable HashSet<E> this) {
         try {
             HashSet<E> newSet = (HashSet<E>) super.clone();

@@ -598,7 +598,7 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
      * @return  a clone of the hashtable
      */
     @SideEffectFree
-    @SuppressWarnings({"mutability:return.type.incompatible", "mutability:assignment.type.incompatible"}) // fresh unaliased copy: the body replaces every field it shared
+    @SuppressWarnings({"mutability:return.type.incompatible", "mutability:assignment.type.incompatible", "mutability:mutability.lost.receiver"}) // fresh unaliased copy: the body replaces every field it shared; its own state shares this's one poly
     public synchronized @PolyMutable Object clone(@GuardSatisfied @PolyMutable Hashtable<K, V> this) {
         @Mutable Hashtable<?,?> t = cloneHashtable();
         t.table = new Entry<?,?>[table.length];
@@ -1431,7 +1431,7 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
         }
 
         @SideEffectFree
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({"unchecked", "mutability:argument.type.incompatible", "mutability:mutability.lost.parameter", "mutability:mutability.lost.receiver"}) // fresh unaliased copy: the body replaces every field it shared; its own state shares this's one poly
         protected @PolyMutable Object clone(@PolyMutable Entry<K,V> this) {
             return new @PolyMutable Entry<K,V>(hash, key, value,
                                   (next==null ? null : (@PolyMutable Entry<K,V>) next.clone()));

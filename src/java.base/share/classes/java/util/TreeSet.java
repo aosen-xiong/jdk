@@ -510,7 +510,7 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      * @return a shallow copy of this set
      */
     @SideEffectFree
-    @SuppressWarnings({"unchecked", "mutability:return.type.incompatible"})
+    @SuppressWarnings({"unchecked", "mutability:return.type.incompatible", "mutability:argument.type.incompatible"}) // fresh unaliased copy: the body replaces every field it shared; its own state shares this's one poly
     public @PolyMutable Object clone(@GuardSatisfied @PolyMutable TreeSet<E> this) {
         TreeSet<E> clone;
         try {

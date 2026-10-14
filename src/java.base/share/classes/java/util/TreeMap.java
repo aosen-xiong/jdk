@@ -936,7 +936,7 @@ public class TreeMap<K extends @Immutable Object,V>
      *
      * @return a shallow copy of this map
      */
-    @SuppressWarnings("mutability:return.type.incompatible") // fresh unaliased copy: the body replaces every field it shared
+    @SuppressWarnings({"mutability:return.type.incompatible", "mutability:mutability.lost.receiver"}) // fresh unaliased copy: the body replaces every field it shared; its own state shares this's one poly
     public @PolyMutable Object clone(@GuardSatisfied @PolyMutable TreeMap<K, V> this) {
         TreeMap<?,?> clone;
         try {
