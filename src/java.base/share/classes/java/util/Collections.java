@@ -1756,7 +1756,7 @@ public class Collections {
                 }
 
                 @Override
-                public @Readonly Comparator<? super Map.@Readonly Entry<K, V>> getComparator() {
+                public @Readonly Comparator<Map.@Readonly Entry<K, V>> getComparator() {
                     return s.getComparator();
                 }
             }

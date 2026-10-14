@@ -510,7 +510,7 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      * @return a shallow copy of this set
      */
     @SideEffectFree
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "mutability:return.type.incompatible"})
     public @PolyMutable Object clone(@GuardSatisfied @PolyMutable TreeSet<E> this) {
         TreeSet<E> clone;
         try {
@@ -520,7 +520,7 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
         }
 
         clone.m = new TreeMap<E, @Readonly Object>(m);
-        return (@PolyMutable Object) clone;
+        return clone;
     }
 
     /**

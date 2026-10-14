@@ -283,12 +283,12 @@ import jdk.internal.access.SharedSecrets;
      * @return a shallow copy of this set
      */
     @SideEffectFree
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "mutability:return.type.incompatible"})
     public @PolyMutable Object clone(@GuardSatisfied @PolyMutable HashSet<E> this) {
         try {
             HashSet<E> newSet = (HashSet<E>) super.clone();
             newSet.map = (HashMap<E, @Readonly Object>) map.clone();
-            return (@PolyMutable Object) newSet;
+            return newSet;
         } catch (CloneNotSupportedException e) {
             throw new InternalError(e);
         }

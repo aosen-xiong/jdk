@@ -378,12 +378,13 @@ import jdk.internal.util.ArraysSupport;
      * @return a clone of this {@code ArrayList} instance
      */
     @SideEffectFree
+    @SuppressWarnings("mutability:return.type.incompatible") // fresh unaliased copy: the body replaces every field it shared
     public @PolyMutable Object clone(@GuardSatisfied @PolyMutable ArrayList<E> this) {
         try {
             ArrayList<?> v = (ArrayList<?>) super.clone();
             v.elementData = Arrays.copyOf(elementData, size);
             v.modCount = 0;
-            return (@PolyMutable ArrayList<?>) v;
+            return v;
         } catch (CloneNotSupportedException e) {
             // this shouldn't happen, since we are Cloneable
             throw new InternalError(e);
