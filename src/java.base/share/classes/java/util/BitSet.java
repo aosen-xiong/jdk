@@ -30,6 +30,7 @@ import org.checkerframework.checker.index.qual.NonNegative;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nonempty.qual.EnsuresNonEmptyIf;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.mutability.qual.PolyMutable;
 import org.checkerframework.checker.mutability.qual.Assignable;
 import org.checkerframework.checker.mutability.qual.Mutable;
 import org.checkerframework.checker.mutability.qual.Readonly;
@@ -1125,7 +1126,8 @@ public class BitSet implements Cloneable, java.io.Serializable {
      * @see    #size()
      */
     @SideEffectFree
-    public Object clone(@GuardSatisfied @Mutable BitSet this) {
+    @SuppressWarnings({"mutability:return.type.incompatible", "mutability:assignment.type.incompatible"}) // fresh unaliased copy: the body replaces every field it shared; its own state shares this's one poly
+    public @PolyMutable Object clone(@GuardSatisfied @PolyMutable BitSet this) {
         if (! sizeIsSticky)
             trimToSize();
 
