@@ -720,8 +720,9 @@ public class Vector<E>
      * @since 1.2
      */
     @SideEffectFree
-    public synchronized @PolyNull @PolySigned @Readonly Object[] toArray(Vector<@PolyNull @PolySigned E> this) {
-        return Arrays.<@Readonly Object>copyOf(elementData, elementCount);
+    @SuppressWarnings("mutability:argument.type.incompatible") // elementData holds this vector's elements, of the receiver's @PolyMutable E, but a field read is typed by its declared Object[]
+    public synchronized @PolyNull @PolySigned @PolyMutable Object[] toArray(Vector<@PolyNull @PolySigned @PolyMutable E> this) {
+        return Arrays.<@PolyMutable Object>copyOf(elementData, elementCount);
     }
 
     /**

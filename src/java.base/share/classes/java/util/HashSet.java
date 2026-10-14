@@ -395,6 +395,7 @@ import jdk.internal.access.SharedSecrets;
     }
 
     @Override
+    @SuppressWarnings("mutability:override.return.invalid") // E extends @Immutable Object, so every element is @Immutable. That is the precise return, which an override of a @PolyMutable return cannot state
     public @Immutable Object[] toArray(@Readonly HashSet<E> this) {
         return map.keysToArray(new @Immutable Object[map.size()]);
     }

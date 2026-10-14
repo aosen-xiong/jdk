@@ -541,8 +541,8 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
             EnumMap.this.clear();
         }
         @SideEffectFree
-        public @Readonly Object[] toArray() {
-            return fillEntryArray(new Object[size]);
+        public @PolyMutable Object[] toArray(@Readonly EnumMap<K, V>.@Readonly EntrySet this) {
+            return fillEntryArray(new @PolyMutable Object[size]);
         }
         @CFComment({"nullness: 'a' is known to be of array class type",
         "Annotation for toArray are technically incorrect. Refer to note on toArray in Collection.java"})
@@ -563,12 +563,12 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
         }
         @CFComment({"nullness: Value returned by unmaskNull",
         "will be of type V (not @Nullable V) for mapped value"})
-        @SuppressWarnings({"nullness:argument"})
-        private @Readonly Object[] fillEntryArray(@Readonly Object[] a) {
+        @SuppressWarnings({"nullness:argument", "mutability:type.arguments.not.inferred"}) // mutability: each SimpleEntry is a fresh snapshot, so it may take the array's @PolyMutable, but SimpleEntry's constructor only yields @Mutable
+        private @PolyMutable Object[] fillEntryArray(@PolyMutable Object[] a) {
             int j = 0;
             for (int i = 0; i < vals.length; i++)
                 if (vals[i] != null)
-                    a[j++] = new AbstractMap.SimpleEntry<>(
+                    a[j++] = new AbstractMap.@PolyMutable SimpleEntry<>(
                         keyUniverse[i], unmaskNull(vals[i]));
             return a;
         }

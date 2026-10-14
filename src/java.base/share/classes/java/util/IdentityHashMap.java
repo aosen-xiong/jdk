@@ -1065,8 +1065,9 @@ public class IdentityHashMap<K extends @Immutable Object,V>
             return result;
         }
         @SideEffectFree
-        public Object[] toArray() {
-            return toArray(new Object[0]);
+        @SuppressWarnings("mutability:override.return.invalid") // K extends @Immutable Object, so every key is @Immutable. That is the precise return, which an override of a @PolyMutable return cannot state
+        public @Immutable Object[] toArray(@Readonly KeySet this) {
+            return toArray(new @Immutable Object[0]);
         }
         @SuppressWarnings("unchecked")
         @SideEffectFree
@@ -1162,8 +1163,8 @@ public class IdentityHashMap<K extends @Immutable Object,V>
             IdentityHashMap.this.clear();
         }
         @SideEffectFree
-        public Object[] toArray() {
-            return toArray(new Object[0]);
+        public @PolyMutable Object[] toArray(@Readonly IdentityHashMap<K, @PolyMutable V>.@Readonly Values this) {
+            return toArray(new @PolyMutable Object[0]);
         }
         @SuppressWarnings("unchecked")
         @SideEffectFree
@@ -1289,8 +1290,8 @@ public class IdentityHashMap<K extends @Immutable Object,V>
         }
 
         @SideEffectFree
-        public Object[] toArray() {
-            return toArray(new Object[0]);
+        public @PolyMutable Object[] toArray(@Readonly IdentityHashMap<K, V>.@Readonly EntrySet this) {
+            return toArray(new @PolyMutable Object[0]);
         }
 
         @SuppressWarnings({"unchecked", "mutability:argument.type.incompatible"}) // overappoximation

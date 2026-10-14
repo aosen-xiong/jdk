@@ -608,8 +608,9 @@ public class LinkedHashMap<K extends @Immutable Object,V>
                                             Spliterator.DISTINCT);
         }
 
-        public Object[] toArray() {
-            return keysToArray(new Object[size]);
+        @SuppressWarnings("mutability:override.return.invalid") // K extends @Immutable Object, so every key is @Immutable. That is the precise return, which an override of a @PolyMutable return cannot state
+        public @Immutable Object[] toArray(@Readonly LinkedKeySet this) {
+            return keysToArray(new @Immutable Object[size]);
         }
 
         public <T> @Nullable T[] toArray(@PolyNull T[] a) {
@@ -672,8 +673,8 @@ public class LinkedHashMap<K extends @Immutable Object,V>
                                             Spliterator.ORDERED);
         }
 
-        public Object[] toArray() {
-            return valuesToArray(new Object[size]);
+        public @PolyMutable Object[] toArray(@Readonly LinkedHashMap<K, @PolyMutable V>.@Readonly LinkedValues this) {
+            return valuesToArray(new @PolyMutable Object[size]);
         }
 
         public <T> @Nullable T[] toArray(@PolyNull T[] a) {

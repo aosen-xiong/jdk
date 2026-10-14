@@ -1033,8 +1033,9 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
             return new KeySpliterator<>(HashMap.this, 0, -1, 0, 0);
         }
         // AOSEN: class polymorphism qualifier
-        public Object[] toArray(@Readonly KeySet this) {
-            return keysToArray(new Object[size]);
+        @SuppressWarnings("mutability:override.return.invalid") // K extends @Immutable Object, so every key is @Immutable. That is the precise return, which an override of a @PolyMutable return cannot state
+        public @Immutable Object[] toArray(@Readonly KeySet this) {
+            return keysToArray(new @Immutable Object[size]);
         }
 
         public <T> @Nullable T[] toArray(@Readonly KeySet this, @PolyNull T[] a) {
@@ -1097,8 +1098,8 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
             return new ValueSpliterator<>(HashMap.this, 0, -1, 0, 0);
         }
 
-        public Object[] toArray() {
-            return valuesToArray(new Object[size]);
+        public @PolyMutable Object[] toArray(@Readonly HashMap<K, @PolyMutable V>.@Readonly Values this) {
+            return valuesToArray(new @PolyMutable Object[size]);
         }
 
         public <T> @Nullable T[] toArray(@PolyNull T[] a) {

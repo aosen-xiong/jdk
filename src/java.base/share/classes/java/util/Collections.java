@@ -1798,9 +1798,9 @@ public class Collections {
                 };
             }
 
-            @SuppressWarnings("unchecked")
-            public @Readonly Object[] toArray() {
-                @Readonly Object[] a = c.toArray();
+            @SuppressWarnings({"unchecked", "mutability:override.return.invalid"}) // mutability: every element is replaced by a new @Immutable UnmodifiableEntry. That is the precise return, which an override of a @PolyMutable return cannot state
+            public @Immutable Object[] toArray() {
+                @Immutable Object[] a = c.toArray();
                 for (int i=0; i<a.length; i++)
                     a[i] = new UnmodifiableEntry<>((Map.Entry<? extends K, ? extends V>)a[i]);
                 return a;
@@ -4658,7 +4658,7 @@ public class Collections {
         public boolean containsAll(@Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) { return c.isEmpty(); }
 
         @SideEffectFree
-        public @PolyNull @PolySigned Object[] toArray(Collections.EmptySet<@PolyNull @PolySigned E> this) { return new Object[0]; }
+        public @PolyNull @PolySigned @PolyMutable Object[] toArray(Collections.EmptySet<@PolyNull @PolySigned @PolyMutable E> this) { return new @PolyMutable Object[0]; }
 
         @SideEffectFree
         public <T> @Nullable T[] toArray(@PolyNull T[] a) {
@@ -4802,7 +4802,7 @@ public class Collections {
         public boolean containsAll(@Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) { return c.isEmpty(); }
 
         @SideEffectFree
-        public @PolyNull @PolySigned Object[] toArray(Collections.EmptyList<@PolyNull @PolySigned E> this) { return new Object[0]; }
+        public @PolyNull @PolySigned @PolyMutable Object[] toArray(Collections.EmptyList<@PolyNull @PolySigned @PolyMutable E> this) { return new @PolyMutable Object[0]; }
 
         @SideEffectFree
         public <T> @Nullable T[] toArray(@PolyNull T[] a) {
@@ -5966,6 +5966,7 @@ public class Collections {
         @SideEffectFree
         public Iterator<E> iterator(@Readonly SetFromMap<E> this)     { return s.iterator(); }
         @SideEffectFree
+        @SuppressWarnings("mutability:override.return.invalid") // E extends @Immutable Object, so every element is @Immutable. That is the precise return, which an override of a @PolyMutable return cannot state
         public @PolyNull @PolySigned @Immutable Object[] toArray(Collections.SetFromMap<@PolyNull @PolySigned E> this)         { return s.toArray(); }
         @SideEffectFree
         public <T> @Nullable T[] toArray(@PolyNull T[] a)     { return s.toArray(a); }
