@@ -4065,20 +4065,20 @@ public class Collections {
                 };
             }
 
-            @SuppressWarnings({"unchecked", "mutability:type.arguments.not.inferred"}) // Aosen: not sure how to fix this
-            public Object[] toArray(@Readonly CheckedEntrySet<K,V> this) {
+            @SuppressWarnings({"unchecked", "mutability:type.arguments.not.inferred", "mutability:method.invocation.invalid", "mutability:assignment.type.incompatible", "mutability:override.return.invalid"}) // mutability: s's entries, and the CheckedEntry wrappers that write through to them, share this set's mutability. A @PolyMutable call such as s.toArray() or checkedEntry(...) cannot be instantiated with @ReceiverDependentMutable, and @ReceiverDependentMutable is the precise return, which an override of a @PolyMutable return cannot state
+            public @ReceiverDependentMutable Object[] toArray(@ReceiverDependentMutable CheckedEntrySet<K,V> this) {
                 @ReceiverDependentMutable Object[] source = s.toArray();
 
                 /*
                  * Ensure that we don't get an ArrayStoreException even if
                  * s.toArray returns an array of something other than Object
                  */
-                Object[] dest = (source.getClass() == Object[].class)
+                @ReceiverDependentMutable Object[] dest = (source.getClass() == Object[].class)
                     ? source
-                    : new Object[source.length];
+                    : new @ReceiverDependentMutable Object[source.length];
 
                 for (int i = 0; i < source.length; i++)
-                    dest[i] = checkedEntry((Map.Entry<K,V>)source[i],
+                    dest[i] = checkedEntry((Map.@ReceiverDependentMutable Entry<K,V>)source[i],
                                            valueType);
                 return dest;
             }
