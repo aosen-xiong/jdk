@@ -137,10 +137,10 @@ class ImmutableCollections {
     static class Access {
         static {
             SharedSecrets.setJavaUtilCollectionAccess(new JavaUtilCollectionAccess() {
-                public <E> @Immutable List<E> listFromTrustedArray(Object @Immutable [] array) {
+                public <E> @Immutable List<E> listFromTrustedArray(@Readonly Object @Readonly [] array) {
                     return ImmutableCollections.listFromTrustedArray(array);
                 }
-                public <E> @Immutable List<E> listFromTrustedArrayNullsAllowed(Object[] array) {
+                public <E> @Immutable List<E> listFromTrustedArrayNullsAllowed(@Readonly Object @Readonly [] array) {
                     return ImmutableCollections.listFromTrustedArrayNullsAllowed(array);
                 }
             });
@@ -258,7 +258,7 @@ class ImmutableCollections {
      * @return the new list
      */
     @SuppressWarnings("unchecked")
-    static <E> @Immutable List<E> listFromTrustedArrayNullsAllowed(Object... input) {
+    static <E> @Immutable List<E> listFromTrustedArrayNullsAllowed(@Readonly Object @Readonly... input) {
         assert input.getClass() == Object[].class;
         if (input.length == 0) {
             return (@Immutable List<E>) EMPTY_LIST_NULLS;
