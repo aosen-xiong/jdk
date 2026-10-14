@@ -25,11 +25,9 @@
 
 package jdk.internal.access;
 
-import org.checkerframework.checker.mutability.qual.Readonly;
-import org.checkerframework.checker.mutability.qual.Immutable;
 import java.util.List;
 
 public interface JavaUtilCollectionAccess {
-    <E> @Immutable List<E> listFromTrustedArray(@Readonly Object @Readonly [] array);
-    <E> @Immutable List<E> listFromTrustedArrayNullsAllowed(@Readonly Object @Readonly [] array);
+    <E> List<E> listFromTrustedArray(Object[] array);
+    <E> List<E> listFromTrustedArrayNullsAllowed(Object[] array);
 }

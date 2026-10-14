@@ -1515,7 +1515,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
     @SideEffectFree
     @SuppressWarnings({"unchecked", "mutability:return.type.incompatible"})
     @Override
-    public @ReceiverDependentMutable Object clone(@GuardSatisfied @ReceiverDependentMutable HashMap<K, V> this) {
+    public @PolyMutable Object clone(@GuardSatisfied @PolyMutable HashMap<K, V> this) {
         HashMap<K,V> result;
         try {
             result = (HashMap<K,V>)super.clone();

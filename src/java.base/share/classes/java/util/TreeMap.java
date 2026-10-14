@@ -937,7 +937,7 @@ public class TreeMap<K extends @Immutable Object,V>
      * @return a shallow copy of this map
      */
     @SuppressWarnings("mutability:return.type.incompatible") // fresh unaliased copy: the body replaces every field it shared
-    public @ReceiverDependentMutable Object clone(@GuardSatisfied @ReceiverDependentMutable TreeMap<K, V> this) {
+    public @PolyMutable Object clone(@GuardSatisfied @PolyMutable TreeMap<K, V> this) {
         TreeMap<?,?> clone;
         try {
             clone = (TreeMap<?,?>) super.clone();

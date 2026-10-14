@@ -399,7 +399,7 @@ class JumboEnumSet<E extends Enum<E>> extends EnumSet<E> {
     }
 
     @SuppressWarnings("mutability:return.type.incompatible") // fresh unaliased copy: the body replaces every field it shared
-    public @Mutable EnumSet<E> clone(@Mutable JumboEnumSet<E> this) {
+    public @PolyMutable EnumSet<E> clone(@PolyMutable JumboEnumSet<E> this) {
         JumboEnumSet<E> result = (JumboEnumSet<E>) super.clone();
         result.elements = result.elements.clone();
         return result;

@@ -700,7 +700,7 @@ public class Vector<E>
      */
     @SideEffectFree
     @SuppressWarnings("mutability:return.type.incompatible") // fresh unaliased copy: the body replaces every field it shared
-    public synchronized @ReceiverDependentMutable Object clone(@GuardSatisfied @ReceiverDependentMutable Vector<E> this) {
+    public synchronized @PolyMutable Object clone(@GuardSatisfied @PolyMutable Vector<E> this) {
         try {
             @SuppressWarnings("unchecked")
             Vector<E> v = (Vector<E>) super.clone();

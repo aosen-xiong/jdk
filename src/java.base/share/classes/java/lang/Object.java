@@ -258,7 +258,7 @@ public class Object {
     @SideEffectFree
     @IntrinsicCandidate
     @CFComment("mutability: clone is poly because it be implemented as shallow copy?")
-    protected native @ReceiverDependentMutable Object clone(@GuardSatisfied @ReceiverDependentMutable Object this) throws CloneNotSupportedException;
+    protected native @PolyMutable Object clone(@GuardSatisfied @PolyMutable Object this) throws CloneNotSupportedException;
 
     /**
      * Returns a string representation of the object.
