@@ -1174,7 +1174,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
         public final Spliterator<Map.@Readonly Entry<K,V>> spliterator(@Readonly EntrySet this) {
             return new EntrySpliterator<>(HashMap.this, 0, -1, 0, 0);
         }
-        public final void forEach(@ReceiverDependentMutable HashMap<K,V>.@Mutable EntrySet this, Consumer<? super Map.@ReceiverDependentMutable Entry<K,V>> action) {
+        public final void forEach(@ReceiverDependentMutable HashMap<K,V>.@Readonly EntrySet this, Consumer<? super Map.@ReceiverDependentMutable Entry<K,V>> action) {
             @ReceiverDependentMutable Node<K,V>[] tab;
             if (action == null)
                 throw new NullPointerException();
@@ -1471,7 +1471,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
     }
 
     @Override
-    public void forEach(@Mutable HashMap<K, V> this, BiConsumer<? super K, ? super V> action) {
+    public void forEach(@ReceiverDependentMutable HashMap<K, V> this, BiConsumer<? super K, ? super V> action) {
         @Readonly Node<K,V> @Readonly [] tab;
         if (action == null)
             throw new NullPointerException();
@@ -1638,8 +1638,9 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
             return next != null;
         }
 
+        @SuppressWarnings("mutability:return.type.incompatible") // field depends on outer class
         final @ReceiverDependentMutable Node<K,V> nextNode(@ReceiverDependentMutable HashMap<K,V>.@NonEmpty @Mutable HashIterator this) {
-            @PolyMutable Node<K,V>[] t;
+            @ReceiverDependentMutable Node<K,V>[] t;
             Node<K,V> e = next;
             if (modCount != expectedModCount)
                 throw new ConcurrentModificationException();

@@ -737,7 +737,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
      * @return a shallow copy of this map
      */
     @SideEffectFree
-    @SuppressWarnings("mutability:return.type.incompatible") // fresh unaliased copy: the body replaces every field it shared
+    @SuppressWarnings({"mutability:return.type.incompatible", "mutability:assignment.type.incompatible"}) // fresh unaliased copy: the body replaces every field it shared
     public @ReceiverDependentMutable Object clone(@GuardSatisfied @ReceiverDependentMutable IdentityHashMap<K, V> this) {
         try {
             IdentityHashMap<?,?> m = (IdentityHashMap<?,?>) super.clone();
@@ -1324,7 +1324,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
         }
 
         @SideEffectFree
-        public Spliterator<Map.@Immutable Entry<K,V>> spliterator(@Readonly EntrySet this) {
+        public Spliterator<Map.@Readonly Entry<K,V>> spliterator(@Readonly EntrySet this) {
             return new EntrySpliterator<>(IdentityHashMap.this, 0, -1, 0, 0);
         }
     }
@@ -1609,7 +1609,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
     @ReceiverDependentMutable
     static final class EntrySpliterator<K extends @Immutable Object,V>
         extends IdentityHashMapSpliterator<K,V>
-        implements Spliterator<Map.@Immutable Entry<K,V>> {
+        implements Spliterator<Map.@Readonly Entry<K,V>> {
         EntrySpliterator(@Readonly IdentityHashMap<K,V> m, int origin, int fence, int est,
                          int expectedModCount) {
             super(m, origin, fence, est, expectedModCount);
@@ -1622,7 +1622,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
                                        expectedModCount);
         }
 
-        public void forEachRemaining(@Mutable EntrySpliterator<K,V> this, Consumer<? super Map.@Immutable Entry<K, V>> action) {
+        public void forEachRemaining(@Mutable EntrySpliterator<K,V> this, Consumer<? super Map.@Readonly Entry<K, V>> action) {
             if (action == null)
                 throw new NullPointerException();
             int i, hi, mc;
@@ -1646,7 +1646,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
             throw new ConcurrentModificationException();
         }
 
-        public boolean tryAdvance(@Mutable EntrySpliterator<K,V> this, Consumer<? super Map.@Immutable Entry<K,V>> action) {
+        public boolean tryAdvance(@Mutable EntrySpliterator<K,V> this, Consumer<? super Map.@Readonly Entry<K,V>> action) {
             if (action == null)
                 throw new NullPointerException();
             @Readonly Object[] a = map.table;

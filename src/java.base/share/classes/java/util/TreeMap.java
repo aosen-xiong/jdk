@@ -3450,7 +3450,7 @@ public class TreeMap<K extends @Immutable Object,V>
                 return Map.Entry.comparingByKey(tree.comparator);
             }
             else {
-                return (@Readonly Comparator<Map.Entry<K, V>> & Serializable) (e1, e2) -> {
+                return (@Readonly Comparator<Map.@Readonly Entry<K, V>> & Serializable) (e1, e2) -> {
                     @SuppressWarnings("unchecked")
                     Comparable<? super K> k1 = (Comparable<? super K>) e1.getKey();
                     return k1.compareTo(e2.getKey());

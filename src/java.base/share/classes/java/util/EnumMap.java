@@ -509,7 +509,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
     @SideEffectFree
     @SuppressWarnings("mutability:assignment.type.incompatible") // class polymorphism qualifier
     public @ReceiverDependentMutable Set<Map.@ReceiverDependentMutable Entry<K,V>> entrySet(@ReceiverDependentMutable EnumMap<K, V> this) {
-        Set<Map.@PolyMutable Entry<K,V>> es = entrySet;
+        Set<Map.@ReceiverDependentMutable Entry<K,V>> es = entrySet;
         if (es != null)
             return es;
         else

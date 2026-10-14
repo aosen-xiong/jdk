@@ -593,7 +593,7 @@ public interface Map<K extends @Immutable Object, V> {
          */
         @Pure
         public static <K extends @Immutable Object, V extends Comparable<? super V>> @Readonly Comparator<Map.@Readonly Entry<K, V>> comparingByValue() {
-            return (@Readonly Comparator<Map.Entry<K, V>> & Serializable)
+            return (@Readonly Comparator<Map.@Readonly Entry<K, V>> & Serializable)
                 (c1, c2) -> c1.getValue().compareTo(c2.getValue());
         }
 
@@ -631,9 +631,9 @@ public interface Map<K extends @Immutable Object, V> {
          * @since 1.8
          */
         @Pure
-        public static <K extends @Immutable Object, V> Comparator<Map.Entry<K, V>> comparingByValue(Comparator<? super V> cmp) {
+        public static <K extends @Immutable Object, V> @Readonly Comparator<Map.@Readonly Entry<K, V>> comparingByValue(@Readonly Comparator<? super V> cmp) {
             Objects.requireNonNull(cmp);
-            return (Comparator<Map.Entry<K, V>> & Serializable)
+            return (@Readonly Comparator<Map.@Readonly Entry<K, V>> & Serializable)
                 (c1, c2) -> cmp.compare(c1.getValue(), c2.getValue());
         }
 
