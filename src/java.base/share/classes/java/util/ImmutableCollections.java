@@ -657,11 +657,12 @@ class ImmutableCollections {
         }
 
         @Override
-        public @Readonly Object[] toArray() {
+        @SuppressWarnings("mutability:array.initializer.type.incompatible") // e0 and e1 are this list's elements, of the receiver's @PolyMutable E, but a field read is typed by the declared E (e1 is declared Object to hold the EMPTY sentinel)
+        public @PolyMutable Object[] toArray(@Readonly List12<@PolyMutable E> this) {
             if (e1 == EMPTY) {
-                return new @Readonly Object[] { e0 };
+                return new @PolyMutable Object[] { e0 };
             } else {
-                return new @Readonly Object[] { e0, e1 };
+                return new @PolyMutable Object[] { e0, e1 };
             }
         }
 
