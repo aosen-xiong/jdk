@@ -3524,7 +3524,7 @@ public class Arrays {
      * @since 1.6
      */
     @SideEffectFree
-    @SuppressWarnings({"unchecked", "mutability:argument.type.incompatible"}) // getClass error
+    @SuppressWarnings({"unchecked", "mutability:argument.type.incompatible", "mutability:static.receiverdependentmutable.forbidden"}) // getClass error: the checker reports @ReceiverDependentMutable for any x.getClass() whose result is used in a static method, whatever x's type. Class is @Immutable
     @CFComment("The return type is refined when safe. See " +
             "https://github.com/eisop/checker-framework/blob/17991582bc3a35509f15065b051d8e4c45c3e9ae/checker/src/main/java/org/checkerframework/checker/nullness/NullnessNoInitAnnotatedTypeFactory.java#L756")
     public static <T> @Nullable T[] copyOf(T @Readonly [] original, @NonNegative int newLength) {
@@ -3798,7 +3798,7 @@ public class Arrays {
      * @throws NullPointerException if {@code original} is null
      * @since 1.6
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "mutability:static.receiverdependentmutable.forbidden"}) // mutability: the checker reports @ReceiverDependentMutable for any x.getClass() whose result is used in a static method, whatever x's type. Class is @Immutable
     @SideEffectFree
     public static <T> @Nullable T[] copyOfRange(T @Readonly [] original, @IndexOrHigh({"#1"}) int from, int to) {
         return copyOfRange(original, from, to, (Class<? extends T[]>) original.getClass());

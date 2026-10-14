@@ -1126,7 +1126,7 @@ public class BitSet implements Cloneable, java.io.Serializable {
      * @see    #size()
      */
     @SideEffectFree
-    @SuppressWarnings({"mutability:return.type.incompatible", "mutability:assignment.type.incompatible"}) // fresh unaliased copy: the body replaces every field it shared; its own state shares this's one poly
+    @SuppressWarnings({"mutability:return.type.incompatible", "mutability:assignment.type.incompatible", "mutability:method.invocation.invalid"}) // fresh unaliased copy: the body replaces every field it shared; its own state shares this's one poly. trimToSize() only shrinks this's backing array, which leaves its bits unchanged
     public @PolyMutable Object clone(@GuardSatisfied @PolyMutable BitSet this) {
         if (! sizeIsSticky)
             trimToSize();

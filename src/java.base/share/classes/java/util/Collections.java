@@ -3910,7 +3910,7 @@ public class Collections {
             return m.put(key, value);
         }
 
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({"unchecked", "mutability:method.invocation.invalid"}) // mutability: t is only read. Its entry set reads as @MutabilityLost through the @Readonly map, and toArray's @PolyMutable cannot be instantiated with @MutabilityLost
         public void putAll(@Mutable CheckedMap<K,V> this, @Readonly Map<? extends K, ? extends V> t) {
             // Satisfy the following goals:
             // - good diagnostics in case of type mismatch
