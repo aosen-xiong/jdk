@@ -1698,17 +1698,17 @@ public class Collections {
             }
 
             static <K extends @Immutable Object, V> Consumer<Map.@Readonly Entry<? extends K, ? extends V>> entryConsumer(
-                    Consumer<? super Map.@Immutable Entry<K, V>> action) {
+                    Consumer<? super @Immutable Entry<K, V>> action) {
                 return e -> action.accept(new UnmodifiableEntry<>(e));
             }
 
-            public void forEach(Consumer<? super Map.@Immutable Entry<K, V>> action) {
+            public void forEach(Consumer<? super @Immutable Entry<K, V>> action) {
                 Objects.requireNonNull(action);
                 c.forEach(entryConsumer(action));
             }
 
             static final class UnmodifiableEntrySetSpliterator<K extends @Immutable Object, V>
-                    implements Spliterator<Map.@Immutable Entry<K,V>> {
+                    implements Spliterator<@Immutable Entry<K,V>> {
                 final Spliterator<Map.@Readonly Entry<K, V>> s;
 
                 UnmodifiableEntrySetSpliterator(Spliterator<@Readonly Entry<K, V>> s) {
@@ -1716,19 +1716,19 @@ public class Collections {
                 }
 
                 @Override
-                public boolean tryAdvance(Consumer<? super Map.@Immutable Entry<K, V>> action) {
+                public boolean tryAdvance(Consumer<? super @Immutable Entry<K, V>> action) {
                     Objects.requireNonNull(action);
                     return s.tryAdvance(entryConsumer(action));
                 }
 
                 @Override
-                public void forEachRemaining(Consumer<? super Map.@Immutable Entry<K, V>> action) {
+                public void forEachRemaining(Consumer<? super @Immutable Entry<K, V>> action) {
                     Objects.requireNonNull(action);
                     s.forEachRemaining(entryConsumer(action));
                 }
 
                 @Override
-                public Spliterator<Map.@Immutable Entry<K, V>> trySplit() {
+                public Spliterator<@Immutable Entry<K, V>> trySplit() {
                     Spliterator<@Readonly Entry<K, V>> split = s.trySplit();
                     return split == null
                            ? null
@@ -1762,18 +1762,18 @@ public class Collections {
             }
 
             @SuppressWarnings("unchecked")
-            public Spliterator<Map.@Immutable Entry<K,V>> spliterator() {
+            public Spliterator<@Immutable Entry<K,V>> spliterator() {
                 return new UnmodifiableEntrySetSpliterator<>(
                         (Spliterator<Map.@Readonly Entry<K, V>>) c.spliterator());
             }
 
             @Override
-            public Stream<Map.@Immutable Entry<K,V>> stream() {
+            public Stream<@Immutable Entry<K,V>> stream() {
                 return StreamSupport.stream(spliterator(), false);
             }
 
             @Override
-            public Stream<Map.@Immutable Entry<K,V>> parallelStream() {
+            public Stream<@Immutable Entry<K,V>> parallelStream() {
                 return StreamSupport.stream(spliterator(), true);
             }
 
@@ -1792,7 +1792,7 @@ public class Collections {
                     public void remove() {
                         throw new UnsupportedOperationException();
                     }
-                    public void forEachRemaining(Consumer<? super Map.@Immutable Entry<K, V>> action) {
+                    public void forEachRemaining(Consumer<? super @Immutable Entry<K, V>> action) {
                         i.forEachRemaining(entryConsumer(action));
                     }
                 };
