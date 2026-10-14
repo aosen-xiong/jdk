@@ -2588,6 +2588,7 @@ public class TreeMap<K extends @Immutable Object,V>
     /**
      * Returns the successor of the specified Entry, or null if no such.
      */
+    @SuppressWarnings("mutability:return.type.incompatible") // one poly: the argument and the result are the same instantiation, and its links share its mutability
     static <K extends @Immutable Object,V> TreeMap.@PolyMutable Entry<K,V> successor(@PolyMutable Entry<K,V> t) {
         if (t == null)
             return null;
@@ -2610,6 +2611,7 @@ public class TreeMap<K extends @Immutable Object,V>
     /**
      * Returns the predecessor of the specified Entry, or null if no such.
      */
+    @SuppressWarnings("mutability:return.type.incompatible") // one poly: the argument and the result are the same instantiation, and its links share its mutability
     static <K extends @Immutable Object,V> @PolyMutable Entry<K,V> predecessor(@PolyMutable Entry<K,V> t) {
         if (t == null)
             return null;
@@ -2643,6 +2645,7 @@ public class TreeMap<K extends @Immutable Object,V>
         return (p == null ? BLACK : p.color);
     }
 
+    @SuppressWarnings("mutability:return.type.incompatible") // one poly: the argument and the result are the same instantiation, and its links share its mutability
     private static <K extends @Immutable Object,V> @PolyMutable Entry<K,V> parentOf(@PolyMutable Entry<K,V> p) {
         return (p == null ? null: p.parent);
     }
@@ -2652,10 +2655,12 @@ public class TreeMap<K extends @Immutable Object,V>
             p.color = c;
     }
 
+    @SuppressWarnings("mutability:return.type.incompatible") // one poly: the argument and the result are the same instantiation, and its links share its mutability
     private static <K extends @Immutable Object,V> @PolyMutable Entry<K,V> leftOf(@PolyMutable Entry<K,V> p) {
         return (p == null) ? null: p.left;
     }
 
+    @SuppressWarnings("mutability:return.type.incompatible") // one poly: the argument and the result are the same instantiation, and its links share its mutability
     private static <K extends @Immutable Object,V> @PolyMutable Entry<K,V> rightOf(@PolyMutable Entry<K,V> p) {
         return (p == null) ? null: p.right;
     }
