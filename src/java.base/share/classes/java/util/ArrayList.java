@@ -978,8 +978,8 @@ import jdk.internal.util.ArraysSupport;
      *
      * @see #listIterator(int)
      */
-    public ListIterator<E> listIterator(@Readonly ArrayList<E> this) {
-        return new ListItr(0);
+    public @ReceiverDependentMutable ListIterator<E> listIterator(@ReceiverDependentMutable ArrayList<E> this) {
+        return new @ReceiverDependentMutable ListItr(0);
     }
 
     /**
@@ -990,8 +990,8 @@ import jdk.internal.util.ArraysSupport;
      * @return an iterator over the elements in this list in proper sequence
      */
     @SideEffectFree
-    public Iterator<E> iterator(@Readonly ArrayList<E> this) {
-        return new Itr();
+    public @ReceiverDependentMutable Iterator<E> iterator(@ReceiverDependentMutable ArrayList<E> this) {
+        return new @ReceiverDependentMutable Itr();
     }
 
     /**
@@ -1000,7 +1000,7 @@ import jdk.internal.util.ArraysSupport;
     @ReceiverDependentMutable
     private class Itr implements Iterator<E> {
         @Assignable int cursor;       // index of next element to return
-        int lastRet = -1; // index of last element returned; -1 if no such
+        @Assignable int lastRet = -1; // index of last element returned; -1 if no such
         int expectedModCount = modCount;
 
         // prevent creating a synthetic constructor
@@ -1013,7 +1013,7 @@ import jdk.internal.util.ArraysSupport;
         }
 
         @SuppressWarnings("unchecked")
-        public E next(@NonEmpty @Mutable Itr this) {
+        public E next(@NonEmpty @Readonly Itr this) {
             checkForComodification();
             int i = cursor;
             if (i >= size)
@@ -1042,7 +1042,7 @@ import jdk.internal.util.ArraysSupport;
 
         @SuppressWarnings({"unchecked"})
         @Override
-        public void forEachRemaining(@Mutable Itr this, Consumer<? super E> action) {
+        public void forEachRemaining(@Readonly Itr this, Consumer<? super E> action) {
             Objects.requireNonNull(action);
             final int size = ArrayList.this.size;
             int i = cursor;
@@ -1088,7 +1088,7 @@ import jdk.internal.util.ArraysSupport;
         }
 
         @SuppressWarnings("unchecked")
-        public E previous(@Mutable ListItr this) {
+        public E previous(@Readonly ListItr this) {
             checkForComodification();
             int i = cursor - 1;
             if (i < 0)
@@ -1333,18 +1333,18 @@ import jdk.internal.util.ArraysSupport;
         }
 
         @SideEffectFree
-        public Iterator<E> iterator(@Readonly SubList<E> this) {
+        public @ReceiverDependentMutable Iterator<E> iterator(@ReceiverDependentMutable SubList<E> this) {
             return listIterator();
         }
 
-        public ListIterator<E> listIterator(@Readonly SubList<E> this, @NonNegative int index) {
+        public @ReceiverDependentMutable ListIterator<E> listIterator(@ReceiverDependentMutable SubList<E> this, @NonNegative int index) {
             checkForComodification();
             rangeCheckForAdd(index);
 
-            return new @Mutable ListIterator<E>() {
-                int cursor = index;
-                int lastRet = -1;
-                int expectedModCount = SubList.this.modCount;
+            return new @ReceiverDependentMutable ListIterator<E>() {
+                @Assignable int cursor = index;
+                @Assignable int lastRet = -1;
+                @Assignable int expectedModCount = SubList.this.modCount;
 
                 @Pure
                 @EnsuresNonEmptyIf(result = true, expression = "this")

@@ -302,7 +302,7 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
      * @see     #keySet()
      * @see     Map
      */
-    public synchronized Enumeration<@KeyFor({"this"}) K> keys() {
+    public synchronized @ReceiverDependentMutable Enumeration<@KeyFor({"this"}) K> keys() {
         return this.<K>getEnumeration(KEYS);
     }
 
@@ -318,7 +318,7 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
      * @see     #values()
      * @see     Map
      */
-    public synchronized Enumeration<V> elements() {
+    public synchronized @ReceiverDependentMutable Enumeration<V> elements() {
         return this.<V>getEnumeration(VALUES);
     }
 
@@ -708,7 +708,7 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
     @ReceiverDependentMutable
     private class KeySet extends AbstractSet<K> {
         @SideEffectFree
-        public Iterator<K> iterator(@Readonly KeySet this) {
+        public @ReceiverDependentMutable Iterator<K> iterator(@ReceiverDependentMutable KeySet this) {
             return getIterator(KEYS);
         }
         @Pure
@@ -755,7 +755,7 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
     @ReceiverDependentMutable
     private class EntrySet extends AbstractSet<Map.@Readonly Entry<K,V>> {
         @SideEffectFree
-        public Iterator<Map.@Readonly Entry<K,V>> iterator(@Readonly EntrySet this) {
+        public @ReceiverDependentMutable Iterator<Map.@Readonly Entry<K,V>> iterator(@ReceiverDependentMutable EntrySet this) {
             return getIterator(ENTRIES);
         }
 
@@ -842,7 +842,7 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
     @ReceiverDependentMutable
     private class ValueCollection extends AbstractCollection<V> {
         @SideEffectFree
-        public Iterator<V> iterator(@Readonly ValueCollection this) {
+        public @ReceiverDependentMutable Iterator<V> iterator(@ReceiverDependentMutable ValueCollection this) {
             return getIterator(VALUES);
         }
         @Pure
@@ -1526,7 +1526,7 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
         }
 
         @SuppressWarnings("unchecked")
-        public T nextElement(@NonEmpty @Mutable Enumerator<T> this) {
+        public T nextElement(@NonEmpty @Readonly Enumerator<T> this) {
             Entry<?,?> et = entry;
             int i = index;
             @Readonly Entry<?,?>[] t = table;
@@ -1551,7 +1551,7 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
             return hasMoreElements();
         }
 
-        public T next(@NonEmpty @Mutable Enumerator<T> this) {
+        public T next(@NonEmpty @Readonly Enumerator<T> this) {
             if (Hashtable.this.modCount != expectedModCount)
                 throw new ConcurrentModificationException();
             return nextElement();

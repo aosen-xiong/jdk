@@ -906,16 +906,16 @@ public class LinkedList<E>
      * @throws IndexOutOfBoundsException {@inheritDoc}
      * @see List#listIterator(int)
      */
-    public ListIterator<E> listIterator(@Readonly LinkedList<E> this, @NonNegative int index) {
+    public @ReceiverDependentMutable ListIterator<E> listIterator(@ReceiverDependentMutable LinkedList<E> this, @NonNegative int index) {
         checkPositionIndex(index);
-        return new ListItr(index);
+        return new @ReceiverDependentMutable ListItr(index);
     }
 
     @ReceiverDependentMutable
     private class ListItr implements ListIterator<E> {
         private @Readonly Node<E> lastReturned;
         private @Readonly Node<E> next;
-        private int nextIndex;
+        private @Assignable int nextIndex;
         private int expectedModCount = modCount;
 
         // @SuppressWarnings("mutability:initialization.fields.uninitialized") // Lazy
@@ -931,7 +931,7 @@ public class LinkedList<E>
             return nextIndex < size;
         }
 
-        public E next(@NonEmpty @Mutable ListItr this) {
+        public E next(@NonEmpty @Readonly ListItr this) {
             checkForComodification();
             if (!hasNext())
                 throw new NoSuchElementException();
@@ -946,7 +946,7 @@ public class LinkedList<E>
             return nextIndex > 0;
         }
 
-        public E previous(@Mutable ListItr this) {
+        public E previous(@Readonly ListItr this) {
             checkForComodification();
             if (!hasPrevious())
                 throw new NoSuchElementException();
@@ -1000,7 +1000,7 @@ public class LinkedList<E>
             expectedModCount++;
         }
 
-        public void forEachRemaining(@Mutable ListItr this, Consumer<? super E> action) {
+        public void forEachRemaining(@Readonly ListItr this, Consumer<? super E> action) {
             Objects.requireNonNull(action);
             while (modCount == expectedModCount && nextIndex < size) {
                 action.accept(next.item);
@@ -1033,8 +1033,8 @@ public class LinkedList<E>
     /**
      * @since 1.6
      */
-    public Iterator<E> descendingIterator(@Readonly LinkedList<E> this) {
-        return new DescendingIterator();
+    public @ReceiverDependentMutable Iterator<E> descendingIterator(@ReceiverDependentMutable LinkedList<E> this) {
+        return new @ReceiverDependentMutable DescendingIterator();
     }
 
     /**
@@ -1048,7 +1048,7 @@ public class LinkedList<E>
         public boolean hasNext(@Readonly DescendingIterator this) {
             return itr.hasPrevious();
         }
-        public E next(@NonEmpty @Mutable DescendingIterator this) {
+        public E next(@NonEmpty @Readonly DescendingIterator this) {
             return itr.previous();
         }
         public void remove(@Mutable LinkedList<E> . @Mutable DescendingIterator this) {
@@ -1286,7 +1286,7 @@ public class LinkedList<E>
             return null;
         }
 
-        public void forEachRemaining(@Mutable LLSpliterator<E> this, Consumer<? super E> action) {
+        public void forEachRemaining(@Readonly LLSpliterator<E> this, Consumer<? super E> action) {
             Node<E> p; int n;
             if (action == null) throw new NullPointerException();
             if ((n = getEst()) > 0 && (p = current) != null) {

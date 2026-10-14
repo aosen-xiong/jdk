@@ -592,8 +592,8 @@ public class LinkedHashMap<K extends @Immutable Object,V>
         public final int size(@Readonly LinkedKeySet this)                 { return size; }
         public final void clear(@Mutable LinkedHashMap<K,V>. @Mutable LinkedKeySet this)               { LinkedHashMap.this.clear(); }
         @SideEffectFree
-        public final Iterator<K> iterator(@Readonly LinkedKeySet this) {
-            return new LinkedKeyIterator();
+        public final @ReceiverDependentMutable Iterator<K> iterator(@ReceiverDependentMutable LinkedKeySet this) {
+            return new @ReceiverDependentMutable LinkedKeyIterator();
         }
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
@@ -660,8 +660,8 @@ public class LinkedHashMap<K extends @Immutable Object,V>
         public final int size(@Readonly LinkedValues this)                 { return size; }
         public final void clear(@Mutable LinkedHashMap<K,V>. @Mutable LinkedValues this)               { LinkedHashMap.this.clear(); }
         @SideEffectFree
-        public final Iterator<V> iterator(@Readonly LinkedValues this) {
-            return new LinkedValueIterator();
+        public final @ReceiverDependentMutable Iterator<V> iterator(@ReceiverDependentMutable LinkedValues this) {
+            return new @ReceiverDependentMutable LinkedValueIterator();
         }
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
@@ -723,8 +723,8 @@ public class LinkedHashMap<K extends @Immutable Object,V>
         public final int size(@Readonly LinkedEntrySet this)                 { return size; }
         public final void clear(@Mutable LinkedHashMap<K,V>. @Mutable LinkedEntrySet this)               { LinkedHashMap.this.clear(); }
         @SideEffectFree
-        public final Iterator<Map.@Readonly Entry<K,V>> iterator(@Readonly LinkedEntrySet this) {
-            return new LinkedEntryIterator();
+        public final @ReceiverDependentMutable Iterator<Map.@Readonly Entry<K,V>> iterator(@ReceiverDependentMutable LinkedEntrySet this) {
+            return new @ReceiverDependentMutable LinkedEntryIterator();
         }
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
@@ -828,19 +828,19 @@ public class LinkedHashMap<K extends @Immutable Object,V>
     @ReceiverDependentMutable
     final class LinkedKeyIterator extends LinkedHashIterator
         implements Iterator<K> {
-        public final K next(@NonEmpty @Mutable LinkedKeyIterator this) { return nextNode().getKey(); }
+        public final K next(@NonEmpty @Readonly LinkedKeyIterator this) { return nextNode().getKey(); }
     }
 
     @ReceiverDependentMutable
     final class LinkedValueIterator extends LinkedHashIterator
         implements Iterator<V> {
-        public final V next(@NonEmpty @Mutable LinkedValueIterator this) { return nextNode().value; }
+        public final V next(@NonEmpty @Readonly LinkedValueIterator this) { return nextNode().value; }
     }
 
     @ReceiverDependentMutable
     final class LinkedEntryIterator extends LinkedHashIterator
         implements Iterator<Map.@Readonly Entry<K,V>> {
-        public final Map.@Readonly Entry<K,V> next(@NonEmpty @Mutable LinkedEntryIterator this) { return nextNode(); }
+        public final Map.@Readonly Entry<K,V> next(@NonEmpty @Readonly LinkedEntryIterator this) { return nextNode(); }
     }
 
 

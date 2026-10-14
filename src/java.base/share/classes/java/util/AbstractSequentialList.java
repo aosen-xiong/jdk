@@ -249,7 +249,7 @@ public abstract class AbstractSequentialList<E> extends AbstractList<E> {
      * @return an iterator over the elements in this list (in proper sequence)
      */
     @SideEffectFree
-    public Iterator<E> iterator(@Readonly AbstractSequentialList<E> this) {
+    public @ReceiverDependentMutable Iterator<E> iterator(@ReceiverDependentMutable AbstractSequentialList<E> this) {
         return listIterator();
     }
 
@@ -263,5 +263,5 @@ public abstract class AbstractSequentialList<E> extends AbstractList<E> {
      *         sequence)
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
-    public abstract ListIterator<E> listIterator(@Readonly AbstractSequentialList<E> this, int index);
+    public abstract @ReceiverDependentMutable ListIterator<E> listIterator(@ReceiverDependentMutable AbstractSequentialList<E> this, int index);
 }

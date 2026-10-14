@@ -1021,7 +1021,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
         public final @NonNegative int size(@Readonly KeySet this)                 { return size; }
         public final void clear(@Mutable KeySet this)               { HashMap.this.clear(); }
         @SideEffectFree
-        public final Iterator<K> iterator(@Readonly KeySet this)     { return new KeyIterator(); }
+        public final @ReceiverDependentMutable Iterator<K> iterator(@ReceiverDependentMutable KeySet this)     { return new KeyIterator(); }
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
         public final boolean contains(@Readonly KeySet this, @Nullable @UnknownSignedness @Readonly Object o) { return containsKey(o); }
@@ -1088,7 +1088,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
         public final @NonNegative int size(@Readonly Values this)                 { return size; }
         public final void clear(@Mutable HashMap<K, V>. @Mutable Values this)               { HashMap.this.clear(); }
         @SideEffectFree
-        public final Iterator<V> iterator(@Readonly Values this)     { return new ValueIterator(); }
+        public final @ReceiverDependentMutable Iterator<V> iterator(@ReceiverDependentMutable Values this)     { return new ValueIterator(); }
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
         public final boolean contains(@Readonly Values this, @Nullable @UnknownSignedness @Readonly Object o) { return containsValue(o); }
@@ -1150,8 +1150,8 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
         public final @NonNegative int size(@Readonly EntrySet this)                 { return size; }
         public final void clear(@Mutable HashMap<K,V>.@Mutable EntrySet this)               { HashMap.this.clear(); }
         @SideEffectFree
-        public final Iterator<Map.@ReceiverDependentMutable Entry<K,V>> iterator(@ReceiverDependentMutable HashMap<K,V>.@Readonly EntrySet this) {
-            return new EntryIterator();
+        public final @ReceiverDependentMutable Iterator<Map.@ReceiverDependentMutable Entry<K,V>> iterator(@ReceiverDependentMutable HashMap<K,V>.@ReceiverDependentMutable EntrySet this) {
+            return new @ReceiverDependentMutable EntryIterator();
         }
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
@@ -1667,19 +1667,19 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
     @ReceiverDependentMutable
     final class KeyIterator extends HashIterator
         implements Iterator<K> {
-        public final K next(@NonEmpty @Mutable KeyIterator this) { return nextNode().key; }
+        public final K next(@NonEmpty @Readonly KeyIterator this) { return nextNode().key; }
     }
 
     @ReceiverDependentMutable
     final class ValueIterator extends HashIterator
         implements Iterator<V> {
-        public final V next(@NonEmpty @Mutable ValueIterator this) { return nextNode().value; }
+        public final V next(@NonEmpty @Readonly ValueIterator this) { return nextNode().value; }
     }
 
     @ReceiverDependentMutable
     final class EntryIterator extends HashIterator
         implements Iterator<Map.@ReceiverDependentMutable Entry<K,V>> {
-        public final Map.@ReceiverDependentMutable Entry<K,V> next(@NonEmpty @ReceiverDependentMutable HashMap<K,V>.@Mutable EntryIterator this) { return nextNode(); }
+        public final Map.@ReceiverDependentMutable Entry<K,V> next(@NonEmpty @ReceiverDependentMutable HashMap<K,V>.@Readonly EntryIterator this) { return nextNode(); }
     }
 
     /* ------------------------------------------------------------ */

@@ -323,8 +323,8 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
      * @return an iterator over the elements in this list in proper sequence
      */
     @SideEffectFree
-    public Iterator<E> iterator(@Readonly AbstractList<E> this) {
-        return new Itr();
+    public @ReceiverDependentMutable Iterator<E> iterator(@ReceiverDependentMutable AbstractList<E> this) {
+        return new @ReceiverDependentMutable Itr();
     }
 
     /**
@@ -335,7 +335,7 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
      *
      * @see #listIterator(int)
      */
-    public ListIterator<E> listIterator(@Readonly AbstractList<E> this) {
+    public @ReceiverDependentMutable ListIterator<E> listIterator(@ReceiverDependentMutable AbstractList<E> this) {
         return listIterator(0);
     }
 
@@ -362,10 +362,10 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
      *
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
-    public ListIterator<E> listIterator(@Readonly AbstractList<E> this, final @IndexOrHigh({"this"}) int index) {
+    public @ReceiverDependentMutable ListIterator<E> listIterator(@ReceiverDependentMutable AbstractList<E> this, final @IndexOrHigh({"this"}) int index) {
         rangeCheckForAdd(index);
 
-        return new ListItr(index);
+        return new @ReceiverDependentMutable ListItr(index);
     }
 
     @ReceiverDependentMutable
@@ -380,7 +380,7 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
          * previous.  Reset to -1 if this element is deleted by a call
          * to remove.
          */
-        int lastRet = -1;
+        @Assignable int lastRet = -1;
 
         /**
          * The modCount value that the iterator believes that the backing
@@ -395,7 +395,7 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
             return cursor != size();
         }
 
-        public E next(@NonEmpty @Mutable Itr this) {
+        public E next(@NonEmpty @Readonly Itr this) {
             checkForComodification();
             try {
                 int i = cursor;
@@ -441,7 +441,7 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
             return cursor != 0;
         }
 
-        public E previous(@Mutable ListItr this) {
+        public E previous(@Readonly ListItr this) {
             checkForComodification();
             try {
                 int i = cursor - 1;
@@ -864,15 +864,15 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
             return true;
         }
 
-        public Iterator<E> iterator(@Readonly SubList<E> this) {
+        public @ReceiverDependentMutable Iterator<E> iterator(@ReceiverDependentMutable SubList<E> this) {
             return listIterator();
         }
 
-        public ListIterator<E> listIterator(int index) {
+        public @ReceiverDependentMutable ListIterator<E> listIterator(int index) {
             checkForComodification();
             rangeCheckForAdd(index);
 
-            return new @Mutable ListIterator<E>() {
+            return new @ReceiverDependentMutable ListIterator<E>() {
                 private final ListIterator<E> i =
                         root.listIterator(offset + index);
 

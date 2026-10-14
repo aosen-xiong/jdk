@@ -752,7 +752,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
     private abstract class IdentityHashMapIterator<T> implements Iterator<T> {
         @Assignable int index = (size != 0 ? 0 : table.length); // current slot.
         int expectedModCount = modCount; // to support fast-fail
-        int lastReturnedIndex = -1;      // to allow remove()
+        @Assignable int lastReturnedIndex = -1;      // to allow remove()
         @Assignable boolean indexValid; // To avoid unnecessary next computation
         @SuppressWarnings("mutability") // Field use from outter class
         @Readonly Object[] traversalTable = table; // reference to main table or copy
@@ -772,7 +772,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
             return false;
         }
 
-        protected int nextIndex(@NonEmpty @Mutable IdentityHashMapIterator<T> this) {
+        protected int nextIndex(@NonEmpty @Readonly IdentityHashMapIterator<T> this) {
             if (modCount != expectedModCount)
                 throw new ConcurrentModificationException();
             if (!indexValid && !hasNext())
@@ -865,7 +865,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
     @ReceiverDependentMutable
     private class KeyIterator extends IdentityHashMapIterator<K> {
         @SuppressWarnings("unchecked")
-        public K next(@NonEmpty @Mutable KeyIterator this) {
+        public K next(@NonEmpty @Readonly KeyIterator this) {
             return (K) unmaskNull(traversalTable[nextIndex()]);
         }
     }
@@ -873,7 +873,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
     @ReceiverDependentMutable
     private class ValueIterator extends IdentityHashMapIterator<V> {
         @SuppressWarnings("unchecked")
-        public V next(@NonEmpty @Mutable ValueIterator this) {
+        public V next(@NonEmpty @Readonly ValueIterator this) {
             return (V) traversalTable[nextIndex() + 1];
         }
     }
@@ -885,7 +885,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
         // @SuppressWarnings("mutability:initialization.field.uninitialized") // lazy
         private @Readonly Entry lastReturnedEntry;
 
-        public Map.@Readonly Entry<K,V> next(@NonEmpty @Mutable EntryIterator this) {
+        public Map.@Readonly Entry<K,V> next(@NonEmpty @Readonly EntryIterator this) {
             lastReturnedEntry = new Entry(nextIndex());
             return lastReturnedEntry;
         }
@@ -1021,8 +1021,8 @@ public class IdentityHashMap<K extends @Immutable Object,V>
     @ReceiverDependentMutable
     private class KeySet extends AbstractSet<K> {
         @SideEffectFree
-        public Iterator<K> iterator(@Readonly KeySet this) {
-            return new KeyIterator();
+        public @ReceiverDependentMutable Iterator<K> iterator(@ReceiverDependentMutable KeySet this) {
+            return new @ReceiverDependentMutable KeyIterator();
         }
         @Pure
         public @NonNegative int size(@Readonly KeySet this) {
@@ -1136,8 +1136,8 @@ public class IdentityHashMap<K extends @Immutable Object,V>
     @ReceiverDependentMutable
     private class Values extends AbstractCollection<V> {
         @SideEffectFree
-        public Iterator<V> iterator(@Readonly Values this) {
-            return new ValueIterator();
+        public @ReceiverDependentMutable Iterator<V> iterator(@ReceiverDependentMutable Values this) {
+            return new @ReceiverDependentMutable ValueIterator();
         }
         @Pure
         public @NonNegative int size(@Readonly Values this) {
@@ -1250,8 +1250,8 @@ public class IdentityHashMap<K extends @Immutable Object,V>
     @ReceiverDependentMutable
     private class EntrySet extends AbstractSet<Map.@Readonly Entry<K,V>> {
         @SideEffectFree
-        public Iterator<Map.@Readonly Entry<K,V>> iterator(@Readonly EntrySet this) {
-            return new EntryIterator();
+        public @ReceiverDependentMutable Iterator<Map.@Readonly Entry<K,V>> iterator(@ReceiverDependentMutable EntrySet this) {
+            return new @ReceiverDependentMutable EntryIterator();
         }
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
@@ -1504,7 +1504,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
         }
 
         @SuppressWarnings("unchecked")
-        public void forEachRemaining(@Mutable KeySpliterator<K,V> this, Consumer<? super K> action) {
+        public void forEachRemaining(@Readonly KeySpliterator<K,V> this, Consumer<? super K> action) {
             if (action == null)
                 throw new NullPointerException();
             int i, hi, mc; Object key;
@@ -1561,7 +1561,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
                                        expectedModCount);
         }
 
-        public void forEachRemaining(@Mutable ValueSpliterator<K,V> this, Consumer<? super V> action) {
+        public void forEachRemaining(@Readonly ValueSpliterator<K,V> this, Consumer<? super V> action) {
             if (action == null)
                 throw new NullPointerException();
             int i, hi, mc;
@@ -1621,7 +1621,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
                                        expectedModCount);
         }
 
-        public void forEachRemaining(@Mutable EntrySpliterator<K,V> this, Consumer<? super Map.@Immutable Entry<K, V>> action) {
+        public void forEachRemaining(@Readonly EntrySpliterator<K,V> this, Consumer<? super Map.@Immutable Entry<K, V>> action) {
             if (action == null)
                 throw new NullPointerException();
             int i, hi, mc;

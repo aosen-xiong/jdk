@@ -631,7 +631,7 @@ public interface Deque<E> extends Queue<E> {
      * @return an iterator over the elements in this deque in proper sequence
      */
     @SideEffectFree
-    Iterator<E> iterator(@Readonly Deque<E> this);
+    @ReceiverDependentMutable Iterator<E> iterator(@ReceiverDependentMutable Deque<E> this);
 
     /**
      * Returns an iterator over the elements in this deque in reverse
@@ -641,6 +641,6 @@ public interface Deque<E> extends Queue<E> {
      * @return an iterator over the elements in this deque in reverse
      * sequence
      */
-    Iterator<E> descendingIterator(@Readonly Deque<E> this);
+    @ReceiverDependentMutable Iterator<E> descendingIterator(@ReceiverDependentMutable Deque<E> this);
 
 }
