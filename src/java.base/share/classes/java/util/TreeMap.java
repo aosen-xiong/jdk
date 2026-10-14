@@ -278,7 +278,7 @@ public class TreeMap<K extends @Immutable Object,V>
      * @since 1.2
      */
     @Pure
-    public boolean containsValue(@GuardSatisfied @Readonly TreeMap<K, V> this, @GuardSatisfied @UnknownSignedness @Readonly Object value) {
+    public boolean containsValue(@GuardSatisfied @ReceiverDependentMutable TreeMap<K, V> this, @GuardSatisfied @UnknownSignedness @Readonly Object value) {
         for (Entry<K,V> e = getFirstEntry(); e != null; e = successor(e))
             if (valEquals(value, e.value))
                 return true;
