@@ -2138,10 +2138,12 @@ public class Collections {
      * @param  c the collection to be "wrapped" in a synchronized collection.
      * @return a synchronized view of the specified collection.
      */
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
     public static <T> @PolyMutable Collection<T> synchronizedCollection(@PolyMutable Collection<T> c) {
         return new @PolyMutable SynchronizedCollection<>(c);
     }
 
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
     static <T> @PolyMutable Collection<T> synchronizedCollection(@PolyMutable Collection<T> c, @Readonly Object mutex) {
         return new @PolyMutable SynchronizedCollection<>(c, mutex);
     }
@@ -2283,10 +2285,12 @@ public class Collections {
      * @param  s the set to be "wrapped" in a synchronized set.
      * @return a synchronized view of the specified set.
      */
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
     public static <T> @PolyMutable Set<T> synchronizedSet(@PolyMutable Set<T> s) {
         return new @PolyMutable SynchronizedSet<>(s);
     }
 
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
     static <T> @PolyMutable Set<T> synchronizedSet(@PolyMutable Set<T> s, @Readonly Object mutex) {
         return new @PolyMutable SynchronizedSet<>(s, mutex);
     }
@@ -2356,6 +2360,7 @@ public class Collections {
      * @param  s the sorted set to be "wrapped" in a synchronized sorted set.
      * @return a synchronized view of the specified sorted set.
      */
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
     public static <T> @PolyMutable SortedSet<T> synchronizedSortedSet(@PolyMutable SortedSet<T> s) {
         return new @PolyMutable SynchronizedSortedSet<>(s);
     }
@@ -2453,6 +2458,7 @@ public class Collections {
      * @return a synchronized view of the specified navigable set
      * @since 1.8
      */
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
     public static <T> @PolyMutable NavigableSet<T> synchronizedNavigableSet(@PolyMutable NavigableSet<T> s) {
         return new @PolyMutable SynchronizedNavigableSet<>(s);
     }
@@ -2558,12 +2564,14 @@ public class Collections {
      * @param  list the list to be "wrapped" in a synchronized list.
      * @return a synchronized view of the specified list.
      */
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
     public static <T> @PolyMutable List<T> synchronizedList(@PolyMutable List<T> list) {
         return (list instanceof RandomAccess ?
                 new @PolyMutable SynchronizedRandomAccessList<>(list) :
                 new @PolyMutable SynchronizedList<>(list));
     }
 
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
     static <T> @PolyMutable List<T> synchronizedList(@PolyMutable List<T> list, @Readonly Object mutex) {
         return (list instanceof RandomAccess ?
                 new @PolyMutable SynchronizedRandomAccessList<>(list, mutex) :
@@ -3515,6 +3523,7 @@ public class Collections {
      * @return a dynamically typesafe view of the specified sorted set
      * @since 1.5
      */
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
     public static <E> @PolyMutable SortedSet<E> checkedSortedSet(@PolyMutable SortedSet<E> s,
                                                     Class<E> type) {
         return new @PolyMutable CheckedSortedSet<>(s, type);
@@ -3580,6 +3589,7 @@ public class Collections {
      * @return a dynamically typesafe view of the specified navigable set
      * @since 1.8
      */
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
     public static <E> @PolyMutable NavigableSet<E> checkedNavigableSet(@PolyMutable NavigableSet<E> s,
                                                     Class<E> type) {
         return new @PolyMutable CheckedNavigableSet<>(s, type);
@@ -3816,6 +3826,7 @@ public class Collections {
      * @return a dynamically typesafe view of the specified map
      * @since 1.5
      */
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
     public static <K extends @Immutable Object, V> @PolyMutable Map<K, V> checkedMap(@PolyMutable Map<K, V> m,
                                               Class<K> keyType,
                                               Class<V> valueType) {
@@ -4151,6 +4162,7 @@ public class Collections {
                         && containsAll(that); // Invokes safe containsAll() above
             }
 
+            @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
             static <K extends @Immutable Object,V,T> @PolyMutable CheckedEntry<K,V,T> checkedEntry(Map.@PolyMutable Entry<K,V> e,
                                                             Class<T> valueType) {
                 return new @PolyMutable CheckedEntry<>(e, valueType);
@@ -4237,6 +4249,7 @@ public class Collections {
      * @return a dynamically typesafe view of the specified map
      * @since 1.5
      */
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
     public static <K extends @Immutable Object,V> @PolyMutable SortedMap<K,V> checkedSortedMap(@PolyMutable SortedMap<K, V> m,
                                                         Class<K> keyType,
                                                         Class<V> valueType) {
@@ -4316,6 +4329,7 @@ public class Collections {
      * @return a dynamically typesafe view of the specified map
      * @since 1.8
      */
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
     public static <K extends @Immutable Object,V> @PolyMutable NavigableMap<K,V> checkedNavigableMap(@PolyMutable NavigableMap<K, V> m,
                                                         Class<K> keyType,
                                                         Class<V> valueType) {

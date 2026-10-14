@@ -4189,7 +4189,7 @@ public class Arrays {
      */
     @SafeVarargs
     @SideEffectFree
-    @SuppressWarnings("varargs")
+    @SuppressWarnings({"varargs", "mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created list are the same instantiation
     @CFComment({"array covariance: if a reference to the argument is retained, array covariance could allow",
         "adding a null value to an array of non-null types."})
     public static <T> @PolyNonEmpty @PolyMutable List<T> asList(T @PolyNonEmpty @PolyMutable... a) {
