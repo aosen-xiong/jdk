@@ -699,13 +699,14 @@ public class Vector<E>
      * @return  a clone of this vector
      */
     @SideEffectFree
+    @SuppressWarnings("mutability:return.type.incompatible") // fresh unaliased copy: the body replaces every field it shared
     public synchronized @PolyMutable Object clone(@GuardSatisfied @PolyMutable Vector<E> this) {
         try {
             @SuppressWarnings("unchecked")
             Vector<E> v = (Vector<E>) super.clone();
             v.elementData = Arrays.copyOf(elementData, elementCount);
             v.modCount = 0;
-            return (@PolyMutable Object) v;
+            return v;
         } catch (CloneNotSupportedException e) {
             // this shouldn't happen, since we are Cloneable
             throw new InternalError(e);

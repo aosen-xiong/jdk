@@ -1513,7 +1513,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
      * @return a shallow copy of this map
      */
     @SideEffectFree
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "mutability:return.type.incompatible"})
     @Override
     public @PolyMutable Object clone(@GuardSatisfied @PolyMutable HashMap<K, V> this) {
         HashMap<K,V> result;
@@ -1525,7 +1525,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
         }
         result.reinitialize();
         result.putMapEntries(this, false);
-        return (@PolyMutable Object) result;
+        return result;
     }
 
     // These methods are also used when serializing HashSets
@@ -1638,7 +1638,6 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
             return next != null;
         }
 
-        @SuppressWarnings("mutability:return.type.incompatible") // field depends on outer class
         final @ReceiverDependentMutable Node<K,V> nextNode(@ReceiverDependentMutable HashMap<K,V>.@NonEmpty @Mutable HashIterator this) {
             @PolyMutable Node<K,V>[] t;
             Node<K,V> e = next;

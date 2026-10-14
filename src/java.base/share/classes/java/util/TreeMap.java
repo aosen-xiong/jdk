@@ -936,6 +936,7 @@ public class TreeMap<K extends @Immutable Object,V>
      *
      * @return a shallow copy of this map
      */
+    @SuppressWarnings("mutability:return.type.incompatible") // fresh unaliased copy: the body replaces every field it shared
     public @PolyMutable Object clone(@GuardSatisfied @PolyMutable TreeMap<K, V> this) {
         TreeMap<?,?> clone;
         try {
@@ -958,7 +959,7 @@ public class TreeMap<K extends @Immutable Object,V>
         } catch (java.io.IOException | ClassNotFoundException cannotHappen) {
         }
 
-        return (@PolyMutable Object) clone;
+        return clone;
     }
 
     // NavigableMap API methods
@@ -3443,7 +3444,7 @@ public class TreeMap<K extends @Immutable Object,V>
         }
 
         @Override
-        public @Readonly Comparator<? super Map.@Readonly Entry<K, V>> getComparator() {
+        public @Readonly Comparator<Map.@Readonly Entry<K, V>> getComparator() {
             // Adapt or create a key-based comparator
             if (tree.comparator != null) {
                 return Map.Entry.comparingByKey(tree.comparator);

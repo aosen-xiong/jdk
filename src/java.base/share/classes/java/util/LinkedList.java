@@ -1072,8 +1072,9 @@ public class LinkedList<E>
      * @return a shallow copy of this {@code LinkedList} instance
      */
     @SideEffectFree
+    @SuppressWarnings({"mutability:return.type.incompatible", "mutability:assignment.type.incompatible"}) // fresh unaliased copy: the body replaces every field it shared
     public @PolyMutable Object clone(@GuardSatisfied @PolyMutable LinkedList<E> this) {
-        @Mutable LinkedList<E> clone = (@Mutable LinkedList<E>) superClone();
+        @Mutable LinkedList<E> clone = superClone();
 
         // Put clone into "virgin" state
         clone.first = clone.last = null;
@@ -1084,7 +1085,7 @@ public class LinkedList<E>
         for (Node<E> x = first; x != null; x = x.next)
             clone.add(x.item);
 
-        return (@PolyMutable Object) clone;
+        return clone;
     }
 
     /**

@@ -598,8 +598,9 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
      * @return  a clone of the hashtable
      */
     @SideEffectFree
+    @SuppressWarnings({"mutability:return.type.incompatible", "mutability:assignment.type.incompatible"}) // fresh unaliased copy: the body replaces every field it shared
     public synchronized @PolyMutable Object clone(@GuardSatisfied @PolyMutable Hashtable<K, V> this) {
-        @Mutable Hashtable<?,?> t = (@Mutable Hashtable<?,?>) cloneHashtable();
+        @Mutable Hashtable<?,?> t = cloneHashtable();
         t.table = new Entry<?,?>[table.length];
         for (int i = table.length ; i-- > 0 ; ) {
             t.table[i] = (table[i] != null)
@@ -609,7 +610,7 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
         t.entrySet = null;
         t.values = null;
         t.modCount = 0;
-        return (@PolyMutable Object) t;
+        return t;
     }
 
     /** Calls super.clone() */
