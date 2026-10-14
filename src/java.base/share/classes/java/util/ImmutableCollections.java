@@ -729,7 +729,8 @@ class ImmutableCollections {
         }
 
         @Override
-        public @Readonly Object[] toArray() {
+        @SuppressWarnings({"mutability:type.arguments.not.inferred", "mutability:return.type.incompatible"}) // elements holds this list's elements, of the receiver's @PolyMutable E, but a field read is typed by the declared E
+        public @PolyMutable Object[] toArray(@Readonly ListN<@PolyMutable E> this) {
             return Arrays.copyOf(elements, elements.length);
         }
 
@@ -902,13 +903,14 @@ class ImmutableCollections {
         }
 
         @Override
-        public @Readonly Object[] toArray() {
+        @SuppressWarnings("mutability:array.initializer.type.incompatible") // e0 and e1 are this set's elements, of the receiver's @PolyMutable E, but a field read is typed by the declared E (e1 is declared Object to hold the EMPTY sentinel)
+        public @PolyMutable Object[] toArray(@Readonly Set12<@PolyMutable E> this) {
             if (e1 == EMPTY) {
-                return new @Readonly Object[] { e0 };
+                return new @PolyMutable Object[] { e0 };
             } else if (REVERSE) {
-                return new @Readonly Object[] { e1, e0 };
+                return new @PolyMutable Object[] { e1, e0 };
             } else {
-                return new @Readonly Object[] { e0, e1 };
+                return new @PolyMutable Object[] { e0, e1 };
             }
         }
 
@@ -1037,7 +1039,7 @@ class ImmutableCollections {
         }
 
         @Override
-        public Iterator<E> iterator() {
+        public Iterator<E> iterator(@Readonly SetN<E> this) {
             return new SetNIterator();
         }
 
@@ -1088,9 +1090,9 @@ class ImmutableCollections {
         }
 
         @Override
-        public @Readonly Object[] toArray() {
-            @Readonly Object[] array = new Object[size];
-            Iterator<E> it = iterator();
+        public @PolyMutable Object[] toArray(@Readonly SetN<@PolyMutable E> this) {
+            @PolyMutable Object[] array = new @PolyMutable Object[size];
+            Iterator<@PolyMutable E> it = iterator();
             for (int i = 0; i < size; i++) {
                 array[i] = it.next();
             }
