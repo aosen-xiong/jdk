@@ -1365,7 +1365,7 @@ class ImmutableCollections {
 
         @Override
         @SideEffectFree
-        @SuppressWarnings("mutability:return.type.incompatible") // the diamond infers Map.Entry with the default qualifier, not the target's @Immutable: KeyValueHolder entries are @Immutable
+        @SuppressWarnings("mutability:return.type.incompatible") // the diamond infers Map.Entry with the default qualifier, not the target's @Immutable (https://github.com/eisop/checker-framework/issues/2271): KeyValueHolder entries are @Immutable
         public @Immutable Set<Map.@Immutable Entry<K,V>> entrySet() {
             return new @Immutable AbstractSet<>() {
                 @Override
@@ -1375,7 +1375,7 @@ class ImmutableCollections {
                 }
 
                 @Override
-                @SuppressWarnings("mutability:override.return.invalid") // the diamond infers Map.Entry with the default qualifier, not the target's @Immutable: KeyValueHolder entries are @Immutable
+                @SuppressWarnings("mutability:override.return.invalid") // the diamond infers Map.Entry with the default qualifier, not the target's @Immutable (https://github.com/eisop/checker-framework/issues/2271): KeyValueHolder entries are @Immutable
                 public Iterator<Map.@Immutable Entry<K,V>> iterator() {
                     return new MapNIterator();
                 }
