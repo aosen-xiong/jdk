@@ -955,7 +955,7 @@ class ImmutableCollections {
         final int size;
 
         @SafeVarargs
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({"unchecked", "mutability:illegal.array.write"}) // mutability: elements is filled only while this constructor builds the set, before it escapes
         SetN(E @Readonly... input) {
             size = input.length; // implicit nullcheck of input
 
@@ -1231,6 +1231,7 @@ class ImmutableCollections {
         @Stable
         final int size; // number of pairs
 
+        @SuppressWarnings("mutability:illegal.array.write") // table is filled only while this constructor builds the map, before it escapes
         MapN(@Readonly Object @Readonly... input) {
             if ((input.length & 1) != 0) { // implicit nullcheck of input
                 throw new InternalError("length is odd");

@@ -183,6 +183,7 @@ public class BitSet implements Cloneable, java.io.Serializable {
         sizeIsSticky = true;
     }
 
+    @SuppressWarnings("mutability:illegal.field.write") // called only from constructors, on the bit set they are building
     private void initWords(BitSet this, int nbits) {
         words = new long @ReceiverDependentMutable [wordIndex(nbits-1) + 1];
     }
