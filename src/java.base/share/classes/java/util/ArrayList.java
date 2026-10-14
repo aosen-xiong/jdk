@@ -379,7 +379,7 @@ import jdk.internal.util.ArraysSupport;
      */
     @SideEffectFree
     @SuppressWarnings("mutability:return.type.incompatible") // fresh unaliased copy: the body replaces every field it shared
-    public @PolyMutable Object clone(@GuardSatisfied @PolyMutable ArrayList<E> this) {
+    public @ReceiverDependentMutable Object clone(@GuardSatisfied @ReceiverDependentMutable ArrayList<E> this) {
         try {
             ArrayList<?> v = (ArrayList<?>) super.clone();
             v.elementData = Arrays.copyOf(elementData, size);

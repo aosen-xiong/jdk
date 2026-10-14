@@ -32,6 +32,7 @@ import org.checkerframework.checker.nonempty.qual.NonEmpty;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.mutability.qual.ReceiverDependentMutable;
 import org.checkerframework.checker.mutability.qual.Readonly;
 import org.checkerframework.checker.mutability.qual.PolyMutable;
 import org.checkerframework.checker.mutability.qual.Mutable;
@@ -398,7 +399,7 @@ class JumboEnumSet<E extends Enum<E>> extends EnumSet<E> {
     }
 
     @SuppressWarnings("mutability:return.type.incompatible") // fresh unaliased copy: the body replaces every field it shared
-    public @PolyMutable EnumSet<E> clone(@PolyMutable JumboEnumSet<E> this) {
+    public @ReceiverDependentMutable EnumSet<E> clone(@ReceiverDependentMutable JumboEnumSet<E> this) {
         JumboEnumSet<E> result = (JumboEnumSet<E>) super.clone();
         result.elements = result.elements.clone();
         return result;

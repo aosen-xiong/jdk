@@ -284,7 +284,7 @@ import jdk.internal.access.SharedSecrets;
      */
     @SideEffectFree
     @SuppressWarnings({"unchecked", "mutability:return.type.incompatible"})
-    public @PolyMutable Object clone(@GuardSatisfied @PolyMutable HashSet<E> this) {
+    public @ReceiverDependentMutable Object clone(@GuardSatisfied @ReceiverDependentMutable HashSet<E> this) {
         try {
             HashSet<E> newSet = (HashSet<E>) super.clone();
             newSet.map = (HashMap<E, @Readonly Object>) map.clone();

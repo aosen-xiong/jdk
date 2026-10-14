@@ -1057,9 +1057,9 @@ public class LinkedList<E>
     }
 
     @SuppressWarnings("unchecked")
-    private @PolyMutable LinkedList<E> superClone(@PolyMutable LinkedList<E> this) {
+    private @ReceiverDependentMutable LinkedList<E> superClone(@ReceiverDependentMutable LinkedList<E> this) {
         try {
-            return (@PolyMutable LinkedList<E>) super.clone();
+            return (@ReceiverDependentMutable LinkedList<E>) super.clone();
         } catch (CloneNotSupportedException e) {
             throw new InternalError(e);
         }
@@ -1073,7 +1073,7 @@ public class LinkedList<E>
      */
     @SideEffectFree
     @SuppressWarnings({"mutability:return.type.incompatible", "mutability:assignment.type.incompatible"}) // fresh unaliased copy: the body replaces every field it shared
-    public @PolyMutable Object clone(@GuardSatisfied @PolyMutable LinkedList<E> this) {
+    public @ReceiverDependentMutable Object clone(@GuardSatisfied @ReceiverDependentMutable LinkedList<E> this) {
         @Mutable LinkedList<E> clone = superClone();
 
         // Put clone into "virgin" state

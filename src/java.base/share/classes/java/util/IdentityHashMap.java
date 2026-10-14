@@ -738,7 +738,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
      */
     @SideEffectFree
     @SuppressWarnings("mutability:return.type.incompatible") // fresh unaliased copy: the body replaces every field it shared
-    public @PolyMutable Object clone(@GuardSatisfied @PolyMutable IdentityHashMap<K, V> this) {
+    public @ReceiverDependentMutable Object clone(@GuardSatisfied @ReceiverDependentMutable IdentityHashMap<K, V> this) {
         try {
             IdentityHashMap<?,?> m = (IdentityHashMap<?,?>) super.clone();
             m.entrySet = null;

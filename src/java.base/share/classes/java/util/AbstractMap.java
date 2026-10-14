@@ -621,7 +621,7 @@ public abstract class AbstractMap<K extends @Immutable Object,V> implements Map<
      * @return a shallow copy of this map
      */
     @SuppressWarnings("mutability:return.type.incompatible") // fresh unaliased copy: the body replaces every field it shared
-    protected @PolyMutable Object clone(@PolyMutable AbstractMap<K,V> this) throws CloneNotSupportedException {
+    protected @ReceiverDependentMutable Object clone(@ReceiverDependentMutable AbstractMap<K,V> this) throws CloneNotSupportedException {
         AbstractMap<?,?> result = (AbstractMap<?,?>)super.clone();
         result.keySet = null;
         result.values = null;

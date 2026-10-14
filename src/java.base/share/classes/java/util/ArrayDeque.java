@@ -1189,7 +1189,7 @@ public class ArrayDeque<E extends @NonNull @Readonly Object> extends AbstractCol
      */
     @SideEffectFree
     @SuppressWarnings("mutability:return.type.incompatible") // fresh unaliased copy: the body replaces every field it shared
-    public @PolyMutable ArrayDeque<E> clone(@GuardSatisfied @PolyMutable ArrayDeque<E> this) {
+    public @ReceiverDependentMutable ArrayDeque<E> clone(@GuardSatisfied @ReceiverDependentMutable ArrayDeque<E> this) {
         try {
             @SuppressWarnings("unchecked")
             ArrayDeque<E> result = (ArrayDeque<E>) super.clone();

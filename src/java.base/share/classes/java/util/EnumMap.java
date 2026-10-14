@@ -801,7 +801,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
      * @return a shallow copy of this enum map
      */
     @SuppressWarnings({"unchecked", "mutability:return.type.incompatible"})
-    public @PolyMutable EnumMap<K, V> clone(@PolyMutable EnumMap<K,V> this) {
+    public @ReceiverDependentMutable EnumMap<K, V> clone(@ReceiverDependentMutable EnumMap<K,V> this) {
         EnumMap<K, V> result = null;
         try {
             result = (EnumMap<K, V>) super.clone();

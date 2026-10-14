@@ -511,7 +511,7 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      */
     @SideEffectFree
     @SuppressWarnings({"unchecked", "mutability:return.type.incompatible"})
-    public @PolyMutable Object clone(@GuardSatisfied @PolyMutable TreeSet<E> this) {
+    public @ReceiverDependentMutable Object clone(@GuardSatisfied @ReceiverDependentMutable TreeSet<E> this) {
         TreeSet<E> clone;
         try {
             clone = (TreeSet<E>) super.clone();
