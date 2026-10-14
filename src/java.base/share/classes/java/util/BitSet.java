@@ -107,7 +107,7 @@ public class BitSet implements Cloneable, java.io.Serializable {
     /**
      * The internal field corresponding to the serialField "bits".
      */
-    private long[] words;
+    private @Assignable long[] words;
 
     /**
      * The number of words in the logical size of this BitSet.

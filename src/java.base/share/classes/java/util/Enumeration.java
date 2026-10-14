@@ -28,6 +28,7 @@ package java.util;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nonempty.qual.EnsuresNonEmptyIf;
 import org.checkerframework.checker.nonempty.qual.NonEmpty;
+import org.checkerframework.checker.mutability.qual.Readonly;
 import org.checkerframework.checker.mutability.qual.Mutable;
 import org.checkerframework.checker.mutability.qual.ReceiverDependentMutable;
 import org.checkerframework.dataflow.qual.Pure;
@@ -90,7 +91,7 @@ public interface Enumeration<E> {
      * @return     the next element of this enumeration.
      * @throws     NoSuchElementException  if no more elements exist.
      */
-    E nextElement(@GuardSatisfied @NonEmpty @Mutable Enumeration<E> this);
+    E nextElement(@GuardSatisfied @NonEmpty @Readonly Enumeration<E> this);
 
     /**
      * Returns an {@link Iterator} that traverses the remaining elements

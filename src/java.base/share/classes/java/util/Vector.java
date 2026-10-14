@@ -356,9 +356,9 @@ public class Vector<E>
      * @return  an enumeration of the components of this vector
      * @see     Iterator
      */
-    public Enumeration<E> elements(@Readonly Vector<E> this) {
-        return new Enumeration<E>() {
-            int count = 0;
+    public @ReceiverDependentMutable Enumeration<E> elements(@ReceiverDependentMutable Vector<E> this) {
+        return new @ReceiverDependentMutable Enumeration<E>() {
+            @Assignable int count = 0;
 
             @EnsuresNonEmptyIf(result = true, expression = "this")
             public boolean hasMoreElements() {
@@ -1249,10 +1249,10 @@ public class Vector<E>
      *
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
-    public synchronized ListIterator<E> listIterator(@NonNegative int index) {
+    public synchronized @ReceiverDependentMutable ListIterator<E> listIterator(@NonNegative int index) {
         if (index < 0 || index > elementCount)
             throw new IndexOutOfBoundsException("Index: "+index);
-        return new ListItr(index);
+        return new @ReceiverDependentMutable ListItr(index);
     }
 
     /**
@@ -1263,8 +1263,8 @@ public class Vector<E>
      *
      * @see #listIterator(int)
      */
-    public synchronized ListIterator<E> listIterator() {
-        return new ListItr(0);
+    public synchronized @ReceiverDependentMutable ListIterator<E> listIterator() {
+        return new @ReceiverDependentMutable ListItr(0);
     }
 
     /**
@@ -1275,8 +1275,8 @@ public class Vector<E>
      * @return an iterator over the elements in this list in proper sequence
      */
     @SideEffectFree
-    public synchronized Iterator<E> iterator(@Readonly Vector<E> this) {
-        return new Itr();
+    public synchronized @ReceiverDependentMutable Iterator<E> iterator(@ReceiverDependentMutable Vector<E> this) {
+        return new @ReceiverDependentMutable Itr();
     }
 
     /**
@@ -1285,7 +1285,7 @@ public class Vector<E>
     @ReceiverDependentMutable
     private class Itr implements Iterator<E> {
         @Assignable int cursor;       // index of next element to return
-        int lastRet = -1; // index of last element returned; -1 if no such
+        @Assignable int lastRet = -1; // index of last element returned; -1 if no such
         int expectedModCount = modCount;
 
         @Pure
@@ -1296,7 +1296,7 @@ public class Vector<E>
             return cursor != elementCount;
         }
 
-        public E next(@NonEmpty @Mutable Itr this) {
+        public E next(@NonEmpty @Readonly Itr this) {
             synchronized (Vector.this) {
                 checkForComodification();
                 int i = cursor;
@@ -1320,7 +1320,7 @@ public class Vector<E>
         }
 
         @Override
-        public void forEachRemaining(@Mutable Itr this, Consumer<? super E> action) {
+        public void forEachRemaining(@Readonly Itr this, Consumer<? super E> action) {
             Objects.requireNonNull(action);
             synchronized (Vector.this) {
                 final int size = elementCount;
@@ -1368,7 +1368,7 @@ public class Vector<E>
             return cursor - 1;
         }
 
-        public E previous(@Mutable ListItr this) {
+        public E previous(@Readonly ListItr this) {
             synchronized (Vector.this) {
                 checkForComodification();
                 int i = cursor - 1;

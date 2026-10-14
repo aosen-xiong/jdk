@@ -33,6 +33,7 @@ import org.checkerframework.checker.nonempty.qual.NonEmpty;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.mutability.qual.Assignable;
 import org.checkerframework.checker.mutability.qual.Mutable;
 import org.checkerframework.checker.mutability.qual.Readonly;
 import org.checkerframework.checker.mutability.qual.ReceiverDependentMutable;
@@ -90,8 +91,8 @@ class RegularEnumSet<E extends Enum<E>> extends EnumSet<E> {
      *
      * @return an iterator over the elements contained in this set
      */
-    public Iterator<E> iterator(@Readonly RegularEnumSet<E> this) {
-        return new EnumSetIterator<>();
+    public @ReceiverDependentMutable Iterator<E> iterator(@ReceiverDependentMutable RegularEnumSet<E> this) {
+        return new @ReceiverDependentMutable EnumSetIterator<>();
     }
 
     @ReceiverDependentMutable
@@ -100,13 +101,13 @@ class RegularEnumSet<E extends Enum<E>> extends EnumSet<E> {
          * A bit vector representing the elements in the set not yet
          * returned by this iterator.
          */
-        long unseen;
+        @Assignable long unseen;
 
         /**
          * The bit representing the last element returned by this iterator
          * but not removed, or zero if no such element exists.
          */
-        long lastReturned = 0;
+        @Assignable long lastReturned = 0;
 
         EnumSetIterator() {
             unseen = elements;
@@ -119,7 +120,7 @@ class RegularEnumSet<E extends Enum<E>> extends EnumSet<E> {
         }
 
         @SuppressWarnings("unchecked")
-        public E next(@NonEmpty @Mutable EnumSetIterator<E> this) {
+        public E next(@NonEmpty @Readonly EnumSetIterator<E> this) {
             if (unseen == 0)
                 throw new NoSuchElementException();
             lastReturned = unseen & -unseen;

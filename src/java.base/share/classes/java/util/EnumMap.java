@@ -424,8 +424,8 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
     @ReceiverDependentMutable
     private class KeySet extends AbstractSet<K> {
         @SideEffectFree
-        public Iterator<K> iterator(@Readonly KeySet this) {
-            return new KeyIterator();
+        public @ReceiverDependentMutable Iterator<K> iterator(@ReceiverDependentMutable KeySet this) {
+            return new @ReceiverDependentMutable KeyIterator();
         }
         @Pure
         public @NonNegative int size(@Readonly KeySet this) {
@@ -468,8 +468,8 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
     @ReceiverDependentMutable
     private class Values extends AbstractCollection<V> {
         @SideEffectFree
-        public Iterator<V> iterator(@Readonly Values this) {
-            return new ValueIterator();
+        public @ReceiverDependentMutable Iterator<V> iterator(@ReceiverDependentMutable Values this) {
+            return new @ReceiverDependentMutable ValueIterator();
         }
         @Pure
         public @NonNegative int size(@Readonly Values this) {
@@ -519,8 +519,8 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
     @ReceiverDependentMutable
     private class EntrySet extends AbstractSet<Map.@Readonly Entry<K,V>> {
         @SideEffectFree
-        public Iterator<Map.Entry<K,V>> iterator(@Readonly EntrySet this) {
-            return new EntryIterator();
+        public @ReceiverDependentMutable Iterator<Map.Entry<K,V>> iterator(@ReceiverDependentMutable EntrySet this) {
+            return new @ReceiverDependentMutable EntryIterator();
         }
 
         @Pure
@@ -633,10 +633,10 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
     private class EntryIterator extends EnumMapIterator<Map.Entry<K,V>> {
         private @Assignable Entry lastReturnedEntry;
 
-        public Map.Entry<K,V> next(@Mutable @NonEmpty EntryIterator this) {
+        public Map.Entry<K,V> next(@Readonly @NonEmpty EntryIterator this) {
             if (!hasNext())
                 throw new NoSuchElementException();
-            lastReturnedEntry = new Entry(index++);
+            lastReturnedEntry = new @ReceiverDependentMutable Entry(index++);
             return lastReturnedEntry;
         }
 

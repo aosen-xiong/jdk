@@ -1288,13 +1288,13 @@ public class Properties extends Hashtable<Object,Object> {
     }
 
     @Override
-    public Enumeration<Object> keys() {
+    public @ReceiverDependentMutable Enumeration<Object> keys() {
         // CHM.keys() returns Iterator w/ remove() - instead wrap keySet()
         return Collections.enumeration(map.keySet());
     }
 
     @Override
-    public Enumeration<Object> elements() {
+    public @ReceiverDependentMutable Enumeration<Object> elements() {
         // CHM.elements() returns Iterator w/ remove() - instead wrap values()
         return Collections.enumeration(map.values());
     }
@@ -1432,7 +1432,7 @@ public class Properties extends Hashtable<Object,Object> {
         }
 
         @Override
-        public Iterator<Map.Entry<Object, Object>> iterator() {
+        public @ReceiverDependentMutable Iterator<Map.Entry<Object, Object>> iterator() {
             return entrySet.iterator();
         }
     }

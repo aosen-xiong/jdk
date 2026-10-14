@@ -90,7 +90,7 @@ public interface Iterator<E> {
      * @return the next element in the iteration
      * @throws NoSuchElementException if the iteration has no more elements
      */
-    E next(@GuardSatisfied @NonEmpty @Mutable Iterator<E> this);
+    E next(@GuardSatisfied @NonEmpty @Readonly Iterator<E> this);
 
     /**
      * Removes from the underlying collection the last element returned
@@ -146,7 +146,7 @@ public interface Iterator<E> {
      * @throws NullPointerException if the specified action is null
      * @since 1.8
      */
-     default void forEachRemaining(@Mutable Iterator<E> this, Consumer<? super E> action) {
+     default void forEachRemaining(@Readonly Iterator<E> this, Consumer<? super E> action) {
         Objects.requireNonNull(action);
         while (hasNext())
             action.accept(next());

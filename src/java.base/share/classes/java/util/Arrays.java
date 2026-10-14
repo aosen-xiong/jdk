@@ -38,6 +38,7 @@ import org.checkerframework.checker.nonempty.qual.NonEmpty;
 import org.checkerframework.checker.nonempty.qual.PolyNonEmpty;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
+import org.checkerframework.checker.mutability.qual.Assignable;
 import org.checkerframework.checker.mutability.qual.Immutable;
 import org.checkerframework.checker.mutability.qual.Mutable;
 import org.checkerframework.checker.mutability.qual.PolyMutable;
@@ -4301,14 +4302,14 @@ public class Arrays {
         }
 
         @Override
-        public Iterator<E> iterator(@Readonly ArrayList<E> this) {
-            return new ArrayItr<>(a);
+        public @ReceiverDependentMutable Iterator<E> iterator(@ReceiverDependentMutable ArrayList<E> this) {
+            return new @ReceiverDependentMutable ArrayItr<>(a);
         }
     }
 
     @ReceiverDependentMutable
     private static class ArrayItr<E> implements Iterator<E> {
-        private int cursor;
+        private @Assignable int cursor;
         private final E @Readonly [] a;
 
         @SuppressWarnings("mutability:initialization.fields.uninitialized") // Conservative
@@ -4324,7 +4325,7 @@ public class Arrays {
         }
 
         @Override
-        public E next(@NonEmpty @Mutable ArrayItr<E> this) {
+        public E next(@NonEmpty @Readonly ArrayItr<E> this) {
             int i = cursor;
             if (i >= a.length) {
                 throw new NoSuchElementException();

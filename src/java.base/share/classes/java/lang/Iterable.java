@@ -54,7 +54,7 @@ public interface Iterable<T> {
      *
      * @return an Iterator.
      */
-    @PolyNonEmpty Iterator<T> iterator(@Readonly @PolyNonEmpty Iterable<T> this);
+    @PolyNonEmpty @ReceiverDependentMutable Iterator<T> iterator(@ReceiverDependentMutable @PolyNonEmpty Iterable<T> this);
 
     /**
      * Performs the given action for each element of the {@code Iterable}

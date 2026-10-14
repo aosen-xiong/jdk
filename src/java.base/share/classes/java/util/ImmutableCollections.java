@@ -300,22 +300,22 @@ class ImmutableCollections {
         }
 
         @Override
-        public Iterator<E> iterator() {
-            return new ListItr<E>(this, size());
+        public @ReceiverDependentMutable Iterator<E> iterator() {
+            return new @ReceiverDependentMutable ListItr<E>(this, size());
         }
 
         @Override
-        public ListIterator<E> listIterator() {
+        public @ReceiverDependentMutable ListIterator<E> listIterator() {
             return listIterator(0);
         }
 
         @Override
-        public ListIterator<E> listIterator(final int index) {
+        public @ReceiverDependentMutable ListIterator<E> listIterator(final int index) {
             int size = size();
             if (index < 0 || index > size) {
                 throw outOfBounds(index);
             }
-            return new @Mutable ListItr<E>(this, size, index);
+            return new @ReceiverDependentMutable ListItr<E>(this, size, index);
         }
 
         @Override
@@ -370,7 +370,7 @@ class ImmutableCollections {
         @Stable
         private final boolean isListIterator;
 
-        private int cursor;
+        private @Assignable int cursor;
 
         ListItr(@Readonly List<E> list, int size) {
             this.list = list;
@@ -392,7 +392,7 @@ class ImmutableCollections {
             return cursor != size;
         }
 
-        public E next(@NonEmpty @Mutable ListItr<E> this) {
+        public E next(@NonEmpty @Readonly ListItr<E> this) {
             try {
                 int i = cursor;
                 E next = list.get(i);
@@ -414,7 +414,7 @@ class ImmutableCollections {
             return cursor != 0;
         }
 
-        public E previous(@Mutable ListItr<E> this) {
+        public E previous(@Readonly ListItr<E> this) {
             if (!isListIterator) {
                 throw uoe();
             }
@@ -495,13 +495,13 @@ class ImmutableCollections {
             return size;
         }
 
-        public Iterator<E> iterator() {
-            return new ListItr<>(this, size());
+        public @ReceiverDependentMutable Iterator<E> iterator() {
+            return new @ReceiverDependentMutable ListItr<>(this, size());
         }
 
-        public ListIterator<E> listIterator(int index) {
+        public @ReceiverDependentMutable ListIterator<E> listIterator(int index) {
             rangeCheck(index);
-            return new ListItr<>(this, size(), index);
+            return new @ReceiverDependentMutable ListItr<>(this, size(), index);
         }
 
         public @Immutable List<E> subList(int fromIndex, int toIndex) {
@@ -861,8 +861,8 @@ class ImmutableCollections {
         }
 
         @Override
-        public Iterator<E> iterator() {
-            return new @Mutable Iterator<E>() {
+        public @ReceiverDependentMutable Iterator<E> iterator() {
+            return new @ReceiverDependentMutable Iterator<E>() {
                 private int idx = (e1 == EMPTY) ? 1 : 2;
 
                 @Override
@@ -1039,8 +1039,8 @@ class ImmutableCollections {
         }
 
         @Override
-        public Iterator<E> iterator(@Readonly SetN<E> this) {
-            return new SetNIterator();
+        public @ReceiverDependentMutable Iterator<E> iterator(@ReceiverDependentMutable SetN<E> this) {
+            return new @ReceiverDependentMutable SetNIterator();
         }
 
         @Override
@@ -1380,8 +1380,8 @@ class ImmutableCollections {
 
                 @Override
                 @SuppressWarnings("mutability:override.return.invalid") // the diamond infers Map.Entry with the default qualifier, not the target's @Immutable (https://github.com/eisop/checker-framework/issues/2271): KeyValueHolder entries are @Immutable
-                public Iterator<Map.@Immutable Entry<K,V>> iterator() {
-                    return new MapNIterator();
+                public @ReceiverDependentMutable Iterator<Map.@Immutable Entry<K,V>> iterator() {
+                    return new @ReceiverDependentMutable MapNIterator();
                 }
             };
         }

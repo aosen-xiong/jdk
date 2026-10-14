@@ -699,12 +699,12 @@ public class ArrayDeque<E extends @NonNull @Readonly Object> extends AbstractCol
      * @return an iterator over the elements in this deque
      */
     @SideEffectFree
-    public @PolyNonEmpty Iterator<E> iterator(@PolyNonEmpty @Readonly ArrayDeque<E> this) {
-        return new DeqIterator();
+    public @PolyNonEmpty @ReceiverDependentMutable Iterator<E> iterator(@PolyNonEmpty @ReceiverDependentMutable ArrayDeque<E> this) {
+        return new @ReceiverDependentMutable DeqIterator();
     }
 
-    public @PolyNonEmpty Iterator<E> descendingIterator(@PolyNonEmpty @Readonly ArrayDeque<E> this) {
-        return new DescendingIterator();
+    public @PolyNonEmpty @ReceiverDependentMutable Iterator<E> descendingIterator(@PolyNonEmpty @ReceiverDependentMutable ArrayDeque<E> this) {
+        return new @ReceiverDependentMutable DescendingIterator();
     }
 
     private class DeqIterator implements Iterator<E> {
