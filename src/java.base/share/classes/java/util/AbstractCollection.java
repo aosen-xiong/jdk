@@ -245,7 +245,7 @@ public abstract class AbstractCollection<E> implements Collection<E> {
      *         further elements returned by the iterator, trimmed to size
      */
     @SuppressWarnings("unchecked")
-    private static <T> T[] finishToArray(T[] r, Iterator<?> it) {
+    private static <T> T[] finishToArray(T[] r, @Readonly Iterator<?> it) {
         int len = r.length;
         int i = len;
         while (it.hasNext()) {

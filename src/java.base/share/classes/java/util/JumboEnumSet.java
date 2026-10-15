@@ -111,8 +111,8 @@ class JumboEnumSet<E extends Enum<E>> extends EnumSet<E> {
      *
      * @return an iterator over the elements contained in this set
      */
-    public @ReceiverDependentMutable Iterator<E> iterator() {
-        return new @ReceiverDependentMutable EnumSetIterator<>();
+    public @Mutable Iterator<E> iterator() {
+        return new @Mutable EnumSetIterator<>();
     }
 
     private class EnumSetIterator<E extends Enum<E>> implements Iterator<E> {

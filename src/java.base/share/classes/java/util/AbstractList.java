@@ -873,7 +873,7 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
             rangeCheckForAdd(index);
 
             return new @ReceiverDependentMutable ListIterator<E>() {
-                private final ListIterator<E> i =
+                private final @Mutable ListIterator<E> i =
                         root.listIterator(offset + index);
 
                 @Pure

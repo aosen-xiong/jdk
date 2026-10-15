@@ -680,7 +680,7 @@ public final class Spliterators {
      * @return An iterator
      * @throws NullPointerException if the given spliterator is {@code null}
      */
-    public static<T> @ReceiverDependentMutable Iterator<T> iterator(Spliterator<? extends T> spliterator) {
+    public static<T> Iterator<T> iterator(Spliterator<? extends T> spliterator) {
         Objects.requireNonNull(spliterator);
         class Adapter implements Iterator<T>, Consumer<T> {
             boolean valueReady = false;
@@ -1761,7 +1761,7 @@ public final class Spliterators {
         static final int BATCH_UNIT = 1 << 10;  // batch array size increment
         static final int MAX_BATCH = 1 << 25;  // max batch array size;
         private final @Readonly Collection<? extends T> collection; // null OK
-        private Iterator<? extends T> it;
+        private @Readonly Iterator<? extends T> it;
         private final int characteristics;
         private long est;             // size estimate
         private int batch;            // batch size for splits

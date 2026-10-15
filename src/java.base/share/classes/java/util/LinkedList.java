@@ -913,8 +913,8 @@ public class LinkedList<E>
 
     @ReceiverDependentMutable
     private class ListItr implements ListIterator<E> {
-        private @Readonly Node<E> lastReturned;
-        private @Readonly Node<E> next;
+        private @Assignable @Readonly Node<E> lastReturned;
+        private @Assignable @Readonly Node<E> next;
         private @Assignable int nextIndex;
         private int expectedModCount = modCount;
 

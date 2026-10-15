@@ -884,7 +884,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
         extends IdentityHashMapIterator<Map.@Readonly Entry<K,V>>
     {
         // @SuppressWarnings("mutability:initialization.field.uninitialized") // lazy
-        private @Readonly Entry lastReturnedEntry;
+        private @Assignable @Readonly Entry lastReturnedEntry;
 
         public Map.@Readonly Entry<K,V> next(@NonEmpty @Readonly EntryIterator this) {
             lastReturnedEntry = new Entry(nextIndex());
@@ -1506,7 +1506,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
         }
 
         @SuppressWarnings("unchecked")
-        public void forEachRemaining(@Readonly KeySpliterator<K,V> this, Consumer<? super K> action) {
+        public void forEachRemaining(@Mutable KeySpliterator<K,V> this, Consumer<? super K> action) {
             if (action == null)
                 throw new NullPointerException();
             int i, hi, mc; Object key;
@@ -1563,7 +1563,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
                                        expectedModCount);
         }
 
-        public void forEachRemaining(@Readonly ValueSpliterator<K,V> this, Consumer<? super V> action) {
+        public void forEachRemaining(@Mutable ValueSpliterator<K,V> this, Consumer<? super V> action) {
             if (action == null)
                 throw new NullPointerException();
             int i, hi, mc;
@@ -1623,7 +1623,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
                                        expectedModCount);
         }
 
-        public void forEachRemaining(@Readonly EntrySpliterator<K,V> this, Consumer<? super Map.@Readonly Entry<K, V>> action) {
+        public void forEachRemaining(@Mutable EntrySpliterator<K,V> this, Consumer<? super Map.@Readonly Entry<K, V>> action) {
             if (action == null)
                 throw new NullPointerException();
             int i, hi, mc;

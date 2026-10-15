@@ -44,6 +44,7 @@ import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
+import org.checkerframework.checker.mutability.qual.Assignable;
 import org.checkerframework.checker.mutability.qual.Mutable;
 import org.checkerframework.checker.mutability.qual.PolyMutable;
 import org.checkerframework.checker.mutability.qual.Readonly;
@@ -707,18 +708,19 @@ public class ArrayDeque<E extends @NonNull @Readonly Object> extends AbstractCol
         return new @ReceiverDependentMutable DescendingIterator();
     }
 
+    @ReceiverDependentMutable
     private class DeqIterator implements Iterator<E> {
         /** Index of element to be returned by subsequent call to next. */
-        int cursor;
+        @Assignable int cursor;
 
         /** Number of elements yet to be returned. */
-        int remaining = size();
+        @Assignable int remaining = size();
 
         /**
          * Index of element returned by most recent call to next.
          * Reset to -1 if element is deleted by a call to remove.
          */
-        int lastRet = -1;
+        @Assignable int lastRet = -1;
 
         DeqIterator() { cursor = head; }
 
@@ -773,6 +775,7 @@ public class ArrayDeque<E extends @NonNull @Readonly Object> extends AbstractCol
         }
     }
 
+    @ReceiverDependentMutable
     private class DescendingIterator extends DeqIterator {
         DescendingIterator() { cursor = dec(tail, elements.length); }
 

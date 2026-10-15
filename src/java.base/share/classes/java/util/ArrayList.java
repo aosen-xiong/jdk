@@ -966,9 +966,9 @@ import jdk.internal.util.ArraysSupport;
      *
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
-    public ListIterator<E> listIterator(@Readonly ArrayList<E> this, @NonNegative int index) {
+    public @ReceiverDependentMutable ListIterator<E> listIterator(@ReceiverDependentMutable ArrayList<E> this, @NonNegative int index) {
         rangeCheckForAdd(index);
-        return new ListItr(index);
+        return new @ReceiverDependentMutable ListItr(index);
     }
 
     /**

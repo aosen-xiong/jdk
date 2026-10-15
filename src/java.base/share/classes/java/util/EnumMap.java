@@ -519,7 +519,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
     @ReceiverDependentMutable
     private class EntrySet extends AbstractSet<Map.@Readonly Entry<K,V>> {
         @SideEffectFree
-        public @ReceiverDependentMutable Iterator<Map.Entry<K,V>> iterator(@ReceiverDependentMutable EntrySet this) {
+        public @ReceiverDependentMutable Iterator<Map.@Readonly Entry<K,V>> iterator(@ReceiverDependentMutable EntrySet this) {
             return new @ReceiverDependentMutable EntryIterator();
         }
 
@@ -630,10 +630,10 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
     }
 
     @ReceiverDependentMutable
-    private class EntryIterator extends EnumMapIterator<Map.Entry<K,V>> {
+    private class EntryIterator extends EnumMapIterator<Map.@Readonly Entry<K,V>> {
         private @Assignable Entry lastReturnedEntry;
 
-        public Map.Entry<K,V> next(@Readonly @NonEmpty EntryIterator this) {
+        public Map.@Readonly Entry<K,V> next(@ReceiverDependentMutable @NonEmpty EntryIterator this) {
             if (!hasNext())
                 throw new NoSuchElementException();
             lastReturnedEntry = new @ReceiverDependentMutable Entry(index++);
