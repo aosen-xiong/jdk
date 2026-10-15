@@ -294,7 +294,7 @@ public class Collections {
      * Gets the ith element from the given list by repositioning the specified
      * list listIterator.
      */
-    private static <T> T get(ListIterator<? extends T> i, int index) {
+    private static <T> T get(@Readonly ListIterator<? extends T> i, int index) {
         T obj = null;
         int pos = i.nextIndex();
         if (pos <= index) {
@@ -1097,9 +1097,9 @@ public class Collections {
         public String toString()                   {return c.toString();}
 
         @SideEffectFree
-        public @PolyNonEmpty @ReceiverDependentMutable Iterator<E> iterator(@PolyNonEmpty UnmodifiableCollection<E> this) {
-            return new @ReceiverDependentMutable Iterator<E>() {
-                private final Iterator<? extends E> i = c.iterator();
+        public @PolyNonEmpty @Immutable Iterator<E> iterator(@PolyNonEmpty UnmodifiableCollection<E> this) {
+            return new @Immutable Iterator<E>() {
+                private final @Readonly Iterator<? extends E> i = c.iterator();
 
                 @Pure
                 @EnsuresNonEmptyIf(result = true, expression = "this")
@@ -1341,7 +1341,7 @@ public class Collections {
         public E pollLast()      { throw new UnsupportedOperationException(); }
         public @Immutable NavigableSet<E> descendingSet()
                  { return new UnmodifiableNavigableSet<>(ns.descendingSet()); }
-        public @ReceiverDependentMutable Iterator<E> descendingIterator()
+        public @Immutable Iterator<E> descendingIterator()
                                          { return descendingSet().iterator(); }
 
         public @Immutable NavigableSet<E> subSet(E fromElement, boolean fromInclusive, E toElement, boolean toInclusive) {
@@ -1431,11 +1431,11 @@ public class Collections {
             throw new UnsupportedOperationException();
         }
 
-        public @PolyNonEmpty @ReceiverDependentMutable ListIterator<E> listIterator(@PolyNonEmpty @ReceiverDependentMutable UnmodifiableList<E> this)   {return listIterator(0);}
+        public @PolyNonEmpty @Immutable ListIterator<E> listIterator(@PolyNonEmpty UnmodifiableList<E> this)   {return listIterator(0);}
 
-        public @ReceiverDependentMutable ListIterator<E> listIterator(@ReceiverDependentMutable UnmodifiableList<E> this, final int index) {
-            return new @ReceiverDependentMutable ListIterator<E>() {
-                private final ListIterator<? extends E> i
+        public @Immutable ListIterator<E> listIterator(UnmodifiableList<E> this, final int index) {
+            return new @Immutable ListIterator<E>() {
+                private final @Readonly ListIterator<? extends E> i
                     = list.listIterator(index);
 
                 @Pure
@@ -1777,9 +1777,9 @@ public class Collections {
                 return StreamSupport.stream(spliterator(), true);
             }
 
-            public @ReceiverDependentMutable Iterator<Map.@Immutable Entry<K,V>> iterator() {
-                return new @ReceiverDependentMutable Iterator<Map.@Immutable Entry<K,V>>() {
-                    private final Iterator<? extends Map.@Readonly Entry<? extends K, ? extends V>> i = c.iterator();
+            public @Immutable Iterator<Map.@Immutable Entry<K,V>> iterator() {
+                return new @Immutable Iterator<Map.@Immutable Entry<K,V>>() {
+                    private final @Readonly Iterator<? extends Map.@Readonly Entry<? extends K, ? extends V>> i = c.iterator();
 
                     @Pure
                     @EnsuresNonEmptyIf(result = true, expression = "this")
@@ -3323,6 +3323,7 @@ public class Collections {
                 @EnsuresNonEmptyIf(result = true, expression = "this")
                 public boolean hasNext() { return it.hasNext(); }
                 public E next(/*@NonEmpty Iterator<E> this*/)          { return it.next(); }
+                @SuppressWarnings("mutability:method.invocation.invalid") // it is this collection's own iterator, with its mutability. remove() runs only on a @Mutable iterator, which only a @Mutable collection creates, but the anonymous class cannot state that it shares its mutability
                 public void remove()     {        it.remove(); }
                 public void forEachRemaining(Consumer<? super E> action) {
                     it.forEachRemaining(action);
@@ -4045,20 +4046,21 @@ public class Collections {
                 throw new UnsupportedOperationException();
             }
 
-            public @ReceiverDependentMutable Iterator<Map.Entry<K,V>> iterator(@ReceiverDependentMutable CheckedEntrySet<K,V> this) {
+            public @ReceiverDependentMutable Iterator<Map.@ReceiverDependentMutable Entry<K,V>> iterator(@ReceiverDependentMutable CheckedEntrySet<K,V> this) {
                 final Iterator<Map.@ReceiverDependentMutable Entry<K, V>> i = s.iterator();
 
-                return new @ReceiverDependentMutable Iterator<Map.Entry<K,V>>() {
+                return new @ReceiverDependentMutable Iterator<Map.@ReceiverDependentMutable Entry<K,V>>() {
                     @Pure
                     @EnsuresNonEmptyIf(result = true, expression = "this")
                     public boolean hasNext() { return i.hasNext(); }
+                    @SuppressWarnings("mutability:method.invocation.invalid") // i is this collection's own iterator, with its mutability. remove() runs only on a @Mutable iterator, which only a @Mutable collection creates, but the anonymous class cannot state that i shares its mutability
                     public void remove()     { i.remove(); }
 
-                    public Map.Entry<K,V> next(/*@NonEmpty Iterator<Map.Entry<K,V>> this*/) {
+                    public Map.@ReceiverDependentMutable Entry<K,V> next(/*@NonEmpty Iterator<Map.Entry<K,V>> this*/) {
                         return checkedEntry(i.next(), valueType);
                     }
 
-                    public void forEachRemaining(Consumer<? super Entry<K, V>> action) {
+                    public void forEachRemaining(Consumer<? super Map.@ReceiverDependentMutable Entry<K, V>> action) {
                         i.forEachRemaining(
                             e -> action.accept(checkedEntry(e, valueType)));
                     }
@@ -4499,21 +4501,22 @@ public class Collections {
      */
     @SuppressWarnings("unchecked")
     @SideEffectFree
-    public static <T> Iterator<T> emptyIterator() {
-        return (Iterator<T>) EmptyIterator.EMPTY_ITERATOR;
+    public static <T> @PolyMutable Iterator<T> emptyIterator() {
+        return (@PolyMutable Iterator<T>) EmptyIterator.EMPTY_ITERATOR;
     }
 
+    @Immutable
     private static class EmptyIterator<E> implements Iterator<E> {
-        static final EmptyIterator<Object> EMPTY_ITERATOR
-            = new EmptyIterator<>();
+        static final @Immutable EmptyIterator<Object> EMPTY_ITERATOR
+            = new @Immutable EmptyIterator<>();
 
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
-        public boolean hasNext() { return false; }
-        public E next(@NonEmpty EmptyIterator<E> this) { throw new NoSuchElementException(); }
-        public void remove(@NonEmpty EmptyIterator<E> this) { throw new IllegalStateException(); }
+        public boolean hasNext(@Readonly EmptyIterator<E> this) { return false; }
+        public E next(@NonEmpty @Readonly EmptyIterator<E> this) { throw new NoSuchElementException(); }
+        public void remove(@NonEmpty @Readonly EmptyIterator<E> this) { throw new IllegalStateException(); }
         @Override
-        public void forEachRemaining(Consumer<? super E> action) {
+        public void forEachRemaining(@Readonly EmptyIterator<E> this, Consumer<? super E> action) {
             Objects.requireNonNull(action);
         }
     }
@@ -4546,23 +4549,24 @@ public class Collections {
      */
     @SuppressWarnings("unchecked")
     @SideEffectFree
-    public static <T> ListIterator<T> emptyListIterator() {
-        return (ListIterator<T>) EmptyListIterator.EMPTY_ITERATOR;
+    public static <T> @PolyMutable ListIterator<T> emptyListIterator() {
+        return (@PolyMutable ListIterator<T>) EmptyListIterator.EMPTY_ITERATOR;
     }
 
+    @Immutable
     private static class EmptyListIterator<E>
         extends EmptyIterator<E>
         implements ListIterator<E>
     {
-        static final EmptyListIterator<Object> EMPTY_ITERATOR
-            = new EmptyListIterator<>();
+        static final @Immutable EmptyListIterator<Object> EMPTY_ITERATOR
+            = new @Immutable EmptyListIterator<>();
 
-        public boolean hasPrevious() { return false; }
-        public E previous() { throw new NoSuchElementException(); }
-        public int nextIndex()     { return 0; }
-        public int previousIndex() { return -1; }
-        public void set(E e) { throw new IllegalStateException(); }
-        public void add(E e) { throw new UnsupportedOperationException(); }
+        public boolean hasPrevious(@Readonly EmptyListIterator<E> this) { return false; }
+        public E previous(@Readonly EmptyListIterator<E> this) { throw new NoSuchElementException(); }
+        public int nextIndex(@Readonly EmptyListIterator<E> this)     { return 0; }
+        public int previousIndex(@Readonly EmptyListIterator<E> this) { return -1; }
+        public void set(@Readonly EmptyListIterator<E> this, E e) { throw new IllegalStateException(); }
+        public void add(@Readonly EmptyListIterator<E> this, E e) { throw new UnsupportedOperationException(); }
     }
 
     /**
@@ -4584,8 +4588,8 @@ public class Collections {
      */
     @SuppressWarnings("unchecked")
     @SideEffectFree
-    public static <T> Enumeration<T> emptyEnumeration() {
-        return (Enumeration<T>) EmptyEnumeration.EMPTY_ENUMERATION;
+    public static <T> @PolyMutable Enumeration<T> emptyEnumeration() {
+        return (@PolyMutable Enumeration<T>) EmptyEnumeration.EMPTY_ENUMERATION;
     }
 
     @Immutable private static class EmptyEnumeration<E> implements Enumeration<E> {
@@ -4642,7 +4646,7 @@ public class Collections {
         private static final long serialVersionUID = 1582296315990362920L;
 
         @SideEffectFree
-        public @ReceiverDependentMutable Iterator<E> iterator() { return emptyIterator(); }
+        public @Immutable Iterator<E> iterator() { return emptyIterator(); }
 
         @Pure
         public @NonNegative int size() {return 0;}
@@ -4781,10 +4785,10 @@ public class Collections {
         private static final long serialVersionUID = 8842843931221139166L;
 
         @SideEffectFree
-        public @ReceiverDependentMutable Iterator<E> iterator() {
+        public @Immutable Iterator<E> iterator() {
             return emptyIterator();
         }
-        public @ReceiverDependentMutable ListIterator<E> listIterator() {
+        public @Immutable ListIterator<E> listIterator() {
             return emptyListIterator();
         }
 
@@ -5046,9 +5050,9 @@ public class Collections {
     }
 
     @SuppressWarnings("mutability") // receiver in anonymous class not denotable, see typetool#2433
-    static <E> @Mutable Iterator<E> singletonIterator(final E e) {
-        return new @Mutable Iterator<E>() {
-            private boolean hasNext = true;
+    static <E> @Immutable Iterator<E> singletonIterator(final E e) {
+        return new @Immutable Iterator<E>() {
+            private @Assignable boolean hasNext = true;
             @Pure
             @EnsuresNonEmptyIf(result = true, expression = "this")
             public boolean hasNext() {
@@ -5137,7 +5141,7 @@ public class Collections {
         SingletonSet(E e) {element = e;}
 
         @SideEffectFree
-        public @Mutable Iterator<E> iterator() {
+        public @Immutable Iterator<E> iterator() {
             return singletonIterator(element);
         }
 
@@ -5199,7 +5203,7 @@ public class Collections {
         SingletonList(E obj)                {element = obj;}
 
         @SideEffectFree
-        public @Mutable Iterator<E> iterator() {
+        public @Immutable Iterator<E> iterator() {
             return singletonIterator(element);
         }
 
@@ -5700,9 +5704,9 @@ public class Collections {
      * @return an enumeration over the specified collection.
      * @see Enumeration
      */
-    public static <T> Enumeration<T> enumeration(final Collection<T> c) {
-        return new Enumeration<T>() {
-            private final Iterator<T> i = c.iterator();
+    public static <T> @Immutable Enumeration<T> enumeration(final Collection<T> c) {
+        return new @Immutable Enumeration<T>() {
+            private final @Readonly Iterator<T> i = c.iterator();
 
             @EnsuresNonEmptyIf(result = true, expression = "this")
             public boolean hasMoreElements() {

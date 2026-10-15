@@ -657,19 +657,19 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
     }
 
 
-    private <T> Enumeration<T> getEnumeration(@Readonly Hashtable<K, V> this, int type) {
+    private <T> @ReceiverDependentMutable Enumeration<T> getEnumeration(@ReceiverDependentMutable Hashtable<K, V> this, int type) {
         if (count == 0) {
             return Collections.emptyEnumeration();
         } else {
-            return new Enumerator<>(type, false);
+            return new @ReceiverDependentMutable Enumerator<>(type, false);
         }
     }
 
-    private <T> Iterator<T> getIterator(@Readonly Hashtable<K, V> this, int type) {
+    private <T> @ReceiverDependentMutable Iterator<T> getIterator(@ReceiverDependentMutable Hashtable<K, V> this, int type) {
         if (count == 0) {
             return Collections.emptyIterator();
         } else {
-            return new Enumerator<>(type, true);
+            return new @ReceiverDependentMutable Enumerator<>(type, true);
         }
     }
 
@@ -709,7 +709,7 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
     @ReceiverDependentMutable
     private class KeySet extends AbstractSet<K> {
         @SideEffectFree
-        public @ReceiverDependentMutable Iterator<K> iterator(@ReceiverDependentMutable KeySet this) {
+        public @ReceiverDependentMutable Iterator<K> iterator(@ReceiverDependentMutable Hashtable<K,V>.@ReceiverDependentMutable KeySet this) {
             return getIterator(KEYS);
         }
         @Pure
@@ -756,7 +756,7 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
     @ReceiverDependentMutable
     private class EntrySet extends AbstractSet<Map.@Readonly Entry<K,V>> {
         @SideEffectFree
-        public @ReceiverDependentMutable Iterator<Map.@Readonly Entry<K,V>> iterator(@ReceiverDependentMutable EntrySet this) {
+        public @ReceiverDependentMutable Iterator<Map.@Readonly Entry<K,V>> iterator(@ReceiverDependentMutable Hashtable<K,V>.@ReceiverDependentMutable EntrySet this) {
             return getIterator(ENTRIES);
         }
 
@@ -843,7 +843,7 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
     @ReceiverDependentMutable
     private class ValueCollection extends AbstractCollection<V> {
         @SideEffectFree
-        public @ReceiverDependentMutable Iterator<V> iterator(@ReceiverDependentMutable ValueCollection this) {
+        public @ReceiverDependentMutable Iterator<V> iterator(@ReceiverDependentMutable Hashtable<K,V>.@ReceiverDependentMutable ValueCollection this) {
             return getIterator(VALUES);
         }
         @Pure
