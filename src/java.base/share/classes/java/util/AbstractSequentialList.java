@@ -25,11 +25,14 @@
 
 package java.util;
 
+import org.checkerframework.checker.index.qual.PolyGrowShrink;
+import org.checkerframework.checker.index.qual.CanShrink;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.mutability.qual.Mutable;
 import org.checkerframework.checker.mutability.qual.PolyMutable;
 import org.checkerframework.checker.mutability.qual.Readonly;
 import org.checkerframework.checker.mutability.qual.ReceiverDependentMutable;
+import org.checkerframework.checker.nonempty.qual.PolyNonEmpty;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.framework.qual.AnnotatedFor;
@@ -180,7 +183,7 @@ public abstract class AbstractSequentialList<E> extends AbstractList<E> {
      * @throws UnsupportedOperationException {@inheritDoc}
      * @throws IndexOutOfBoundsException     {@inheritDoc}
      */
-    public E remove(@GuardSatisfied @Mutable AbstractSequentialList<E> this, int index) {
+    public E remove(@GuardSatisfied @Mutable @CanShrink AbstractSequentialList<E> this, int index) {
         try {
             ListIterator<E> e = listIterator(index);
             E outCast = e.next();
@@ -249,7 +252,7 @@ public abstract class AbstractSequentialList<E> extends AbstractList<E> {
      * @return an iterator over the elements in this list (in proper sequence)
      */
     @SideEffectFree
-    public @ReceiverDependentMutable Iterator<E> iterator(@ReceiverDependentMutable AbstractSequentialList<E> this) {
+    public @ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty AbstractSequentialList<E> this) {
         return listIterator();
     }
 
@@ -263,5 +266,5 @@ public abstract class AbstractSequentialList<E> extends AbstractList<E> {
      *         sequence)
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
-    public abstract @ReceiverDependentMutable ListIterator<E> listIterator(@ReceiverDependentMutable AbstractSequentialList<E> this, int index);
+    public abstract @ReceiverDependentMutable @PolyGrowShrink ListIterator<E> listIterator(@ReceiverDependentMutable @PolyGrowShrink AbstractSequentialList<E> this, int index);
 }

@@ -30,6 +30,7 @@ import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.mutability.qual.Immutable;
 import org.checkerframework.checker.mutability.qual.Readonly;
+import org.checkerframework.checker.signature.qual.Identifier;
 import org.checkerframework.common.reflection.qual.Invoke;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
@@ -242,7 +243,7 @@ public final class Method extends Executable {
      * object, as a {@code String}.
      */
     @Override
-    public @Interned String getName() {
+    public @Interned @Identifier String getName() {
         return name;
     }
 

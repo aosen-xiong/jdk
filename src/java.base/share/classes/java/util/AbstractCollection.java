@@ -26,6 +26,8 @@
 package java.util;
 
 import org.checkerframework.checker.index.qual.NonNegative;
+import org.checkerframework.checker.index.qual.PolyGrowShrink;
+import org.checkerframework.checker.index.qual.CanShrink;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nonempty.qual.EnsuresNonEmptyIf;
 import org.checkerframework.checker.nonempty.qual.PolyNonEmpty;
@@ -97,7 +99,7 @@ public abstract class AbstractCollection<E> implements Collection<E> {
      * @return an iterator over the elements contained in this collection
      */
     @SideEffectFree
-    public abstract @PolyNonEmpty @ReceiverDependentMutable Iterator<E> iterator(@PolyNonEmpty @ReceiverDependentMutable AbstractCollection<E> this);
+    public abstract @PolyNonEmpty @ReceiverDependentMutable @PolyGrowShrink Iterator<E> iterator(@PolyNonEmpty @ReceiverDependentMutable @PolyGrowShrink AbstractCollection<E> this);
 
     @Pure
     public abstract @NonNegative int size(@GuardSatisfied @Readonly AbstractCollection<E> this);
@@ -297,7 +299,7 @@ public abstract class AbstractCollection<E> implements Collection<E> {
      * @throws ClassCastException            {@inheritDoc}
      * @throws NullPointerException          {@inheritDoc}
      */
-    public boolean remove(@Mutable @GuardSatisfied AbstractCollection<E> this, @GuardSatisfied @UnknownSignedness @Readonly Object o) {
+    public boolean remove(@Mutable @GuardSatisfied @CanShrink AbstractCollection<E> this, @GuardSatisfied @UnknownSignedness @Readonly Object o) {
         Iterator<E> it = iterator();
         if (o==null) {
             while (it.hasNext()) {
@@ -390,7 +392,7 @@ public abstract class AbstractCollection<E> implements Collection<E> {
      * @see #remove(Object)
      * @see #contains(Object)
      */
-    public boolean removeAll(@Mutable @GuardSatisfied AbstractCollection<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) {
+    public boolean removeAll(@Mutable @GuardSatisfied @CanShrink AbstractCollection<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) {
         Objects.requireNonNull(c);
         boolean modified = false;
         Iterator<?> it = iterator();
@@ -425,7 +427,7 @@ public abstract class AbstractCollection<E> implements Collection<E> {
      * @see #remove(Object)
      * @see #contains(Object)
      */
-    public boolean retainAll(@Mutable @GuardSatisfied AbstractCollection<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) {
+    public boolean retainAll(@Mutable @GuardSatisfied @CanShrink AbstractCollection<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) {
         Objects.requireNonNull(c);
         boolean modified = false;
         Iterator<E> it = iterator();
@@ -454,7 +456,7 @@ public abstract class AbstractCollection<E> implements Collection<E> {
      *
      * @throws UnsupportedOperationException {@inheritDoc}
      */
-    public void clear(@Mutable @GuardSatisfied AbstractCollection<E> this) {
+    public void clear(@Mutable @GuardSatisfied @CanShrink AbstractCollection<E> this) {
         Iterator<E> it = iterator();
         while (it.hasNext()) {
             it.next();

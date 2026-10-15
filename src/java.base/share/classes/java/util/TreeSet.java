@@ -26,6 +26,7 @@
 package java.util;
 
 import org.checkerframework.checker.index.qual.NonNegative;
+import org.checkerframework.checker.index.qual.PolyGrowShrink;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nonempty.qual.EnsuresNonEmpty;
 import org.checkerframework.checker.nonempty.qual.EnsuresNonEmptyIf;
@@ -202,7 +203,7 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      * @return an iterator over the elements in this set in ascending order
      */
     @SideEffectFree
-    public @PolyNonEmpty @ReceiverDependentMutable Iterator<E> iterator(@PolyNonEmpty @ReceiverDependentMutable TreeSet<E> this) {
+    public @PolyGrowShrink @PolyNonEmpty @ReceiverDependentMutable Iterator<E> iterator(@PolyGrowShrink @PolyNonEmpty @ReceiverDependentMutable TreeSet<E> this) {
         return m.navigableKeySet().iterator();
     }
 
@@ -212,7 +213,7 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      * @return an iterator over the elements in this set in descending order
      * @since 1.6
      */
-    public @PolyNonEmpty @ReceiverDependentMutable Iterator<E> descendingIterator(@PolyNonEmpty @ReceiverDependentMutable TreeSet<E> this) {
+    public @PolyGrowShrink @PolyNonEmpty @ReceiverDependentMutable Iterator<E> descendingIterator(@PolyGrowShrink @PolyNonEmpty @ReceiverDependentMutable TreeSet<E> this) {
         return m.descendingKeySet().iterator();
     }
 
@@ -350,7 +351,7 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      * @since 1.6
      */
     @SideEffectFree
-    public @ReceiverDependentMutable NavigableSet<E> subSet(@GuardSatisfied @ReceiverDependentMutable TreeSet<E> this, @GuardSatisfied E fromElement, boolean fromInclusive,
+    public @ReceiverDependentMutable @PolyGrowShrink NavigableSet<E> subSet(@GuardSatisfied @ReceiverDependentMutable @PolyGrowShrink TreeSet<E> this, @GuardSatisfied E fromElement, boolean fromInclusive,
                                   @GuardSatisfied E toElement,   boolean toInclusive) {
         return new @ReceiverDependentMutable TreeSet<>(m.subMap(fromElement, fromInclusive,
                                        toElement,   toInclusive));
@@ -365,7 +366,7 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      * @since 1.6
      */
     @SideEffectFree
-    public @ReceiverDependentMutable NavigableSet<E> headSet(@GuardSatisfied @ReceiverDependentMutable TreeSet<E> this, @GuardSatisfied E toElement, boolean inclusive) {
+    public @ReceiverDependentMutable @PolyGrowShrink NavigableSet<E> headSet(@GuardSatisfied @ReceiverDependentMutable @PolyGrowShrink TreeSet<E> this, @GuardSatisfied E toElement, boolean inclusive) {
         return new @ReceiverDependentMutable TreeSet<>(m.headMap(toElement, inclusive));
     }
 
@@ -378,7 +379,7 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      * @since 1.6
      */
     @SideEffectFree
-    public @ReceiverDependentMutable NavigableSet<E> tailSet(@GuardSatisfied @ReceiverDependentMutable TreeSet<E> this, @GuardSatisfied E fromElement, boolean inclusive) {
+    public @ReceiverDependentMutable @PolyGrowShrink NavigableSet<E> tailSet(@GuardSatisfied @ReceiverDependentMutable @PolyGrowShrink TreeSet<E> this, @GuardSatisfied E fromElement, boolean inclusive) {
         return new @ReceiverDependentMutable TreeSet<>(m.tailMap(fromElement, inclusive));
     }
 
@@ -390,7 +391,7 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      * @throws IllegalArgumentException {@inheritDoc}
      */
     @SideEffectFree
-    public @ReceiverDependentMutable SortedSet<E> subSet(@GuardSatisfied @ReceiverDependentMutable TreeSet<E> this, @GuardSatisfied E fromElement, @GuardSatisfied E toElement) {
+    public @ReceiverDependentMutable @PolyGrowShrink SortedSet<E> subSet(@GuardSatisfied @ReceiverDependentMutable @PolyGrowShrink TreeSet<E> this, @GuardSatisfied E fromElement, @GuardSatisfied E toElement) {
         return subSet(fromElement, true, toElement, false);
     }
 
@@ -402,7 +403,7 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      * @throws IllegalArgumentException {@inheritDoc}
      */
     @SideEffectFree
-    public @ReceiverDependentMutable SortedSet<E> headSet(@GuardSatisfied @ReceiverDependentMutable TreeSet<E> this, E toElement) {
+    public @ReceiverDependentMutable @PolyGrowShrink SortedSet<E> headSet(@GuardSatisfied @ReceiverDependentMutable @PolyGrowShrink TreeSet<E> this, E toElement) {
         return headSet(toElement, false);
     }
 
@@ -414,7 +415,7 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      * @throws IllegalArgumentException {@inheritDoc}
      */
     @SideEffectFree
-    public @ReceiverDependentMutable SortedSet<E> tailSet(@GuardSatisfied @ReceiverDependentMutable TreeSet<E> this, E fromElement) {
+    public @ReceiverDependentMutable @PolyGrowShrink SortedSet<E> tailSet(@GuardSatisfied @ReceiverDependentMutable @PolyGrowShrink TreeSet<E> this, E fromElement) {
         return tailSet(fromElement, true);
     }
 

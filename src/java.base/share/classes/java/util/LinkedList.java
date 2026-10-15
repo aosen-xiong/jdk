@@ -27,6 +27,8 @@ package java.util;
 
 import org.checkerframework.checker.index.qual.GTENegativeOne;
 import org.checkerframework.checker.index.qual.NonNegative;
+import org.checkerframework.checker.index.qual.PolyGrowShrink;
+import org.checkerframework.checker.index.qual.CanShrink;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.lock.qual.ReleasesNoLocks;
 import org.checkerframework.checker.nonempty.qual.EnsuresNonEmpty;
@@ -295,7 +297,7 @@ public class LinkedList<E>
      * @return the first element from this list
      * @throws NoSuchElementException if this list is empty
      */
-    public E removeFirst(@GuardSatisfied @Mutable @NonEmpty LinkedList<E> this) {
+    public E removeFirst(@GuardSatisfied @Mutable @NonEmpty @CanShrink LinkedList<E> this) {
         final Node<E> f = first;
         if (f == null)
             throw new NoSuchElementException();
@@ -308,7 +310,7 @@ public class LinkedList<E>
      * @return the last element from this list
      * @throws NoSuchElementException if this list is empty
      */
-    public E removeLast(@GuardSatisfied @Mutable @NonEmpty LinkedList<E> this) {
+    public E removeLast(@GuardSatisfied @Mutable @NonEmpty @CanShrink LinkedList<E> this) {
         final Node<E> l = last;
         if (l == null)
             throw new NoSuchElementException();
@@ -389,7 +391,7 @@ public class LinkedList<E>
      * @return {@code true} if this list contained the specified element
      */
     @ReleasesNoLocks
-    public boolean remove(@GuardSatisfied @Mutable LinkedList<E> this, @GuardSatisfied @Nullable @UnknownSignedness @Readonly Object o) {
+    public boolean remove(@GuardSatisfied @Mutable @CanShrink LinkedList<E> this, @GuardSatisfied @Nullable @UnknownSignedness @Readonly Object o) {
         if (o == null) {
             for (Node<E> x = first; x != null; x = x.next) {
                 if (x.item == null) {
@@ -482,7 +484,7 @@ public class LinkedList<E>
      * Removes all of the elements from this list.
      * The list will be empty after this call returns.
      */
-    public void clear(@GuardSatisfied @Mutable LinkedList<E> this) {
+    public void clear(@GuardSatisfied @Mutable @CanShrink LinkedList<E> this) {
         // Clearing all of the links between nodes is "unnecessary", but:
         // - helps a generational GC if the discarded nodes inhabit
         //   more than one generation
@@ -559,7 +561,7 @@ public class LinkedList<E>
      * @return the element previously at the specified position
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
-    public E remove(@GuardSatisfied @Mutable LinkedList<E> this, @NonNegative int index) {
+    public E remove(@GuardSatisfied @Mutable @CanShrink LinkedList<E> this, @NonNegative int index) {
         checkElementIndex(index);
         return unlink(node(index));
     }
@@ -710,7 +712,7 @@ public class LinkedList<E>
      * @return the head of this list, or {@code null} if this list is empty
      * @since 1.5
      */
-    public @Nullable E poll(@GuardSatisfied @Mutable LinkedList<E> this) {
+    public @Nullable E poll(@GuardSatisfied @Mutable @CanShrink LinkedList<E> this) {
         final Node<E> f = first;
         return (f == null) ? null : unlinkFirst(f);
     }
@@ -722,7 +724,7 @@ public class LinkedList<E>
      * @throws NoSuchElementException if this list is empty
      * @since 1.5
      */
-    public E remove(@GuardSatisfied @Mutable @NonEmpty LinkedList<E> this) {
+    public E remove(@GuardSatisfied @Mutable @NonEmpty @CanShrink LinkedList<E> this) {
         return removeFirst();
     }
 
@@ -798,7 +800,7 @@ public class LinkedList<E>
      *     this list is empty
      * @since 1.6
      */
-    public @Nullable E pollFirst(@GuardSatisfied @Mutable LinkedList<E> this) {
+    public @Nullable E pollFirst(@GuardSatisfied @Mutable @CanShrink LinkedList<E> this) {
         final Node<E> f = first;
         return (f == null) ? null : unlinkFirst(f);
     }
@@ -811,7 +813,7 @@ public class LinkedList<E>
      *     this list is empty
      * @since 1.6
      */
-    public @Nullable E pollLast(@GuardSatisfied @Mutable LinkedList<E> this) {
+    public @Nullable E pollLast(@GuardSatisfied @Mutable @CanShrink LinkedList<E> this) {
         final Node<E> l = last;
         return (l == null) ? null : unlinkLast(l);
     }
@@ -840,7 +842,7 @@ public class LinkedList<E>
      * @throws NoSuchElementException if this list is empty
      * @since 1.6
      */
-    public E pop(@GuardSatisfied @Mutable @NonEmpty LinkedList<E> this) {
+    public E pop(@GuardSatisfied @Mutable @NonEmpty @CanShrink LinkedList<E> this) {
         return removeFirst();
     }
 
@@ -853,7 +855,7 @@ public class LinkedList<E>
      * @return {@code true} if the list contained the specified element
      * @since 1.6
      */
-    public boolean removeFirstOccurrence(@GuardSatisfied @Mutable LinkedList<E> this, @Nullable @Readonly Object o) {
+    public boolean removeFirstOccurrence(@GuardSatisfied @Mutable @CanShrink LinkedList<E> this, @Nullable @Readonly @GuardSatisfied @UnknownSignedness Object o) {
         return remove(o);
     }
 
@@ -866,7 +868,7 @@ public class LinkedList<E>
      * @return {@code true} if the list contained the specified element
      * @since 1.6
      */
-    public boolean removeLastOccurrence(@GuardSatisfied @Mutable LinkedList<E> this, @Nullable @Readonly Object o) {
+    public boolean removeLastOccurrence(@GuardSatisfied @Mutable @CanShrink LinkedList<E> this, @Nullable @Readonly @GuardSatisfied @UnknownSignedness Object o) {
         if (o == null) {
             for (Node<E> x = last; x != null; x = x.prev) {
                 if (x.item == null) {
@@ -906,7 +908,7 @@ public class LinkedList<E>
      * @throws IndexOutOfBoundsException {@inheritDoc}
      * @see List#listIterator(int)
      */
-    public @ReceiverDependentMutable ListIterator<E> listIterator(@ReceiverDependentMutable LinkedList<E> this, @NonNegative int index) {
+    public @ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty ListIterator<E> listIterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty LinkedList<E> this, @NonNegative int index) {
         checkPositionIndex(index);
         return new @ReceiverDependentMutable ListItr(index);
     }
@@ -1033,7 +1035,7 @@ public class LinkedList<E>
     /**
      * @since 1.6
      */
-    public @ReceiverDependentMutable Iterator<E> descendingIterator(@ReceiverDependentMutable LinkedList<E> this) {
+    public @ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty Iterator<E> descendingIterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty LinkedList<E> this) {
         return new @ReceiverDependentMutable DescendingIterator();
     }
 

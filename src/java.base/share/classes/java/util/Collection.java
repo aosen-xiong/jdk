@@ -26,6 +26,8 @@
 package java.util;
 
 import org.checkerframework.checker.index.qual.NonNegative;
+import org.checkerframework.checker.index.qual.PolyGrowShrink;
+import org.checkerframework.checker.index.qual.CanShrink;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nonempty.qual.EnsuresNonEmpty;
 import org.checkerframework.checker.nonempty.qual.EnsuresNonEmptyIf;
@@ -326,7 +328,7 @@ public interface Collection<E> extends Iterable<E> {
      * @return an {@code Iterator} over the elements in this collection
      */
     @SideEffectFree
-    @PolyNonEmpty @ReceiverDependentMutable Iterator<E> iterator(@PolyNonEmpty @ReceiverDependentMutable Collection<E> this);
+    @PolyNonEmpty @ReceiverDependentMutable @PolyGrowShrink Iterator<E> iterator(@PolyNonEmpty @ReceiverDependentMutable @PolyGrowShrink Collection<E> this);
 
     /**
      * Returns an array containing all of the elements in this collection.
@@ -508,7 +510,7 @@ public interface Collection<E> extends Iterable<E> {
      * @throws UnsupportedOperationException if the {@code remove} operation
      *         is not supported by this collection
      */
-    boolean remove(@Mutable @GuardSatisfied Collection<E> this, @UnknownSignedness @Readonly Object o);
+    boolean remove(@Mutable @GuardSatisfied @CanShrink Collection<E> this, @UnknownSignedness @Readonly Object o);
 
 
     // Bulk Operations
@@ -583,7 +585,7 @@ public interface Collection<E> extends Iterable<E> {
      * @see #remove(Object)
      * @see #contains(Object)
      */
-    boolean removeAll(@Mutable @GuardSatisfied Collection<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c);
+    boolean removeAll(@Mutable @GuardSatisfied @CanShrink Collection<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c);
 
     /**
      * Removes all of the elements of this collection that satisfy the given
@@ -607,7 +609,7 @@ public interface Collection<E> extends Iterable<E> {
      *         supported.
      * @since 1.8
      */
-    default boolean removeIf(@Mutable Collection<E> this, Predicate<? super E> filter) {
+    default boolean removeIf(@Mutable @CanShrink Collection<E> this, Predicate<? super E> filter) {
         Objects.requireNonNull(filter);
         boolean removed = false;
         final Iterator<E> each = iterator();
@@ -642,7 +644,7 @@ public interface Collection<E> extends Iterable<E> {
      * @see #remove(Object)
      * @see #contains(Object)
      */
-    boolean retainAll(@Mutable @GuardSatisfied Collection<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c);
+    boolean retainAll(@Mutable @GuardSatisfied @CanShrink Collection<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c);
 
     /**
      * Removes all of the elements from this collection (optional operation).
@@ -651,7 +653,7 @@ public interface Collection<E> extends Iterable<E> {
      * @throws UnsupportedOperationException if the {@code clear} operation
      *         is not supported by this collection
      */
-    void clear(@Mutable @GuardSatisfied Collection<E> this);
+    void clear(@Mutable @GuardSatisfied @CanShrink Collection<E> this);
 
 
     // Comparison and hashing

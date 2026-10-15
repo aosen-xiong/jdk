@@ -27,6 +27,8 @@ package java.util;
 
 import org.checkerframework.checker.index.qual.GTENegativeOne;
 import org.checkerframework.checker.index.qual.NonNegative;
+import org.checkerframework.checker.index.qual.PolyGrowShrink;
+import org.checkerframework.checker.index.qual.CanShrink;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nonempty.qual.EnsuresNonEmpty;
 import org.checkerframework.checker.nonempty.qual.EnsuresNonEmptyIf;
@@ -545,7 +547,7 @@ import jdk.internal.util.ArraysSupport;
      * @return the element that was removed from the list
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
-    public E remove(@Mutable @GuardSatisfied ArrayList<E> this, @NonNegative int index) {
+    public E remove(@Mutable @GuardSatisfied @CanShrink ArrayList<E> this, @NonNegative int index) {
         Objects.checkIndex(index, size);
         final @Readonly Object[] es = elementData;
 
@@ -657,7 +659,7 @@ import jdk.internal.util.ArraysSupport;
      * @param o element to be removed from this list, if present
      * @return {@code true} if this list contained the specified element
      */
-    public boolean remove(@GuardSatisfied @Mutable ArrayList<E> this, @GuardSatisfied @Nullable @UnknownSignedness @Readonly Object o) {
+    public boolean remove(@GuardSatisfied @Mutable @CanShrink ArrayList<E> this, @GuardSatisfied @Nullable @UnknownSignedness @Readonly Object o) {
         final @Readonly Object[] es = elementData;
         final int size = this.size;
         int i = 0;
@@ -693,7 +695,7 @@ import jdk.internal.util.ArraysSupport;
      * Removes all of the elements from this list.  The list will
      * be empty after this call returns.
      */
-    public void clear(@Mutable @GuardSatisfied ArrayList<E> this) {
+    public void clear(@Mutable @GuardSatisfied @CanShrink ArrayList<E> this) {
         modCount++;
         final @Readonly Object[] es = elementData;
         for (int to = size, i = size = 0; i < to; i++)
@@ -779,7 +781,7 @@ import jdk.internal.util.ArraysSupport;
      *          toIndex > size() ||
      *          toIndex < fromIndex})
      */
-    protected void removeRange(@Mutable ArrayList<E> this, int fromIndex, int toIndex) {
+    protected void removeRange(@Mutable @GuardSatisfied @CanShrink ArrayList<E> this, int fromIndex, int toIndex) {
         if (fromIndex > toIndex) {
             throw new IndexOutOfBoundsException(
                     outOfBoundsMsg(fromIndex, toIndex));
@@ -834,7 +836,7 @@ import jdk.internal.util.ArraysSupport;
      *         or if the specified collection is null
      * @see Collection#contains(Object)
      */
-    public boolean removeAll(@Mutable ArrayList<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) {
+    public boolean removeAll(@Mutable @CanShrink ArrayList<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) {
         return batchRemove(c, false, 0, size);
     }
 
@@ -854,7 +856,7 @@ import jdk.internal.util.ArraysSupport;
      *         or if the specified collection is null
      * @see Collection#contains(Object)
      */
-    public boolean retainAll(@Mutable ArrayList<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) {
+    public boolean retainAll(@Mutable @GuardSatisfied @CanShrink ArrayList<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) {
         return batchRemove(c, true, 0, size);
     }
 
@@ -966,7 +968,7 @@ import jdk.internal.util.ArraysSupport;
      *
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
-    public @ReceiverDependentMutable ListIterator<E> listIterator(@ReceiverDependentMutable ArrayList<E> this, @NonNegative int index) {
+    public @ReceiverDependentMutable @PolyGrowShrink ListIterator<E> listIterator(@ReceiverDependentMutable @PolyGrowShrink ArrayList<E> this, @NonNegative int index) {
         rangeCheckForAdd(index);
         return new @ReceiverDependentMutable ListItr(index);
     }
@@ -979,7 +981,7 @@ import jdk.internal.util.ArraysSupport;
      *
      * @see #listIterator(int)
      */
-    public @ReceiverDependentMutable ListIterator<E> listIterator(@ReceiverDependentMutable ArrayList<E> this) {
+    public @ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty ListIterator<E> listIterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty ArrayList<E> this) {
         return new @ReceiverDependentMutable ListItr(0);
     }
 
@@ -991,7 +993,7 @@ import jdk.internal.util.ArraysSupport;
      * @return an iterator over the elements in this list in proper sequence
      */
     @SideEffectFree
-    public @ReceiverDependentMutable Iterator<E> iterator(@ReceiverDependentMutable ArrayList<E> this) {
+    public @ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty ArrayList<E> this) {
         return new @ReceiverDependentMutable Itr();
     }
 
@@ -1157,7 +1159,7 @@ import jdk.internal.util.ArraysSupport;
      * @throws IndexOutOfBoundsException {@inheritDoc}
      * @throws IllegalArgumentException {@inheritDoc}
      */
-    public @ReceiverDependentMutable List<E> subList(@ReceiverDependentMutable ArrayList<E> this, @NonNegative int fromIndex, @NonNegative int toIndex) {
+    public @ReceiverDependentMutable @PolyGrowShrink List<E> subList(@ReceiverDependentMutable @GuardSatisfied @PolyGrowShrink ArrayList<E> this, @NonNegative int fromIndex, @NonNegative int toIndex) {
         subListRangeCheck(fromIndex, toIndex, size);
         return new @ReceiverDependentMutable SubList<>(this, fromIndex, toIndex);
     }
@@ -1718,7 +1720,7 @@ import jdk.internal.util.ArraysSupport;
      * @throws NullPointerException {@inheritDoc}
      */
     @Override
-    public boolean removeIf(@Mutable ArrayList<E> this, Predicate<? super E> filter) {
+    public boolean removeIf(@Mutable @CanShrink ArrayList<E> this, Predicate<? super E> filter) {
         return removeIf(filter, 0, size);
     }
 
@@ -1726,7 +1728,7 @@ import jdk.internal.util.ArraysSupport;
      * Removes all elements satisfying the given predicate, from index
      * i (inclusive) to index end (exclusive).
      */
-    boolean removeIf(@Mutable ArrayList<E> this, Predicate<? super E> filter, int i, final int end) {
+    boolean removeIf(@Mutable @CanShrink ArrayList<E> this, Predicate<? super E> filter, int i, final int end) {
         Objects.requireNonNull(filter);
         int expectedModCount = modCount;
         final @Readonly Object[] es = elementData;

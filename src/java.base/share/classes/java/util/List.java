@@ -29,6 +29,8 @@ import org.checkerframework.checker.index.qual.GTENegativeOne;
 import org.checkerframework.checker.index.qual.IndexFor;
 import org.checkerframework.checker.index.qual.IndexOrHigh;
 import org.checkerframework.checker.index.qual.NonNegative;
+import org.checkerframework.checker.index.qual.PolyGrowShrink;
+import org.checkerframework.checker.index.qual.CanShrink;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.lock.qual.ReleasesNoLocks;
 import org.checkerframework.checker.nonempty.qual.EnsuresNonEmpty;
@@ -214,7 +216,7 @@ public interface List<E> extends Collection<E> {
      * @return an iterator over the elements in this list in proper sequence
      */
     @SideEffectFree
-    @PolyNonEmpty @ReceiverDependentMutable Iterator<E> iterator(@ReceiverDependentMutable @PolyNonEmpty List<E> this);
+    @PolyNonEmpty @ReceiverDependentMutable @PolyGrowShrink Iterator<E> iterator(@ReceiverDependentMutable @PolyNonEmpty @PolyGrowShrink List<E> this);
 
     /**
      * Returns an array containing all of the elements in this list in proper
@@ -327,7 +329,7 @@ public interface List<E> extends Collection<E> {
      * @throws UnsupportedOperationException if the {@code remove} operation
      *         is not supported by this list
      */
-    boolean remove(@Mutable @GuardSatisfied List<E> this, @UnknownSignedness @Readonly Object o);
+    boolean remove(@Mutable @GuardSatisfied @CanShrink List<E> this, @UnknownSignedness @Readonly Object o);
 
 
     // Bulk Modification Operations
@@ -425,7 +427,7 @@ public interface List<E> extends Collection<E> {
      * @see #remove(Object)
      * @see #contains(Object)
      */
-    boolean removeAll(@Mutable @GuardSatisfied List<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c);
+    boolean removeAll(@Mutable @GuardSatisfied @CanShrink List<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c);
 
     /**
      * Retains only the elements in this list that are contained in the
@@ -447,7 +449,7 @@ public interface List<E> extends Collection<E> {
      * @see #remove(Object)
      * @see #contains(Object)
      */
-    boolean retainAll(@Mutable @GuardSatisfied List<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c);
+    boolean retainAll(@Mutable @GuardSatisfied @CanShrink List<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c);
 
     /**
      * Replaces each element of this list with the result of applying the
@@ -564,7 +566,7 @@ public interface List<E> extends Collection<E> {
      * @throws UnsupportedOperationException if the {@code clear} operation
      *         is not supported by this list
      */
-    void clear(@Mutable @GuardSatisfied List<E> this);
+    void clear(@Mutable @GuardSatisfied @CanShrink List<E> this);
 
 
     // Comparison and hashing
@@ -676,7 +678,7 @@ public interface List<E> extends Collection<E> {
      *         ({@code index < 0 || index >= size()})
      */
     @ReleasesNoLocks
-    E remove(@Mutable @GuardSatisfied List<E> this, @IndexFor({"this"}) int index);
+    E remove(@Mutable @GuardSatisfied @CanShrink List<E> this, @IndexFor({"this"}) int index);
 
 
     // Search Operations
@@ -731,7 +733,7 @@ public interface List<E> extends Collection<E> {
      * @return a list iterator over the elements in this list (in proper
      *         sequence)
      */
-    @ReceiverDependentMutable ListIterator<E> listIterator(@ReceiverDependentMutable List<E> this);
+    @ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty ListIterator<E> listIterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty List<E> this);
 
     /**
      * Returns a list iterator over the elements in this list (in proper
@@ -748,7 +750,7 @@ public interface List<E> extends Collection<E> {
      * @throws IndexOutOfBoundsException if the index is out of range
      *         ({@code index < 0 || index > size()})
      */
-    @ReceiverDependentMutable ListIterator<E> listIterator(@ReceiverDependentMutable List<E> this, @IndexOrHigh({"this"}) int index);
+    @ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty ListIterator<E> listIterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty List<E> this, @IndexOrHigh({"this"}) int index);
 
     // View
 
@@ -787,7 +789,7 @@ public interface List<E> extends Collection<E> {
      *         fromIndex > toIndex})
      */
     @SideEffectFree
-    @ReceiverDependentMutable List<E> subList(@GuardSatisfied @ReceiverDependentMutable List<E> this, @IndexOrHigh({"this"}) int fromIndex, @IndexOrHigh({"this"}) int toIndex);
+    @ReceiverDependentMutable @PolyGrowShrink List<E> subList(@GuardSatisfied @ReceiverDependentMutable @PolyGrowShrink List<E> this, @IndexOrHigh({"this"}) int fromIndex, @IndexOrHigh({"this"}) int toIndex);
 
     /**
      * Creates a {@link Spliterator} over the elements in this list.

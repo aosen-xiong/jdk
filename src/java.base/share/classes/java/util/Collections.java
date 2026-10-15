@@ -27,6 +27,7 @@ package java.util;
 
 import org.checkerframework.checker.index.qual.GTENegativeOne;
 import org.checkerframework.checker.index.qual.NonNegative;
+import org.checkerframework.checker.index.qual.PolyGrowShrink;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nonempty.qual.EnsuresNonEmpty;
 import org.checkerframework.checker.nonempty.qual.EnsuresNonEmptyIf;
@@ -1056,7 +1057,7 @@ public class Collections {
      */
     @SuppressWarnings({"unchecked", "mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // mutability: one poly: the backing collection and the view are the same instantiation
     @SideEffectFree
-    public static <T> @PolyNonEmpty @PolyMutable Collection<T> unmodifiableCollection(@PolyNonEmpty @PolyMutable Collection<? extends T> c) {
+    public static <T> @PolyNonEmpty @PolyMutable @PolyGrowShrink Collection<T> unmodifiableCollection(@PolyNonEmpty @PolyMutable @PolyGrowShrink Collection<? extends T> c) {
         if (c.getClass() == UnmodifiableCollection.class) {
             return (@PolyMutable Collection<T>) c;
         }
@@ -1097,7 +1098,7 @@ public class Collections {
         public String toString()                   {return c.toString();}
 
         @SideEffectFree
-        public @PolyNonEmpty @ReceiverDependentMutable Iterator<E> iterator(@PolyNonEmpty UnmodifiableCollection<E> this) {
+        public @PolyNonEmpty @ReceiverDependentMutable @PolyGrowShrink Iterator<E> iterator(@PolyNonEmpty @PolyGrowShrink UnmodifiableCollection<E> this) {
             return new @ReceiverDependentMutable Iterator<E>() {
                 private final @Readonly Iterator<? extends E> i = c.iterator();
 
@@ -1378,7 +1379,7 @@ public class Collections {
      * @return an unmodifiable view of the specified list.
      */
     @SuppressWarnings({"unchecked", "mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // mutability: one poly: the backing collection and the view are the same instantiation
-    public static <T> @PolyNonEmpty @PolyMutable List<T> unmodifiableList(@PolyNonEmpty @PolyMutable List<? extends T> list) {
+    public static <T> @PolyGrowShrink @PolyNonEmpty @PolyMutable List<T> unmodifiableList(@PolyGrowShrink @PolyNonEmpty @PolyMutable List<? extends T> list) {
         if (list.getClass() == UnmodifiableList.class || list.getClass() == UnmodifiableRandomAccessList.class) {
            return (@PolyMutable List<T>) list;
         }
@@ -1432,7 +1433,7 @@ public class Collections {
             throw new UnsupportedOperationException();
         }
 
-        public @PolyNonEmpty @ReceiverDependentMutable ListIterator<E> listIterator(@PolyNonEmpty UnmodifiableList<E> this)   {return listIterator(0);}
+        public @PolyNonEmpty @ReceiverDependentMutable @PolyGrowShrink ListIterator<E> listIterator(@PolyNonEmpty @PolyGrowShrink UnmodifiableList<E> this)   {return listIterator(0);}
 
         public @ReceiverDependentMutable ListIterator<E> listIterator(UnmodifiableList<E> this, final int index) {
             return new @ReceiverDependentMutable ListIterator<E>() {
@@ -2141,12 +2142,12 @@ public class Collections {
      * @return a synchronized view of the specified collection.
      */
     @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
-    public static <T> @PolyMutable Collection<T> synchronizedCollection(@PolyMutable Collection<T> c) {
+    public static <T> @PolyMutable @PolyGrowShrink @PolyNonEmpty Collection<T> synchronizedCollection(@PolyMutable @PolyGrowShrink @PolyNonEmpty Collection<T> c) {
         return new @PolyMutable SynchronizedCollection<>(c);
     }
 
     @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
-    static <T> @PolyMutable Collection<T> synchronizedCollection(@PolyMutable Collection<T> c, @Readonly Object mutex) {
+    static <T> @PolyMutable @PolyGrowShrink @PolyNonEmpty Collection<T> synchronizedCollection(@PolyMutable @PolyGrowShrink @PolyNonEmpty Collection<T> c, @Readonly Object mutex) {
         return new @PolyMutable SynchronizedCollection<>(c, mutex);
     }
 
@@ -2567,14 +2568,14 @@ public class Collections {
      * @return a synchronized view of the specified list.
      */
     @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
-    public static <T> @PolyMutable List<T> synchronizedList(@PolyMutable List<T> list) {
+    public static <T> @PolyMutable @PolyGrowShrink @PolyNonEmpty List<T> synchronizedList(@PolyMutable @PolyGrowShrink @PolyNonEmpty List<T> list) {
         return (list instanceof RandomAccess ?
                 new @PolyMutable SynchronizedRandomAccessList<>(list) :
                 new @PolyMutable SynchronizedList<>(list));
     }
 
     @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
-    static <T> @PolyMutable List<T> synchronizedList(@PolyMutable List<T> list, @Readonly Object mutex) {
+    static <T> @PolyMutable @PolyGrowShrink @PolyNonEmpty List<T> synchronizedList(@PolyMutable @PolyGrowShrink @PolyNonEmpty List<T> list, @Readonly Object mutex) {
         return (list instanceof RandomAccess ?
                 new @PolyMutable SynchronizedRandomAccessList<>(list, mutex) :
                 new @PolyMutable SynchronizedList<>(list, mutex));
@@ -3247,7 +3248,7 @@ public class Collections {
      * @return a dynamically typesafe view of the specified collection
      * @since 1.5
      */
-    public static <E> Collection<E> checkedCollection(Collection<E> c,
+    public static <E> @PolyGrowShrink @PolyNonEmpty Collection<E> checkedCollection(@PolyGrowShrink @PolyNonEmpty Collection<E> c,
                                                       Class<E> type) {
         return new CheckedCollection<>(c, type);
     }
@@ -3418,7 +3419,7 @@ public class Collections {
      * @return a dynamically typesafe view of the specified queue
      * @since 1.8
      */
-    public static <E> Queue<E> checkedQueue(Queue<E> queue, Class<E> type) {
+    public static <E> @PolyGrowShrink @PolyNonEmpty Queue<E> checkedQueue(@PolyGrowShrink @PolyNonEmpty Queue<E> queue, Class<E> type) {
         return new CheckedQueue<>(queue, type);
     }
 
@@ -3676,7 +3677,7 @@ public class Collections {
      * @return a dynamically typesafe view of the specified list
      * @since 1.5
      */
-    public static <E> List<E> checkedList(List<E> list, Class<E> type) {
+    public static <E> @PolyGrowShrink @PolyNonEmpty List<E> checkedList(@PolyGrowShrink @PolyNonEmpty List<E> list, Class<E> type) {
         return (list instanceof RandomAccess ?
                 new CheckedRandomAccessList<>(list, type) :
                 new CheckedList<>(list, type));
@@ -6030,7 +6031,7 @@ public class Collections {
      * @return the queue
      * @since  1.6
      */
-    public static <T> @Readonly Queue<T> asLifoQueue(Deque<T> deque) {
+    public static <T> @Readonly @PolyGrowShrink @PolyNonEmpty Queue<T> asLifoQueue(@PolyGrowShrink @PolyNonEmpty Deque<T> deque) {
         return new AsLIFOQueue<>(Objects.requireNonNull(deque));
     }
 
