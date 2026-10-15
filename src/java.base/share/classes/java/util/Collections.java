@@ -1792,7 +1792,7 @@ public class Collections {
                     public void remove() {
                         throw new UnsupportedOperationException();
                     }
-                    public void forEachRemaining(Consumer<? super @Immutable Entry<K, V>> action) {
+                    public void forEachRemaining(Consumer<? super Map.@Immutable Entry<K, V>> action) {
                         i.forEachRemaining(entryConsumer(action));
                     }
                 };
@@ -4060,7 +4060,7 @@ public class Collections {
                         return checkedEntry(i.next(), valueType);
                     }
 
-                    public void forEachRemaining(Consumer<? super Map.@ReceiverDependentMutable Entry<K, V>> action) {
+                    public void forEachRemaining(Consumer<? super @ReceiverDependentMutable Entry<K, V>> action) {
                         i.forEachRemaining(
                             e -> action.accept(checkedEntry(e, valueType)));
                     }
