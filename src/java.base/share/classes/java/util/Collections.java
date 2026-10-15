@@ -483,7 +483,7 @@ public class Collections {
      * @throws UnsupportedOperationException if the specified list or its
      *         list-iterator does not support the {@code set} operation.
      */
-    @SuppressWarnings({"rawtypes", "unchecked", "mutability:argument.type.incompatible"}) // Revisit later, seems to be a bug
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public static void shuffle(@GuardSatisfied List<? extends @Readonly Object> list, Random rnd) {
         int size = list.size();
         if (size < SHUFFLE_THRESHOLD || list instanceof RandomAccess) {
@@ -1222,7 +1222,6 @@ public class Collections {
      *        returned.
      * @return an unmodifiable view of the specified sorted set.
      */
-    @SuppressWarnings("mutability") // PICO Flow
     public static <T> @PolyNonEmpty @Immutable SortedSet<T> unmodifiableSortedSet(@PolyNonEmpty @Readonly SortedSet<T> s) {
         // Not checking for subclasses because of heap pollution and information leakage.
         if (s.getClass() == UnmodifiableSortedSet.class) {
@@ -3342,7 +3341,7 @@ public class Collections {
                 (zeroLengthElementArray = zeroLengthArray(type));
         }
 
-        @SuppressWarnings({"unchecked", "mutability:argument.type.incompatible"}) // getClass error
+        @SuppressWarnings("unchecked")
         Collection<E> checkedCopyOf(@Mutable CheckedCollection<E> this, @Readonly Collection<? extends E> coll) {
             @Readonly Object[] a;
             try {
@@ -3621,7 +3620,6 @@ public class Collections {
         public E pollLast(@Mutable CheckedNavigableSet<E> this)                            {return ns.pollLast(); }
         public @ReceiverDependentMutable NavigableSet<E> descendingSet(@ReceiverDependentMutable CheckedNavigableSet<E> this)
                       { return checkedNavigableSet(ns.descendingSet(), type); }
-        @SuppressWarnings("mutability") // lost can not invoke poly method.
         public @ReceiverDependentMutable Iterator<E> descendingIterator(@ReceiverDependentMutable CheckedNavigableSet<E> this)
             {return checkedNavigableSet(ns.descendingSet(), type).iterator(); }
 
@@ -3935,7 +3933,6 @@ public class Collections {
         private transient @Assignable /* should be @LazyFinal */ Set<Map.@ReceiverDependentMutable Entry<K,V>> entrySet;
 
         @SideEffectFree
-        @SuppressWarnings("mutability:assignment.type.incompatible") // polyq on supertype's type argument
         public @ReceiverDependentMutable Set<Map.@ReceiverDependentMutable Entry<K,V>> entrySet(@ReceiverDependentMutable CheckedMap<K,V> this) {
             if (entrySet==null)
                 entrySet = new @ReceiverDependentMutable CheckedEntrySet<>(m.entrySet(), valueType);
@@ -5049,7 +5046,6 @@ public class Collections {
         return new SingletonSet<>(o);
     }
 
-    @SuppressWarnings("mutability") // receiver in anonymous class not denotable, see typetool#2433
     static <E> @Immutable Iterator<E> singletonIterator(final E e) {
         return new @Immutable Iterator<E>() {
             private @Assignable boolean hasNext = true;
@@ -5704,7 +5700,7 @@ public class Collections {
      * @return an enumeration over the specified collection.
      * @see Enumeration
      */
-    public static <T> @Immutable Enumeration<T> enumeration(final Collection<T> c) {
+    public static <T> @Readonly Enumeration<T> enumeration(final Collection<T> c) {
         return new @Immutable Enumeration<T>() {
             private final @Readonly Iterator<T> i = c.iterator();
 

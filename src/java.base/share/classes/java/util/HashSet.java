@@ -194,7 +194,6 @@ import jdk.internal.access.SharedSecrets;
      * @see ConcurrentModificationException
      */
     @SideEffectFree
-    @SuppressWarnings("mutability") // lost can not invoke poly method.
     public @PolyNonEmpty @ReceiverDependentMutable Iterator<E> iterator(@PolyNonEmpty @ReceiverDependentMutable HashSet<E> this) {
         return map.keySet().iterator();
     }

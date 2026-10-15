@@ -202,7 +202,6 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      * @return an iterator over the elements in this set in ascending order
      */
     @SideEffectFree
-    @SuppressWarnings("mutability:method.invocation.invalid") // lost can not invoke poly method.
     public @PolyNonEmpty @ReceiverDependentMutable Iterator<E> iterator(@PolyNonEmpty @ReceiverDependentMutable TreeSet<E> this) {
         return m.navigableKeySet().iterator();
     }
@@ -213,7 +212,6 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      * @return an iterator over the elements in this set in descending order
      * @since 1.6
      */
-    @SuppressWarnings("mutability:method.invocation.invalid") // lost can not invoke poly method.
     public @PolyNonEmpty @ReceiverDependentMutable Iterator<E> descendingIterator(@PolyNonEmpty @ReceiverDependentMutable TreeSet<E> this) {
         return m.descendingKeySet().iterator();
     }

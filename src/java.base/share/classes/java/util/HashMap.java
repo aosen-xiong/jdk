@@ -366,7 +366,6 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
      * Returns x's Class if it is of the form "class C implements
      * Comparable<C>", else null.
      */
-    @SuppressWarnings("mutability:static.receiverdependentmutable.forbidden") // getClass error
     static Class<?> comparableClassFor(@Readonly Object x) {
         if (x instanceof Comparable) {
             Class<?> c; Type[] ts, as; ParameterizedType p;
@@ -1139,7 +1138,6 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
      * @return a set view of the mappings contained in this map
      */
     @SideEffectFree
-    @SuppressWarnings("mutability:assignment.type.incompatible") // class polymorphism qualifier
     public @ReceiverDependentMutable Set<Map.@ReceiverDependentMutable Entry<@KeyFor({"this"}) K,V>> entrySet(@ReceiverDependentMutable @GuardSatisfied HashMap<K, V> this) {
         Set<Map.@ReceiverDependentMutable Entry<K,V>> es;
         return (es = entrySet) == null ? (entrySet = new @ReceiverDependentMutable EntrySet()) : es;
@@ -1515,7 +1513,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
      * @return a shallow copy of this map
      */
     @SideEffectFree
-    @SuppressWarnings({"unchecked", "mutability:return.type.incompatible"})
+    @SuppressWarnings({"unchecked", "mutability:return.type.incompatible"}) // mutability: fresh unaliased copy: the body replaces every field it shared
     @Override
     public @PolyMutable Object clone(@GuardSatisfied @PolyMutable HashMap<K, V> this) {
         HashMap<K,V> result;

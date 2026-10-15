@@ -436,7 +436,7 @@ import jdk.internal.util.ArraysSupport;
      * @throws NullPointerException if the specified array is null
      */
     @SideEffectFree
-    @SuppressWarnings({"unchecked", "mutability:argument.type.incompatible"}) // getClass error
+    @SuppressWarnings("unchecked")
     public <T> @Nullable T[] toArray(@PolyNull T[] a) {
         if (a.length < size)
             // Make a new array of a's runtime type, but my contents:

@@ -735,7 +735,7 @@ class ImmutableCollections {
         }
 
         @Override
-        @SuppressWarnings({"unchecked", "mutability:argument.type.incompatible"}) // getClass error
+        @SuppressWarnings("unchecked")
         public <T> @Nullable T[] toArray(@PolyNull T[] a) {
             int size = elements.length;
             if (a.length < size) {
