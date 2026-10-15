@@ -1438,12 +1438,12 @@ public class TreeMap<K extends @Immutable Object,V>
      * submap classes.
      */
 
-    Iterator<K> keyIterator() {
-        return new KeyIterator(getFirstEntry());
+    @ReceiverDependentMutable Iterator<K> keyIterator(@ReceiverDependentMutable TreeMap<K,V> this) {
+        return new @ReceiverDependentMutable KeyIterator(getFirstEntry());
     }
 
-    Iterator<K> descendingKeyIterator() {
-        return new DescendingKeyIterator(getLastEntry());
+    @ReceiverDependentMutable Iterator<K> descendingKeyIterator(@ReceiverDependentMutable TreeMap<K,V> this) {
+        return new @ReceiverDependentMutable DescendingKeyIterator(getLastEntry());
     }
 
     @ReceiverDependentMutable
@@ -1454,16 +1454,16 @@ public class TreeMap<K extends @Immutable Object,V>
         @SideEffectFree
         public @ReceiverDependentMutable Iterator<E> iterator(@ReceiverDependentMutable KeySet<E> this) {
             if (m instanceof TreeMap)
-                return ((TreeMap<E,?>)m).keyIterator();
+                return ((@ReceiverDependentMutable TreeMap<E,?>)m).keyIterator();
             else
-                return ((TreeMap.NavigableSubMap<E,?>)m).keyIterator();
+                return ((TreeMap.@ReceiverDependentMutable NavigableSubMap<E,?>)m).keyIterator();
         }
 
         public @ReceiverDependentMutable Iterator<E> descendingIterator(@ReceiverDependentMutable KeySet<E> this) {
             if (m instanceof TreeMap)
-                return ((TreeMap<E,?>)m).descendingKeyIterator();
+                return ((@ReceiverDependentMutable TreeMap<E,?>)m).descendingKeyIterator();
             else
-                return ((TreeMap.NavigableSubMap<E,?>)m).descendingKeyIterator();
+                return ((TreeMap.@ReceiverDependentMutable NavigableSubMap<E,?>)m).descendingKeyIterator();
         }
 
         @Pure
@@ -1530,9 +1530,9 @@ public class TreeMap<K extends @Immutable Object,V>
      */
     @ReceiverDependentMutable
     abstract class PrivateEntryIterator<T> implements Iterator<T> {
-        @Readonly Entry<K,V> next;
-        @Readonly Entry<K,V> lastReturned;
-        int expectedModCount;
+        @Assignable @Readonly Entry<K,V> next;
+        @Assignable @Readonly Entry<K,V> lastReturned;
+        @Assignable int expectedModCount;
 
         PrivateEntryIterator(@Readonly Entry<K,V> first) {
             expectedModCount = modCount;
@@ -1546,7 +1546,7 @@ public class TreeMap<K extends @Immutable Object,V>
             return next != null;
         }
 
-        final @Readonly Entry<K,V> nextEntry(@Mutable PrivateEntryIterator<T> this) {
+        final @Readonly Entry<K,V> nextEntry(@Readonly PrivateEntryIterator<T> this) {
             Entry<K,V> e = next;
             if (e == null)
                 throw new NoSuchElementException();
@@ -1557,7 +1557,7 @@ public class TreeMap<K extends @Immutable Object,V>
             return e;
         }
 
-        final @Readonly Entry<K,V> prevEntry(@Mutable PrivateEntryIterator<T> this) {
+        final @Readonly Entry<K,V> prevEntry(@Readonly PrivateEntryIterator<T> this) {
             Entry<K,V> e = next;
             if (e == null)
                 throw new NoSuchElementException();
@@ -1843,12 +1843,12 @@ public class TreeMap<K extends @Immutable Object,V>
         abstract TreeMap.@ReceiverDependentMutable Entry<K,V> subLower(@ReceiverDependentMutable NavigableSubMap<K,V> this, K key);
 
         /** Returns ascending iterator from the perspective of this submap */
-        abstract Iterator<K> keyIterator(@Readonly NavigableSubMap<K,V> this);
+        abstract @ReceiverDependentMutable Iterator<K> keyIterator(@ReceiverDependentMutable NavigableSubMap<K,V> this);
 
         abstract Spliterator<K> keySpliterator(@Readonly NavigableSubMap<K,V> this);
 
         /** Returns descending iterator from the perspective of this submap */
-        abstract Iterator<K> descendingKeyIterator(@Readonly NavigableSubMap<K,V> this);
+        abstract @ReceiverDependentMutable Iterator<K> descendingKeyIterator(@ReceiverDependentMutable NavigableSubMap<K,V> this);
 
         // public methods
 
@@ -2083,10 +2083,10 @@ public class TreeMap<K extends @Immutable Object,V>
          */
         @ReceiverDependentMutable
         abstract class SubMapIterator<T> implements Iterator<T> {
-            TreeMap.@Readonly Entry<K,V> lastReturned;
-            TreeMap.@Readonly Entry<K,V> next;
+            @Assignable TreeMap.@Readonly Entry<K,V> lastReturned;
+            @Assignable TreeMap.@Readonly Entry<K,V> next;
             final @Readonly Object fenceKey;
-            int expectedModCount;
+            @Assignable int expectedModCount;
 
             SubMapIterator(TreeMap.@Readonly Entry<K,V> first,
                            TreeMap.@Readonly Entry<K,V> fence) {
@@ -2103,7 +2103,7 @@ public class TreeMap<K extends @Immutable Object,V>
             }
 
             @SuppressWarnings("mutability:return.type.incompatible") // outter receiver dependence
-            final TreeMap.@ReceiverDependentMutable Entry<K,V> nextEntry(@ReceiverDependentMutable NavigableSubMap<K,V>.@Mutable SubMapIterator<T> this) {
+            final TreeMap.@ReceiverDependentMutable Entry<K,V> nextEntry(@ReceiverDependentMutable NavigableSubMap<K,V>.@Readonly SubMapIterator<T> this) {
                 TreeMap.Entry<K,V> e = next;
                 if (e == null || e.key == fenceKey)
                     throw new NoSuchElementException();
@@ -2114,7 +2114,7 @@ public class TreeMap<K extends @Immutable Object,V>
                 return e;
             }
 
-            final TreeMap.@Readonly Entry<K,V> prevEntry(@Readonly NavigableSubMap<K,V>.@Mutable SubMapIterator<T> this) {
+            final TreeMap.@Readonly Entry<K,V> prevEntry(@Readonly NavigableSubMap<K,V>.@Readonly SubMapIterator<T> this) {
                 TreeMap.Entry<K,V> e = next;
                 if (e == null || e.key == fenceKey)
                     throw new NoSuchElementException();
@@ -2315,16 +2315,16 @@ public class TreeMap<K extends @Immutable Object,V>
                                         toEnd,     hi, hiInclusive));
         }
 
-        Iterator<K> keyIterator(@Readonly AscendingSubMap<K,V> this) {
-            return new SubMapKeyIterator(absLowest(), absHighFence());
+        @ReceiverDependentMutable Iterator<K> keyIterator(@ReceiverDependentMutable AscendingSubMap<K,V> this) {
+            return new @ReceiverDependentMutable SubMapKeyIterator(absLowest(), absHighFence());
         }
 
         Spliterator<K> keySpliterator(@Readonly AscendingSubMap<K,V> this) {
             return new SubMapKeyIterator(absLowest(), absHighFence());
         }
 
-        Iterator<K> descendingKeyIterator(@Readonly AscendingSubMap<K,V> this) {
-            return new DescendingSubMapKeyIterator(absHighest(), absLowFence());
+        @ReceiverDependentMutable Iterator<K> descendingKeyIterator(@ReceiverDependentMutable AscendingSubMap<K,V> this) {
+            return new @ReceiverDependentMutable DescendingSubMapKeyIterator(absHighest(), absLowFence());
         }
 
         @ReceiverDependentMutable
@@ -2411,16 +2411,16 @@ public class TreeMap<K extends @Immutable Object,V>
                                        toEnd,     hi, hiInclusive));
         }
 
-        Iterator<K> keyIterator(@Readonly DescendingSubMap<K,V> this) {
-            return new DescendingSubMapKeyIterator(absHighest(), absLowFence());
+        @ReceiverDependentMutable Iterator<K> keyIterator(@ReceiverDependentMutable DescendingSubMap<K,V> this) {
+            return new @ReceiverDependentMutable DescendingSubMapKeyIterator(absHighest(), absLowFence());
         }
 
         Spliterator<K> keySpliterator(@Readonly DescendingSubMap<K,V> this) {
             return new DescendingSubMapKeyIterator(absHighest(), absLowFence());
         }
 
-        Iterator<K> descendingKeyIterator(@Readonly DescendingSubMap<K,V> this) {
-            return new SubMapKeyIterator(absLowest(), absHighFence());
+        @ReceiverDependentMutable Iterator<K> descendingKeyIterator(@ReceiverDependentMutable DescendingSubMap<K,V> this) {
+            return new @ReceiverDependentMutable SubMapKeyIterator(absLowest(), absHighFence());
         }
 
         @ReceiverDependentMutable
@@ -2949,7 +2949,7 @@ public class TreeMap<K extends @Immutable Object,V>
      * @throws ClassNotFoundException propagated from readObject.
      *         This cannot occur if str is null.
      */
-    private void buildFromSorted(@Mutable TreeMap<K,V> this, int size, Iterator<?> it,
+    private void buildFromSorted(@Mutable TreeMap<K,V> this, int size, @Readonly Iterator<?> it,
                                  java.io.ObjectInputStream str,
                                  V defaultVal)
         throws  java.io.IOException, ClassNotFoundException {
@@ -2975,7 +2975,7 @@ public class TreeMap<K extends @Immutable Object,V>
     @SuppressWarnings("unchecked")
     private final Entry<K,V> buildFromSorted(@Mutable TreeMap<K,V> this, int level, int lo, int hi,
                                              int redLevel,
-                                             Iterator<?> it,
+                                             @Readonly Iterator<?> it,
                                              java.io.ObjectInputStream str,
                                              V defaultVal)
         throws  java.io.IOException, ClassNotFoundException {
