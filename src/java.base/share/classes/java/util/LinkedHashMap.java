@@ -787,9 +787,9 @@ public class LinkedHashMap<K extends @Immutable Object,V>
 
     @ReceiverDependentMutable
     abstract class LinkedHashIterator {
-        LinkedHashMap.@Readonly Entry<K,V> next;
-        LinkedHashMap.@Readonly Entry<K,V> current;
-        int expectedModCount;
+        @Assignable LinkedHashMap.@Readonly Entry<K,V> next;
+        @Assignable LinkedHashMap.@Readonly Entry<K,V> current;
+        @Assignable int expectedModCount;
 
         LinkedHashIterator() {
             next = head;
@@ -803,7 +803,7 @@ public class LinkedHashMap<K extends @Immutable Object,V>
             return next != null;
         }
 
-        final LinkedHashMap.@Readonly Entry<K,V> nextNode(@NonEmpty @Mutable LinkedHashIterator this) {
+        final LinkedHashMap.@Readonly Entry<K,V> nextNode(@NonEmpty @Readonly LinkedHashIterator this) {
             LinkedHashMap.Entry<K,V> e = next;
             if (modCount != expectedModCount)
                 throw new ConcurrentModificationException();

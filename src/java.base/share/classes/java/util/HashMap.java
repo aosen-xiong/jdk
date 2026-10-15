@@ -1021,7 +1021,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
         public final @NonNegative int size(@Readonly KeySet this)                 { return size; }
         public final void clear(@Mutable KeySet this)               { HashMap.this.clear(); }
         @SideEffectFree
-        public final @ReceiverDependentMutable Iterator<K> iterator(@ReceiverDependentMutable KeySet this)     { return new KeyIterator(); }
+        public final @ReceiverDependentMutable Iterator<K> iterator(@ReceiverDependentMutable KeySet this)     { return new @ReceiverDependentMutable KeyIterator(); }
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
         public final boolean contains(@Readonly KeySet this, @Nullable @UnknownSignedness @Readonly Object o) { return containsKey(o); }
@@ -1089,7 +1089,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
         public final @NonNegative int size(@Readonly Values this)                 { return size; }
         public final void clear(@Mutable HashMap<K, V>. @Mutable Values this)               { HashMap.this.clear(); }
         @SideEffectFree
-        public final @ReceiverDependentMutable Iterator<V> iterator(@ReceiverDependentMutable Values this)     { return new ValueIterator(); }
+        public final @ReceiverDependentMutable Iterator<V> iterator(@ReceiverDependentMutable Values this)     { return new @ReceiverDependentMutable ValueIterator(); }
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
         public final boolean contains(@Readonly Values this, @Nullable @UnknownSignedness @Readonly Object o) { return containsValue(o); }
@@ -1618,10 +1618,10 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
 
     @ReceiverDependentMutable
     abstract class HashIterator {
-        @Readonly Node<K,V> next;        // next entry to return
-        @Readonly Node<K,V> current;     // current entry
-        int expectedModCount;  // for fast-fail
-        int index;             // current slot
+        @Assignable @Readonly Node<K,V> next;        // next entry to return
+        @Assignable @Readonly Node<K,V> current;     // current entry
+        @Assignable int expectedModCount;  // for fast-fail
+        @Assignable int index;             // current slot
 
         HashIterator() {
             expectedModCount = modCount;
@@ -1640,7 +1640,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
         }
 
         @SuppressWarnings("mutability:return.type.incompatible") // field depends on outer class
-        final @ReceiverDependentMutable Node<K,V> nextNode(@ReceiverDependentMutable HashMap<K,V>.@NonEmpty @Mutable HashIterator this) {
+        final @ReceiverDependentMutable Node<K,V> nextNode(@ReceiverDependentMutable HashMap<K,V>.@NonEmpty @ReceiverDependentMutable HashIterator this) {
             @ReceiverDependentMutable Node<K,V>[] t;
             Node<K,V> e = next;
             if (modCount != expectedModCount)
@@ -1680,7 +1680,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
     @ReceiverDependentMutable
     final class EntryIterator extends HashIterator
         implements Iterator<Map.@ReceiverDependentMutable Entry<K,V>> {
-        public final Map.@ReceiverDependentMutable Entry<K,V> next(@NonEmpty @ReceiverDependentMutable HashMap<K,V>.@Readonly EntryIterator this) { return nextNode(); }
+        public final Map.@ReceiverDependentMutable Entry<K,V> next(@NonEmpty @ReceiverDependentMutable HashMap<K,V>.@ReceiverDependentMutable EntryIterator this) { return nextNode(); }
     }
 
     /* ------------------------------------------------------------ */
