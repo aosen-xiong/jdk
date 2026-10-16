@@ -462,7 +462,7 @@ public final class Spliterators {
      * @return A spliterator from an iterator
      * @throws NullPointerException if the given iterator is {@code null}
      */
-    public static <T> Spliterator<T> spliterator(Iterator<? extends T> iterator,
+    public static <T> Spliterator<T> spliterator(@Readonly Iterator<? extends T> iterator,
                                                  long size,
                                                  int characteristics) {
         return new IteratorSpliterator<>(Objects.requireNonNull(iterator), size,
@@ -490,7 +490,7 @@ public final class Spliterators {
      * @return A spliterator from an iterator
      * @throws NullPointerException if the given iterator is {@code null}
      */
-    public static <T> Spliterator<T> spliteratorUnknownSize(Iterator<? extends T> iterator,
+    public static <T> Spliterator<T> spliteratorUnknownSize(@Readonly Iterator<? extends T> iterator,
                                                             int characteristics) {
         return new IteratorSpliterator<>(Objects.requireNonNull(iterator), characteristics);
     }
@@ -1794,7 +1794,7 @@ public final class Spliterators {
          * @param characteristics properties of this spliterator's
          * source or elements.
          */
-        public IteratorSpliterator(Iterator<? extends T> iterator, long size, int characteristics) {
+        public IteratorSpliterator(@Readonly Iterator<? extends T> iterator, long size, int characteristics) {
             this.collection = null;
             this.it = iterator;
             this.est = size;
@@ -1812,7 +1812,7 @@ public final class Spliterators {
          * @param characteristics properties of this spliterator's
          * source or elements.
          */
-        public IteratorSpliterator(Iterator<? extends T> iterator, int characteristics) {
+        public IteratorSpliterator(@Readonly Iterator<? extends T> iterator, int characteristics) {
             this.collection = null;
             this.it = iterator;
             this.est = Long.MAX_VALUE;
