@@ -346,7 +346,7 @@ public class Collections {
      *         elements of the list using this comparator.
      */
     @SuppressWarnings("unchecked")
-    public static <T> int binarySearch(@Readonly List<? extends T> list, T key, @Nullable Comparator<? super T> c) {
+    public static <T> int binarySearch(@Readonly List<? extends T> list, T key, @Nullable @Readonly Comparator<? super T> c) {
         if (c==null)
             return binarySearch((@Readonly List<? extends Comparable<? super T>>) list, key);
 
@@ -356,7 +356,7 @@ public class Collections {
             return Collections.iteratorBinarySearch(list, key, c);
     }
 
-    private static <T> int indexedBinarySearch(@Readonly List<? extends T> l, T key, Comparator<? super T> c) {
+    private static <T> int indexedBinarySearch(@Readonly List<? extends T> l, T key, @Readonly Comparator<? super T> c) {
         int low = 0;
         int high = l.size()-1;
 
@@ -375,7 +375,7 @@ public class Collections {
         return -(low + 1);  // key not found
     }
 
-    private static <T> int iteratorBinarySearch(@Readonly List<? extends T> l, T key, Comparator<? super T> c) {
+    private static <T> int iteratorBinarySearch(@Readonly List<? extends T> l, T key, @Readonly Comparator<? super T> c) {
         int low = 0;
         int high = l.size()-1;
         ListIterator<? extends T> i = l.listIterator();

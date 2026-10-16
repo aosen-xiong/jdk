@@ -1255,7 +1255,7 @@ public class Arrays {
      *         found to violate the {@link Comparator} contract
      */
     @CFComment("A comparator that can handle the array elements needs to be provided. Otherwise, use method without comparator.")
-    public static <T> void sort(@UnknownSignedness T[] a, Comparator<? super T> c) {
+    public static <T> void sort(@UnknownSignedness T[] a, @Readonly Comparator<? super T> c) {
         if (c == null) {
             sort(a);
         } else {
@@ -1267,7 +1267,7 @@ public class Arrays {
     }
 
     /** To be removed in a future release. */
-    private static <T> void legacyMergeSort(T[] a, Comparator<? super T> c) {
+    private static <T> void legacyMergeSort(T[] a, @Readonly Comparator<? super T> c) {
         T[] aux = a.clone();
         if (c==null)
             mergeSort(aux, a, 0, a.length, 0);
@@ -1329,7 +1329,7 @@ public class Arrays {
      */
     @CFComment("A comparator that can handle the array elements needs to be provided. Otherwise, use method without comparator.")
     public static <T> void sort(@UnknownSignedness T[] a, @IndexOrHigh({"#1"}) int fromIndex, @IndexOrHigh({"#1"}) int toIndex,
-                                Comparator<? super T> c) {
+                                @Readonly Comparator<? super T> c) {
         if (c == null) {
             sort(a, fromIndex, toIndex);
         } else {
@@ -1343,7 +1343,7 @@ public class Arrays {
 
     /** To be removed in a future release. */
     private static <T> void legacyMergeSort(T[] a, @IndexOrHigh({"#1"}) int fromIndex, @IndexOrHigh({"#1"}) int toIndex,
-                                            Comparator<? super T> c) {
+                                            @Readonly Comparator<? super T> c) {
         T[] aux = copyOfRange(a, fromIndex, toIndex);
         if (c==null)
             mergeSort(aux, a, fromIndex, toIndex, -fromIndex);
@@ -1363,7 +1363,7 @@ public class Arrays {
     private static void mergeSort(@Readonly Object[] src,
                                   @Readonly Object[] dest,
                                   int low, int high, int off,
-                                  Comparator c) {
+                                  @Readonly Comparator c) {
         int length = high - low;
 
         // Insertion sort on smallest arrays
