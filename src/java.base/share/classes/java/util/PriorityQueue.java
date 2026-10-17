@@ -216,7 +216,7 @@ public class PriorityQueue<E extends @NonNull Object> extends AbstractQueue<E>
      * @throws NullPointerException if the specified collection or any
      *         of its elements are null
      */
-    public @PolyNonEmpty PriorityQueue(@PolyNonEmpty Collection<? extends E> c) {
+    public @PolyNonEmpty PriorityQueue(@PolyNonEmpty @Readonly Collection<? extends E> c) {
         if (c instanceof SortedSet<?>) {
             SortedSet<? extends E> ss = (SortedSet<? extends E>) c;
             this.comparator = (Comparator<? super E>) ss.comparator();
@@ -247,7 +247,7 @@ public class PriorityQueue<E extends @NonNull Object> extends AbstractQueue<E>
      * @throws NullPointerException if the specified priority queue or any
      *         of its elements are null
      */
-    public PriorityQueue(PriorityQueue<? extends E> c) {
+    public PriorityQueue(@Readonly PriorityQueue<? extends E> c) {
         this.comparator = (Comparator<? super E>) c.comparator();
         initFromPriorityQueue(c);
     }
@@ -265,7 +265,7 @@ public class PriorityQueue<E extends @NonNull Object> extends AbstractQueue<E>
      * @throws NullPointerException if the specified sorted set or any
      *         of its elements are null
      */
-    public PriorityQueue(SortedSet<? extends E> c) {
+    public PriorityQueue(@Readonly SortedSet<? extends E> c) {
         this.comparator = (Comparator<? super E>) c.comparator();
         initElementsFromCollection(c);
     }

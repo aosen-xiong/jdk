@@ -212,7 +212,7 @@ public class LinkedBlockingDeque<E extends @Readonly Object>
      * @throws NullPointerException if the specified collection or any
      *         of its elements are null
      */
-    public LinkedBlockingDeque(Collection<? extends E> c) {
+    public LinkedBlockingDeque(@Readonly Collection<? extends E> c) {
         this(Integer.MAX_VALUE);
         addAll(c);
     }

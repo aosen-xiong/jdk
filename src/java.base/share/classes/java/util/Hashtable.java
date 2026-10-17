@@ -254,7 +254,7 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
      * @since   1.2
      */
     @SuppressWarnings("mutability:method.invocation.invalid") // PICO constructor fix
-    public Hashtable(Map<? extends K, ? extends V> t) {
+    public Hashtable(@Readonly Map<? extends K, ? extends V> t) {
         this(Math.max(2*t.size(), 11), 0.75f);
         putAll(t);
     }

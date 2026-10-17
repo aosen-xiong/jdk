@@ -188,7 +188,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
      * @throws NullPointerException if {@code m} is null
      */
     @SuppressWarnings("mutability:method.invocation.invalid") // PICO constructor fix
-    public EnumMap(@ReceiverDependentMutable Map<K, ? extends V> m) {
+    public EnumMap(@Readonly Map<K, ? extends V> m) {
         if (m instanceof EnumMap) {
             EnumMap<K, ? extends V> em = (@ReceiverDependentMutable EnumMap<K, ? extends V>) m;
             keyType = em.keyType;

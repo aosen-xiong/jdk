@@ -872,7 +872,7 @@ public class ConcurrentHashMap<K extends @NonNull @Immutable Object,V extends @N
      *
      * @param m the map
      */
-    public ConcurrentHashMap(Map<? extends K, ? extends V> m) {
+    public ConcurrentHashMap(@Readonly Map<? extends K, ? extends V> m) {
         this.sizeCtl = DEFAULT_CAPACITY;
         putAll(m);
     }

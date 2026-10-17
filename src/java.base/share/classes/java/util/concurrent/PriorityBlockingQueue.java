@@ -257,7 +257,7 @@ public class PriorityBlockingQueue<E extends Object> extends AbstractQueue<E>
      * @throws NullPointerException if the specified collection or any
      *         of its elements are null
      */
-    public PriorityBlockingQueue(Collection<? extends E> c) {
+    public PriorityBlockingQueue(@Readonly Collection<? extends E> c) {
         boolean heapify = true; // true if not known to be in heap order
         boolean screen = true;  // true if must screen for nulls
         if (c instanceof SortedSet<?>) {

@@ -277,7 +277,7 @@ public class WeakHashMap<K extends @Immutable Object,V>
      * @since   1.3
      */
     @SuppressWarnings("mutability") // PICO constructor fix
-    public @PolyNonEmpty WeakHashMap(@PolyNonEmpty Map<? extends K, ? extends V> m) {
+    public @PolyNonEmpty WeakHashMap(@PolyNonEmpty @Readonly Map<? extends K, ? extends V> m) {
         this(Math.max((int) ((float)m.size() / DEFAULT_LOAD_FACTOR + 1.0F),
                 DEFAULT_INITIAL_CAPACITY),
              DEFAULT_LOAD_FACTOR);

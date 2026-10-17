@@ -291,7 +291,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
      * @throws NullPointerException if the specified map is null
      */
     @SuppressWarnings("mutability") // PICO constructor fix
-    public IdentityHashMap(Map<? extends K, ? extends V> m) {
+    public IdentityHashMap(@Readonly Map<? extends K, ? extends V> m) {
         // Allow for a bit of growth
         this((int) ((1 + m.size()) * 1.1));
         putAll(m);

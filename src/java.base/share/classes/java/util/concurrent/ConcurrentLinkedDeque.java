@@ -800,7 +800,7 @@ public class ConcurrentLinkedDeque<E extends @NonNull Object>
      * @throws NullPointerException if the specified collection or any
      *         of its elements are null
      */
-    public ConcurrentLinkedDeque(Collection<? extends E> c) {
+    public ConcurrentLinkedDeque(@Readonly Collection<? extends E> c) {
         // Copy c into a private chain of Nodes
         Node<E> h = null, t = null;
         for (E e : c) {

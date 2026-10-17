@@ -131,7 +131,7 @@ public class CopyOnWriteArraySet<E> extends AbstractSet<E>
      * @param c the collection of elements to initially contain
      * @throws NullPointerException if the specified collection is null
      */
-    public CopyOnWriteArraySet(Collection<? extends E> c) {
+    public CopyOnWriteArraySet(@Readonly Collection<? extends E> c) {
         if (c.getClass() == CopyOnWriteArraySet.class) {
             @SuppressWarnings("unchecked") CopyOnWriteArraySet<E> cc =
                 (CopyOnWriteArraySet<E>)c;

@@ -273,7 +273,7 @@ public class ConcurrentLinkedQueue<E extends @NonNull Object> extends AbstractQu
      * @throws NullPointerException if the specified collection or any
      *         of its elements are null
      */
-    public ConcurrentLinkedQueue(Collection<? extends E> c) {
+    public ConcurrentLinkedQueue(@Readonly Collection<? extends E> c) {
         Node<E> h = null, t = null;
         for (E e : c) {
             Node<E> newNode = new Node<E>(Objects.requireNonNull(e));

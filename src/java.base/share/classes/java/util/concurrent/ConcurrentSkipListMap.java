@@ -1111,7 +1111,7 @@ public class ConcurrentSkipListMap<K,V> extends AbstractMap<K,V>
      * @throws NullPointerException if the specified map or any of its keys
      *         or values are null
      */
-    public ConcurrentSkipListMap(Map<? extends K, ? extends V> m) {
+    public ConcurrentSkipListMap(@Readonly Map<? extends K, ? extends V> m) {
         this.comparator = null;
         putAll(m);
     }
@@ -1125,7 +1125,7 @@ public class ConcurrentSkipListMap<K,V> extends AbstractMap<K,V>
      * @throws NullPointerException if the specified sorted map or any of
      *         its keys or values are null
      */
-    public ConcurrentSkipListMap(SortedMap<K, ? extends V> m) {
+    public ConcurrentSkipListMap(@Readonly SortedMap<K, ? extends V> m) {
         this.comparator = m.comparator();
         buildFromSorted(m); // initializes transients
     }

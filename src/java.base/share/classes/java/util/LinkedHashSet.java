@@ -25,6 +25,7 @@
 
 package java.util;
 
+import org.checkerframework.checker.mutability.qual.Readonly;
 import org.checkerframework.checker.mutability.qual.Immutable;
 import org.checkerframework.checker.mutability.qual.ReceiverDependentMutable;
 import org.checkerframework.framework.qual.AnnotatedFor;
@@ -174,7 +175,7 @@ public class LinkedHashSet<E extends @Immutable Object>
      * @throws NullPointerException if the specified collection is null
      */
     @SuppressWarnings("mutability:method.invocation.invalid") // PICO constructor fix
-    public LinkedHashSet(Collection<? extends E> c) {
+    public LinkedHashSet(@Readonly Collection<? extends E> c) {
         super(Math.max(2*c.size(), 11), .75f, true);
         addAll(c);
     }

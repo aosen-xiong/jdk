@@ -179,7 +179,7 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      * @throws NullPointerException if the specified collection is null
      */
     @SuppressWarnings("mutability:method.invocation.invalid") // PICO constructor fix
-    public @PolyNonEmpty TreeSet(@PolyNonEmpty Collection<? extends E> c) {
+    public @PolyNonEmpty TreeSet(@PolyNonEmpty @Readonly Collection<? extends E> c) {
         this();
         addAll(c);
     }
@@ -192,7 +192,7 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      * @throws NullPointerException if the specified sorted set is null
      */
     @SuppressWarnings("mutability:method.invocation.invalid") // PICO constructor fix
-    public @PolyNonEmpty TreeSet(@PolyNonEmpty SortedSet<E> s) {
+    public @PolyNonEmpty TreeSet(@PolyNonEmpty @Readonly SortedSet<E> s) {
         this(s.comparator());
         addAll(s);
     }

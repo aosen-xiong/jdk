@@ -1182,7 +1182,7 @@ public class LinkedTransferQueue<E extends Object> extends AbstractQueue<E>
      * @throws NullPointerException if the specified collection or any
      *         of its elements are null
      */
-    public LinkedTransferQueue(Collection<? extends E> c) {
+    public LinkedTransferQueue(@Readonly Collection<? extends E> c) {
         Node h = null, t = null;
         for (E e : c) {
             Node newNode = new Node(Objects.requireNonNull(e));

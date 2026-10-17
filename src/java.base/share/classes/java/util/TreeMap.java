@@ -209,7 +209,7 @@ public class TreeMap<K extends @Immutable Object,V>
      * @throws NullPointerException if the specified map is null
      */
     @SuppressWarnings("mutability:method.invocation.invalid") // PICO constructor fix
-    public @PolyNonEmpty TreeMap(@PolyNonEmpty Map<? extends K, ? extends V> m) {
+    public @PolyNonEmpty TreeMap(@PolyNonEmpty @Readonly Map<? extends K, ? extends V> m) {
         comparator = null;
         putAll(m);
     }
@@ -224,7 +224,7 @@ public class TreeMap<K extends @Immutable Object,V>
      * @throws NullPointerException if the specified map is null
      */
     @SuppressWarnings("mutability:method.invocation.invalid") // PICO constructor fix
-    public @PolyNonEmpty TreeMap(@PolyNonEmpty @ReceiverDependentMutable SortedMap<K, ? extends V> m) {
+    public @PolyNonEmpty TreeMap(@PolyNonEmpty @Readonly SortedMap<K, ? extends V> m) {
         comparator = m.comparator();
         try {
             buildFromSorted(m.size(), m.entrySet().iterator(), null, null);

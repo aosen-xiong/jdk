@@ -231,7 +231,7 @@ public class ArrayDeque<E extends @NonNull @Readonly Object> extends AbstractCol
      * @throws NullPointerException if the specified collection is null
      */
     @SuppressWarnings("mutability") // PICO RDM constructor call mutable method
-    public @PolyNonEmpty ArrayDeque(@PolyNonEmpty Collection<? extends E> c) {
+    public @PolyNonEmpty ArrayDeque(@PolyNonEmpty @Readonly Collection<? extends E> c) {
         this(c.size());
         copyElements(c);
     }

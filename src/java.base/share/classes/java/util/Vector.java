@@ -205,7 +205,7 @@ public class Vector<E>
      * @since   1.2
      */
     @SuppressWarnings("mutability") // cast from @Unique @Mutable to @RDM and class literal
-    public @PolyNonEmpty Vector(@PolyNonEmpty Collection<? extends E> c) {
+    public @PolyNonEmpty Vector(@PolyNonEmpty @Readonly Collection<? extends E> c) {
         @Readonly Object @ReceiverDependentMutable [] a = c.toArray();
         elementCount = a.length;
         if (c.getClass() == ArrayList.class) {

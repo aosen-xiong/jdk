@@ -285,7 +285,7 @@ public class LinkedBlockingQueue<E extends @Readonly Object> extends AbstractQue
      * @throws NullPointerException if the specified collection or any
      *         of its elements are null
      */
-    public LinkedBlockingQueue(Collection<? extends E> c) {
+    public LinkedBlockingQueue(@Readonly Collection<? extends E> c) {
         this(Integer.MAX_VALUE);
         final ReentrantLock putLock = this.putLock;
         putLock.lock(); // Never contended, but necessary for visibility

@@ -151,7 +151,7 @@ public class CopyOnWriteArrayList<E>
      * @param c the collection of initially held elements
      * @throws NullPointerException if the specified collection is null
      */
-    public CopyOnWriteArrayList(Collection<? extends E> c) {
+    public CopyOnWriteArrayList(@Readonly Collection<? extends E> c) {
         Object[] es;
         if (c.getClass() == CopyOnWriteArrayList.class)
             es = ((CopyOnWriteArrayList<?>)c).getArray();
