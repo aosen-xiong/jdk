@@ -61,6 +61,7 @@
  */
 package java.time.chrono;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import java.time.DateTimeException;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
@@ -341,7 +342,7 @@ public interface ChronoPeriod
      * @return true if this is equal to the other period
      */
     @Override
-    boolean equals(Object obj);
+    boolean equals(@Nullable Object obj);
 
     /**
      * A hash code for this period.

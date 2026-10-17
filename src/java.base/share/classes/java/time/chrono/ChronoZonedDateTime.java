@@ -61,6 +61,7 @@
  */
 package java.time.chrono;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import static java.time.temporal.ChronoField.INSTANT_SECONDS;
 import static java.time.temporal.ChronoField.OFFSET_SECONDS;
 import static java.time.temporal.ChronoUnit.FOREVER;
@@ -380,7 +381,7 @@ public interface ChronoZonedDateTime<D extends ChronoLocalDate>
      * @return true if the field can be queried, false if not
      */
     @Override
-    boolean isSupported(TemporalField field);
+    boolean isSupported(@Nullable TemporalField field);
 
     /**
      * Checks if the specified unit is supported.
@@ -401,7 +402,7 @@ public interface ChronoZonedDateTime<D extends ChronoLocalDate>
      * @return true if the unit can be added/subtracted, false if not
      */
     @Override
-    default boolean isSupported(TemporalUnit unit) {
+    default boolean isSupported(@Nullable TemporalUnit unit) {
         if (unit instanceof ChronoUnit) {
             return unit != FOREVER;
         }
@@ -487,7 +488,7 @@ public interface ChronoZonedDateTime<D extends ChronoLocalDate>
      */
     @SuppressWarnings("unchecked")
     @Override
-    default <R> R query(TemporalQuery<R> query) {
+    default <R extends @Nullable Object> R query(TemporalQuery<R> query) {
         if (query == TemporalQueries.zone() || query == TemporalQueries.zoneId()) {
             return (R) getZone();
         } else if (query == TemporalQueries.offset()) {
@@ -660,7 +661,7 @@ public interface ChronoZonedDateTime<D extends ChronoLocalDate>
      * @return true if this is equal to the other date-time
      */
     @Override
-    boolean equals(Object obj);
+    boolean equals(@Nullable Object obj);
 
     /**
      * A hash code for this date-time.

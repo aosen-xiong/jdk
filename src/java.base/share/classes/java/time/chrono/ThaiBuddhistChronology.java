@@ -56,6 +56,7 @@
  */
 package java.time.chrono;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import java.io.InvalidObjectException;
 import static java.time.temporal.ChronoField.PROLEPTIC_MONTH;
 import static java.time.temporal.ChronoField.YEAR;
@@ -367,7 +368,7 @@ public final class ThaiBuddhistChronology extends AbstractChronology implements 
 
     //-----------------------------------------------------------------------
     @Override  // override for return type
-    public ThaiBuddhistDate resolveDate(Map<TemporalField, Long> fieldValues, ResolverStyle resolverStyle) {
+    public @Nullable ThaiBuddhistDate resolveDate(Map<TemporalField, Long> fieldValues, ResolverStyle resolverStyle) {
         return (ThaiBuddhistDate) super.resolveDate(fieldValues, resolverStyle);
     }
 

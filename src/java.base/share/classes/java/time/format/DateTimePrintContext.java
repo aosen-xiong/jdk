@@ -61,6 +61,7 @@
  */
 package java.time.format;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import static java.time.temporal.ChronoField.EPOCH_DAY;
 import static java.time.temporal.ChronoField.INSTANT_SECONDS;
 import static java.time.temporal.ChronoField.OFFSET_SECONDS;
@@ -206,7 +207,7 @@ final class DateTimePrintContext {
             }
             @SuppressWarnings("unchecked")
             @Override
-            public <R> R query(TemporalQuery<R> query) {
+            public <R extends @Nullable Object> R query(TemporalQuery<R> query) {
                 if (query == TemporalQueries.chronology()) {
                     return (R) effectiveChrono;
                 }

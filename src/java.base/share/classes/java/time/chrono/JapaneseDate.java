@@ -56,6 +56,7 @@
  */
 package java.time.chrono;
 
+import org.checkerframework.framework.qual.CFComment;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -334,6 +335,8 @@ public final class JapaneseDate
      *
      * @param isoDate  the standard local date, validated not null
      */
+    @CFComment("nullness: jdate comes from a valid date, so its era is one of the known eras")
+    @SuppressWarnings("nullness:assignment")
     JapaneseDate(LocalDate isoDate) {
         if (isoDate.isBefore(MEIJI_6_ISODATE)) {
             throw new DateTimeException("JapaneseDate before Meiji 6 is not supported");
@@ -440,7 +443,7 @@ public final class JapaneseDate
      * @return true if the field is supported on this date, false if not
      */
     @Override
-    public boolean isSupported(TemporalField field) {
+    public boolean isSupported(@Nullable TemporalField field) {
         if (field == ALIGNED_DAY_OF_WEEK_IN_MONTH || field == ALIGNED_DAY_OF_WEEK_IN_YEAR ||
                 field == ALIGNED_WEEK_OF_MONTH || field == ALIGNED_WEEK_OF_YEAR) {
             return false;

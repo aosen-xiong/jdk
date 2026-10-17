@@ -61,6 +61,7 @@
  */
 package java.time.zone;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import static java.time.temporal.TemporalAdjusters.nextOrSame;
 import static java.time.temporal.TemporalAdjusters.previousOrSame;
 
@@ -121,7 +122,7 @@ public final class ZoneOffsetTransitionRule implements Serializable {
     /**
      * The cutover day-of-week, null to retain the day-of-month.
      */
-    private final DayOfWeek dow;
+    private final @Nullable DayOfWeek dow;
     /**
      * The cutover time in the 'before' offset.
      */
@@ -172,7 +173,7 @@ public final class ZoneOffsetTransitionRule implements Serializable {
     public static ZoneOffsetTransitionRule of(
             Month month,
             int dayOfMonthIndicator,
-            DayOfWeek dayOfWeek,
+            @Nullable DayOfWeek dayOfWeek,
             LocalTime time,
             boolean timeEndOfDay,
             TimeDefinition timeDefinition,
@@ -217,7 +218,7 @@ public final class ZoneOffsetTransitionRule implements Serializable {
     ZoneOffsetTransitionRule(
             Month month,
             int dayOfMonthIndicator,
-            DayOfWeek dayOfWeek,
+            @Nullable DayOfWeek dayOfWeek,
             LocalTime time,
             boolean timeEndOfDay,
             TimeDefinition timeDefinition,
@@ -409,7 +410,7 @@ public final class ZoneOffsetTransitionRule implements Serializable {
      *
      * @return the day-of-week that the transition occurs, null if the rule defines an exact date
      */
-    public DayOfWeek getDayOfWeek() {
+    public @Nullable DayOfWeek getDayOfWeek() {
         return dow;
     }
 
@@ -515,7 +516,7 @@ public final class ZoneOffsetTransitionRule implements Serializable {
      * @return true if equal
      */
     @Override
-    public boolean equals(Object otherRule) {
+    public boolean equals(@Nullable Object otherRule) {
         if (otherRule == this) {
             return true;
         }

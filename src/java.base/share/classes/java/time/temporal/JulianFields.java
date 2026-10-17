@@ -61,6 +61,7 @@
  */
 package java.time.temporal;
 
+import org.checkerframework.framework.qual.CFComment;
 import static java.time.temporal.ChronoField.EPOCH_DAY;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static java.time.temporal.ChronoUnit.FOREVER;
@@ -292,6 +293,8 @@ public final class JulianFields {
 
         //-----------------------------------------------------------------------
         @Override
+        @CFComment("nullness: the parser calls resolve only for a field that is in fieldValues")
+        @SuppressWarnings("nullness:unboxing")
         public ChronoLocalDate resolve(
                 Map<TemporalField, Long> fieldValues, TemporalAccessor partialTemporal, ResolverStyle resolverStyle) {
             long value = fieldValues.remove(this);

@@ -61,6 +61,7 @@
  */
 package java.time;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import static java.time.LocalTime.MINUTES_PER_HOUR;
 import static java.time.LocalTime.SECONDS_PER_HOUR;
 import static java.time.LocalTime.SECONDS_PER_MINUTE;
@@ -528,7 +529,7 @@ public final class ZoneOffset
      * @return true if the field is supported on this offset, false if not
      */
     @Override
-    public boolean isSupported(TemporalField field) {
+    public boolean isSupported(@Nullable TemporalField field) {
         if (field instanceof ChronoField) {
             return field == OFFSET_SECONDS;
         }
@@ -651,7 +652,7 @@ public final class ZoneOffset
      */
     @SuppressWarnings("unchecked")
     @Override
-    public <R> R query(TemporalQuery<R> query) {
+    public <R extends @Nullable Object> R query(TemporalQuery<R> query) {
         if (query == TemporalQueries.offset() || query == TemporalQueries.zone()) {
             return (R) this;
         }
@@ -718,7 +719,7 @@ public final class ZoneOffset
      * @return true if this is equal to the other offset
      */
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (this == obj) {
            return true;
         }
