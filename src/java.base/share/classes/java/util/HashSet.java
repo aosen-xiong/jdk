@@ -195,8 +195,7 @@ import jdk.internal.access.SharedSecrets;
      * @see ConcurrentModificationException
      */
     @SideEffectFree
-    @SuppressWarnings("mutability") // lost can not invoke poly method.
-    public @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@PolyGrowShrink @PolyNonEmpty @Readonly HashSet<E> this) {
+    public @PolyGrowShrink @PolyNonEmpty @ReceiverDependentMutable Iterator<E> iterator(@PolyGrowShrink @PolyNonEmpty @ReceiverDependentMutable HashSet<E> this) {
         return map.keySet().iterator();
     }
 
@@ -284,8 +283,8 @@ import jdk.internal.access.SharedSecrets;
      * @return a shallow copy of this set
      */
     @SideEffectFree
-    @SuppressWarnings("unchecked")
-    public Object clone(@GuardSatisfied @Mutable HashSet<E> this) {
+    @SuppressWarnings({"unchecked", "mutability:return.type.incompatible", "mutability:mutability.lost.receiver"}) // fresh unaliased copy: the body replaces every field it shared; its own state shares this's one poly
+    public @PolyMutable Object clone(@GuardSatisfied @PolyMutable HashSet<E> this) {
         try {
             HashSet<E> newSet = (HashSet<E>) super.clone();
             newSet.map = (HashMap<E, @Readonly Object>) map.clone();
@@ -396,6 +395,7 @@ import jdk.internal.access.SharedSecrets;
     }
 
     @Override
+    @SuppressWarnings("mutability:override.return.invalid") // E extends @Immutable Object, so every element is @Immutable. That is the precise return, which an override of a @PolyMutable return cannot state
     public @Immutable Object[] toArray(@Readonly HashSet<E> this) {
         return map.keysToArray(new @Immutable Object[map.size()]);
     }

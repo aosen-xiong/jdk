@@ -391,7 +391,7 @@ public class LinkedList<E>
      * @return {@code true} if this list contained the specified element
      */
     @ReleasesNoLocks
-    public boolean remove(@GuardSatisfied @Mutable @CanShrink LinkedList<E> this, @GuardSatisfied @Nullable @UnknownSignedness Object o) {
+    public boolean remove(@GuardSatisfied @Mutable @CanShrink LinkedList<E> this, @GuardSatisfied @Nullable @UnknownSignedness @Readonly Object o) {
         if (o == null) {
             for (Node<E> x = first; x != null; x = x.next) {
                 if (x.item == null) {
@@ -603,7 +603,7 @@ public class LinkedList<E>
     /**
      * Returns the (non-null) Node at the specified element index.
      */
-    @PolyMutable Node<E> node(@PolyMutable LinkedList<E> this, @NonNegative int index) {
+    @ReceiverDependentMutable Node<E> node(@ReceiverDependentMutable LinkedList<E> this, @NonNegative int index) {
         // assert isElementIndex(index);
 
         if (index < (size >> 1)) {
@@ -855,7 +855,7 @@ public class LinkedList<E>
      * @return {@code true} if the list contained the specified element
      * @since 1.6
      */
-    public boolean removeFirstOccurrence(@GuardSatisfied @Mutable @CanShrink LinkedList<E> this, @GuardSatisfied @Nullable @UnknownSignedness Object o) {
+    public boolean removeFirstOccurrence(@GuardSatisfied @Mutable @CanShrink LinkedList<E> this, @Nullable @Readonly @GuardSatisfied @UnknownSignedness Object o) {
         return remove(o);
     }
 
@@ -868,7 +868,7 @@ public class LinkedList<E>
      * @return {@code true} if the list contained the specified element
      * @since 1.6
      */
-    public boolean removeLastOccurrence(@GuardSatisfied @Mutable @CanShrink LinkedList<E> this, @GuardSatisfied @Nullable @UnknownSignedness Object o) {
+    public boolean removeLastOccurrence(@GuardSatisfied @Mutable @CanShrink LinkedList<E> this, @Nullable @Readonly @GuardSatisfied @UnknownSignedness Object o) {
         if (o == null) {
             for (Node<E> x = last; x != null; x = x.prev) {
                 if (x.item == null) {
@@ -908,16 +908,16 @@ public class LinkedList<E>
      * @throws IndexOutOfBoundsException {@inheritDoc}
      * @see List#listIterator(int)
      */
-    public @PolyGrowShrink @PolyNonEmpty ListIterator<E> listIterator(@Readonly @PolyGrowShrink @PolyNonEmpty LinkedList<E> this, @NonNegative int index) {
+    public @ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty ListIterator<E> listIterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty LinkedList<E> this, @NonNegative int index) {
         checkPositionIndex(index);
-        return new ListItr(index);
+        return new @ReceiverDependentMutable ListItr(index);
     }
 
     @ReceiverDependentMutable
     private class ListItr implements ListIterator<E> {
-        private @Readonly Node<E> lastReturned;
-        private @Readonly Node<E> next;
-        private int nextIndex;
+        private @Assignable @Readonly Node<E> lastReturned;
+        private @Assignable @Readonly Node<E> next;
+        private @Assignable int nextIndex;
         private int expectedModCount = modCount;
 
         // @SuppressWarnings("mutability:initialization.fields.uninitialized") // Lazy
@@ -933,7 +933,7 @@ public class LinkedList<E>
             return nextIndex < size;
         }
 
-        public E next(@NonEmpty @Mutable ListItr this) {
+        public E next(@NonEmpty @Readonly ListItr this) {
             checkForComodification();
             if (!hasNext())
                 throw new NoSuchElementException();
@@ -948,7 +948,7 @@ public class LinkedList<E>
             return nextIndex > 0;
         }
 
-        public E previous(@Mutable ListItr this) {
+        public E previous(@Readonly ListItr this) {
             checkForComodification();
             if (!hasPrevious())
                 throw new NoSuchElementException();
@@ -1002,7 +1002,7 @@ public class LinkedList<E>
             expectedModCount++;
         }
 
-        public void forEachRemaining(@Mutable ListItr this, Consumer<? super E> action) {
+        public void forEachRemaining(@Readonly ListItr this, Consumer<? super E> action) {
             Objects.requireNonNull(action);
             while (modCount == expectedModCount && nextIndex < size) {
                 action.accept(next.item);
@@ -1035,8 +1035,8 @@ public class LinkedList<E>
     /**
      * @since 1.6
      */
-    public @PolyGrowShrink @PolyNonEmpty Iterator<E> descendingIterator(@Readonly @PolyGrowShrink @PolyNonEmpty LinkedList<E> this) {
-        return new DescendingIterator();
+    public @ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty Iterator<E> descendingIterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty LinkedList<E> this) {
+        return new @ReceiverDependentMutable DescendingIterator();
     }
 
     /**
@@ -1050,7 +1050,7 @@ public class LinkedList<E>
         public boolean hasNext(@Readonly DescendingIterator this) {
             return itr.hasPrevious();
         }
-        public E next(@NonEmpty @Mutable DescendingIterator this) {
+        public E next(@NonEmpty @Readonly DescendingIterator this) {
             return itr.previous();
         }
         public void remove(@Mutable LinkedList<E> . @Mutable DescendingIterator this) {
@@ -1059,9 +1059,9 @@ public class LinkedList<E>
     }
 
     @SuppressWarnings("unchecked")
-    private LinkedList<E> superClone(@Mutable LinkedList<E> this) {
+    private @PolyMutable LinkedList<E> superClone(@PolyMutable LinkedList<E> this) {
         try {
-            return (LinkedList<E>) super.clone();
+            return (@PolyMutable LinkedList<E>) super.clone();
         } catch (CloneNotSupportedException e) {
             throw new InternalError(e);
         }
@@ -1074,8 +1074,9 @@ public class LinkedList<E>
      * @return a shallow copy of this {@code LinkedList} instance
      */
     @SideEffectFree
-    public Object clone(@GuardSatisfied @Mutable LinkedList<E> this) {
-        LinkedList<E> clone = superClone();
+    @SuppressWarnings({"mutability:return.type.incompatible", "mutability:assignment.type.incompatible"}) // fresh unaliased copy: the body replaces every field it shared
+    public @PolyMutable Object clone(@GuardSatisfied @PolyMutable LinkedList<E> this) {
+        @Mutable LinkedList<E> clone = superClone();
 
         // Put clone into "virgin" state
         clone.first = clone.last = null;
@@ -1288,7 +1289,7 @@ public class LinkedList<E>
             return null;
         }
 
-        public void forEachRemaining(@Mutable LLSpliterator<E> this, Consumer<? super E> action) {
+        public void forEachRemaining(@Readonly LLSpliterator<E> this, Consumer<? super E> action) {
             Node<E> p; int n;
             if (action == null) throw new NullPointerException();
             if ((n = getEst()) > 0 && (p = current) != null) {

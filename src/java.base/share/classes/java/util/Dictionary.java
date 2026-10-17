@@ -30,6 +30,7 @@ import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nonempty.qual.EnsuresNonEmptyIf;
 import org.checkerframework.checker.nullness.qual.EnsuresKeyFor;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.mutability.qual.Mutable;
 import org.checkerframework.checker.mutability.qual.ReceiverDependentMutable;
 import org.checkerframework.checker.signedness.qual.UnknownSignedness;
 import org.checkerframework.dataflow.qual.Pure;
@@ -98,7 +99,7 @@ public abstract class Dictionary<K,V> {
      * @see     java.util.Dictionary#elements()
      * @see     java.util.Enumeration
      */
-    public abstract Enumeration<K> keys();
+    public abstract @ReceiverDependentMutable Enumeration<K> keys();
 
     /**
      * Returns an enumeration of the values in this dictionary. The general
@@ -110,7 +111,7 @@ public abstract class Dictionary<K,V> {
      * @see     java.util.Dictionary#keys()
      * @see     java.util.Enumeration
      */
-    public abstract Enumeration<V> elements();
+    public abstract @ReceiverDependentMutable Enumeration<V> elements();
 
     /**
      * Returns the value to which the key is mapped in this dictionary.
@@ -156,7 +157,7 @@ public abstract class Dictionary<K,V> {
      * @see        java.util.Dictionary#get(java.lang.Object)
      */
     @EnsuresKeyFor(value={"#1"}, map={"this"})
-    public abstract @Nullable V put(@GuardSatisfied Dictionary<K, V> this, K key, V value);
+    public abstract @Nullable V put(@GuardSatisfied @Mutable Dictionary<K, V> this, K key, V value);
 
     /**
      * Removes the {@code key} (and its corresponding
@@ -169,5 +170,5 @@ public abstract class Dictionary<K,V> {
      *          mapping.
      * @throws    NullPointerException if {@code key} is {@code null}.
      */
-    public abstract @Nullable V remove(@GuardSatisfied Dictionary<K, V> this, Object key);
+    public abstract @Nullable V remove(@GuardSatisfied @Mutable Dictionary<K, V> this, Object key);
 }

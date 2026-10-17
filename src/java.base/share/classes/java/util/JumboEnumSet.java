@@ -34,6 +34,9 @@ import org.checkerframework.checker.nonempty.qual.PolyNonEmpty;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.mutability.qual.ReceiverDependentMutable;
+import org.checkerframework.checker.mutability.qual.Readonly;
+import org.checkerframework.checker.mutability.qual.PolyMutable;
 import org.checkerframework.checker.mutability.qual.Mutable;
 import org.checkerframework.checker.signedness.qual.UnknownSignedness;
 import org.checkerframework.dataflow.qual.Pure;
@@ -110,8 +113,8 @@ class JumboEnumSet<E extends Enum<E>> extends EnumSet<E> {
      *
      * @return an iterator over the elements contained in this set
      */
-    public @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@PolyGrowShrink @PolyNonEmpty JumboEnumSet<E> this) {
-        return new EnumSetIterator<>();
+    public @Mutable @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@PolyGrowShrink @PolyNonEmpty JumboEnumSet<E> this) {
+        return new @Mutable EnumSetIterator<>();
     }
 
     private class EnumSetIterator<E extends Enum<E>> implements Iterator<E> {
@@ -204,7 +207,7 @@ class JumboEnumSet<E extends Enum<E>> extends EnumSet<E> {
      */
     @Pure
     @EnsuresNonEmptyIf(result = true, expression = "this")
-    public boolean contains(@GuardSatisfied @Nullable @UnknownSignedness Object e) {
+    public boolean contains(@GuardSatisfied @Nullable @UnknownSignedness @Readonly Object e) {
         if (e == null)
             return false;
         Class<?> eClass = e.getClass();
@@ -246,7 +249,7 @@ class JumboEnumSet<E extends Enum<E>> extends EnumSet<E> {
      * @param e element to be removed from this set, if present
      * @return {@code true} if the set contained the specified element
      */
-    public boolean remove(@GuardSatisfied @Nullable @UnknownSignedness Object e) {
+    public boolean remove(@GuardSatisfied @Nullable @UnknownSignedness @Readonly Object e) {
         if (e == null)
             return false;
         Class<?> eClass = e.getClass();
@@ -275,7 +278,7 @@ class JumboEnumSet<E extends Enum<E>> extends EnumSet<E> {
      * @throws NullPointerException if the specified collection is null
      */
     @Pure
-    public boolean containsAll(Collection<? extends @UnknownSignedness Object> c) {
+    public boolean containsAll(@Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) {
         if (!(c instanceof JumboEnumSet<?> es))
             return super.containsAll(c);
 
@@ -296,7 +299,7 @@ class JumboEnumSet<E extends Enum<E>> extends EnumSet<E> {
      * @throws NullPointerException if the specified collection or any of
      *     its elements are null
      */
-    public boolean addAll(Collection<? extends E> c) {
+    public boolean addAll(@Readonly Collection<? extends E> c) {
         if (!(c instanceof JumboEnumSet<?> es))
             return super.addAll(c);
 
@@ -321,7 +324,7 @@ class JumboEnumSet<E extends Enum<E>> extends EnumSet<E> {
      * @return {@code true} if this set changed as a result of the call
      * @throws NullPointerException if the specified collection is null
      */
-    public boolean removeAll(Collection<? extends @UnknownSignedness Object> c) {
+    public boolean removeAll(@Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) {
         if (!(c instanceof JumboEnumSet<?> es))
             return super.removeAll(c);
 
@@ -341,7 +344,7 @@ class JumboEnumSet<E extends Enum<E>> extends EnumSet<E> {
      * @return {@code true} if this set changed as a result of the call
      * @throws NullPointerException if the specified collection is null
      */
-    public boolean retainAll(Collection<? extends @UnknownSignedness Object> c) {
+    public boolean retainAll(@Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) {
         if (!(c instanceof JumboEnumSet<?> es))
             return super.retainAll(c);
 
@@ -375,7 +378,7 @@ class JumboEnumSet<E extends Enum<E>> extends EnumSet<E> {
      */
     @Pure
     @EnsuresNonNullIf(expression="#1", result=true)
-    public boolean equals(@Nullable Object o) {
+    public boolean equals(@Nullable @Readonly Object o) {
         if (!(o instanceof JumboEnumSet<?> es))
             return super.equals(o);
 
@@ -397,7 +400,8 @@ class JumboEnumSet<E extends Enum<E>> extends EnumSet<E> {
         return size != oldSize;
     }
 
-    public EnumSet<E> clone() {
+    @SuppressWarnings("mutability:return.type.incompatible") // fresh unaliased copy: the body replaces every field it shared
+    public @PolyMutable EnumSet<E> clone(@PolyMutable JumboEnumSet<E> this) {
         JumboEnumSet<E> result = (JumboEnumSet<E>) super.clone();
         result.elements = result.elements.clone();
         return result;

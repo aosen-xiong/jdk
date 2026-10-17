@@ -123,7 +123,7 @@ public interface NavigableMap<K extends @Immutable Object,V> extends SortedMap<K
      * @throws NullPointerException if the specified key is null
      *         and this map does not permit null keys
      */
-    Map.@Nullable @PolyMutable Entry<K,V> lowerEntry(@PolyMutable NavigableMap<K,V> this, K key);
+    Map.@Nullable @Immutable Entry<K,V> lowerEntry(@Readonly NavigableMap<K,V> this, K key);
 
     /**
      * Returns the greatest key strictly less than the given key, or
@@ -152,7 +152,7 @@ public interface NavigableMap<K extends @Immutable Object,V> extends SortedMap<K
      * @throws NullPointerException if the specified key is null
      *         and this map does not permit null keys
      */
-    Map.@Nullable @PolyMutable Entry<K,V> floorEntry(@PolyMutable NavigableMap<K,V> this, K key);
+    Map.@Nullable @Immutable Entry<K,V> floorEntry(@Readonly NavigableMap<K,V> this, K key);
 
     /**
      * Returns the greatest key less than or equal to the given key,
@@ -181,7 +181,7 @@ public interface NavigableMap<K extends @Immutable Object,V> extends SortedMap<K
      * @throws NullPointerException if the specified key is null
      *         and this map does not permit null keys
      */
-    Map.@Nullable @PolyMutable Entry<K,V> ceilingEntry(@PolyMutable NavigableMap<K,V> this, K key);
+    Map.@Nullable @Immutable Entry<K,V> ceilingEntry(@Readonly NavigableMap<K,V> this, K key);
 
     /**
      * Returns the least key greater than or equal to the given key,
@@ -210,7 +210,7 @@ public interface NavigableMap<K extends @Immutable Object,V> extends SortedMap<K
      * @throws NullPointerException if the specified key is null
      *         and this map does not permit null keys
      */
-    Map.@Nullable @PolyMutable Entry<K,V> higherEntry(@PolyMutable NavigableMap<K,V> this, K key);
+    Map.@Nullable @Immutable Entry<K,V> higherEntry(@Readonly NavigableMap<K,V> this, K key);
 
     /**
      * Returns the least key strictly greater than the given key, or
@@ -233,7 +233,7 @@ public interface NavigableMap<K extends @Immutable Object,V> extends SortedMap<K
      * @return an entry with the least key,
      *         or {@code null} if this map is empty
      */
-    Map.@Nullable @PolyMutable Entry<K,V> firstEntry(@PolyMutable NavigableMap<K,V> this);
+    Map.@Nullable @Immutable Entry<K,V> firstEntry(@Readonly NavigableMap<K,V> this);
 
     /**
      * Returns a key-value mapping associated with the greatest
@@ -242,7 +242,7 @@ public interface NavigableMap<K extends @Immutable Object,V> extends SortedMap<K
      * @return an entry with the greatest key,
      *         or {@code null} if this map is empty
      */
-    Map.@Nullable @PolyMutable Entry<K,V> lastEntry(@PolyMutable NavigableMap<K,V> this);
+    Map.@Nullable @Immutable Entry<K,V> lastEntry(@Readonly NavigableMap<K,V> this);
 
     /**
      * Removes and returns a key-value mapping associated with
@@ -251,7 +251,7 @@ public interface NavigableMap<K extends @Immutable Object,V> extends SortedMap<K
      * @return the removed first entry of this map,
      *         or {@code null} if this map is empty
      */
-    Map.@Nullable Entry<K,V> pollFirstEntry(@GuardSatisfied @Mutable NavigableMap<K, V> this);
+    Map.@Nullable @Immutable Entry<K,V> pollFirstEntry(@GuardSatisfied @Mutable NavigableMap<K, V> this);
 
     /**
      * Removes and returns a key-value mapping associated with
@@ -260,7 +260,7 @@ public interface NavigableMap<K extends @Immutable Object,V> extends SortedMap<K
      * @return the removed last entry of this map,
      *         or {@code null} if this map is empty
      */
-    Map.@Nullable Entry<K,V> pollLastEntry(@GuardSatisfied @Mutable NavigableMap<K, V> this);
+    Map.@Nullable @Immutable Entry<K,V> pollLastEntry(@GuardSatisfied @Mutable NavigableMap<K, V> this);
 
     /**
      * Returns a reverse order view of the mappings contained in this map.
@@ -278,7 +278,7 @@ public interface NavigableMap<K extends @Immutable Object,V> extends SortedMap<K
      * @return a reverse order view of this map
      */
     @SideEffectFree
-    @PolyMutable NavigableMap<K,V> descendingMap(@PolyMutable NavigableMap<K,V> this);
+    @ReceiverDependentMutable NavigableMap<K,V> descendingMap(@ReceiverDependentMutable NavigableMap<K,V> this);
 
     /**
      * Returns a {@link NavigableSet} view of the keys contained in this map.
@@ -295,7 +295,7 @@ public interface NavigableMap<K extends @Immutable Object,V> extends SortedMap<K
      * @return a navigable set view of the keys in this map
      */
     @SideEffectFree
-    @PolyMutable NavigableSet<@KeyFor({"this"}) K> navigableKeySet(@PolyMutable NavigableMap<K,V> this);
+    @ReceiverDependentMutable NavigableSet<@KeyFor({"this"}) K> navigableKeySet(@ReceiverDependentMutable NavigableMap<K,V> this);
 
     /**
      * Returns a reverse order {@link NavigableSet} view of the keys contained in this map.
@@ -312,7 +312,7 @@ public interface NavigableMap<K extends @Immutable Object,V> extends SortedMap<K
      * @return a reverse order navigable set view of the keys in this map
      */
     @SideEffectFree
-    @PolyMutable NavigableSet<@KeyFor({"this"}) K> descendingKeySet(@PolyMutable NavigableMap<K, V> this);
+    @ReceiverDependentMutable NavigableSet<@KeyFor({"this"}) K> descendingKeySet(@ReceiverDependentMutable NavigableMap<K, V> this);
 
     /**
      * Returns a view of the portion of this map whose keys range from
@@ -349,7 +349,7 @@ public interface NavigableMap<K extends @Immutable Object,V> extends SortedMap<K
      *         outside the bounds of the range
      */
     @SideEffectFree
-    @PolyMutable NavigableMap<K,V> subMap(@PolyMutable NavigableMap<K,V> this, K fromKey, boolean fromInclusive,
+    @ReceiverDependentMutable NavigableMap<K,V> subMap(@ReceiverDependentMutable NavigableMap<K,V> this, K fromKey, boolean fromInclusive,
                              K toKey,   boolean toInclusive);
 
     /**
@@ -380,7 +380,7 @@ public interface NavigableMap<K extends @Immutable Object,V> extends SortedMap<K
      *         bounds of the range
      */
     @SideEffectFree
-    @PolyMutable NavigableMap<K,V> headMap(@PolyMutable NavigableMap<K,V> this, K toKey, boolean inclusive);
+    @ReceiverDependentMutable NavigableMap<K,V> headMap(@ReceiverDependentMutable NavigableMap<K,V> this, K toKey, boolean inclusive);
 
     /**
      * Returns a view of the portion of this map whose keys are greater than (or
@@ -410,7 +410,7 @@ public interface NavigableMap<K extends @Immutable Object,V> extends SortedMap<K
      *         bounds of the range
      */
     @SideEffectFree
-    @PolyMutable NavigableMap<K,V> tailMap(@PolyMutable NavigableMap<K,V> this, K fromKey, boolean inclusive);
+    @ReceiverDependentMutable NavigableMap<K,V> tailMap(@ReceiverDependentMutable NavigableMap<K,V> this, K fromKey, boolean inclusive);
 
     /**
      * {@inheritDoc}
@@ -422,7 +422,7 @@ public interface NavigableMap<K extends @Immutable Object,V> extends SortedMap<K
      * @throws IllegalArgumentException {@inheritDoc}
      */
     @SideEffectFree
-    @PolyMutable SortedMap<K,V> subMap(@PolyMutable NavigableMap<K,V> this, K fromKey, K toKey);
+    @ReceiverDependentMutable SortedMap<K,V> subMap(@ReceiverDependentMutable NavigableMap<K,V> this, K fromKey, K toKey);
 
     /**
      * {@inheritDoc}
@@ -434,7 +434,7 @@ public interface NavigableMap<K extends @Immutable Object,V> extends SortedMap<K
      * @throws IllegalArgumentException {@inheritDoc}
      */
     @SideEffectFree
-    @PolyMutable SortedMap<K,V> headMap(@PolyMutable NavigableMap<K,V> this, K toKey);
+    @ReceiverDependentMutable SortedMap<K,V> headMap(@ReceiverDependentMutable NavigableMap<K,V> this, K toKey);
 
     /**
      * {@inheritDoc}
@@ -446,5 +446,5 @@ public interface NavigableMap<K extends @Immutable Object,V> extends SortedMap<K
      * @throws IllegalArgumentException {@inheritDoc}
      */
     @SideEffectFree
-    @PolyMutable SortedMap<K,V> tailMap(@PolyMutable NavigableMap<K,V> this, K fromKey);
+    @ReceiverDependentMutable SortedMap<K,V> tailMap(@ReceiverDependentMutable NavigableMap<K,V> this, K fromKey);
 }

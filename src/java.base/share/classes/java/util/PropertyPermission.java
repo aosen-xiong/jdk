@@ -25,6 +25,7 @@
 
 package java.util;
 
+import org.checkerframework.checker.mutability.qual.ReceiverDependentMutable;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.dataflow.qual.Pure;
@@ -585,7 +586,7 @@ final class PropertyPermissionCollection extends PermissionCollection
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Enumeration<Permission> elements() {
+    public @ReceiverDependentMutable Enumeration<Permission> elements() {
         /**
          * Casting to rawtype since Enumeration<PropertyPermission>
          * cannot be directly cast to Enumeration<Permission>

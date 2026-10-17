@@ -108,7 +108,7 @@ public abstract class AbstractMap<K extends @Immutable Object,V> implements Map<
      * This implementation returns {@code entrySet().size()}.
      */
     @Pure
-    public @NonNegative int size(@GuardSatisfied @Readonly AbstractMap<K, V> this) {
+    public @NonNegative int size(@GuardSatisfied @ReceiverDependentMutable AbstractMap<K, V> this) {
         return entrySet().size();
     }
 
@@ -138,7 +138,7 @@ public abstract class AbstractMap<K extends @Immutable Object,V> implements Map<
      * @throws NullPointerException {@inheritDoc}
      */
     @Pure
-    public boolean containsValue(@GuardSatisfied @Readonly AbstractMap<K, V> this, @GuardSatisfied @UnknownSignedness @Readonly Object value) {
+    public boolean containsValue(@GuardSatisfied @ReceiverDependentMutable AbstractMap<K, V> this, @GuardSatisfied @UnknownSignedness @Readonly Object value) {
         Iterator<@Readonly Entry<K,V>> i = entrySet().iterator();
         if (value==null) {
             while (i.hasNext()) {
@@ -172,7 +172,7 @@ public abstract class AbstractMap<K extends @Immutable Object,V> implements Map<
      */
     @EnsuresKeyForIf(expression={"#1"}, result=true, map={"this"})
     @Pure
-    public boolean containsKey(@GuardSatisfied @Readonly AbstractMap<K, V> this, @GuardSatisfied @UnknownSignedness @Readonly Object key) {
+    public boolean containsKey(@GuardSatisfied @ReceiverDependentMutable AbstractMap<K, V> this, @GuardSatisfied @UnknownSignedness @Readonly Object key) {
         Iterator<Map.@Readonly Entry<K,V>> i = entrySet().iterator();
         if (key==null) {
             while (i.hasNext()) {
@@ -205,7 +205,7 @@ public abstract class AbstractMap<K extends @Immutable Object,V> implements Map<
      * @throws NullPointerException          {@inheritDoc}
      */
     @Pure
-    public @Nullable V get(@GuardSatisfied @Readonly AbstractMap<K, V> this, @UnknownSignedness @GuardSatisfied @Readonly Object key) {
+    public @Nullable V get(@GuardSatisfied @ReceiverDependentMutable AbstractMap<K, V> this, @UnknownSignedness @GuardSatisfied @Readonly Object key) {
         Iterator<@Readonly Entry<K,V>> i = entrySet().iterator();
         if (key==null) {
             while (i.hasNext()) {
@@ -380,11 +380,11 @@ public abstract class AbstractMap<K extends @Immutable Object,V> implements Map<
      */
     @SuppressWarnings("mutability") // receiver in anonymous class not denotable, see typetool#2433
     @SideEffectFree
-    public @PolyMutable Set<@KeyFor({"this"}) K> keySet(@GuardSatisfied @PolyMutable AbstractMap<K, V> this) {
+    public @ReceiverDependentMutable Set<@KeyFor({"this"}) K> keySet(@GuardSatisfied @ReceiverDependentMutable AbstractMap<K, V> this) {
         Set<K> ks = keySet;
         if (ks == null) {
-            ks = new @PolyMutable AbstractSet<K>() {
-                public Iterator<K> iterator() {
+            ks = new @ReceiverDependentMutable AbstractSet<K>() {
+                public @ReceiverDependentMutable Iterator<K> iterator() {
                     return new Iterator<K>() {
                         private Iterator<Entry<K,V>> i = entrySet().iterator();
 
@@ -447,11 +447,11 @@ public abstract class AbstractMap<K extends @Immutable Object,V> implements Map<
      */
     @SuppressWarnings("mutability") // receiver in anonymous class not denotable, see typetool#2433
     @SideEffectFree
-    public @PolyMutable Collection<V> values(@GuardSatisfied @PolyMutable AbstractMap<K, V> this) {
+    public @ReceiverDependentMutable Collection<V> values(@GuardSatisfied @ReceiverDependentMutable AbstractMap<K, V> this) {
         Collection<V> vals = values;
         if (vals == null) {
-            vals = new @PolyMutable AbstractCollection<V>() {
-                public Iterator<V> iterator() {
+            vals = new @ReceiverDependentMutable AbstractCollection<V>() {
+                public @ReceiverDependentMutable Iterator<V> iterator() {
                     return new Iterator<V>() {
                         private Iterator<Entry<K,V>> i = entrySet().iterator();
 
@@ -497,7 +497,7 @@ public abstract class AbstractMap<K extends @Immutable Object,V> implements Map<
     }
 
     @SideEffectFree
-    public abstract @PolyMutable Set<@PolyMutable Entry<@KeyFor({"this"}) K,V>> entrySet(@GuardSatisfied @PolyMutable AbstractMap<K, V> this);
+    public abstract @ReceiverDependentMutable Set<@ReceiverDependentMutable Entry<@KeyFor({"this"}) K,V>> entrySet(@GuardSatisfied @ReceiverDependentMutable AbstractMap<K, V> this);
 
 
     // Comparison and hashing
@@ -594,7 +594,7 @@ public abstract class AbstractMap<K extends @Immutable Object,V> implements Map<
      * @return a string representation of this map
      */
     @SideEffectFree
-    public String toString(@GuardSatisfied @Readonly AbstractMap<K, V> this) {
+    public String toString(@GuardSatisfied @ReceiverDependentMutable AbstractMap<K, V> this) {
         Iterator<@Readonly Entry<K,V>> i = entrySet().iterator();
         if (! i.hasNext())
             return "{}";
@@ -620,7 +620,8 @@ public abstract class AbstractMap<K extends @Immutable Object,V> implements Map<
      *
      * @return a shallow copy of this map
      */
-    protected Object clone(@Mutable AbstractMap<K,V> this) throws CloneNotSupportedException {
+    @SuppressWarnings("mutability:return.type.incompatible") // fresh unaliased copy: the body replaces every field it shared
+    protected @PolyMutable Object clone(@PolyMutable AbstractMap<K,V> this) throws CloneNotSupportedException {
         AbstractMap<?,?> result = (AbstractMap<?,?>)super.clone();
         result.keySet = null;
         result.values = null;
@@ -747,7 +748,7 @@ public abstract class AbstractMap<K extends @Immutable Object,V> implements Map<
          * @see    #hashCode
          */
         @Pure
-        public boolean equals(AbstractMap.@GuardSatisfied SimpleEntry<K, V> this, @GuardSatisfied @Nullable Object o) {
+        public boolean equals(AbstractMap.@GuardSatisfied SimpleEntry<K, V> this, @GuardSatisfied @Nullable @Readonly Object o) {
             return o instanceof Map.Entry<?, ?> e
                     && eq(key, e.getKey())
                     && eq(value, e.getValue());

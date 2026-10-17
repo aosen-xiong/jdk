@@ -96,7 +96,7 @@ public interface ListIterator<E> extends Iterator<E> {
      * @return the next element in the list
      * @throws NoSuchElementException if the iteration has no next element
      */
-    E next(@GuardSatisfied @NonEmpty @Mutable ListIterator<E> this);
+    E next(@GuardSatisfied @NonEmpty @Readonly ListIterator<E> this);
 
     /**
      * Returns {@code true} if this list iterator has more elements when

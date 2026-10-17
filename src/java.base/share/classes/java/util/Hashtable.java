@@ -254,7 +254,7 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
      * @since   1.2
      */
     @SuppressWarnings("mutability:method.invocation.invalid") // PICO constructor fix
-    public Hashtable(Map<? extends K, ? extends V> t) {
+    public Hashtable(@Readonly Map<? extends K, ? extends V> t) {
         this(Math.max(2*t.size(), 11), 0.75f);
         putAll(t);
     }
@@ -302,7 +302,7 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
      * @see     #keySet()
      * @see     Map
      */
-    public synchronized Enumeration<@KeyFor({"this"}) K> keys() {
+    public synchronized @ReceiverDependentMutable Enumeration<@KeyFor({"this"}) K> keys() {
         return this.<K>getEnumeration(KEYS);
     }
 
@@ -318,7 +318,7 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
      * @see     #values()
      * @see     Map
      */
-    public synchronized Enumeration<V> elements() {
+    public synchronized @ReceiverDependentMutable Enumeration<V> elements() {
         return this.<V>getEnumeration(VALUES);
     }
 
@@ -598,8 +598,9 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
      * @return  a clone of the hashtable
      */
     @SideEffectFree
-    public synchronized Object clone(@GuardSatisfied @Mutable Hashtable<K, V> this) {
-        Hashtable<?,?> t = cloneHashtable();
+    @SuppressWarnings({"mutability:return.type.incompatible", "mutability:assignment.type.incompatible", "mutability:mutability.lost.receiver"}) // fresh unaliased copy: the body replaces every field it shared; its own state shares this's one poly
+    public synchronized @PolyMutable Object clone(@GuardSatisfied @PolyMutable Hashtable<K, V> this) {
+        @Mutable Hashtable<?,?> t = cloneHashtable();
         t.table = new Entry<?,?>[table.length];
         for (int i = table.length ; i-- > 0 ; ) {
             t.table[i] = (table[i] != null)
@@ -613,9 +614,9 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
     }
 
     /** Calls super.clone() */
-    final Hashtable<?,?> cloneHashtable(@Mutable Hashtable<K, V> this) {
+    final @PolyMutable Hashtable<?,?> cloneHashtable(@PolyMutable Hashtable<K, V> this) {
         try {
-            return (Hashtable<?,?>)super.clone();
+            return (@PolyMutable Hashtable<?,?>)super.clone();
         } catch (CloneNotSupportedException e) {
             // this shouldn't happen, since we are Cloneable
             throw new InternalError(e);
@@ -632,7 +633,7 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
      *
      * @return  a string representation of this hashtable
      */
-    public synchronized String toString(@GuardSatisfied @Readonly Hashtable<K, V> this) {
+    public synchronized String toString(@GuardSatisfied @ReceiverDependentMutable Hashtable<K, V> this) {
         int max = size() - 1;
         if (max == -1)
             return "{}";
@@ -656,19 +657,19 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
     }
 
 
-    private <T> Enumeration<T> getEnumeration(@Readonly Hashtable<K, V> this, int type) {
+    private <T> @ReceiverDependentMutable Enumeration<T> getEnumeration(@ReceiverDependentMutable Hashtable<K, V> this, int type) {
         if (count == 0) {
             return Collections.emptyEnumeration();
         } else {
-            return new Enumerator<>(type, false);
+            return new @ReceiverDependentMutable Enumerator<>(type, false);
         }
     }
 
-    private <T> Iterator<T> getIterator(@Readonly Hashtable<K, V> this, int type) {
+    private <T> @ReceiverDependentMutable Iterator<T> getIterator(@ReceiverDependentMutable Hashtable<K, V> this, int type) {
         if (count == 0) {
             return Collections.emptyIterator();
         } else {
-            return new Enumerator<>(type, true);
+            return new @ReceiverDependentMutable Enumerator<>(type, true);
         }
     }
 
@@ -699,16 +700,16 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
      * @since 1.2
      */
     @SideEffectFree
-    public @PolyMutable Set<@KeyFor({"this"}) K> keySet(@GuardSatisfied @PolyMutable Hashtable<K, V> this) {
+    public @ReceiverDependentMutable Set<@KeyFor({"this"}) K> keySet(@GuardSatisfied @ReceiverDependentMutable Hashtable<K, V> this) {
         if (keySet == null)
-            keySet = Collections.synchronizedSet(new @PolyMutable KeySet(), this);
+            keySet = Collections.synchronizedSet(new @ReceiverDependentMutable KeySet(), this);
         return keySet;
     }
 
     @ReceiverDependentMutable
     private class KeySet extends AbstractSet<K> {
         @SideEffectFree
-        public Iterator<K> iterator(@Readonly KeySet this) {
+        public @ReceiverDependentMutable Iterator<K> iterator(@ReceiverDependentMutable Hashtable<K,V>.@ReceiverDependentMutable KeySet this) {
             return getIterator(KEYS);
         }
         @Pure
@@ -746,16 +747,16 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
      */
     @SideEffectFree
     @SuppressWarnings("mutability:argument.type.incompatible") // Aosen: class polymorphism qualifier
-    public @PolyMutable Set<Map.@PolyMutable Entry<@KeyFor({"this"}) K,V>> entrySet(@GuardSatisfied @PolyMutable Hashtable<K, V> this) {
+    public @ReceiverDependentMutable Set<Map.@ReceiverDependentMutable Entry<@KeyFor({"this"}) K,V>> entrySet(@GuardSatisfied @ReceiverDependentMutable Hashtable<K, V> this) {
         if (entrySet==null)
-            entrySet = Collections.synchronizedSet(new @PolyMutable EntrySet(), this);
+            entrySet = Collections.synchronizedSet(new @ReceiverDependentMutable EntrySet(), this);
         return entrySet;
     }
 
     @ReceiverDependentMutable
     private class EntrySet extends AbstractSet<Map.@Readonly Entry<K,V>> {
         @SideEffectFree
-        public Iterator<Map.@Readonly Entry<K,V>> iterator(@Readonly EntrySet this) {
+        public @ReceiverDependentMutable Iterator<Map.@Readonly Entry<K,V>> iterator(@ReceiverDependentMutable Hashtable<K,V>.@ReceiverDependentMutable EntrySet this) {
             return getIterator(ENTRIES);
         }
 
@@ -832,9 +833,9 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
      * @since 1.2
      */
     @SideEffectFree
-    public @PolyMutable Collection<V> values(@GuardSatisfied @PolyMutable Hashtable<K, V> this) {
+    public @ReceiverDependentMutable Collection<V> values(@GuardSatisfied @ReceiverDependentMutable Hashtable<K, V> this) {
         if (values==null)
-            values = Collections.synchronizedCollection(new @PolyMutable ValueCollection(),
+            values = Collections.synchronizedCollection(new @ReceiverDependentMutable ValueCollection(),
                                                         this);
         return values;
     }
@@ -842,7 +843,7 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
     @ReceiverDependentMutable
     private class ValueCollection extends AbstractCollection<V> {
         @SideEffectFree
-        public Iterator<V> iterator(@Readonly ValueCollection this) {
+        public @ReceiverDependentMutable Iterator<V> iterator(@ReceiverDependentMutable Hashtable<K,V>.@ReceiverDependentMutable ValueCollection this) {
             return getIterator(VALUES);
         }
         @Pure
@@ -947,7 +948,7 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
 
     @SuppressWarnings("unchecked")
     @Override
-    public synchronized void forEach(@Mutable Hashtable<K,V> this, BiConsumer<? super K, ? super V> action) {
+    public synchronized void forEach(@Readonly Hashtable<K,V> this, BiConsumer<? super K, ? super V> action) {
         Objects.requireNonNull(action);     // explicit check required in case
                                             // table is empty.
         final int expectedModCount = modCount;
@@ -1430,10 +1431,10 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
         }
 
         @SideEffectFree
-        @SuppressWarnings("unchecked")
-        protected Object clone(@Mutable Entry<K,V> this) {
-            return new Entry<K,V>(hash, key, value,
-                                  (next==null ? null : (Entry<K,V>) next.clone()));
+        @SuppressWarnings({"unchecked", "mutability:argument.type.incompatible", "mutability:mutability.lost.parameter", "mutability:mutability.lost.receiver"}) // fresh unaliased copy: the body replaces every field it shared; its own state shares this's one poly
+        protected @PolyMutable Object clone(@PolyMutable Entry<K,V> this) {
+            return new @PolyMutable Entry<K,V>(hash, key, value,
+                                  (next==null ? null : (@PolyMutable Entry<K,V>) next.clone()));
         }
 
         // Map.Entry Ops
@@ -1526,7 +1527,7 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
         }
 
         @SuppressWarnings("unchecked")
-        public T nextElement(@NonEmpty @Mutable Enumerator<T> this) {
+        public T nextElement(@NonEmpty @Readonly Enumerator<T> this) {
             Entry<?,?> et = entry;
             int i = index;
             @Readonly Entry<?,?>[] t = table;
@@ -1551,7 +1552,7 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
             return hasMoreElements();
         }
 
-        public T next(@NonEmpty @Mutable Enumerator<T> this) {
+        public T next(@NonEmpty @Readonly Enumerator<T> this) {
             if (Hashtable.this.modCount != expectedModCount)
                 throw new ConcurrentModificationException();
             return nextElement();

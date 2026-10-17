@@ -210,7 +210,7 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
      * @throws NullPointerException {@inheritDoc}
      */
     @Pure
-    public @GTENegativeOne int indexOf(@GuardSatisfied AbstractList<E> this, @GuardSatisfied @UnknownSignedness Object o) {
+    public @GTENegativeOne int indexOf(@GuardSatisfied AbstractList<E> this, @GuardSatisfied @UnknownSignedness @Readonly Object o) {
         ListIterator<E> it = listIterator();
         if (o==null) {
             while (it.hasNext())
@@ -237,7 +237,7 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
      * @throws NullPointerException {@inheritDoc}
      */
     @Pure
-    public @GTENegativeOne int lastIndexOf(@GuardSatisfied AbstractList<E> this, @GuardSatisfied @UnknownSignedness Object o) {
+    public @GTENegativeOne int lastIndexOf(@GuardSatisfied AbstractList<E> this, @GuardSatisfied @UnknownSignedness @Readonly Object o) {
         ListIterator<E> it = listIterator(size());
         if (o==null) {
             while (it.hasPrevious())
@@ -326,8 +326,8 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
      * @return an iterator over the elements in this list in proper sequence
      */
     @SideEffectFree
-    public @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@Readonly @PolyGrowShrink @PolyNonEmpty AbstractList<E> this) {
-        return new Itr();
+    public @ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty AbstractList<E> this) {
+        return new @ReceiverDependentMutable Itr();
     }
 
     /**
@@ -338,7 +338,7 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
      *
      * @see #listIterator(int)
      */
-    public @PolyGrowShrink @PolyNonEmpty ListIterator<E> listIterator(@Readonly @PolyGrowShrink @PolyNonEmpty AbstractList<E> this) {
+    public @ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty ListIterator<E> listIterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty AbstractList<E> this) {
         return listIterator(0);
     }
 
@@ -365,10 +365,10 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
      *
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
-    public @PolyGrowShrink ListIterator<E> listIterator(@Readonly @PolyGrowShrink AbstractList<E> this, final @IndexOrHigh({"this"}) int index) {
+    public @ReceiverDependentMutable @PolyGrowShrink ListIterator<E> listIterator(@ReceiverDependentMutable @PolyGrowShrink AbstractList<E> this, final @IndexOrHigh({"this"}) int index) {
         rangeCheckForAdd(index);
 
-        return new ListItr(index);
+        return new @ReceiverDependentMutable ListItr(index);
     }
 
     @ReceiverDependentMutable
@@ -376,14 +376,14 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
         /**
          * Index of element to be returned by subsequent call to next.
          */
-        int cursor = 0;
+        @Assignable int cursor = 0;
 
         /**
          * Index of element returned by most recent call to next or
          * previous.  Reset to -1 if this element is deleted by a call
          * to remove.
          */
-        int lastRet = -1;
+        @Assignable int lastRet = -1;
 
         /**
          * The modCount value that the iterator believes that the backing
@@ -398,7 +398,7 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
             return cursor != size();
         }
 
-        public E next(@NonEmpty @Mutable Itr this) {
+        public E next(@NonEmpty @Readonly Itr this) {
             checkForComodification();
             try {
                 int i = cursor;
@@ -444,7 +444,7 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
             return cursor != 0;
         }
 
-        public E previous(@Mutable ListItr this) {
+        public E previous(@Readonly ListItr this) {
             checkForComodification();
             try {
                 int i = cursor - 1;
@@ -529,11 +529,11 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
      *         {@code (fromIndex > toIndex)}
      */
     @SideEffectFree
-    public @PolyMutable @PolyGrowShrink List<E> subList(@GuardSatisfied @PolyMutable @PolyGrowShrink AbstractList<E> this, @IndexOrHigh({"this"}) int fromIndex, @IndexOrHigh({"this"}) int toIndex) {
+    public @ReceiverDependentMutable @PolyGrowShrink List<E> subList(@GuardSatisfied @ReceiverDependentMutable @PolyGrowShrink AbstractList<E> this, @IndexOrHigh({"this"}) int fromIndex, @IndexOrHigh({"this"}) int toIndex) {
         subListRangeCheck(fromIndex, toIndex, size());
         return (this instanceof RandomAccess ?
-                new @PolyMutable RandomAccessSubList<>(this, fromIndex, toIndex) :
-                new @PolyMutable SubList<>(this, fromIndex, toIndex));
+                new @ReceiverDependentMutable RandomAccessSubList<>(this, fromIndex, toIndex) :
+                new @ReceiverDependentMutable SubList<>(this, fromIndex, toIndex));
     }
 
     static void subListRangeCheck(int fromIndex, int toIndex, int size) {
@@ -867,16 +867,16 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
             return true;
         }
 
-        public Iterator<E> iterator(@Readonly SubList<E> this) {
+        public @ReceiverDependentMutable Iterator<E> iterator(@ReceiverDependentMutable SubList<E> this) {
             return listIterator();
         }
 
-        public ListIterator<E> listIterator(int index) {
+        public @ReceiverDependentMutable ListIterator<E> listIterator(int index) {
             checkForComodification();
             rangeCheckForAdd(index);
 
-            return new ListIterator<E>() {
-                private final ListIterator<E> i =
+            return new @ReceiverDependentMutable ListIterator<E>() {
+                private final @Mutable ListIterator<E> i =
                         root.listIterator(offset + index);
 
                 @Pure
@@ -889,7 +889,7 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
                     if (hasNext())
                         return i.next();
                     else
-                        throw new NoSuchElementException();
+                        throw new @Mutable NoSuchElementException();
                 }
 
                 @Pure
@@ -901,7 +901,7 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
                     if (hasPrevious())
                         return i.previous();
                     else
-                        throw new NoSuchElementException();
+                        throw new @Mutable NoSuchElementException();
                 }
 
                 @Pure
@@ -930,9 +930,9 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
             };
         }
 
-        public @PolyMutable List<E> subList(@PolyMutable SubList<E> this, int fromIndex, int toIndex) {
+        public @ReceiverDependentMutable List<E> subList(@ReceiverDependentMutable SubList<E> this, int fromIndex, int toIndex) {
             subListRangeCheck(fromIndex, toIndex, size);
-            return new @PolyMutable SubList<>(this, fromIndex, toIndex);
+            return new @ReceiverDependentMutable SubList<>(this, fromIndex, toIndex);
         }
 
         private void rangeCheckForAdd(int index) {
@@ -979,9 +979,9 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
             super(parent, fromIndex, toIndex);
         }
 
-        public @PolyMutable List<E> subList(@PolyMutable RandomAccessSubList<E> this, int fromIndex, int toIndex) {
+        public @ReceiverDependentMutable List<E> subList(@ReceiverDependentMutable RandomAccessSubList<E> this, int fromIndex, int toIndex) {
             subListRangeCheck(fromIndex, toIndex, size);
-            return new @PolyMutable RandomAccessSubList<>(this, fromIndex, toIndex);
+            return new @ReceiverDependentMutable RandomAccessSubList<>(this, fromIndex, toIndex);
         }
     }
 }

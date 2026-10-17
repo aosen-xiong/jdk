@@ -24,6 +24,8 @@
  */
 package java.util.function;
 
+import org.checkerframework.checker.mutability.qual.Readonly;
+import org.checkerframework.checker.mutability.qual.ReceiverDependentMutable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
@@ -39,8 +41,9 @@ import java.util.Objects;
  *
  * @since 1.8
  */
-@AnnotatedFor({"lock", "nullness"})
+@AnnotatedFor({"lock", "nullness", "mutability"})
 @FunctionalInterface
+@ReceiverDependentMutable
 public interface Predicate<T> {
 
     /**
@@ -68,7 +71,7 @@ public interface Predicate<T> {
      * AND of this predicate and the {@code other} predicate
      * @throws NullPointerException if other is null
      */
-    default Predicate<T> and(Predicate<? super T> other) {
+    default Predicate<T> and(@Readonly Predicate<? super T> other) {
         Objects.requireNonNull(other);
         return (t) -> test(t) && other.test(t);
     }
@@ -100,7 +103,7 @@ public interface Predicate<T> {
      * OR of this predicate and the {@code other} predicate
      * @throws NullPointerException if other is null
      */
-    default Predicate<T> or(Predicate<? super T> other) {
+    default Predicate<T> or(@Readonly Predicate<? super T> other) {
         Objects.requireNonNull(other);
         return (t) -> test(t) || other.test(t);
     }
@@ -115,7 +118,7 @@ public interface Predicate<T> {
      * @return a predicate that tests if two arguments are equal according
      * to {@link Objects#equals(Object, Object)}
      */
-    static <T> Predicate<T> isEqual(@Nullable Object targetRef) {
+    static <T> Predicate<T> isEqual(@Nullable @Readonly Object targetRef) {
         return (null == targetRef)
                 ? Objects::isNull
                 : object -> targetRef.equals(object);
@@ -137,7 +140,7 @@ public interface Predicate<T> {
      * @since 11
      */
     @SuppressWarnings("unchecked")
-    static <T> Predicate<T> not(Predicate<? super T> target) {
+    static <T> Predicate<T> not(@Readonly Predicate<? super T> target) {
         Objects.requireNonNull(target);
         return (Predicate<T>)target.negate();
     }

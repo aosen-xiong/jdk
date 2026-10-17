@@ -99,7 +99,7 @@ public abstract class AbstractCollection<E> implements Collection<E> {
      * @return an iterator over the elements contained in this collection
      */
     @SideEffectFree
-    public abstract @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@PolyGrowShrink @PolyNonEmpty @Readonly AbstractCollection<E> this);
+    public abstract @PolyNonEmpty @ReceiverDependentMutable @PolyGrowShrink Iterator<E> iterator(@PolyNonEmpty @ReceiverDependentMutable @PolyGrowShrink AbstractCollection<E> this);
 
     @Pure
     public abstract @NonNegative int size(@GuardSatisfied @Readonly AbstractCollection<E> this);
@@ -247,7 +247,7 @@ public abstract class AbstractCollection<E> implements Collection<E> {
      *         further elements returned by the iterator, trimmed to size
      */
     @SuppressWarnings("unchecked")
-    private static <T> T[] finishToArray(T[] r, Iterator<?> it) {
+    private static <T> T[] finishToArray(T[] r, @Readonly Iterator<?> it) {
         int len = r.length;
         int i = len;
         while (it.hasNext()) {

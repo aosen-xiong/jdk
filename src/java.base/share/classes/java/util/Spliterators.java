@@ -462,7 +462,7 @@ public final class Spliterators {
      * @return A spliterator from an iterator
      * @throws NullPointerException if the given iterator is {@code null}
      */
-    public static <T> Spliterator<T> spliterator(Iterator<? extends T> iterator,
+    public static <T> Spliterator<T> spliterator(@Readonly Iterator<? extends T> iterator,
                                                  long size,
                                                  int characteristics) {
         return new IteratorSpliterator<>(Objects.requireNonNull(iterator), size,
@@ -490,7 +490,7 @@ public final class Spliterators {
      * @return A spliterator from an iterator
      * @throws NullPointerException if the given iterator is {@code null}
      */
-    public static <T> Spliterator<T> spliteratorUnknownSize(Iterator<? extends T> iterator,
+    public static <T> Spliterator<T> spliteratorUnknownSize(@Readonly Iterator<? extends T> iterator,
                                                             int characteristics) {
         return new IteratorSpliterator<>(Objects.requireNonNull(iterator), characteristics);
     }
@@ -1039,7 +1039,7 @@ public final class Spliterators {
         }
 
         @Override
-        public Comparator<? super T> getComparator() {
+        public @Readonly Comparator<? super T> getComparator() {
             if (hasCharacteristics(Spliterator.SORTED))
                 return null;
             throw new IllegalStateException();
@@ -1761,7 +1761,7 @@ public final class Spliterators {
         static final int BATCH_UNIT = 1 << 10;  // batch array size increment
         static final int MAX_BATCH = 1 << 25;  // max batch array size;
         private final @Readonly Collection<? extends T> collection; // null OK
-        private Iterator<? extends T> it;
+        private @Readonly Iterator<? extends T> it;
         private final int characteristics;
         private long est;             // size estimate
         private int batch;            // batch size for splits
@@ -1794,7 +1794,7 @@ public final class Spliterators {
          * @param characteristics properties of this spliterator's
          * source or elements.
          */
-        public IteratorSpliterator(Iterator<? extends T> iterator, long size, int characteristics) {
+        public IteratorSpliterator(@Readonly Iterator<? extends T> iterator, long size, int characteristics) {
             this.collection = null;
             this.it = iterator;
             this.est = size;
@@ -1812,7 +1812,7 @@ public final class Spliterators {
          * @param characteristics properties of this spliterator's
          * source or elements.
          */
-        public IteratorSpliterator(Iterator<? extends T> iterator, int characteristics) {
+        public IteratorSpliterator(@Readonly Iterator<? extends T> iterator, int characteristics) {
             this.collection = null;
             this.it = iterator;
             this.est = Long.MAX_VALUE;
@@ -1897,7 +1897,7 @@ public final class Spliterators {
         public int characteristics() { return characteristics; }
 
         @Override
-        public Comparator<? super T> getComparator() {
+        public @Readonly Comparator<? super T> getComparator() {
             if (hasCharacteristics(Spliterator.SORTED))
                 return null;
             throw new IllegalStateException();

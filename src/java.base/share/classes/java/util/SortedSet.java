@@ -131,7 +131,7 @@ public interface SortedSet<E> extends Set<E> {
      *         of its elements
      */
     @Pure
-    @Nullable Comparator<? super E> comparator(@GuardSatisfied @Readonly SortedSet<E> this);
+    @Nullable @Readonly Comparator<? super E> comparator(@GuardSatisfied @Readonly SortedSet<E> this);
 
     /**
      * Returns a view of the portion of this set whose elements range
@@ -165,7 +165,7 @@ public interface SortedSet<E> extends Set<E> {
      *         {@code toElement} lies outside the bounds of the range
      */
     @SideEffectFree
-    @PolyMutable SortedSet<E> subSet(@GuardSatisfied @PolyMutable SortedSet<E> this, @GuardSatisfied E fromElement, @GuardSatisfied E toElement);
+    @ReceiverDependentMutable SortedSet<E> subSet(@GuardSatisfied @ReceiverDependentMutable SortedSet<E> this, @GuardSatisfied E fromElement, @GuardSatisfied E toElement);
 
     /**
      * Returns a view of the portion of this set whose elements are
@@ -193,7 +193,7 @@ public interface SortedSet<E> extends Set<E> {
      *         bounds of the range
      */
     @SideEffectFree
-    @PolyMutable SortedSet<E> headSet(@GuardSatisfied @PolyMutable SortedSet<E> this, E toElement);
+    @ReceiverDependentMutable SortedSet<E> headSet(@GuardSatisfied @ReceiverDependentMutable SortedSet<E> this, E toElement);
 
     /**
      * Returns a view of the portion of this set whose elements are
@@ -221,7 +221,7 @@ public interface SortedSet<E> extends Set<E> {
      *         bounds of the range
      */
     @SideEffectFree
-    @PolyMutable SortedSet<E> tailSet(@GuardSatisfied @PolyMutable SortedSet<E> this, E fromElement);
+    @ReceiverDependentMutable SortedSet<E> tailSet(@GuardSatisfied @ReceiverDependentMutable SortedSet<E> this, E fromElement);
 
     /**
      * Returns the first (lowest) element currently in this set.
@@ -273,11 +273,11 @@ public interface SortedSet<E> extends Set<E> {
      * @since 1.8
      */
     @Override
-    default Spliterator<E> spliterator(@Mutable SortedSet<E> this) {
+    default Spliterator<E> spliterator(@Readonly SortedSet<E> this) {
         return new Spliterators.IteratorSpliterator<E>(
                 this, Spliterator.DISTINCT | Spliterator.SORTED | Spliterator.ORDERED) {
             @Override
-            public Comparator<? super E> getComparator() {
+            public @Readonly Comparator<? super E> getComparator() {
                 return SortedSet.this.comparator();
             }
         };

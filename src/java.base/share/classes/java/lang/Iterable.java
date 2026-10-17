@@ -55,7 +55,7 @@ public interface Iterable<T> {
      *
      * @return an Iterator.
      */
-    @PolyGrowShrink @PolyNonEmpty Iterator<T> iterator(@Readonly @PolyGrowShrink @PolyNonEmpty Iterable<T> this);
+    @PolyNonEmpty @ReceiverDependentMutable @PolyGrowShrink Iterator<T> iterator(@ReceiverDependentMutable @PolyNonEmpty @PolyGrowShrink Iterable<T> this);
 
     /**
      * Performs the given action for each element of the {@code Iterable}

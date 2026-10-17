@@ -872,7 +872,7 @@ public class ConcurrentHashMap<K extends @NonNull @Immutable Object,V extends @N
      *
      * @param m the map
      */
-    public ConcurrentHashMap(Map<? extends K, ? extends V> m) {
+    public ConcurrentHashMap(@Readonly Map<? extends K, ? extends V> m) {
         this.sizeCtl = DEFAULT_CAPACITY;
         putAll(m);
     }
@@ -4823,7 +4823,7 @@ public class ConcurrentHashMap<K extends @NonNull @Immutable Object,V extends @N
             return modified;
         }
 
-        public boolean removeIf(Predicate<? super V> filter) {
+        public boolean removeIf(@Readonly Predicate<? super V> filter) {
             return map.removeValueIf(filter);
         }
 
@@ -4901,7 +4901,7 @@ public class ConcurrentHashMap<K extends @NonNull @Immutable Object,V extends @N
             return added;
         }
 
-        public boolean removeIf(Predicate<? super Entry<K,V>> filter) {
+        public boolean removeIf(@Readonly Predicate<? super Entry<K,V>> filter) {
             return map.removeEntryIf(filter);
         }
 

@@ -46,6 +46,7 @@ import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
+import org.checkerframework.checker.mutability.qual.Assignable;
 import org.checkerframework.checker.mutability.qual.Mutable;
 import org.checkerframework.checker.mutability.qual.PolyMutable;
 import org.checkerframework.checker.mutability.qual.Readonly;
@@ -230,7 +231,7 @@ public class ArrayDeque<E extends @NonNull @Readonly Object> extends AbstractCol
      * @throws NullPointerException if the specified collection is null
      */
     @SuppressWarnings("mutability") // PICO RDM constructor call mutable method
-    public @PolyNonEmpty ArrayDeque(@PolyNonEmpty Collection<? extends E> c) {
+    public @PolyNonEmpty ArrayDeque(@PolyNonEmpty @Readonly Collection<? extends E> c) {
         this(c.size());
         copyElements(c);
     }
@@ -701,26 +702,27 @@ public class ArrayDeque<E extends @NonNull @Readonly Object> extends AbstractCol
      * @return an iterator over the elements in this deque
      */
     @SideEffectFree
-    public @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@PolyGrowShrink @PolyNonEmpty @Readonly ArrayDeque<E> this) {
-        return new DeqIterator();
+    public @PolyNonEmpty @ReceiverDependentMutable @PolyGrowShrink Iterator<E> iterator(@PolyNonEmpty @ReceiverDependentMutable @PolyGrowShrink ArrayDeque<E> this) {
+        return new @ReceiverDependentMutable DeqIterator();
     }
 
-    public @PolyGrowShrink @PolyNonEmpty Iterator<E> descendingIterator(@PolyGrowShrink @PolyNonEmpty @Readonly ArrayDeque<E> this) {
-        return new DescendingIterator();
+    public @PolyNonEmpty @ReceiverDependentMutable @PolyGrowShrink Iterator<E> descendingIterator(@PolyNonEmpty @ReceiverDependentMutable @PolyGrowShrink ArrayDeque<E> this) {
+        return new @ReceiverDependentMutable DescendingIterator();
     }
 
+    @ReceiverDependentMutable
     private class DeqIterator implements Iterator<E> {
         /** Index of element to be returned by subsequent call to next. */
-        int cursor;
+        @Assignable int cursor;
 
         /** Number of elements yet to be returned. */
-        int remaining = size();
+        @Assignable int remaining = size();
 
         /**
          * Index of element returned by most recent call to next.
          * Reset to -1 if element is deleted by a call to remove.
          */
-        int lastRet = -1;
+        @Assignable int lastRet = -1;
 
         DeqIterator() { cursor = head; }
 
@@ -775,6 +777,7 @@ public class ArrayDeque<E extends @NonNull @Readonly Object> extends AbstractCol
         }
     }
 
+    @ReceiverDependentMutable
     private class DescendingIterator extends DeqIterator {
         DescendingIterator() { cursor = dec(tail, elements.length); }
 
@@ -916,7 +919,7 @@ public class ArrayDeque<E extends @NonNull @Readonly Object> extends AbstractCol
     /**
      * @throws NullPointerException {@inheritDoc}
      */
-    public void forEach(@Mutable ArrayDeque<E> this, Consumer<? super E> action) {
+    public void forEach(@Readonly ArrayDeque<E> this, Consumer<? super E> action) {
         Objects.requireNonNull(action);
         final @Readonly Object[] es = elements;
         for (int i = head, end = tail, to = (i <= end) ? end : es.length;
@@ -933,7 +936,7 @@ public class ArrayDeque<E extends @NonNull @Readonly Object> extends AbstractCol
     /**
      * @throws NullPointerException {@inheritDoc}
      */
-    public boolean removeIf(@Mutable @CanShrink ArrayDeque<E> this, Predicate<? super E> filter) {
+    public boolean removeIf(@Mutable @CanShrink ArrayDeque<E> this, @Readonly Predicate<? super E> filter) {
         Objects.requireNonNull(filter);
         return bulkRemove(filter);
     }
@@ -941,7 +944,7 @@ public class ArrayDeque<E extends @NonNull @Readonly Object> extends AbstractCol
     /**
      * @throws NullPointerException {@inheritDoc}
      */
-    public boolean removeAll(@Mutable @CanShrink ArrayDeque<E> this, @Readonly Collection<? extends @UnknownSignedness Object> c) {
+    public boolean removeAll(@Mutable @CanShrink ArrayDeque<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) {
         Objects.requireNonNull(c);
         return bulkRemove(e -> c.contains(e));
     }
@@ -949,13 +952,13 @@ public class ArrayDeque<E extends @NonNull @Readonly Object> extends AbstractCol
     /**
      * @throws NullPointerException {@inheritDoc}
      */
-    public boolean retainAll(@Mutable @GuardSatisfied @CanShrink ArrayDeque<E> this, @Readonly Collection<? extends @UnknownSignedness Object> c) {
+    public boolean retainAll(@Mutable @GuardSatisfied @CanShrink ArrayDeque<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) {
         Objects.requireNonNull(c);
         return bulkRemove(e -> !c.contains(e));
     }
 
     /** Implementation of bulk remove methods. */
-    private boolean bulkRemove(@Mutable ArrayDeque<E> this, Predicate<? super E> filter) {
+    private boolean bulkRemove(@Mutable ArrayDeque<E> this, @Readonly Predicate<? super E> filter) {
         final @Readonly Object[] es = elements;
         // Optimize for initial run of survivors
         for (int i = head, end = tail, to = (i <= end) ? end : es.length;
@@ -993,7 +996,7 @@ public class ArrayDeque<E extends @NonNull @Readonly Object> extends AbstractCol
      */
     private boolean bulkRemoveModified(
         @Mutable ArrayDeque<E> this,
-        Predicate<? super E> filter, final int beg) {
+        @Readonly Predicate<? super E> filter, final int beg) {
         final @Readonly Object[] es = elements;
         final int capacity = es.length;
         final int end = tail;
@@ -1039,7 +1042,7 @@ public class ArrayDeque<E extends @NonNull @Readonly Object> extends AbstractCol
      */
     @Pure
     @EnsuresNonEmptyIf(result = true, expression = "this")
-    public boolean contains(@GuardSatisfied @Readonly ArrayDeque<E> this, @GuardSatisfied @Nullable @UnknownSignedness Object o) {
+    public boolean contains(@GuardSatisfied @Readonly ArrayDeque<E> this, @GuardSatisfied @Nullable @UnknownSignedness @Readonly Object o) {
         if (o != null) {
             final @Readonly Object[] es = elements;
             for (int i = head, end = tail, to = (i <= end) ? end : es.length;
@@ -1190,7 +1193,8 @@ public class ArrayDeque<E extends @NonNull @Readonly Object> extends AbstractCol
      * @return a copy of this deque
      */
     @SideEffectFree
-    public ArrayDeque<E> clone(@GuardSatisfied @Mutable ArrayDeque<E> this) {
+    @SuppressWarnings("mutability:return.type.incompatible") // fresh unaliased copy: the body replaces every field it shared
+    public @PolyMutable ArrayDeque<E> clone(@GuardSatisfied @PolyMutable ArrayDeque<E> this) {
         try {
             @SuppressWarnings("unchecked")
             ArrayDeque<E> result = (ArrayDeque<E>) super.clone();

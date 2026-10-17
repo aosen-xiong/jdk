@@ -557,10 +557,10 @@ public class LinkedHashMap<K extends @Immutable Object,V>
      * @return a set view of the keys contained in this map
      */
     @SideEffectFree
-    public @PolyMutable Set<@KeyFor({"this"}) K> keySet(@PolyMutable LinkedHashMap<K, V> this) {
+    public @ReceiverDependentMutable Set<@KeyFor({"this"}) K> keySet(@ReceiverDependentMutable LinkedHashMap<K, V> this) {
         Set<K> ks = keySet;
         if (ks == null) {
-            ks = new @PolyMutable LinkedKeySet();
+            ks = new @ReceiverDependentMutable LinkedKeySet();
             keySet = ks;
         }
         return ks;
@@ -592,8 +592,8 @@ public class LinkedHashMap<K extends @Immutable Object,V>
         public final int size(@Readonly LinkedKeySet this)                 { return size; }
         public final void clear(@Mutable LinkedHashMap<K,V>. @Mutable LinkedKeySet this)               { LinkedHashMap.this.clear(); }
         @SideEffectFree
-        public final Iterator<K> iterator(@Readonly LinkedKeySet this) {
-            return new LinkedKeyIterator();
+        public final @ReceiverDependentMutable Iterator<K> iterator(@ReceiverDependentMutable LinkedKeySet this) {
+            return new @ReceiverDependentMutable LinkedKeyIterator();
         }
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
@@ -608,8 +608,9 @@ public class LinkedHashMap<K extends @Immutable Object,V>
                                             Spliterator.DISTINCT);
         }
 
-        public Object[] toArray() {
-            return keysToArray(new Object[size]);
+        @SuppressWarnings("mutability:override.return.invalid") // K extends @Immutable Object, so every key is @Immutable. That is the precise return, which an override of a @PolyMutable return cannot state
+        public @Immutable Object[] toArray(@Readonly LinkedKeySet this) {
+            return keysToArray(new @Immutable Object[size]);
         }
 
         public <T> @Nullable T[] toArray(@PolyNull T[] a) {
@@ -645,10 +646,10 @@ public class LinkedHashMap<K extends @Immutable Object,V>
      *
      * @return a view of the values contained in this map
      */
-    public @PolyMutable Collection<V> values(@PolyMutable LinkedHashMap<K, V> this) {
+    public @ReceiverDependentMutable Collection<V> values(@ReceiverDependentMutable LinkedHashMap<K, V> this) {
         Collection<V> vs = values;
         if (vs == null) {
-            vs = new @PolyMutable LinkedValues();
+            vs = new @ReceiverDependentMutable LinkedValues();
             values = vs;
         }
         return vs;
@@ -660,8 +661,8 @@ public class LinkedHashMap<K extends @Immutable Object,V>
         public final int size(@Readonly LinkedValues this)                 { return size; }
         public final void clear(@Mutable LinkedHashMap<K,V>. @Mutable LinkedValues this)               { LinkedHashMap.this.clear(); }
         @SideEffectFree
-        public final Iterator<V> iterator(@Readonly LinkedValues this) {
-            return new LinkedValueIterator();
+        public final @ReceiverDependentMutable Iterator<V> iterator(@ReceiverDependentMutable LinkedValues this) {
+            return new @ReceiverDependentMutable LinkedValueIterator();
         }
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
@@ -672,8 +673,8 @@ public class LinkedHashMap<K extends @Immutable Object,V>
                                             Spliterator.ORDERED);
         }
 
-        public Object[] toArray() {
-            return valuesToArray(new Object[size]);
+        public @PolyMutable Object[] toArray(@Readonly LinkedHashMap<K, @PolyMutable V>.@Readonly LinkedValues this) {
+            return valuesToArray(new @PolyMutable Object[size]);
         }
 
         public <T> @Nullable T[] toArray(@PolyNull T[] a) {
@@ -712,9 +713,9 @@ public class LinkedHashMap<K extends @Immutable Object,V>
      */
     @SideEffectFree
     @SuppressWarnings("mutability:assignment.type.incompatible") // class polymorphic qualifier
-    public @PolyMutable Set<Map.@PolyMutable Entry<@KeyFor({"this"}) K,V>> entrySet(@GuardSatisfied @PolyMutable LinkedHashMap<K, V> this) {
-        Set<Map.@PolyMutable Entry<K,V>> es;
-        return (es = entrySet) == null ? (entrySet = new @PolyMutable LinkedEntrySet()) : es;
+    public @ReceiverDependentMutable Set<Map.@ReceiverDependentMutable Entry<@KeyFor({"this"}) K,V>> entrySet(@GuardSatisfied @ReceiverDependentMutable LinkedHashMap<K, V> this) {
+        Set<Map.@ReceiverDependentMutable Entry<K,V>> es;
+        return (es = entrySet) == null ? (entrySet = new @ReceiverDependentMutable LinkedEntrySet()) : es;
     }
 
     @ReceiverDependentMutable
@@ -723,8 +724,8 @@ public class LinkedHashMap<K extends @Immutable Object,V>
         public final int size(@Readonly LinkedEntrySet this)                 { return size; }
         public final void clear(@Mutable LinkedHashMap<K,V>. @Mutable LinkedEntrySet this)               { LinkedHashMap.this.clear(); }
         @SideEffectFree
-        public final Iterator<Map.Entry<K,V>> iterator(@Readonly LinkedEntrySet this) {
-            return new LinkedEntryIterator();
+        public final @ReceiverDependentMutable Iterator<Map.@Readonly Entry<K,V>> iterator(@ReceiverDependentMutable LinkedEntrySet this) {
+            return new @ReceiverDependentMutable LinkedEntryIterator();
         }
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
@@ -786,9 +787,9 @@ public class LinkedHashMap<K extends @Immutable Object,V>
 
     @ReceiverDependentMutable
     abstract class LinkedHashIterator {
-        LinkedHashMap.@Readonly Entry<K,V> next;
-        LinkedHashMap.@Readonly Entry<K,V> current;
-        int expectedModCount;
+        @Assignable LinkedHashMap.@Readonly Entry<K,V> next;
+        @Assignable LinkedHashMap.@Readonly Entry<K,V> current;
+        @Assignable int expectedModCount;
 
         LinkedHashIterator() {
             next = head;
@@ -802,7 +803,7 @@ public class LinkedHashMap<K extends @Immutable Object,V>
             return next != null;
         }
 
-        final LinkedHashMap.@Readonly Entry<K,V> nextNode(@NonEmpty @Mutable LinkedHashIterator this) {
+        final LinkedHashMap.@Readonly Entry<K,V> nextNode(@NonEmpty @Readonly LinkedHashIterator this) {
             LinkedHashMap.Entry<K,V> e = next;
             if (modCount != expectedModCount)
                 throw new ConcurrentModificationException();
@@ -828,19 +829,19 @@ public class LinkedHashMap<K extends @Immutable Object,V>
     @ReceiverDependentMutable
     final class LinkedKeyIterator extends LinkedHashIterator
         implements Iterator<K> {
-        public final K next(@NonEmpty @Mutable LinkedKeyIterator this) { return nextNode().getKey(); }
+        public final K next(@NonEmpty @Readonly LinkedKeyIterator this) { return nextNode().getKey(); }
     }
 
     @ReceiverDependentMutable
     final class LinkedValueIterator extends LinkedHashIterator
         implements Iterator<V> {
-        public final V next(@NonEmpty @Mutable LinkedValueIterator this) { return nextNode().value; }
+        public final V next(@NonEmpty @Readonly LinkedValueIterator this) { return nextNode().value; }
     }
 
     @ReceiverDependentMutable
     final class LinkedEntryIterator extends LinkedHashIterator
-        implements Iterator<Map.Entry<K,V>> {
-        public final Map.@Readonly Entry<K,V> next(@NonEmpty @Mutable LinkedEntryIterator this) { return nextNode(); }
+        implements Iterator<Map.@Readonly Entry<K,V>> {
+        public final Map.@Readonly Entry<K,V> next(@NonEmpty @Readonly LinkedEntryIterator this) { return nextNode(); }
     }
 
 

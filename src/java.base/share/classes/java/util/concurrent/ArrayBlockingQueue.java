@@ -1492,7 +1492,7 @@ public class ArrayBlockingQueue<E extends @Readonly Object> extends AbstractQueu
     /**
      * @throws NullPointerException {@inheritDoc}
      */
-    public boolean removeIf(@CanShrink ArrayBlockingQueue<E> this, Predicate<? super E> filter) {
+    public boolean removeIf(@CanShrink ArrayBlockingQueue<E> this, @Readonly Predicate<? super E> filter) {
         Objects.requireNonNull(filter);
         return bulkRemove(filter);
     }
@@ -1514,7 +1514,7 @@ public class ArrayBlockingQueue<E extends @Readonly Object> extends AbstractQueu
     }
 
     /** Implementation of bulk remove methods. */
-    private boolean bulkRemove(Predicate<? super E> filter) {
+    private boolean bulkRemove(@Readonly Predicate<? super E> filter) {
         final ReentrantLock lock = this.lock;
         lock.lock();
         try {
@@ -1571,7 +1571,7 @@ public class ArrayBlockingQueue<E extends @Readonly Object> extends AbstractQueu
      * @param beg valid index of first element to be deleted
      */
     private boolean bulkRemoveModified(
-        Predicate<? super E> filter, final int beg) {
+        @Readonly Predicate<? super E> filter, final int beg) {
         final Object[] es = items;
         final int capacity = items.length;
         final int end = putIndex;

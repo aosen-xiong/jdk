@@ -38,6 +38,7 @@ import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
+import org.checkerframework.checker.mutability.qual.Assignable;
 import org.checkerframework.checker.mutability.qual.Mutable;
 import org.checkerframework.checker.mutability.qual.PolyMutable;
 import org.checkerframework.checker.mutability.qual.Readonly;
@@ -379,7 +380,8 @@ import jdk.internal.util.ArraysSupport;
      * @return a clone of this {@code ArrayList} instance
      */
     @SideEffectFree
-    public Object clone(@GuardSatisfied @Mutable ArrayList<E> this) {
+    @SuppressWarnings("mutability:return.type.incompatible") // fresh unaliased copy: the body replaces every field it shared
+    public @PolyMutable Object clone(@GuardSatisfied @PolyMutable ArrayList<E> this) {
         try {
             ArrayList<?> v = (ArrayList<?>) super.clone();
             v.elementData = Arrays.copyOf(elementData, size);
@@ -436,7 +438,7 @@ import jdk.internal.util.ArraysSupport;
      * @throws NullPointerException if the specified array is null
      */
     @SideEffectFree
-    @SuppressWarnings({"unchecked", "mutability:argument.type.incompatible"}) // getClass error
+    @SuppressWarnings("unchecked")
     public <T> @Nullable T[] toArray(@PolyNull T[] a) {
         if (a.length < size)
             // Make a new array of a's runtime type, but my contents:
@@ -455,7 +457,7 @@ import jdk.internal.util.ArraysSupport;
     }
 
     @SuppressWarnings("unchecked")
-    static <E> E elementAt(@Readonly Object[] es, int index) {
+    static <E> E elementAt(@Readonly Object @Readonly [] es, int index) {
         return (E) es[index];
     }
 
@@ -966,9 +968,9 @@ import jdk.internal.util.ArraysSupport;
      *
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
-    public @PolyMutable @PolyGrowShrink ListIterator<E> listIterator(@PolyMutable @PolyGrowShrink ArrayList<E> this, @NonNegative int index) {
+    public @ReceiverDependentMutable @PolyGrowShrink ListIterator<E> listIterator(@ReceiverDependentMutable @PolyGrowShrink ArrayList<E> this, @NonNegative int index) {
         rangeCheckForAdd(index);
-        return new @PolyMutable ListItr(index);
+        return new @ReceiverDependentMutable ListItr(index);
     }
 
     /**
@@ -979,8 +981,8 @@ import jdk.internal.util.ArraysSupport;
      *
      * @see #listIterator(int)
      */
-    public @PolyGrowShrink @PolyNonEmpty ListIterator<E> listIterator(@Readonly @PolyGrowShrink @PolyNonEmpty ArrayList<E> this) {
-        return new ListItr(0);
+    public @ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty ListIterator<E> listIterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty ArrayList<E> this) {
+        return new @ReceiverDependentMutable ListItr(0);
     }
 
     /**
@@ -991,8 +993,8 @@ import jdk.internal.util.ArraysSupport;
      * @return an iterator over the elements in this list in proper sequence
      */
     @SideEffectFree
-    public @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@Readonly @PolyGrowShrink @PolyNonEmpty ArrayList<E> this) {
-        return new Itr();
+    public @ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty ArrayList<E> this) {
+        return new @ReceiverDependentMutable Itr();
     }
 
     /**
@@ -1000,8 +1002,8 @@ import jdk.internal.util.ArraysSupport;
      */
     @ReceiverDependentMutable
     private class Itr implements Iterator<E> {
-        int cursor;       // index of next element to return
-        int lastRet = -1; // index of last element returned; -1 if no such
+        @Assignable int cursor;       // index of next element to return
+        @Assignable int lastRet = -1; // index of last element returned; -1 if no such
         int expectedModCount = modCount;
 
         // prevent creating a synthetic constructor
@@ -1014,7 +1016,7 @@ import jdk.internal.util.ArraysSupport;
         }
 
         @SuppressWarnings("unchecked")
-        public E next(@NonEmpty @Mutable Itr this) {
+        public E next(@NonEmpty @Readonly Itr this) {
             checkForComodification();
             int i = cursor;
             if (i >= size)
@@ -1043,14 +1045,14 @@ import jdk.internal.util.ArraysSupport;
 
         @SuppressWarnings({"unchecked"})
         @Override
-        public void forEachRemaining(@Mutable Itr this, Consumer<? super E> action) {
+        public void forEachRemaining(@Readonly Itr this, Consumer<? super E> action) {
             Objects.requireNonNull(action);
             final int size = ArrayList.this.size;
             int i = cursor;
             if (i < size) {
                 final @Readonly Object[] es = elementData;
                 if (i >= es.length)
-                    throw new ConcurrentModificationException();
+                    throw new @Mutable ConcurrentModificationException();
                 for (; i < size && modCount == expectedModCount; i++)
                     action.accept(elementAt(es, i));
                 // update once at end to reduce heap write traffic
@@ -1089,7 +1091,7 @@ import jdk.internal.util.ArraysSupport;
         }
 
         @SuppressWarnings("unchecked")
-        public E previous(@Mutable ListItr this) {
+        public E previous(@Readonly ListItr this) {
             checkForComodification();
             int i = cursor - 1;
             if (i < 0)
@@ -1157,9 +1159,9 @@ import jdk.internal.util.ArraysSupport;
      * @throws IndexOutOfBoundsException {@inheritDoc}
      * @throws IllegalArgumentException {@inheritDoc}
      */
-    public @PolyMutable @PolyGrowShrink List<E> subList(@PolyMutable @GuardSatisfied @PolyGrowShrink ArrayList<E> this, @NonNegative int fromIndex, @NonNegative int toIndex) {
+    public @ReceiverDependentMutable @PolyGrowShrink List<E> subList(@ReceiverDependentMutable @GuardSatisfied @PolyGrowShrink ArrayList<E> this, @NonNegative int fromIndex, @NonNegative int toIndex) {
         subListRangeCheck(fromIndex, toIndex, size);
-        return new @PolyMutable SubList<>(this, fromIndex, toIndex);
+        return new @ReceiverDependentMutable SubList<>(this, fromIndex, toIndex);
     }
 
     @ReceiverDependentMutable
@@ -1269,7 +1271,7 @@ import jdk.internal.util.ArraysSupport;
             return modified;
         }
 
-        public boolean removeIf(@Mutable SubList<E> this, Predicate<? super E> filter) {
+        public boolean removeIf(@Mutable SubList<E> this, @Readonly Predicate<? super E> filter) {
             checkForComodification();
             int oldSize = root.size;
             boolean modified = root.removeIf(filter, offset, offset + size);
@@ -1334,18 +1336,18 @@ import jdk.internal.util.ArraysSupport;
         }
 
         @SideEffectFree
-        public Iterator<E> iterator(@Readonly SubList<E> this) {
+        public @ReceiverDependentMutable Iterator<E> iterator(@ReceiverDependentMutable SubList<E> this) {
             return listIterator();
         }
 
-        public ListIterator<E> listIterator(@Readonly SubList<E> this, @NonNegative int index) {
+        public @ReceiverDependentMutable ListIterator<E> listIterator(@ReceiverDependentMutable SubList<E> this, @NonNegative int index) {
             checkForComodification();
             rangeCheckForAdd(index);
 
-            return new ListIterator<E>() {
-                int cursor = index;
-                int lastRet = -1;
-                int expectedModCount = SubList.this.modCount;
+            return new @ReceiverDependentMutable ListIterator<E>() {
+                @Assignable int cursor = index;
+                @Assignable int lastRet = -1;
+                @Assignable int expectedModCount = SubList.this.modCount;
 
                 @Pure
                 @EnsuresNonEmptyIf(result = true, expression = "this")
@@ -1361,7 +1363,7 @@ import jdk.internal.util.ArraysSupport;
                         throw new NoSuchElementException();
                     @Readonly Object[] elementData = root.elementData;
                     if (offset + i >= elementData.length)
-                        throw new ConcurrentModificationException();
+                        throw new @Mutable ConcurrentModificationException();
                     cursor = i + 1;
                     return (E) elementData[offset + (lastRet = i)];
                 }
@@ -1390,7 +1392,7 @@ import jdk.internal.util.ArraysSupport;
                     if (i < size) {
                         final @Readonly Object[] es = root.elementData;
                         if (offset + i >= es.length)
-                            throw new ConcurrentModificationException();
+                            throw new @Mutable ConcurrentModificationException();
                         for (; i < size && root.modCount == expectedModCount; i++)
                             action.accept(elementAt(es, offset + i));
                         // update once at end to reduce heap write traffic
@@ -1456,9 +1458,9 @@ import jdk.internal.util.ArraysSupport;
             };
         }
 
-        public @PolyMutable List<E> subList(@PolyMutable SubList<E> this, int fromIndex, int toIndex) {
+        public @ReceiverDependentMutable List<E> subList(@ReceiverDependentMutable SubList<E> this, int fromIndex, int toIndex) {
             subListRangeCheck(fromIndex, toIndex, size);
-            return new @PolyMutable SubList<>(this, fromIndex, toIndex);
+            return new @ReceiverDependentMutable SubList<>(this, fromIndex, toIndex);
         }
 
         private void rangeCheckForAdd(@Readonly SubList<E> this, @NonNegative int index) {
@@ -1489,7 +1491,7 @@ import jdk.internal.util.ArraysSupport;
             checkForComodification();
 
             // ArrayListSpliterator not used here due to late-binding
-            return new Spliterator<E>() {
+            return new @Mutable Spliterator<E>() {
                 private int index = offset; // current index, modified on advance/split
                 private int fence = -1; // -1 until used; then one past last index
                 private int expectedModCount; // initialized when fence set
@@ -1563,7 +1565,7 @@ import jdk.internal.util.ArraysSupport;
      * @throws NullPointerException {@inheritDoc}
      */
     @Override
-    public void forEach(@Mutable ArrayList<E> this, Consumer<? super E> action) {
+    public void forEach(@Readonly ArrayList<E> this, Consumer<? super E> action) {
         Objects.requireNonNull(action);
         final int expectedModCount = modCount;
         final @Readonly Object[] es = elementData;
@@ -1718,7 +1720,7 @@ import jdk.internal.util.ArraysSupport;
      * @throws NullPointerException {@inheritDoc}
      */
     @Override
-    public boolean removeIf(@Mutable @CanShrink ArrayList<E> this, Predicate<? super E> filter) {
+    public boolean removeIf(@Mutable @CanShrink ArrayList<E> this, @Readonly Predicate<? super E> filter) {
         return removeIf(filter, 0, size);
     }
 
@@ -1726,7 +1728,7 @@ import jdk.internal.util.ArraysSupport;
      * Removes all elements satisfying the given predicate, from index
      * i (inclusive) to index end (exclusive).
      */
-    boolean removeIf(@Mutable @CanShrink ArrayList<E> this, Predicate<? super E> filter, int i, final int end) {
+    boolean removeIf(@Mutable @CanShrink ArrayList<E> this, @Readonly Predicate<? super E> filter, int i, final int end) {
         Objects.requireNonNull(filter);
         int expectedModCount = modCount;
         final @Readonly Object[] es = elementData;

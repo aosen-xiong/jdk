@@ -35,6 +35,7 @@
 
 package java.util.concurrent;
 
+import org.checkerframework.checker.mutability.qual.Readonly;
 import org.checkerframework.checker.index.qual.PolyGrowShrink;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nonempty.qual.EnsuresNonEmpty;
@@ -130,7 +131,7 @@ public class CopyOnWriteArraySet<E> extends AbstractSet<E>
      * @param c the collection of elements to initially contain
      * @throws NullPointerException if the specified collection is null
      */
-    public CopyOnWriteArraySet(Collection<? extends E> c) {
+    public CopyOnWriteArraySet(@Readonly Collection<? extends E> c) {
         if (c.getClass() == CopyOnWriteArraySet.class) {
             @SuppressWarnings("unchecked") CopyOnWriteArraySet<E> cc =
                 (CopyOnWriteArraySet<E>)c;
@@ -438,7 +439,7 @@ public class CopyOnWriteArraySet<E> extends AbstractSet<E>
     /**
      * @throws NullPointerException {@inheritDoc}
      */
-    public boolean removeIf(Predicate<? super E> filter) {
+    public boolean removeIf(@Readonly Predicate<? super E> filter) {
         return al.removeIf(filter);
     }
 

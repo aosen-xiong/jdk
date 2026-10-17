@@ -400,7 +400,7 @@ public interface Map<K extends @Immutable Object, V> {
      * @return a set view of the keys contained in this map
      */
     @SideEffectFree
-    @PolyNonEmpty @PolyMutable Set<@KeyFor({"this"}) K> keySet(@GuardSatisfied @PolyNonEmpty @PolyMutable Map<K, V> this);
+    @PolyNonEmpty @ReceiverDependentMutable Set<@KeyFor({"this"}) K> keySet(@GuardSatisfied @PolyNonEmpty @ReceiverDependentMutable Map<K, V> this);
 
     /**
      * Returns a {@link Collection} view of the values contained in this map.
@@ -418,7 +418,7 @@ public interface Map<K extends @Immutable Object, V> {
      * @return a collection view of the values contained in this map
      */
     @SideEffectFree
-    @PolyNonEmpty @PolyMutable Collection<V> values(@GuardSatisfied @PolyNonEmpty @PolyMutable Map<K, V> this);
+    @PolyNonEmpty @ReceiverDependentMutable Collection<V> values(@GuardSatisfied @PolyNonEmpty @ReceiverDependentMutable Map<K, V> this);
 
     /**
      * Returns a {@link Set} view of the mappings contained in this map.
@@ -437,7 +437,7 @@ public interface Map<K extends @Immutable Object, V> {
      * @return a set view of the mappings contained in this map
      */
     @SideEffectFree
-    @PolyNonEmpty @PolyMutable Set<Map.@PolyMutable Entry<@KeyFor({"this"}) K, V>> entrySet(@GuardSatisfied @PolyNonEmpty @PolyMutable Map<K, V> this);
+    @PolyNonEmpty @ReceiverDependentMutable Set<Map.@ReceiverDependentMutable Entry<@KeyFor({"this"}) K, V>> entrySet(@GuardSatisfied @PolyNonEmpty @ReceiverDependentMutable Map<K, V> this);
 
     /**
      * A map entry (key-value pair). The Entry may be unmodifiable, or the
@@ -574,8 +574,8 @@ public interface Map<K extends @Immutable Object, V> {
          */
         @Pure
         @SuppressWarnings("mutability") // covariant
-        public static <K extends @Immutable Comparable<? super K>, V> Comparator<Map.Entry<K, V>> comparingByKey() {
-            return (Comparator<Map.Entry<K, V>> & Serializable)
+        public static <K extends @Immutable Comparable<? super K>, V> @Readonly Comparator<Map.@Readonly Entry<K, V>> comparingByKey() {
+            return (@Readonly Comparator<Map.@Readonly Entry<K, V>> & Serializable)
                 (c1, c2) -> c1.getKey().compareTo(c2.getKey());
         }
 
@@ -592,8 +592,8 @@ public interface Map<K extends @Immutable Object, V> {
          * @since 1.8
          */
         @Pure
-        public static <K extends @Immutable Object, V extends Comparable<? super V>> Comparator<Map.Entry<K, V>> comparingByValue() {
-            return (Comparator<Map.Entry<K, V>> & Serializable)
+        public static <K extends @Immutable Object, V extends Comparable<? super V>> @Readonly Comparator<Map.@Readonly Entry<K, V>> comparingByValue() {
+            return (@Readonly Comparator<Map.@Readonly Entry<K, V>> & Serializable)
                 (c1, c2) -> c1.getValue().compareTo(c2.getValue());
         }
 
@@ -611,9 +611,9 @@ public interface Map<K extends @Immutable Object, V> {
          * @since 1.8
          */
         @Pure
-        public static <K extends @Immutable Object, V> Comparator<Map.Entry<K, V>> comparingByKey(Comparator<? super K> cmp) {
+        public static <K extends @Immutable Object, V> @Readonly Comparator<Map.@Readonly Entry<K, V>> comparingByKey(@Readonly Comparator<? super K> cmp) {
             Objects.requireNonNull(cmp);
-            return (Comparator<Map.Entry<K, V>> & Serializable)
+            return (@Readonly Comparator<Map.@Readonly Entry<K, V>> & Serializable)
                 (c1, c2) -> cmp.compare(c1.getKey(), c2.getKey());
         }
 
@@ -631,9 +631,9 @@ public interface Map<K extends @Immutable Object, V> {
          * @since 1.8
          */
         @Pure
-        public static <K extends @Immutable Object, V> Comparator<Map.Entry<K, V>> comparingByValue(Comparator<? super V> cmp) {
+        public static <K extends @Immutable Object, V> @Readonly Comparator<Map.@Readonly Entry<K, V>> comparingByValue(@Readonly Comparator<? super V> cmp) {
             Objects.requireNonNull(cmp);
-            return (Comparator<Map.Entry<K, V>> & Serializable)
+            return (@Readonly Comparator<Map.@Readonly Entry<K, V>> & Serializable)
                 (c1, c2) -> cmp.compare(c1.getValue(), c2.getValue());
         }
 
