@@ -936,7 +936,7 @@ public class ArrayDeque<E extends @NonNull @Readonly Object> extends AbstractCol
     /**
      * @throws NullPointerException {@inheritDoc}
      */
-    public boolean removeIf(@Mutable @CanShrink ArrayDeque<E> this, Predicate<? super E> filter) {
+    public boolean removeIf(@Mutable @CanShrink ArrayDeque<E> this, @Readonly Predicate<? super E> filter) {
         Objects.requireNonNull(filter);
         return bulkRemove(filter);
     }
@@ -958,7 +958,7 @@ public class ArrayDeque<E extends @NonNull @Readonly Object> extends AbstractCol
     }
 
     /** Implementation of bulk remove methods. */
-    private boolean bulkRemove(@Mutable ArrayDeque<E> this, Predicate<? super E> filter) {
+    private boolean bulkRemove(@Mutable ArrayDeque<E> this, @Readonly Predicate<? super E> filter) {
         final @Readonly Object[] es = elements;
         // Optimize for initial run of survivors
         for (int i = head, end = tail, to = (i <= end) ? end : es.length;
@@ -996,7 +996,7 @@ public class ArrayDeque<E extends @NonNull @Readonly Object> extends AbstractCol
      */
     private boolean bulkRemoveModified(
         @Mutable ArrayDeque<E> this,
-        Predicate<? super E> filter, final int beg) {
+        @Readonly Predicate<? super E> filter, final int beg) {
         final @Readonly Object[] es = elements;
         final int capacity = es.length;
         final int end = tail;

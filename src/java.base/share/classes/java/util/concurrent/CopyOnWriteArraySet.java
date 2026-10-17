@@ -35,6 +35,7 @@
 
 package java.util.concurrent;
 
+import org.checkerframework.checker.mutability.qual.Readonly;
 import org.checkerframework.checker.index.qual.PolyGrowShrink;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nonempty.qual.EnsuresNonEmpty;
@@ -438,7 +439,7 @@ public class CopyOnWriteArraySet<E> extends AbstractSet<E>
     /**
      * @throws NullPointerException {@inheritDoc}
      */
-    public boolean removeIf(Predicate<? super E> filter) {
+    public boolean removeIf(@Readonly Predicate<? super E> filter) {
         return al.removeIf(filter);
     }
 

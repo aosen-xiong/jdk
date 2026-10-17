@@ -1271,7 +1271,7 @@ import jdk.internal.util.ArraysSupport;
             return modified;
         }
 
-        public boolean removeIf(@Mutable SubList<E> this, Predicate<? super E> filter) {
+        public boolean removeIf(@Mutable SubList<E> this, @Readonly Predicate<? super E> filter) {
             checkForComodification();
             int oldSize = root.size;
             boolean modified = root.removeIf(filter, offset, offset + size);
@@ -1720,7 +1720,7 @@ import jdk.internal.util.ArraysSupport;
      * @throws NullPointerException {@inheritDoc}
      */
     @Override
-    public boolean removeIf(@Mutable @CanShrink ArrayList<E> this, Predicate<? super E> filter) {
+    public boolean removeIf(@Mutable @CanShrink ArrayList<E> this, @Readonly Predicate<? super E> filter) {
         return removeIf(filter, 0, size);
     }
 
@@ -1728,7 +1728,7 @@ import jdk.internal.util.ArraysSupport;
      * Removes all elements satisfying the given predicate, from index
      * i (inclusive) to index end (exclusive).
      */
-    boolean removeIf(@Mutable @CanShrink ArrayList<E> this, Predicate<? super E> filter, int i, final int end) {
+    boolean removeIf(@Mutable @CanShrink ArrayList<E> this, @Readonly Predicate<? super E> filter, int i, final int end) {
         Objects.requireNonNull(filter);
         int expectedModCount = modCount;
         final @Readonly Object[] es = elementData;

@@ -169,7 +169,7 @@ class ImmutableCollections {
         @Override public void    clear() { throw uoe(); }
         @Override public boolean remove(@UnknownSignedness @Readonly Object o) { throw uoe(); }
         @Override public boolean removeAll(@Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) { throw uoe(); }
-        @Override public boolean removeIf(Predicate<? super E> filter) { throw uoe(); }
+        @Override public boolean removeIf(@Readonly Predicate<? super E> filter) { throw uoe(); }
         @Override public boolean retainAll(@Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) { throw uoe(); }
     }
 

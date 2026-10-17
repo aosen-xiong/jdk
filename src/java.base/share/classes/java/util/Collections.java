@@ -1148,7 +1148,7 @@ public class Collections {
             c.forEach(action);
         }
         @Override
-        public boolean removeIf(Predicate<? super E> filter) {
+        public boolean removeIf(@Readonly Predicate<? super E> filter) {
             throw new UnsupportedOperationException();
         }
         @SideEffectFree
@@ -2239,7 +2239,7 @@ public class Collections {
             synchronized (mutex) {c.forEach(consumer);}
         }
         @Override
-        public boolean removeIf(@Mutable SynchronizedCollection<E> this, Predicate<? super E> filter) {
+        public boolean removeIf(@Mutable SynchronizedCollection<E> this, @Readonly Predicate<? super E> filter) {
             synchronized (mutex) {return c.removeIf(filter);}
         }
         @SideEffectFree
@@ -3380,7 +3380,7 @@ public class Collections {
         @Override
         public void forEach(@Readonly CheckedCollection<E> this, Consumer<? super E> action) {c.forEach(action);}
         @Override
-        public boolean removeIf(@Mutable CheckedCollection<E> this, Predicate<? super E> filter) {
+        public boolean removeIf(@Mutable CheckedCollection<E> this, @Readonly Predicate<? super E> filter) {
             return c.removeIf(filter);
         }
         @SideEffectFree
@@ -4678,7 +4678,7 @@ public class Collections {
             Objects.requireNonNull(action);
         }
         @Override
-        public boolean removeIf(Predicate<? super E> filter) {
+        public boolean removeIf(@Readonly Predicate<? super E> filter) {
             Objects.requireNonNull(filter);
             return false;
         }
@@ -4827,7 +4827,7 @@ public class Collections {
         public int hashCode() { return 1; }
 
         @Override
-        public boolean removeIf(Predicate<? super E> filter) {
+        public boolean removeIf(@Readonly Predicate<? super E> filter) {
             Objects.requireNonNull(filter);
             return false;
         }
@@ -5163,7 +5163,7 @@ public class Collections {
             return singletonSpliterator(element);
         }
         @Override
-        public boolean removeIf(Predicate<? super E> filter) {
+        public boolean removeIf(@Readonly Predicate<? super E> filter) {
             throw new UnsupportedOperationException();
         }
         @Override
@@ -5226,7 +5226,7 @@ public class Collections {
             action.accept(element);
         }
         @Override
-        public boolean removeIf(Predicate<? super E> filter) {
+        public boolean removeIf(@Readonly Predicate<? super E> filter) {
             throw new UnsupportedOperationException();
         }
         @Override
@@ -5989,7 +5989,7 @@ public class Collections {
             s.forEach(action);
         }
         @Override
-        public boolean removeIf(@Mutable SetFromMap<E> this, Predicate<? super E> filter) {
+        public boolean removeIf(@Mutable SetFromMap<E> this, @Readonly Predicate<? super E> filter) {
             return s.removeIf(filter);
         }
 
@@ -6082,7 +6082,7 @@ public class Collections {
         @Override
         public void forEach(@Readonly AsLIFOQueue<E> this, Consumer<? super E> action) {q.forEach(action);}
         @Override
-        public boolean removeIf(@Mutable AsLIFOQueue<E> this, Predicate<? super E> filter) {
+        public boolean removeIf(@Mutable AsLIFOQueue<E> this, @Readonly Predicate<? super E> filter) {
             return q.removeIf(filter);
         }
         @SideEffectFree

@@ -35,6 +35,7 @@
 
 package java.util.concurrent;
 
+import org.checkerframework.checker.mutability.qual.Readonly;
 import org.checkerframework.checker.index.qual.PolyGrowShrink;
 import org.checkerframework.checker.index.qual.CanShrink;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
@@ -1561,7 +1562,7 @@ public class LinkedTransferQueue<E extends Object> extends AbstractQueue<E>
     /**
      * @throws NullPointerException {@inheritDoc}
      */
-    public boolean removeIf(@CanShrink LinkedTransferQueue<E> this, Predicate<? super E> filter) {
+    public boolean removeIf(@CanShrink LinkedTransferQueue<E> this, @Readonly Predicate<? super E> filter) {
         Objects.requireNonNull(filter);
         return bulkRemove(filter);
     }
@@ -1594,7 +1595,7 @@ public class LinkedTransferQueue<E extends Object> extends AbstractQueue<E>
 
     /** Implementation of bulk remove methods. */
     @SuppressWarnings("unchecked")
-    private boolean bulkRemove(Predicate<? super E> filter) {
+    private boolean bulkRemove(@Readonly Predicate<? super E> filter) {
         boolean removed = false;
         restartFromHead: for (;;) {
             int hops = MAX_HOPS;

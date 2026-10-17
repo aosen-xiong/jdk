@@ -34,6 +34,7 @@
 
 package java.util.concurrent;
 
+import org.checkerframework.checker.mutability.qual.Readonly;
 import org.checkerframework.checker.index.qual.PolyGrowShrink;
 import org.checkerframework.checker.index.qual.CanShrink;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
@@ -834,7 +835,7 @@ public class CopyOnWriteArrayList<E>
     /**
      * @throws NullPointerException {@inheritDoc}
      */
-    public boolean removeIf(@CanShrink CopyOnWriteArrayList<E> this, Predicate<? super E> filter) {
+    public boolean removeIf(@CanShrink CopyOnWriteArrayList<E> this, @Readonly Predicate<? super E> filter) {
         Objects.requireNonNull(filter);
         return bulkRemove(filter);
     }
@@ -851,13 +852,13 @@ public class CopyOnWriteArrayList<E>
         return (bits[i >> 6] & (1L << i)) == 0;
     }
 
-    private boolean bulkRemove(Predicate<? super E> filter) {
+    private boolean bulkRemove(@Readonly Predicate<? super E> filter) {
         synchronized (lock) {
             return bulkRemove(filter, 0, getArray().length);
         }
     }
 
-    boolean bulkRemove(Predicate<? super E> filter, int i, int end) {
+    boolean bulkRemove(@Readonly Predicate<? super E> filter, int i, int end) {
         // assert Thread.holdsLock(lock);
         final Object[] es = getArray();
         // Optimize for initial run of survivors
@@ -1538,12 +1539,12 @@ public class CopyOnWriteArrayList<E>
             return bulkRemove(e -> !c.contains(e));
         }
 
-        public boolean removeIf(Predicate<? super E> filter) {
+        public boolean removeIf(@Readonly Predicate<? super E> filter) {
             Objects.requireNonNull(filter);
             return bulkRemove(filter);
         }
 
-        private boolean bulkRemove(Predicate<? super E> filter) {
+        private boolean bulkRemove(@Readonly Predicate<? super E> filter) {
             synchronized (lock) {
                 final Object[] oldArray = getArrayChecked();
                 boolean modified = CopyOnWriteArrayList.this.bulkRemove(

@@ -1005,7 +1005,7 @@ public class Vector<E>
      */
     @SuppressWarnings({"unchecked"})
     @Override
-    public boolean removeIf(@Mutable @CanShrink Vector<E> this, Predicate<? super E> filter) {
+    public boolean removeIf(@Mutable @CanShrink Vector<E> this, @Readonly Predicate<? super E> filter) {
         Objects.requireNonNull(filter);
         return bulkRemove(filter);
     }
@@ -1022,7 +1022,7 @@ public class Vector<E>
         return (bits[i >> 6] & (1L << i)) == 0;
     }
 
-    private synchronized boolean bulkRemove(@Mutable Vector<E> this, Predicate<? super E> filter) {
+    private synchronized boolean bulkRemove(@Mutable Vector<E> this, @Readonly Predicate<? super E> filter) {
         int expectedModCount = modCount;
         final @Readonly Object[] es = elementData;
         final int end = elementCount;
