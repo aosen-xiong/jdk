@@ -316,7 +316,7 @@ public final class String
      */
     @SideEffectFree
     @StaticallyExecutable
-    public @PolyValue @Unique String(char value @GuardSatisfied @PolyValue @Immutable []) {
+    public @PolyValue @Unique String(char value @GuardSatisfied @PolyValue @Readonly []) {
         this(value, 0, value.length, null);
     }
 
@@ -343,7 +343,7 @@ public final class String
      */
     @SideEffectFree
     @StaticallyExecutable
-    public @Unique String(char value @GuardSatisfied @Immutable [], @IndexOrHigh({"#1"}) int offset, @LTLengthOf(value={"#1"}, offset={"#2 - 1"}) @NonNegative int count) {
+    public @Unique String(char value @GuardSatisfied @Readonly [], @IndexOrHigh({"#1"}) int offset, @LTLengthOf(value={"#1"}, offset={"#2 - 1"}) @NonNegative int count) {
         this(value, offset, count, rangeCheck(value, offset, count));
     }
 
@@ -539,7 +539,7 @@ public final class String
      */
     @SideEffectFree
     @StaticallyExecutable
-    public @Unique String(@PolySigned byte @GuardSatisfied @Immutable [] bytes, @IndexOrHigh({"#1"}) int offset, @LTLengthOf(value={"#1"}, offset={"#2 - 1"}) @NonNegative int length, String charsetName)
+    public @Unique String(@PolySigned byte @GuardSatisfied @Readonly [] bytes, @IndexOrHigh({"#1"}) int offset, @LTLengthOf(value={"#1"}, offset={"#2 - 1"}) @NonNegative int length, String charsetName)
             throws UnsupportedEncodingException {
         this(bytes, offset, length, lookupCharset(charsetName));
     }
@@ -577,7 +577,7 @@ public final class String
     @SideEffectFree
     @StaticallyExecutable
     @SuppressWarnings({"removal", "mutability"}) // cast from @Unique @Mutable to @Immutable
-    public @Unique String(@PolySigned byte @GuardSatisfied @Immutable [] bytes, @IndexOrHigh({"#1"}) int offset, @LTLengthOf(value={"#1"}, offset={"#2 - 1"}) @NonNegative int length, Charset charset) {
+    public @Unique String(@PolySigned byte @GuardSatisfied @Readonly [] bytes, @IndexOrHigh({"#1"}) int offset, @LTLengthOf(value={"#1"}, offset={"#2 - 1"}) @NonNegative int length, Charset charset) {
         Objects.requireNonNull(charset);
         checkBoundsOffCount(offset, length, bytes.length);
         if (length == 0) {
@@ -1417,7 +1417,7 @@ public final class String
      */
     @SideEffectFree
     @StaticallyExecutable
-    public @Unique String(@PolySigned byte bytes @GuardSatisfied @Immutable [], String charsetName)
+    public @Unique String(@PolySigned byte bytes @GuardSatisfied @Readonly [], String charsetName)
             throws UnsupportedEncodingException {
         this(bytes, 0, bytes.length, charsetName);
     }
@@ -1444,7 +1444,7 @@ public final class String
      */
     @SideEffectFree
     @StaticallyExecutable
-    public @Unique String(@PolySigned byte bytes @GuardSatisfied @Immutable [], Charset charset) {
+    public @Unique String(@PolySigned byte bytes @GuardSatisfied @Readonly [], Charset charset) {
         this(bytes, 0, bytes.length, charset);
     }
 
@@ -1476,7 +1476,7 @@ public final class String
      */
     @SideEffectFree
     @StaticallyExecutable
-    public @Unique String(@PolySigned byte @GuardSatisfied @Immutable [] bytes, @IndexOrHigh({"#1"}) int offset, @LTLengthOf(value={"#1"}, offset={"#2 - 1"}) @NonNegative int length) {
+    public @Unique String(@PolySigned byte @GuardSatisfied @Readonly [] bytes, @IndexOrHigh({"#1"}) int offset, @LTLengthOf(value={"#1"}, offset={"#2 - 1"}) @NonNegative int length) {
         this(bytes, offset, length, Charset.defaultCharset());
     }
 
@@ -1498,7 +1498,7 @@ public final class String
      */
     @SideEffectFree
     @StaticallyExecutable
-    public @Unique String(@PolySigned byte @GuardSatisfied @Immutable [] bytes) {
+    public @Unique String(@PolySigned byte @GuardSatisfied @Readonly [] bytes) {
         this(bytes, 0, bytes.length);
     }
 
@@ -4436,7 +4436,7 @@ public final class String
      */
     @SideEffectFree
     @StaticallyExecutable
-    public static @NewObject @SameLen({"#1"}) @PolyValue String valueOf(char data @GuardSatisfied @PolyValue @Immutable []) {
+    public static @NewObject @SameLen({"#1"}) @PolyValue String valueOf(char data @GuardSatisfied @PolyValue @Readonly []) {
         return new String(data);
     }
 
@@ -4462,7 +4462,7 @@ public final class String
      */
     @SideEffectFree
     @StaticallyExecutable
-    public static @NewObject String valueOf(char data @GuardSatisfied @Immutable [], @IndexOrHigh({"#1"}) int offset, @LTLengthOf(value={"#1"}, offset={"#2 - 1"}) @NonNegative int count) {
+    public static @NewObject String valueOf(char data @GuardSatisfied @Readonly [], @IndexOrHigh({"#1"}) int offset, @LTLengthOf(value={"#1"}, offset={"#2 - 1"}) @NonNegative int count) {
         return new String(data, offset, count);
     }
 
@@ -4481,7 +4481,7 @@ public final class String
      */
     @SideEffectFree
     @StaticallyExecutable
-    public static String copyValueOf(char data @GuardSatisfied @Immutable [], @IndexOrHigh({"#1"}) int offset, @LTLengthOf(value={"#1"}, offset={"#2 - 1"}) @NonNegative int count) {
+    public static String copyValueOf(char data @GuardSatisfied @Readonly [], @IndexOrHigh({"#1"}) int offset, @LTLengthOf(value={"#1"}, offset={"#2 - 1"}) @NonNegative int count) {
         return new String(data, offset, count);
     }
 
@@ -4494,7 +4494,7 @@ public final class String
      */
     @SideEffectFree
     @StaticallyExecutable
-    public static @SameLen({"#1"}) @PolyValue String copyValueOf(char data @GuardSatisfied @PolyValue @Immutable []) {
+    public static @SameLen({"#1"}) @PolyValue String copyValueOf(char data @GuardSatisfied @PolyValue @Readonly []) {
         return new String(data);
     }
 
@@ -4722,7 +4722,7 @@ public final class String
      * characters in their byte sequences defined by the {@code StringUTF16}.
      */
     @SuppressWarnings("mutability:assignment.type.incompatible") // cast from @Unique @Mutable to @Immutable
-    String(char @Immutable [] value, int off, int len, Void sig) {
+    String(char @Readonly [] value, int off, int len, Void sig) {
         if (len == 0) {
             this.value = "".value;
             this.coder = "".coder;
