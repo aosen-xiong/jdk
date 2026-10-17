@@ -24,6 +24,7 @@
  */
 
 package java.lang.reflect;
+import org.checkerframework.checker.mutability.qual.Immutable;
 import org.checkerframework.common.value.qual.MinLen;
 
 /**
@@ -33,6 +34,7 @@ import org.checkerframework.common.value.qual.MinLen;
  * @jls 4.5.1 Type Arguments of Parameterized Types
  * @since 1.5
  */
+@Immutable
 public interface WildcardType extends Type {
     /**
      * Returns an array of {@code Type} objects representing the  upper
