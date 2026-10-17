@@ -57,6 +57,8 @@
 
 package java.time.chrono;
 
+import org.checkerframework.framework.qual.CFComment;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import static java.time.temporal.ChronoField.EPOCH_DAY;
 
 import java.io.FilePermission;
@@ -557,7 +559,7 @@ public final class HijrahChronology extends AbstractChronology implements Serial
 
     //-----------------------------------------------------------------------
     @Override  // override for return type
-    public HijrahDate resolveDate(Map<TemporalField, Long> fieldValues, ResolverStyle resolverStyle) {
+    public @Nullable HijrahDate resolveDate(Map<TemporalField, Long> fieldValues, ResolverStyle resolverStyle) {
         return (HijrahDate) super.resolveDate(fieldValues, resolverStyle);
     }
 
@@ -833,9 +835,11 @@ public final class HijrahChronology extends AbstractChronology implements Serial
      * @return a Properties containing the properties read from the resource.
      * @throws Exception if access to the property resource fails
      */
+    @CFComment("nullness: false positive, eisop#2310: a lambda in a conditional does not get the @Nullable type argument of its target type")
+    @SuppressWarnings("nullness:return")
     private static Properties readConfigProperties(final String chronologyId, final String calendarType) throws Exception {
         String resourceName = RESOURCE_PREFIX + chronologyId + "_" + calendarType + RESOURCE_SUFFIX;
-        PrivilegedAction<InputStream> getResourceAction =  calendarType.equals("islamic-umalqura") ?
+        PrivilegedAction<@Nullable InputStream> getResourceAction =  calendarType.equals("islamic-umalqura") ?
             () -> HijrahChronology.class.getResourceAsStream(resourceName) :
             () -> {
                 try {
@@ -1042,6 +1046,8 @@ public final class HijrahChronology extends AbstractChronology implements Serial
      * Look for Hijrah chronology variant properties files in
      * <JAVA_HOME>/conf/chronology directory. Then register its chronology, if any.
      */
+    @CFComment("nullness: every path comes from listing CONF_PATH, so it has a file name")
+    @SuppressWarnings("nullness:dereference")
     private static void registerCustomChrono() {
         AccessController.doPrivileged(
             (PrivilegedAction<Void>)() -> {

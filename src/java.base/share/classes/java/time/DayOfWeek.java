@@ -61,6 +61,7 @@
  */
 package java.time;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import static java.time.temporal.ChronoField.DAY_OF_WEEK;
 import static java.time.temporal.ChronoUnit.DAYS;
 
@@ -248,7 +249,7 @@ public enum DayOfWeek implements TemporalAccessor, TemporalAdjuster {
      * @return true if the field is supported on this day-of-week, false if not
      */
     @Override
-    public boolean isSupported(TemporalField field) {
+    public boolean isSupported(@Nullable TemporalField field) {
         if (field instanceof ChronoField) {
             return field == DAY_OF_WEEK;
         }
@@ -403,7 +404,7 @@ public enum DayOfWeek implements TemporalAccessor, TemporalAdjuster {
      */
     @SuppressWarnings("unchecked")
     @Override
-    public <R> R query(TemporalQuery<R> query) {
+    public <R extends @Nullable Object> R query(TemporalQuery<R> query) {
         if (query == TemporalQueries.precision()) {
             return (R) DAYS;
         }

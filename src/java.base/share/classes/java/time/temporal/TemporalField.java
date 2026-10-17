@@ -61,6 +61,7 @@
  */
 package java.time.temporal;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import java.time.DateTimeException;
 import java.time.chrono.Chronology;
 import java.time.format.ResolverStyle;
@@ -371,7 +372,7 @@ public interface TemporalField {
      * @throws DateTimeException if resolving results in an error. This must not be thrown
      *  by querying a field on the temporal without first checking if it is supported
      */
-    default TemporalAccessor resolve(
+    default @Nullable TemporalAccessor resolve(
             Map<TemporalField, Long> fieldValues,
             TemporalAccessor partialTemporal,
             ResolverStyle resolverStyle) {

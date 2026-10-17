@@ -56,6 +56,7 @@
  */
 package java.time.chrono;
 
+import org.checkerframework.framework.qual.CFComment;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -695,6 +696,8 @@ public final class HijrahDate
         out.writeByte(get(DAY_OF_MONTH));
     }
 
+    @CFComment("nullness: writeExternal wrote these objects, and none of them is null")
+    @SuppressWarnings({"nullness:dereference", "nullness:argument"})
     static HijrahDate readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         HijrahChronology chrono = (HijrahChronology) in.readObject();
         int year = in.readInt();

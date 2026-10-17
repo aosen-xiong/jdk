@@ -61,6 +61,7 @@
  */
 package java.time.chrono;
 
+import org.checkerframework.framework.qual.CFComment;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -138,8 +139,10 @@ final class ChronoZonedDateTimeImpl<D extends ChronoLocalDate>
      * @param preferredOffset  the zone offset, null if no preference
      * @return the zoned date-time, not null
      */
+    @CFComment("nullness: no valid offsets means localDateTime is in a gap, for which getTransition returns the transition")
+    @SuppressWarnings("nullness:dereference")
     static <R extends ChronoLocalDate> ChronoZonedDateTime<R> ofBest(
-            ChronoLocalDateTimeImpl<R> localDateTime, ZoneId zone, ZoneOffset preferredOffset) {
+            ChronoLocalDateTimeImpl<R> localDateTime, ZoneId zone, @Nullable ZoneOffset preferredOffset) {
         Objects.requireNonNull(localDateTime, "localDateTime");
         Objects.requireNonNull(zone, "zone");
         if (zone instanceof ZoneOffset) {
@@ -282,7 +285,7 @@ final class ChronoZonedDateTimeImpl<D extends ChronoLocalDate>
 
     //-----------------------------------------------------------------------
     @Override
-    public boolean isSupported(TemporalField field) {
+    public boolean isSupported(@Nullable TemporalField field) {
         return field instanceof ChronoField || (field != null && field.isSupportedBy(this));
     }
 
@@ -361,6 +364,8 @@ final class ChronoZonedDateTimeImpl<D extends ChronoLocalDate>
         out.writeObject(zone);
     }
 
+    @CFComment("nullness: writeExternal wrote these objects, and none of them is null")
+    @SuppressWarnings({"nullness:dereference", "nullness:argument"})
     static ChronoZonedDateTime<?> readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         ChronoLocalDateTime<?> dateTime = (ChronoLocalDateTime<?>) in.readObject();
         ZoneOffset offset = (ZoneOffset) in.readObject();

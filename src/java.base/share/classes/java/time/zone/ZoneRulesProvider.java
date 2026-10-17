@@ -61,6 +61,7 @@
  */
 package java.time.zone;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.time.ZoneId;
@@ -148,8 +149,8 @@ public abstract class ZoneRulesProvider {
         // if the property java.time.zone.DefaultZoneRulesProvider is
         // set then its value is the class name of the default provider
         final List<ZoneRulesProvider> loaded = new ArrayList<>();
-        AccessController.doPrivileged(new PrivilegedAction<>() {
-            public Object run() {
+        AccessController.doPrivileged(new PrivilegedAction<@Nullable Object>() {
+            public @Nullable Object run() {
                 String prop = System.getProperty("java.time.zone.DefaultZoneRulesProvider");
                 if (prop != null) {
                     try {

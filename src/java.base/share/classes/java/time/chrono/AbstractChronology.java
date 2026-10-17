@@ -61,6 +61,7 @@
  */
 package java.time.chrono;
 
+import org.checkerframework.framework.qual.CFComment;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -149,7 +150,7 @@ public abstract class AbstractChronology implements Chronology {
      * @param chrono the chronology to register; not null
      * @return the already registered Chronology if any, may be null
      */
-    static Chronology registerChrono(Chronology chrono) {
+    static @Nullable Chronology registerChrono(Chronology chrono) {
         return registerChrono(chrono, chrono.getId());
     }
 
@@ -162,7 +163,7 @@ public abstract class AbstractChronology implements Chronology {
      * @param id the ID to register the chronology; not null
      * @return the already registered Chronology if any, may be null
      */
-    static Chronology registerChrono(Chronology chrono, String id) {
+    static @Nullable Chronology registerChrono(Chronology chrono, String id) {
         Chronology prev = CHRONOS_BY_ID.putIfAbsent(id, chrono);
         if (prev == null) {
             String type = chrono.getCalendarType();
@@ -426,7 +427,9 @@ public abstract class AbstractChronology implements Chronology {
      *  because of a conflict in the input data
      */
     @Override
-    public ChronoLocalDate resolveDate(Map<TemporalField, Long> fieldValues, ResolverStyle resolverStyle) {
+    @CFComment("nullness: EPOCH_DAY is removed only after fieldValues.containsKey(EPOCH_DAY)")
+    @SuppressWarnings("nullness:unboxing")
+    public @Nullable ChronoLocalDate resolveDate(Map<TemporalField, Long> fieldValues, ResolverStyle resolverStyle) {
         // check epoch-day before inventing era
         if (fieldValues.containsKey(EPOCH_DAY)) {
             return dateEpochDay(fieldValues.remove(EPOCH_DAY));
@@ -486,7 +489,7 @@ public abstract class AbstractChronology implements Chronology {
         }
     }
 
-    ChronoLocalDate resolveYearOfEra(Map<TemporalField, Long> fieldValues, ResolverStyle resolverStyle) {
+    @Nullable ChronoLocalDate resolveYearOfEra(Map<TemporalField, Long> fieldValues, ResolverStyle resolverStyle) {
         Long yoeLong = fieldValues.remove(YEAR_OF_ERA);
         if (yoeLong != null) {
             Long eraLong = fieldValues.remove(ERA);
@@ -524,6 +527,8 @@ public abstract class AbstractChronology implements Chronology {
         return null;
     }
 
+    @CFComment("nullness: resolveDate calls this only after checking fieldValues.containsKey for every field removed here")
+    @SuppressWarnings("nullness:unboxing")
     ChronoLocalDate resolveYMD(Map<TemporalField, Long> fieldValues, ResolverStyle resolverStyle) {
         int y = range(YEAR).checkValidIntValue(fieldValues.remove(YEAR), YEAR);
         if (resolverStyle == ResolverStyle.LENIENT) {
@@ -544,6 +549,8 @@ public abstract class AbstractChronology implements Chronology {
         return date(y, moy, dom);
     }
 
+    @CFComment("nullness: resolveDate calls this only after checking fieldValues.containsKey for every field removed here")
+    @SuppressWarnings("nullness:unboxing")
     ChronoLocalDate resolveYD(Map<TemporalField, Long> fieldValues, ResolverStyle resolverStyle) {
         int y = range(YEAR).checkValidIntValue(fieldValues.remove(YEAR), YEAR);
         if (resolverStyle == ResolverStyle.LENIENT) {
@@ -554,6 +561,8 @@ public abstract class AbstractChronology implements Chronology {
         return dateYearDay(y, doy);  // smart is same as strict
     }
 
+    @CFComment("nullness: resolveDate calls this only after checking fieldValues.containsKey for every field removed here")
+    @SuppressWarnings("nullness:unboxing")
     ChronoLocalDate resolveYMAA(Map<TemporalField, Long> fieldValues, ResolverStyle resolverStyle) {
         int y = range(YEAR).checkValidIntValue(fieldValues.remove(YEAR), YEAR);
         if (resolverStyle == ResolverStyle.LENIENT) {
@@ -572,6 +581,8 @@ public abstract class AbstractChronology implements Chronology {
         return date;
     }
 
+    @CFComment("nullness: resolveDate calls this only after checking fieldValues.containsKey for every field removed here")
+    @SuppressWarnings("nullness:unboxing")
     ChronoLocalDate resolveYMAD(Map<TemporalField, Long> fieldValues, ResolverStyle resolverStyle) {
         int y = range(YEAR).checkValidIntValue(fieldValues.remove(YEAR), YEAR);
         if (resolverStyle == ResolverStyle.LENIENT) {
@@ -590,6 +601,8 @@ public abstract class AbstractChronology implements Chronology {
         return date;
     }
 
+    @CFComment("nullness: resolveDate calls this only after checking fieldValues.containsKey for every field removed here")
+    @SuppressWarnings("nullness:unboxing")
     ChronoLocalDate resolveYAA(Map<TemporalField, Long> fieldValues, ResolverStyle resolverStyle) {
         int y = range(YEAR).checkValidIntValue(fieldValues.remove(YEAR), YEAR);
         if (resolverStyle == ResolverStyle.LENIENT) {
@@ -606,6 +619,8 @@ public abstract class AbstractChronology implements Chronology {
         return date;
     }
 
+    @CFComment("nullness: resolveDate calls this only after checking fieldValues.containsKey for every field removed here")
+    @SuppressWarnings("nullness:unboxing")
     ChronoLocalDate resolveYAD(Map<TemporalField, Long> fieldValues, ResolverStyle resolverStyle) {
         int y = range(YEAR).checkValidIntValue(fieldValues.remove(YEAR), YEAR);
         if (resolverStyle == ResolverStyle.LENIENT) {

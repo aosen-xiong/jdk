@@ -61,6 +61,8 @@
  */
 package java.time.chrono;
 
+import org.checkerframework.framework.qual.CFComment;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import static java.time.temporal.ChronoField.DAY_OF_MONTH;
 import static java.time.temporal.ChronoField.ERA;
 import static java.time.temporal.ChronoField.HOUR_OF_DAY;
@@ -582,7 +584,7 @@ public final class IsoChronology extends AbstractChronology implements Serializa
      *  because of a conflict in the input data
      */
     @Override  // override for performance
-    public LocalDate resolveDate(Map<TemporalField, Long> fieldValues, ResolverStyle resolverStyle) {
+    public @Nullable LocalDate resolveDate(Map<TemporalField, Long> fieldValues, ResolverStyle resolverStyle) {
         return (LocalDate) super.resolveDate(fieldValues, resolverStyle);
     }
 
@@ -599,7 +601,7 @@ public final class IsoChronology extends AbstractChronology implements Serializa
     }
 
     @Override  // override for enhanced behaviour
-    LocalDate resolveYearOfEra(Map<TemporalField, Long> fieldValues, ResolverStyle resolverStyle) {
+    @Nullable LocalDate resolveYearOfEra(Map<TemporalField, Long> fieldValues, ResolverStyle resolverStyle) {
         Long yoeLong = fieldValues.remove(YEAR_OF_ERA);
         if (yoeLong != null) {
             if (resolverStyle != ResolverStyle.LENIENT) {
@@ -634,6 +636,8 @@ public final class IsoChronology extends AbstractChronology implements Serializa
     }
 
     @Override  // override for performance
+    @CFComment("nullness: callers call this only after checking fieldValues.containsKey for every field removed here")
+    @SuppressWarnings("nullness:unboxing")
     LocalDate resolveYMD(Map <TemporalField, Long> fieldValues, ResolverStyle resolverStyle) {
         int y = YEAR.checkValidIntValue(fieldValues.remove(YEAR));
         if (resolverStyle == ResolverStyle.LENIENT) {

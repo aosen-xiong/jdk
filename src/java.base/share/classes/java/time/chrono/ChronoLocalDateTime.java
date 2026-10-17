@@ -61,6 +61,8 @@
  */
 package java.time.chrono;
 
+import org.checkerframework.framework.qual.CFComment;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import static java.time.temporal.ChronoField.EPOCH_DAY;
 import static java.time.temporal.ChronoField.NANO_OF_DAY;
 import static java.time.temporal.ChronoUnit.FOREVER;
@@ -233,7 +235,7 @@ public interface ChronoLocalDateTime<D extends ChronoLocalDate>
      * @return true if the field can be queried, false if not
      */
     @Override
-    boolean isSupported(TemporalField field);
+    boolean isSupported(@Nullable TemporalField field);
 
     /**
      * Checks if the specified unit is supported.
@@ -254,7 +256,7 @@ public interface ChronoLocalDateTime<D extends ChronoLocalDate>
      * @return true if the unit can be added/subtracted, false if not
      */
     @Override
-    default boolean isSupported(TemporalUnit unit) {
+    default boolean isSupported(@Nullable TemporalUnit unit) {
         if (unit instanceof ChronoUnit) {
             return unit != FOREVER;
         }
@@ -338,9 +340,10 @@ public interface ChronoLocalDateTime<D extends ChronoLocalDate>
      * @throws DateTimeException if unable to query (defined by the query)
      * @throws ArithmeticException if numeric overflow occurs (defined by the query)
      */
-    @SuppressWarnings("unchecked")
+    @CFComment("nullness: returns null only for queries whose result type is nullable, such as TemporalQueries.zoneId()")
+    @SuppressWarnings({"unchecked", "nullness:return"})
     @Override
-    default <R> R query(TemporalQuery<R> query) {
+    default <R extends @Nullable Object> R query(TemporalQuery<R> query) {
         if (query == TemporalQueries.zoneId() || query == TemporalQueries.zone() || query == TemporalQueries.offset()) {
             return null;
         } else if (query == TemporalQueries.localTime()) {
@@ -585,7 +588,7 @@ public interface ChronoLocalDateTime<D extends ChronoLocalDate>
      * @return true if this is equal to the other date
      */
     @Override
-    boolean equals(Object obj);
+    boolean equals(@Nullable Object obj);
 
     /**
      * A hash code for this date-time.

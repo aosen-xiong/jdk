@@ -61,6 +61,7 @@
  */
 package java.time;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 /**
  * Exception used to indicate a problem while calculating a date-time.
  * <p>
@@ -85,7 +86,7 @@ public class DateTimeException extends RuntimeException {
      *
      * @param message  the message to use for this exception, may be null
      */
-    public DateTimeException(String message) {
+    public DateTimeException(@Nullable String message) {
         super(message);
     }
 
@@ -95,7 +96,7 @@ public class DateTimeException extends RuntimeException {
      * @param message  the message to use for this exception, may be null
      * @param cause  the cause of the exception, may be null
      */
-    public DateTimeException(String message, Throwable cause) {
+    public DateTimeException(@Nullable String message, @Nullable Throwable cause) {
         super(message, cause);
     }
 

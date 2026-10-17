@@ -61,6 +61,7 @@
  */
 package java.time.format;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import static java.time.format.DateTimeFormatterBuilder.DayPeriod;
 import static java.time.temporal.ChronoField.AMPM_OF_DAY;
 import static java.time.temporal.ChronoField.CLOCK_HOUR_OF_AMPM;
@@ -213,7 +214,7 @@ final class Parsed implements TemporalAccessor {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <R> R query(TemporalQuery<R> query) {
+    public <R extends @Nullable Object> R query(TemporalQuery<R> query) {
         if (query == TemporalQueries.zoneId()) {
             return (R) zone;
         } else if (query == TemporalQueries.chronology()) {
