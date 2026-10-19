@@ -123,7 +123,7 @@ public interface NavigableMap<K extends @Immutable Object,V> extends SortedMap<K
      * @throws NullPointerException if the specified key is null
      *         and this map does not permit null keys
      */
-    Map.@Nullable @Immutable Entry<K,V> lowerEntry(@Readonly NavigableMap<K,V> this, K key);
+    Map.@Nullable @Readonly Entry<K,V> lowerEntry(@Readonly NavigableMap<K,V> this, K key);
 
     /**
      * Returns the greatest key strictly less than the given key, or
@@ -152,7 +152,7 @@ public interface NavigableMap<K extends @Immutable Object,V> extends SortedMap<K
      * @throws NullPointerException if the specified key is null
      *         and this map does not permit null keys
      */
-    Map.@Nullable @Immutable Entry<K,V> floorEntry(@Readonly NavigableMap<K,V> this, K key);
+    Map.@Nullable @Readonly Entry<K,V> floorEntry(@Readonly NavigableMap<K,V> this, K key);
 
     /**
      * Returns the greatest key less than or equal to the given key,
@@ -181,7 +181,7 @@ public interface NavigableMap<K extends @Immutable Object,V> extends SortedMap<K
      * @throws NullPointerException if the specified key is null
      *         and this map does not permit null keys
      */
-    Map.@Nullable @Immutable Entry<K,V> ceilingEntry(@Readonly NavigableMap<K,V> this, K key);
+    Map.@Nullable @Readonly Entry<K,V> ceilingEntry(@Readonly NavigableMap<K,V> this, K key);
 
     /**
      * Returns the least key greater than or equal to the given key,
@@ -210,7 +210,7 @@ public interface NavigableMap<K extends @Immutable Object,V> extends SortedMap<K
      * @throws NullPointerException if the specified key is null
      *         and this map does not permit null keys
      */
-    Map.@Nullable @Immutable Entry<K,V> higherEntry(@Readonly NavigableMap<K,V> this, K key);
+    Map.@Nullable @Readonly Entry<K,V> higherEntry(@Readonly NavigableMap<K,V> this, K key);
 
     /**
      * Returns the least key strictly greater than the given key, or
@@ -233,7 +233,7 @@ public interface NavigableMap<K extends @Immutable Object,V> extends SortedMap<K
      * @return an entry with the least key,
      *         or {@code null} if this map is empty
      */
-    Map.@Nullable @Immutable Entry<K,V> firstEntry(@Readonly NavigableMap<K,V> this);
+    Map.@Nullable @Readonly Entry<K,V> firstEntry(@Readonly NavigableMap<K,V> this);
 
     /**
      * Returns a key-value mapping associated with the greatest
@@ -242,7 +242,7 @@ public interface NavigableMap<K extends @Immutable Object,V> extends SortedMap<K
      * @return an entry with the greatest key,
      *         or {@code null} if this map is empty
      */
-    Map.@Nullable @Immutable Entry<K,V> lastEntry(@Readonly NavigableMap<K,V> this);
+    Map.@Nullable @Readonly Entry<K,V> lastEntry(@Readonly NavigableMap<K,V> this);
 
     /**
      * Removes and returns a key-value mapping associated with
@@ -251,7 +251,7 @@ public interface NavigableMap<K extends @Immutable Object,V> extends SortedMap<K
      * @return the removed first entry of this map,
      *         or {@code null} if this map is empty
      */
-    Map.@Nullable @Immutable Entry<K,V> pollFirstEntry(@GuardSatisfied @Mutable NavigableMap<K, V> this);
+    Map.@Nullable @Readonly Entry<K,V> pollFirstEntry(@GuardSatisfied @Mutable NavigableMap<K, V> this);
 
     /**
      * Removes and returns a key-value mapping associated with
@@ -260,7 +260,7 @@ public interface NavigableMap<K extends @Immutable Object,V> extends SortedMap<K
      * @return the removed last entry of this map,
      *         or {@code null} if this map is empty
      */
-    Map.@Nullable @Immutable Entry<K,V> pollLastEntry(@GuardSatisfied @Mutable NavigableMap<K, V> this);
+    Map.@Nullable @Readonly Entry<K,V> pollLastEntry(@GuardSatisfied @Mutable NavigableMap<K, V> this);
 
     /**
      * Returns a reverse order view of the mappings contained in this map.

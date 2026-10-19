@@ -3088,29 +3088,29 @@ public class Collections {
             nm = m;
         }
 
-        public @Immutable Entry<K, V> lowerEntry(@Readonly SynchronizedNavigableMap<K,V> this, K key)
+        public @Readonly Entry<K, V> lowerEntry(@Readonly SynchronizedNavigableMap<K,V> this, K key)
                         { synchronized (mutex) { return nm.lowerEntry(key); } }
         public K lowerKey(@Readonly SynchronizedNavigableMap<K,V> this, K key)
                           { synchronized (mutex) { return nm.lowerKey(key); } }
-        public @Immutable Entry<K, V> floorEntry(@Readonly SynchronizedNavigableMap<K,V> this, K key)
+        public @Readonly Entry<K, V> floorEntry(@Readonly SynchronizedNavigableMap<K,V> this, K key)
                         { synchronized (mutex) { return nm.floorEntry(key); } }
         public K floorKey(@Readonly SynchronizedNavigableMap<K,V> this, K key)
                           { synchronized (mutex) { return nm.floorKey(key); } }
-        public @Immutable Entry<K, V> ceilingEntry(@Readonly SynchronizedNavigableMap<K,V> this, K key)
+        public @Readonly Entry<K, V> ceilingEntry(@Readonly SynchronizedNavigableMap<K,V> this, K key)
                       { synchronized (mutex) { return nm.ceilingEntry(key); } }
         public K ceilingKey(@Readonly SynchronizedNavigableMap<K,V> this, K key)
                         { synchronized (mutex) { return nm.ceilingKey(key); } }
-        public @Immutable Entry<K, V> higherEntry(@Readonly SynchronizedNavigableMap<K,V> this, K key)
+        public @Readonly Entry<K, V> higherEntry(@Readonly SynchronizedNavigableMap<K,V> this, K key)
                        { synchronized (mutex) { return nm.higherEntry(key); } }
         public K higherKey(@Readonly SynchronizedNavigableMap<K,V> this, K key)
                          { synchronized (mutex) { return nm.higherKey(key); } }
-        public @Immutable Entry<K, V> firstEntry(@Readonly SynchronizedNavigableMap<K,V> this)
+        public @Readonly Entry<K, V> firstEntry(@Readonly SynchronizedNavigableMap<K,V> this)
                            { synchronized (mutex) { return nm.firstEntry(); } }
-        public @Immutable Entry<K, V> lastEntry(@Readonly SynchronizedNavigableMap<K,V> this)
+        public @Readonly Entry<K, V> lastEntry(@Readonly SynchronizedNavigableMap<K,V> this)
                             { synchronized (mutex) { return nm.lastEntry(); } }
-        public @Immutable Entry<K, V> pollFirstEntry(@Mutable SynchronizedNavigableMap<K,V> this)
+        public @Readonly Entry<K, V> pollFirstEntry(@Mutable SynchronizedNavigableMap<K,V> this)
                        { synchronized (mutex) { return nm.pollFirstEntry(); } }
-        public @Immutable Entry<K, V> pollLastEntry(@Mutable SynchronizedNavigableMap<K,V> this)
+        public @Readonly Entry<K, V> pollLastEntry(@Mutable SynchronizedNavigableMap<K,V> this)
                         { synchronized (mutex) { return nm.pollLastEntry(); } }
 
         @SideEffectFree
@@ -4361,7 +4361,8 @@ public class Collections {
         public K firstKey(@Readonly CheckedNavigableMap<K,V> this)                           { return nm.firstKey(); }
         public K lastKey(@Readonly CheckedNavigableMap<K,V> this)                             { return nm.lastKey(); }
 
-        public @Immutable Entry<K, V> lowerEntry(@Readonly CheckedNavigableMap<K,V> this, K key) {
+        @SuppressWarnings("mutability:argument.type.incompatible") // a CheckedEntry cannot be created @Readonly: it wraps the backing map's @Readonly entry, and the method returns it @Readonly
+        public @Readonly Entry<K, V> lowerEntry(@Readonly CheckedNavigableMap<K,V> this, K key) {
             Entry<K,V> lower = nm.lowerEntry(key);
             return (null != lower)
                 ? new CheckedMap.CheckedEntrySet.@Immutable CheckedEntry<>(lower, valueType)
@@ -4370,7 +4371,8 @@ public class Collections {
 
         public K lowerKey(@Readonly CheckedNavigableMap<K,V> this, K key)                   { return nm.lowerKey(key); }
 
-        public @Immutable Entry<K, V> floorEntry(@Readonly CheckedNavigableMap<K,V> this, K key) {
+        @SuppressWarnings("mutability:argument.type.incompatible") // a CheckedEntry cannot be created @Readonly: it wraps the backing map's @Readonly entry, and the method returns it @Readonly
+        public @Readonly Entry<K, V> floorEntry(@Readonly CheckedNavigableMap<K,V> this, K key) {
             Entry<K,V> floor = nm.floorEntry(key);
             return (null != floor)
                 ? new CheckedMap.CheckedEntrySet.@Immutable CheckedEntry<>(floor, valueType)
@@ -4379,7 +4381,8 @@ public class Collections {
 
         public K floorKey(@Readonly CheckedNavigableMap<K,V> this, K key)                   { return nm.floorKey(key); }
 
-        public @Immutable Entry<K, V> ceilingEntry(@Readonly CheckedNavigableMap<K,V> this, K key) {
+        @SuppressWarnings("mutability:argument.type.incompatible") // a CheckedEntry cannot be created @Readonly: it wraps the backing map's @Readonly entry, and the method returns it @Readonly
+        public @Readonly Entry<K, V> ceilingEntry(@Readonly CheckedNavigableMap<K,V> this, K key) {
             Entry<K,V> ceiling = nm.ceilingEntry(key);
             return (null != ceiling)
                 ? new CheckedMap.CheckedEntrySet.@Immutable CheckedEntry<>(ceiling, valueType)
@@ -4388,7 +4391,8 @@ public class Collections {
 
         public K ceilingKey(@Readonly CheckedNavigableMap<K,V> this, K key)               { return nm.ceilingKey(key); }
 
-        public @Immutable Entry<K, V> higherEntry(@Readonly CheckedNavigableMap<K,V> this, K key) {
+        @SuppressWarnings("mutability:argument.type.incompatible") // a CheckedEntry cannot be created @Readonly: it wraps the backing map's @Readonly entry, and the method returns it @Readonly
+        public @Readonly Entry<K, V> higherEntry(@Readonly CheckedNavigableMap<K,V> this, K key) {
             Entry<K,V> higher = nm.higherEntry(key);
             return (null != higher)
                 ? new CheckedMap.CheckedEntrySet.@Immutable CheckedEntry<>(higher, valueType)
@@ -4397,28 +4401,32 @@ public class Collections {
 
         public K higherKey(@Readonly CheckedNavigableMap<K,V> this, K key)                 { return nm.higherKey(key); }
 
-        public @Immutable Entry<K, V> firstEntry(@Readonly CheckedNavigableMap<K,V> this) {
+        @SuppressWarnings("mutability:argument.type.incompatible") // a CheckedEntry cannot be created @Readonly: it wraps the backing map's @Readonly entry, and the method returns it @Readonly
+        public @Readonly Entry<K, V> firstEntry(@Readonly CheckedNavigableMap<K,V> this) {
             Entry<K,V> first = nm.firstEntry();
             return (null != first)
                 ? new CheckedMap.CheckedEntrySet.@Immutable CheckedEntry<>(first, valueType)
                 : null;
         }
 
-        public @Immutable Entry<K, V> lastEntry(@Readonly CheckedNavigableMap<K,V> this) {
+        @SuppressWarnings("mutability:argument.type.incompatible") // a CheckedEntry cannot be created @Readonly: it wraps the backing map's @Readonly entry, and the method returns it @Readonly
+        public @Readonly Entry<K, V> lastEntry(@Readonly CheckedNavigableMap<K,V> this) {
             Entry<K,V> last = nm.lastEntry();
             return (null != last)
                 ? new CheckedMap.CheckedEntrySet.@Immutable CheckedEntry<>(last, valueType)
                 : null;
         }
 
-        public @Immutable Entry<K, V> pollFirstEntry(@Mutable CheckedNavigableMap<K,V> this) {
+        @SuppressWarnings("mutability:argument.type.incompatible") // a CheckedEntry cannot be created @Readonly: it wraps the backing map's @Readonly entry, and the method returns it @Readonly
+        public @Readonly Entry<K, V> pollFirstEntry(@Mutable CheckedNavigableMap<K,V> this) {
             Entry<K,V> entry = nm.pollFirstEntry();
             return (null == entry)
                 ? null
                 : new CheckedMap.CheckedEntrySet.@Immutable CheckedEntry<>(entry, valueType);
         }
 
-        public @Immutable Entry<K, V> pollLastEntry(@Mutable CheckedNavigableMap<K,V> this) {
+        @SuppressWarnings("mutability:argument.type.incompatible") // a CheckedEntry cannot be created @Readonly: it wraps the backing map's @Readonly entry, and the method returns it @Readonly
+        public @Readonly Entry<K, V> pollLastEntry(@Mutable CheckedNavigableMap<K,V> this) {
             Entry<K,V> entry = nm.pollLastEntry();
             return (null == entry)
                 ? null
