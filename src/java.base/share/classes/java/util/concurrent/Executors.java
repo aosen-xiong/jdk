@@ -35,6 +35,7 @@
 
 package java.util.concurrent;
 
+import org.checkerframework.checker.mutability.qual.Readonly;
 import org.checkerframework.checker.interning.qual.UsesObjectEquals;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
@@ -764,26 +765,26 @@ public @UsesObjectEquals class Executors {
                 return e.submit(task, result);
             } finally { reachabilityFence(this); }
         }
-        public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks)
+        public <T> List<Future<T>> invokeAll(@Readonly Collection<? extends Callable<T>> tasks)
             throws InterruptedException {
             try {
                 return e.invokeAll(tasks);
             } finally { reachabilityFence(this); }
         }
-        public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks,
+        public <T> List<Future<T>> invokeAll(@Readonly Collection<? extends Callable<T>> tasks,
                                              long timeout, TimeUnit unit)
             throws InterruptedException {
             try {
                 return e.invokeAll(tasks, timeout, unit);
             } finally { reachabilityFence(this); }
         }
-        public <T> T invokeAny(Collection<? extends Callable<T>> tasks)
+        public <T> T invokeAny(@Readonly Collection<? extends Callable<T>> tasks)
             throws InterruptedException, ExecutionException {
             try {
                 return e.invokeAny(tasks);
             } finally { reachabilityFence(this); }
         }
-        public <T> T invokeAny(Collection<? extends Callable<T>> tasks,
+        public <T> T invokeAny(@Readonly Collection<? extends Callable<T>> tasks,
                                long timeout, TimeUnit unit)
             throws InterruptedException, ExecutionException, TimeoutException {
             try {

@@ -35,6 +35,7 @@
 
 package java.util.concurrent;
 
+import org.checkerframework.checker.mutability.qual.Readonly;
 import org.checkerframework.checker.nonempty.qual.EnsuresNonEmptyIf;
 import org.checkerframework.dataflow.qual.Pure;
 
@@ -2724,7 +2725,7 @@ public class ForkJoinPool extends AbstractExecutorService {
      * @throws RejectedExecutionException {@inheritDoc}
      */
     @Override
-    public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks) {
+    public <T> List<Future<T>> invokeAll(@Readonly Collection<? extends Callable<T>> tasks) {
         ArrayList<Future<T>> futures = new ArrayList<>(tasks.size());
         try {
             for (Callable<T> t : tasks) {
@@ -2744,7 +2745,7 @@ public class ForkJoinPool extends AbstractExecutorService {
     }
 
     @Override
-    public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks,
+    public <T> List<Future<T>> invokeAll(@Readonly Collection<? extends Callable<T>> tasks,
                                          long timeout, TimeUnit unit)
         throws InterruptedException {
         long nanos = unit.toNanos(timeout);
@@ -2850,7 +2851,7 @@ public class ForkJoinPool extends AbstractExecutorService {
     }
 
     @Override
-    public <T> T invokeAny(Collection<? extends Callable<T>> tasks)
+    public <T> T invokeAny(@Readonly Collection<? extends Callable<T>> tasks)
         throws InterruptedException, ExecutionException {
         int n = tasks.size();
         if (n <= 0)
@@ -2875,7 +2876,7 @@ public class ForkJoinPool extends AbstractExecutorService {
     }
 
     @Override
-    public <T> T invokeAny(Collection<? extends Callable<T>> tasks,
+    public <T> T invokeAny(@Readonly Collection<? extends Callable<T>> tasks,
                            long timeout, TimeUnit unit)
         throws InterruptedException, ExecutionException, TimeoutException {
         long nanos = unit.toNanos(timeout);
