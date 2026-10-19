@@ -25,6 +25,7 @@
 
 package java.lang.reflect;
 
+import org.checkerframework.checker.mutability.qual.Immutable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
@@ -50,7 +51,8 @@ import sun.reflect.generics.repository.ConstructorRepository;
  *
  * @since 1.8
  */
-@AnnotatedFor({"nullness"})
+@AnnotatedFor({"nullness", "mutability"})
+@Immutable
 public abstract sealed class Executable extends AccessibleObject
     implements Member, GenericDeclaration permits Constructor, Method {
     /*

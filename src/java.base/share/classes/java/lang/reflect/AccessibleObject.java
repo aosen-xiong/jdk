@@ -25,6 +25,8 @@
 
 package java.lang.reflect;
 
+import org.checkerframework.checker.mutability.qual.Assignable;
+import org.checkerframework.checker.mutability.qual.Immutable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.framework.qual.AnnotatedFor;
 import org.checkerframework.framework.qual.CFComment;
@@ -79,7 +81,8 @@ import sun.security.util.SecurityConstants;
  * @since 1.2
  * @revised 9
  */
-@AnnotatedFor({"nullness"})
+@AnnotatedFor({"nullness", "mutability"})
+@Immutable
 public class AccessibleObject implements AnnotatedElement {
     static {
         // AccessibleObject is initialized early in initPhase1
@@ -485,7 +488,7 @@ public class AccessibleObject implements AnnotatedElement {
     //
     // NOTE: for security purposes, this field must not be visible
     // outside this package.
-    boolean override;
+    @Assignable boolean override;
 
     // Reflection factory used by subclasses for creating field,
     // method, and constructor accessors. Note that this is called
@@ -623,7 +626,7 @@ public class AccessibleObject implements AnnotatedElement {
     // or a caller (with targetClass implicitly equal to memberClass).
     // In the {caller,targetClass} case, the targetClass is always different
     // from the memberClass.
-    volatile Object accessCheckCache;
+    @Assignable volatile Object accessCheckCache;
 
     private static class Cache {
         final WeakReference<Class<?>> callerRef;
