@@ -1020,7 +1020,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
         public final @NonNegative int size(@Readonly KeySet this)                 { return size; }
         public final void clear(@Mutable KeySet this)               { HashMap.this.clear(); }
         @SideEffectFree
-        public final @ReceiverDependentMutable Iterator<K> iterator(@ReceiverDependentMutable KeySet this)     { return new @ReceiverDependentMutable KeyIterator(); }
+        public final @Mutable Iterator<K> iterator(@ReceiverDependentMutable KeySet this)     { return new @Mutable KeyIterator(); }
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
         public final boolean contains(@Readonly KeySet this, @Nullable @UnknownSignedness @Readonly Object o) { return containsKey(o); }
@@ -1088,7 +1088,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
         public final @NonNegative int size(@Readonly Values this)                 { return size; }
         public final void clear(@Mutable HashMap<K, V>. @Mutable Values this)               { HashMap.this.clear(); }
         @SideEffectFree
-        public final @ReceiverDependentMutable Iterator<V> iterator(@ReceiverDependentMutable Values this)     { return new @ReceiverDependentMutable ValueIterator(); }
+        public final @Mutable Iterator<V> iterator(@ReceiverDependentMutable Values this)     { return new @Mutable ValueIterator(); }
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
         public final boolean contains(@Readonly Values this, @Nullable @UnknownSignedness @Readonly Object o) { return containsValue(o); }
@@ -1149,8 +1149,9 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
         public final @NonNegative int size(@Readonly EntrySet this)                 { return size; }
         public final void clear(@Mutable HashMap<K,V>.@Mutable EntrySet this)               { HashMap.this.clear(); }
         @SideEffectFree
-        public final @ReceiverDependentMutable Iterator<Map.@ReceiverDependentMutable Entry<K,V>> iterator(@ReceiverDependentMutable HashMap<K,V>.@ReceiverDependentMutable EntrySet this) {
-            return new @ReceiverDependentMutable EntryIterator();
+        @SuppressWarnings("mutability:return.type.incompatible") // the entries have the enclosing map's mutability, but in the iterator class's supertype a receiver-dependent qualifier is relative to the iterator, which is a fresh @Mutable cursor. There is no qualifier relative to the enclosing instance: https://github.com/eisop/checker-framework/issues/2322
+        public final @Mutable Iterator<Map.@ReceiverDependentMutable Entry<K,V>> iterator(@ReceiverDependentMutable HashMap<K,V>.@ReceiverDependentMutable EntrySet this) {
+            return new @Mutable EntryIterator();
         }
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
@@ -1615,12 +1616,12 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
     /* ------------------------------------------------------------ */
     // iterators
 
-    @ReceiverDependentMutable
+    @Mutable
     abstract class HashIterator {
-        @Assignable @Readonly Node<K,V> next;        // next entry to return
-        @Assignable @Readonly Node<K,V> current;     // current entry
-        @Assignable int expectedModCount;  // for fast-fail
-        @Assignable int index;             // current slot
+        @Readonly Node<K,V> next;        // next entry to return
+        @Readonly Node<K,V> current;     // current entry
+        int expectedModCount;  // for fast-fail
+        int index;             // current slot
 
         HashIterator() {
             expectedModCount = modCount;
@@ -1638,9 +1639,8 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
             return next != null;
         }
 
-        @SuppressWarnings("mutability:return.type.incompatible") // field depends on outer class
-        final @ReceiverDependentMutable Node<K,V> nextNode(@ReceiverDependentMutable HashMap<K,V>.@NonEmpty @ReceiverDependentMutable HashIterator this) {
-            @ReceiverDependentMutable Node<K,V>[] t;
+        final @Readonly Node<K,V> nextNode(@Readonly HashMap<K,V>.@NonEmpty @Mutable HashIterator this) {
+            @Readonly Node<K,V>[] t;
             Node<K,V> e = next;
             if (modCount != expectedModCount)
                 throw new ConcurrentModificationException();
@@ -1664,22 +1664,23 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
         }
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     final class KeyIterator extends HashIterator
         implements Iterator<K> {
-        public final K next(@NonEmpty @Readonly KeyIterator this) { return nextNode().key; }
+        public final K next(@Readonly HashMap<K,V>.@NonEmpty @Mutable KeyIterator this) { return nextNode().key; }
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     final class ValueIterator extends HashIterator
         implements Iterator<V> {
-        public final V next(@NonEmpty @Readonly ValueIterator this) { return nextNode().value; }
+        public final V next(@Readonly HashMap<K,V>.@NonEmpty @Mutable ValueIterator this) { return nextNode().value; }
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     final class EntryIterator extends HashIterator
         implements Iterator<Map.@ReceiverDependentMutable Entry<K,V>> {
-        public final Map.@ReceiverDependentMutable Entry<K,V> next(@NonEmpty @ReceiverDependentMutable HashMap<K,V>.@ReceiverDependentMutable EntryIterator this) { return nextNode(); }
+        @SuppressWarnings({"mutability:return.type.incompatible", "mutability:override.return.invalid"}) // the entries have the enclosing map's mutability, but nextNode reads them through the @Readonly enclosing map, and in the iterator's supertype a receiver-dependent qualifier is relative to the iterator, a fresh @Mutable cursor. There is no qualifier relative to the enclosing instance: https://github.com/eisop/checker-framework/issues/2322
+        public final Map.@ReceiverDependentMutable Entry<K,V> next(@Readonly HashMap<K,V>.@NonEmpty @Mutable EntryIterator this) { return nextNode(); }
     }
 
     /* ------------------------------------------------------------ */

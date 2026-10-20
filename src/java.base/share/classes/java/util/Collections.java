@@ -295,7 +295,7 @@ public class Collections {
      * Gets the ith element from the given list by repositioning the specified
      * list listIterator.
      */
-    private static <T> T get(@Readonly ListIterator<? extends T> i, int index) {
+    private static <T> T get(@Mutable ListIterator<? extends T> i, int index) {
         T obj = null;
         int pos = i.nextIndex();
         if (pos <= index) {
@@ -1098,9 +1098,9 @@ public class Collections {
         public String toString()                   {return c.toString();}
 
         @SideEffectFree
-        public @PolyNonEmpty @ReceiverDependentMutable @PolyGrowShrink Iterator<E> iterator(@PolyNonEmpty @PolyGrowShrink UnmodifiableCollection<E> this) {
-            return new @ReceiverDependentMutable Iterator<E>() {
-                private final @Readonly Iterator<? extends E> i = c.iterator();
+        public @PolyNonEmpty @Mutable @PolyGrowShrink Iterator<E> iterator(@PolyNonEmpty @PolyGrowShrink UnmodifiableCollection<E> this) {
+            return new @Mutable Iterator<E>() {
+                private final @Mutable Iterator<? extends E> i = c.iterator();
 
                 @Pure
                 @EnsuresNonEmptyIf(result = true, expression = "this")
@@ -1343,7 +1343,7 @@ public class Collections {
         public E pollLast()      { throw new UnsupportedOperationException(); }
         public @ReceiverDependentMutable NavigableSet<E> descendingSet()
                  { return new @ReceiverDependentMutable UnmodifiableNavigableSet<>(ns.descendingSet()); }
-        public @ReceiverDependentMutable Iterator<E> descendingIterator()
+        public @Mutable Iterator<E> descendingIterator()
                                          { return descendingSet().iterator(); }
 
         public @ReceiverDependentMutable NavigableSet<E> subSet(E fromElement, boolean fromInclusive, E toElement, boolean toInclusive) {
@@ -1433,11 +1433,11 @@ public class Collections {
             throw new UnsupportedOperationException();
         }
 
-        public @PolyNonEmpty @ReceiverDependentMutable @PolyGrowShrink ListIterator<E> listIterator(@PolyNonEmpty @PolyGrowShrink UnmodifiableList<E> this)   {return listIterator(0);}
+        public @PolyNonEmpty @Mutable @PolyGrowShrink ListIterator<E> listIterator(@PolyNonEmpty @PolyGrowShrink UnmodifiableList<E> this)   {return listIterator(0);}
 
-        public @ReceiverDependentMutable ListIterator<E> listIterator(UnmodifiableList<E> this, final int index) {
-            return new @ReceiverDependentMutable ListIterator<E>() {
-                private final @Readonly ListIterator<? extends E> i
+        public @Mutable ListIterator<E> listIterator(UnmodifiableList<E> this, final int index) {
+            return new @Mutable ListIterator<E>() {
+                private final @Mutable ListIterator<? extends E> i
                     = list.listIterator(index);
 
                 @Pure
@@ -1780,9 +1780,9 @@ public class Collections {
                 return StreamSupport.stream(spliterator(), true);
             }
 
-            public @ReceiverDependentMutable Iterator<Map.@Readonly Entry<K,V>> iterator() {
-                return new @ReceiverDependentMutable Iterator<Map.@Readonly Entry<K,V>>() {
-                    private final @Readonly Iterator<? extends Map.@Readonly Entry<? extends K, ? extends V>> i = c.iterator();
+            public @Mutable Iterator<Map.@Readonly Entry<K,V>> iterator() {
+                return new @Mutable Iterator<Map.@Readonly Entry<K,V>>() {
+                    private final @Mutable Iterator<? extends Map.@Readonly Entry<? extends K, ? extends V>> i = c.iterator();
 
                     @Pure
                     @EnsuresNonEmptyIf(result = true, expression = "this")
@@ -2202,7 +2202,7 @@ public class Collections {
         }
 
         @SideEffectFree
-        public @ReceiverDependentMutable Iterator<E> iterator(@ReceiverDependentMutable SynchronizedCollection<E> this) {
+        public @Mutable Iterator<E> iterator(@ReceiverDependentMutable SynchronizedCollection<E> this) {
             return c.iterator(); // Must be manually synched by user!
         }
 
@@ -2502,7 +2502,7 @@ public class Collections {
             }
         }
 
-        public @ReceiverDependentMutable Iterator<E> descendingIterator(@ReceiverDependentMutable SynchronizedNavigableSet<E> this)
+        public @Mutable Iterator<E> descendingIterator(@ReceiverDependentMutable SynchronizedNavigableSet<E> this)
                  { synchronized (mutex) { return descendingSet().iterator(); } }
 
         public @ReceiverDependentMutable NavigableSet<E> subSet(@ReceiverDependentMutable SynchronizedNavigableSet<E> this, E fromElement, E toElement) {
@@ -2636,11 +2636,11 @@ public class Collections {
             synchronized (mutex) {return list.addAll(index, c);}
         }
 
-        public @ReceiverDependentMutable ListIterator<E> listIterator(@ReceiverDependentMutable SynchronizedList<E> this) {
+        public @Mutable ListIterator<E> listIterator(@ReceiverDependentMutable SynchronizedList<E> this) {
             return list.listIterator(); // Must be manually synched by user
         }
 
-        public @ReceiverDependentMutable ListIterator<E> listIterator(@ReceiverDependentMutable SynchronizedList<E> this, int index) {
+        public @Mutable ListIterator<E> listIterator(@ReceiverDependentMutable SynchronizedList<E> this, int index) {
             return list.listIterator(index); // Must be manually synched by user
         }
 
@@ -3317,11 +3317,11 @@ public class Collections {
         }
 
         @SideEffectFree
-        public @ReceiverDependentMutable Iterator<E> iterator(@ReceiverDependentMutable CheckedCollection<E> this) {
+        public @Mutable Iterator<E> iterator(@ReceiverDependentMutable CheckedCollection<E> this) {
             // JDK-6363904 - unwrapped iterator could be typecast to
             // ListIterator with unsafe set()
             final Iterator<E> it = c.iterator();
-            return new @ReceiverDependentMutable Iterator<E>() {
+            return new @Mutable Iterator<E>() {
                 @Pure
                 @EnsuresNonEmptyIf(result = true, expression = "this")
                 public boolean hasNext() { return it.hasNext(); }
@@ -3624,7 +3624,7 @@ public class Collections {
         public E pollLast(@Mutable CheckedNavigableSet<E> this)                            {return ns.pollLast(); }
         public @ReceiverDependentMutable NavigableSet<E> descendingSet(@ReceiverDependentMutable CheckedNavigableSet<E> this)
                       { return checkedNavigableSet(ns.descendingSet(), type); }
-        public @ReceiverDependentMutable Iterator<E> descendingIterator(@ReceiverDependentMutable CheckedNavigableSet<E> this)
+        public @Mutable Iterator<E> descendingIterator(@ReceiverDependentMutable CheckedNavigableSet<E> this)
             {return checkedNavigableSet(ns.descendingSet(), type).iterator(); }
 
         public @ReceiverDependentMutable NavigableSet<E> subSet(@ReceiverDependentMutable CheckedNavigableSet<E> this, E fromElement, E toElement) {
@@ -3718,10 +3718,10 @@ public class Collections {
         public boolean addAll(@Mutable CheckedList<E> this, int index, @Readonly Collection<? extends E> c) {
             return list.addAll(index, checkedCopyOf(c));
         }
-        public @ReceiverDependentMutable ListIterator<E> listIterator(@ReceiverDependentMutable CheckedList<E> this)   { return listIterator(0); }
+        public @Mutable ListIterator<E> listIterator(@ReceiverDependentMutable CheckedList<E> this)   { return listIterator(0); }
 
         @SuppressWarnings("mutability") // receiver in anonymous class not denotable, see typetool#2433
-        public @ReceiverDependentMutable ListIterator<E> listIterator(@ReceiverDependentMutable CheckedList<E> this, final int index) {
+        public @Mutable ListIterator<E> listIterator(@ReceiverDependentMutable CheckedList<E> this, final int index) {
             final ListIterator<E> i = list.listIterator(index);
 
             return new ListIterator<E>() {
@@ -4047,10 +4047,11 @@ public class Collections {
                 throw new UnsupportedOperationException();
             }
 
-            public @ReceiverDependentMutable Iterator<Map.@ReceiverDependentMutable Entry<K,V>> iterator(@ReceiverDependentMutable CheckedEntrySet<K,V> this) {
+            @SuppressWarnings({"mutability:return.type.incompatible", "mutability:override.return.invalid", "mutability:override.param.invalid"}) // the entries have the enclosing map's mutability, but in the iterator class's supertype a receiver-dependent qualifier is relative to the iterator, which is a fresh @Mutable cursor. There is no qualifier relative to the enclosing instance: https://github.com/eisop/checker-framework/issues/2322
+            public @Mutable Iterator<Map.@ReceiverDependentMutable Entry<K,V>> iterator(@ReceiverDependentMutable CheckedEntrySet<K,V> this) {
                 final Iterator<Map.@ReceiverDependentMutable Entry<K, V>> i = s.iterator();
 
-                return new @ReceiverDependentMutable Iterator<Map.@ReceiverDependentMutable Entry<K,V>>() {
+                return new @Mutable Iterator<Map.@ReceiverDependentMutable Entry<K,V>>() {
                     @Pure
                     @EnsuresNonEmptyIf(result = true, expression = "this")
                     public boolean hasNext() { return i.hasNext(); }
@@ -4655,7 +4656,7 @@ public class Collections {
         private static final long serialVersionUID = 1582296315990362920L;
 
         @SideEffectFree
-        public @Immutable Iterator<E> iterator() { return emptyIterator(); }
+        public @Mutable Iterator<E> iterator() { return emptyIterator(); }
 
         @Pure
         public @NonNegative int size() {return 0;}
@@ -4794,10 +4795,10 @@ public class Collections {
         private static final long serialVersionUID = 8842843931221139166L;
 
         @SideEffectFree
-        public @Immutable Iterator<E> iterator() {
+        public @Mutable Iterator<E> iterator() {
             return emptyIterator();
         }
-        public @Immutable ListIterator<E> listIterator() {
+        public @Mutable ListIterator<E> listIterator() {
             return emptyListIterator();
         }
 
@@ -5058,9 +5059,9 @@ public class Collections {
         return new SingletonSet<>(o);
     }
 
-    static <E> @Immutable Iterator<E> singletonIterator(final E e) {
-        return new @Immutable Iterator<E>() {
-            private @Assignable boolean hasNext = true;
+    static <E> @Mutable Iterator<E> singletonIterator(final E e) {
+        return new @Mutable Iterator<E>() {
+            private boolean hasNext = true;
             @Pure
             @EnsuresNonEmptyIf(result = true, expression = "this")
             public boolean hasNext() {
@@ -5149,7 +5150,7 @@ public class Collections {
         SingletonSet(E e) {element = e;}
 
         @SideEffectFree
-        public @Immutable Iterator<E> iterator() {
+        public @Mutable Iterator<E> iterator() {
             return singletonIterator(element);
         }
 
@@ -5211,7 +5212,7 @@ public class Collections {
         SingletonList(E obj)                {element = obj;}
 
         @SideEffectFree
-        public @Immutable Iterator<E> iterator() {
+        public @Mutable Iterator<E> iterator() {
             return singletonIterator(element);
         }
 
@@ -5714,7 +5715,7 @@ public class Collections {
      */
     public static <T> @Readonly Enumeration<T> enumeration(final Collection<T> c) {
         return new @Immutable Enumeration<T>() {
-            private final @Readonly Iterator<T> i = c.iterator();
+            private final @Mutable Iterator<T> i = c.iterator();
 
             @EnsuresNonEmptyIf(result = true, expression = "this")
             public boolean hasMoreElements() {
@@ -5976,7 +5977,7 @@ public class Collections {
         @EnsuresNonEmpty("this")
         public boolean add(@Mutable SetFromMap<E> this, E e) { return m.put(e, Boolean.TRUE) == null; }
         @SideEffectFree
-        public @ReceiverDependentMutable Iterator<E> iterator(@ReceiverDependentMutable SetFromMap<E> this)     { return s.iterator(); }
+        public @Mutable Iterator<E> iterator(@ReceiverDependentMutable SetFromMap<E> this)     { return s.iterator(); }
         @SideEffectFree
         @SuppressWarnings("mutability:override.return.invalid") // E extends @Immutable Object, so every element is @Immutable. That is the precise return, which an override of a @PolyMutable return cannot state
         public @PolyNull @PolySigned @Immutable Object[] toArray(Collections.SetFromMap<@PolyNull @PolySigned E> this)         { return s.toArray(); }
@@ -6072,7 +6073,7 @@ public class Collections {
         public boolean contains(@Readonly AsLIFOQueue<E> this, @UnknownSignedness @Readonly Object o)           { return q.contains(o); }
         public boolean remove(@Mutable AsLIFOQueue<E> this, @UnknownSignedness @Readonly Object o)             { return q.remove(o); }
         @SideEffectFree
-        public @ReceiverDependentMutable Iterator<E> iterator(@ReceiverDependentMutable AsLIFOQueue<E> this)               { return q.iterator(); }
+        public @Mutable Iterator<E> iterator(@ReceiverDependentMutable AsLIFOQueue<E> this)               { return q.iterator(); }
         @SideEffectFree
         @SuppressWarnings("mutability") // poly does not work on field's type argument
         public @PolyNull @PolySigned @PolyMutable Object[] toArray(Collections.AsLIFOQueue<@PolyNull @PolySigned @PolyMutable E> this)                   { return q.toArray(); }

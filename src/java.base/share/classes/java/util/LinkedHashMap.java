@@ -592,8 +592,8 @@ public class LinkedHashMap<K extends @Immutable Object,V>
         public final int size(@Readonly LinkedKeySet this)                 { return size; }
         public final void clear(@Mutable LinkedHashMap<K,V>. @Mutable LinkedKeySet this)               { LinkedHashMap.this.clear(); }
         @SideEffectFree
-        public final @ReceiverDependentMutable Iterator<K> iterator(@ReceiverDependentMutable LinkedKeySet this) {
-            return new @ReceiverDependentMutable LinkedKeyIterator();
+        public final @Mutable Iterator<K> iterator(@ReceiverDependentMutable LinkedKeySet this) {
+            return new @Mutable LinkedKeyIterator();
         }
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
@@ -661,8 +661,8 @@ public class LinkedHashMap<K extends @Immutable Object,V>
         public final int size(@Readonly LinkedValues this)                 { return size; }
         public final void clear(@Mutable LinkedHashMap<K,V>. @Mutable LinkedValues this)               { LinkedHashMap.this.clear(); }
         @SideEffectFree
-        public final @ReceiverDependentMutable Iterator<V> iterator(@ReceiverDependentMutable LinkedValues this) {
-            return new @ReceiverDependentMutable LinkedValueIterator();
+        public final @Mutable Iterator<V> iterator(@ReceiverDependentMutable LinkedValues this) {
+            return new @Mutable LinkedValueIterator();
         }
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
@@ -724,8 +724,8 @@ public class LinkedHashMap<K extends @Immutable Object,V>
         public final int size(@Readonly LinkedEntrySet this)                 { return size; }
         public final void clear(@Mutable LinkedHashMap<K,V>. @Mutable LinkedEntrySet this)               { LinkedHashMap.this.clear(); }
         @SideEffectFree
-        public final @ReceiverDependentMutable Iterator<Map.@Readonly Entry<K,V>> iterator(@ReceiverDependentMutable LinkedEntrySet this) {
-            return new @ReceiverDependentMutable LinkedEntryIterator();
+        public final @Mutable Iterator<Map.@Readonly Entry<K,V>> iterator(@ReceiverDependentMutable LinkedEntrySet this) {
+            return new @Mutable LinkedEntryIterator();
         }
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")

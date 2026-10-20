@@ -186,7 +186,7 @@ public interface Set<E> extends Collection<E> {
      * @return an iterator over the elements in this set
      */
     @SideEffectFree
-    @PolyNonEmpty @ReceiverDependentMutable @PolyGrowShrink Iterator<E> iterator(@PolyNonEmpty @ReceiverDependentMutable @PolyGrowShrink Set<E> this);
+    @PolyNonEmpty @Mutable @PolyGrowShrink Iterator<E> iterator(@PolyNonEmpty @ReceiverDependentMutable @PolyGrowShrink Set<E> this);
 
     /**
      * Returns an array containing all of the elements in this set.

@@ -702,27 +702,27 @@ public class ArrayDeque<E extends @NonNull @Readonly Object> extends AbstractCol
      * @return an iterator over the elements in this deque
      */
     @SideEffectFree
-    public @PolyNonEmpty @ReceiverDependentMutable @PolyGrowShrink Iterator<E> iterator(@PolyNonEmpty @ReceiverDependentMutable @PolyGrowShrink ArrayDeque<E> this) {
-        return new @ReceiverDependentMutable DeqIterator();
+    public @PolyNonEmpty @Mutable @PolyGrowShrink Iterator<E> iterator(@PolyNonEmpty @ReceiverDependentMutable @PolyGrowShrink ArrayDeque<E> this) {
+        return new @Mutable DeqIterator();
     }
 
-    public @PolyNonEmpty @ReceiverDependentMutable @PolyGrowShrink Iterator<E> descendingIterator(@PolyNonEmpty @ReceiverDependentMutable @PolyGrowShrink ArrayDeque<E> this) {
-        return new @ReceiverDependentMutable DescendingIterator();
+    public @PolyNonEmpty @Mutable @PolyGrowShrink Iterator<E> descendingIterator(@PolyNonEmpty @ReceiverDependentMutable @PolyGrowShrink ArrayDeque<E> this) {
+        return new @Mutable DescendingIterator();
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     private class DeqIterator implements Iterator<E> {
         /** Index of element to be returned by subsequent call to next. */
-        @Assignable int cursor;
+        int cursor;
 
         /** Number of elements yet to be returned. */
-        @Assignable int remaining = size();
+        int remaining = size();
 
         /**
          * Index of element returned by most recent call to next.
          * Reset to -1 if element is deleted by a call to remove.
          */
-        @Assignable int lastRet = -1;
+        int lastRet = -1;
 
         DeqIterator() { cursor = head; }
 
@@ -732,7 +732,7 @@ public class ArrayDeque<E extends @NonNull @Readonly Object> extends AbstractCol
             return remaining > 0;
         }
 
-        public E next(@NonEmpty DeqIterator this) {
+        public E next(@NonEmpty @Mutable DeqIterator this) {
             if (remaining <= 0)
                 throw new NoSuchElementException();
             final @Readonly Object[] es = elements;
@@ -754,7 +754,7 @@ public class ArrayDeque<E extends @NonNull @Readonly Object> extends AbstractCol
             lastRet = -1;
         }
 
-        public void forEachRemaining(Consumer<? super E> action) {
+        public void forEachRemaining(@Mutable DeqIterator this, Consumer<? super E> action) {
             Objects.requireNonNull(action);
             int r;
             if ((r = remaining) <= 0)
@@ -777,11 +777,11 @@ public class ArrayDeque<E extends @NonNull @Readonly Object> extends AbstractCol
         }
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     private class DescendingIterator extends DeqIterator {
         DescendingIterator() { cursor = dec(tail, elements.length); }
 
-        public final E next(@NonEmpty DescendingIterator this) {
+        public final E next(@NonEmpty @Mutable DescendingIterator this) {
             if (remaining <= 0)
                 throw new NoSuchElementException();
             final @Readonly Object[] es = elements;
@@ -796,7 +796,7 @@ public class ArrayDeque<E extends @NonNull @Readonly Object> extends AbstractCol
                 cursor = inc(cursor, elements.length);
         }
 
-        public final void forEachRemaining(Consumer<? super E> action) {
+        public final void forEachRemaining(@Mutable DescendingIterator this, Consumer<? super E> action) {
             Objects.requireNonNull(action);
             int r;
             if ((r = remaining) <= 0)

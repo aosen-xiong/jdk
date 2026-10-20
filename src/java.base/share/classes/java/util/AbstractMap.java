@@ -384,7 +384,7 @@ public abstract class AbstractMap<K extends @Readonly Object,V> implements Map<K
         Set<K> ks = keySet;
         if (ks == null) {
             ks = new @ReceiverDependentMutable AbstractSet<K>() {
-                public @ReceiverDependentMutable Iterator<K> iterator() {
+                public @Mutable Iterator<K> iterator() {
                     return new Iterator<K>() {
                         private Iterator<Entry<K,V>> i = entrySet().iterator();
 
@@ -451,7 +451,7 @@ public abstract class AbstractMap<K extends @Readonly Object,V> implements Map<K
         Collection<V> vals = values;
         if (vals == null) {
             vals = new @ReceiverDependentMutable AbstractCollection<V>() {
-                public @ReceiverDependentMutable Iterator<V> iterator() {
+                public @Mutable Iterator<V> iterator() {
                     return new Iterator<V>() {
                         private Iterator<Entry<K,V>> i = entrySet().iterator();
 

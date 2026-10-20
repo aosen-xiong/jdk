@@ -91,7 +91,7 @@ public interface Enumeration<E> {
      * @return     the next element of this enumeration.
      * @throws     NoSuchElementException  if no more elements exist.
      */
-    E nextElement(@GuardSatisfied @NonEmpty @Readonly Enumeration<E> this);
+    E nextElement(@GuardSatisfied @NonEmpty @Mutable Enumeration<E> this);
 
     /**
      * Returns an {@link Iterator} that traverses the remaining elements

@@ -302,7 +302,7 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
      * @see     #keySet()
      * @see     Map
      */
-    public synchronized @ReceiverDependentMutable Enumeration<@KeyFor({"this"}) K> keys() {
+    public synchronized @Mutable Enumeration<@KeyFor({"this"}) K> keys() {
         return this.<K>getEnumeration(KEYS);
     }
 
@@ -318,7 +318,7 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
      * @see     #values()
      * @see     Map
      */
-    public synchronized @ReceiverDependentMutable Enumeration<V> elements() {
+    public synchronized @Mutable Enumeration<V> elements() {
         return this.<V>getEnumeration(VALUES);
     }
 
@@ -657,19 +657,19 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
     }
 
 
-    private <T> @ReceiverDependentMutable Enumeration<T> getEnumeration(@ReceiverDependentMutable Hashtable<K, V> this, int type) {
+    private <T> @Mutable Enumeration<T> getEnumeration(@ReceiverDependentMutable Hashtable<K, V> this, int type) {
         if (count == 0) {
             return Collections.emptyEnumeration();
         } else {
-            return new @ReceiverDependentMutable Enumerator<>(type, false);
+            return new @Mutable Enumerator<>(type, false);
         }
     }
 
-    private <T> @ReceiverDependentMutable Iterator<T> getIterator(@ReceiverDependentMutable Hashtable<K, V> this, int type) {
+    private <T> @Mutable Iterator<T> getIterator(@ReceiverDependentMutable Hashtable<K, V> this, int type) {
         if (count == 0) {
             return Collections.emptyIterator();
         } else {
-            return new @ReceiverDependentMutable Enumerator<>(type, true);
+            return new @Mutable Enumerator<>(type, true);
         }
     }
 
@@ -709,7 +709,7 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
     @ReceiverDependentMutable
     private class KeySet extends AbstractSet<K> {
         @SideEffectFree
-        public @ReceiverDependentMutable Iterator<K> iterator(@ReceiverDependentMutable Hashtable<K,V>.@ReceiverDependentMutable KeySet this) {
+        public @Mutable Iterator<K> iterator(@ReceiverDependentMutable Hashtable<K,V>.@ReceiverDependentMutable KeySet this) {
             return getIterator(KEYS);
         }
         @Pure
@@ -756,7 +756,7 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
     @ReceiverDependentMutable
     private class EntrySet extends AbstractSet<Map.@Readonly Entry<K,V>> {
         @SideEffectFree
-        public @ReceiverDependentMutable Iterator<Map.@Readonly Entry<K,V>> iterator(@ReceiverDependentMutable Hashtable<K,V>.@ReceiverDependentMutable EntrySet this) {
+        public @Mutable Iterator<Map.@Readonly Entry<K,V>> iterator(@ReceiverDependentMutable Hashtable<K,V>.@ReceiverDependentMutable EntrySet this) {
             return getIterator(ENTRIES);
         }
 
@@ -843,7 +843,7 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
     @ReceiverDependentMutable
     private class ValueCollection extends AbstractCollection<V> {
         @SideEffectFree
-        public @ReceiverDependentMutable Iterator<V> iterator(@ReceiverDependentMutable Hashtable<K,V>.@ReceiverDependentMutable ValueCollection this) {
+        public @Mutable Iterator<V> iterator(@ReceiverDependentMutable Hashtable<K,V>.@ReceiverDependentMutable ValueCollection this) {
             return getIterator(VALUES);
         }
         @Pure
@@ -1485,13 +1485,13 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
      * to avoid unintentionally increasing the capabilities granted a user
      * by passing an Enumeration.
      */
-    @ReceiverDependentMutable
+    @Mutable
     private class Enumerator<T> implements Enumeration<T>, Iterator<T> {
         @SuppressWarnings("mutability:assignment.type.incompatible") // PICO field use
         final @Readonly Entry<?,?>[] table = Hashtable.this.table;
         @Assignable int index = table.length;
         @Assignable @Readonly Entry<?,?> entry;
-        @Assignable @Readonly Entry<?,?> lastReturned;
+        @Readonly Entry<?,?> lastReturned;
         final int type;
 
         /**
@@ -1527,7 +1527,7 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
         }
 
         @SuppressWarnings("unchecked")
-        public T nextElement(@NonEmpty @Readonly Enumerator<T> this) {
+        public T nextElement(@Readonly Hashtable<K,V>.@NonEmpty @Mutable Enumerator<T> this) {
             Entry<?,?> et = entry;
             int i = index;
             @Readonly Entry<?,?>[] t = table;
@@ -1552,7 +1552,7 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
             return hasMoreElements();
         }
 
-        public T next(@NonEmpty @Readonly Enumerator<T> this) {
+        public T next(@Readonly Hashtable<K,V>.@NonEmpty @Mutable Enumerator<T> this) {
             if (Hashtable.this.modCount != expectedModCount)
                 throw new ConcurrentModificationException();
             return nextElement();

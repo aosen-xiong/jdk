@@ -968,9 +968,9 @@ import jdk.internal.util.ArraysSupport;
      *
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
-    public @ReceiverDependentMutable @PolyGrowShrink ListIterator<E> listIterator(@ReceiverDependentMutable @PolyGrowShrink ArrayList<E> this, @NonNegative int index) {
+    public @Mutable @PolyGrowShrink ListIterator<E> listIterator(@ReceiverDependentMutable @PolyGrowShrink ArrayList<E> this, @NonNegative int index) {
         rangeCheckForAdd(index);
-        return new @ReceiverDependentMutable ListItr(index);
+        return new @Mutable ListItr(index);
     }
 
     /**
@@ -981,8 +981,8 @@ import jdk.internal.util.ArraysSupport;
      *
      * @see #listIterator(int)
      */
-    public @ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty ListIterator<E> listIterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty ArrayList<E> this) {
-        return new @ReceiverDependentMutable ListItr(0);
+    public @Mutable @PolyGrowShrink @PolyNonEmpty ListIterator<E> listIterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty ArrayList<E> this) {
+        return new @Mutable ListItr(0);
     }
 
     /**
@@ -993,17 +993,17 @@ import jdk.internal.util.ArraysSupport;
      * @return an iterator over the elements in this list in proper sequence
      */
     @SideEffectFree
-    public @ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty ArrayList<E> this) {
-        return new @ReceiverDependentMutable Itr();
+    public @Mutable @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty ArrayList<E> this) {
+        return new @Mutable Itr();
     }
 
     /**
      * An optimized version of AbstractList.Itr
      */
-    @ReceiverDependentMutable
+    @Mutable
     private class Itr implements Iterator<E> {
-        @Assignable int cursor;       // index of next element to return
-        @Assignable int lastRet = -1; // index of last element returned; -1 if no such
+        int cursor;       // index of next element to return
+        int lastRet = -1; // index of last element returned; -1 if no such
         int expectedModCount = modCount;
 
         // prevent creating a synthetic constructor
@@ -1016,7 +1016,7 @@ import jdk.internal.util.ArraysSupport;
         }
 
         @SuppressWarnings("unchecked")
-        public E next(@NonEmpty @Readonly Itr this) {
+        public E next(@Readonly ArrayList<E>.@NonEmpty @Mutable Itr this) {
             checkForComodification();
             int i = cursor;
             if (i >= size)
@@ -1045,7 +1045,7 @@ import jdk.internal.util.ArraysSupport;
 
         @SuppressWarnings({"unchecked"})
         @Override
-        public void forEachRemaining(@Readonly Itr this, Consumer<? super E> action) {
+        public void forEachRemaining(@Readonly ArrayList<E>.@Mutable Itr this, Consumer<? super E> action) {
             Objects.requireNonNull(action);
             final int size = ArrayList.this.size;
             int i = cursor;
@@ -1071,7 +1071,7 @@ import jdk.internal.util.ArraysSupport;
     /**
      * An optimized version of AbstractList.ListItr
      */
-    @ReceiverDependentMutable
+    @Mutable
     private class ListItr extends Itr implements ListIterator<E> {
         ListItr(int index) {
             super();
@@ -1091,7 +1091,7 @@ import jdk.internal.util.ArraysSupport;
         }
 
         @SuppressWarnings("unchecked")
-        public E previous(@Readonly ListItr this) {
+        public E previous(@Readonly ArrayList<E>.@Mutable ListItr this) {
             checkForComodification();
             int i = cursor - 1;
             if (i < 0)
@@ -1336,15 +1336,15 @@ import jdk.internal.util.ArraysSupport;
         }
 
         @SideEffectFree
-        public @ReceiverDependentMutable Iterator<E> iterator(@ReceiverDependentMutable SubList<E> this) {
+        public @Mutable Iterator<E> iterator(@ReceiverDependentMutable SubList<E> this) {
             return listIterator();
         }
 
-        public @ReceiverDependentMutable ListIterator<E> listIterator(@ReceiverDependentMutable SubList<E> this, @NonNegative int index) {
+        public @Mutable ListIterator<E> listIterator(@ReceiverDependentMutable SubList<E> this, @NonNegative int index) {
             checkForComodification();
             rangeCheckForAdd(index);
 
-            return new @ReceiverDependentMutable ListIterator<E>() {
+            return new @Mutable ListIterator<E>() {
                 @Assignable int cursor = index;
                 @Assignable int lastRet = -1;
                 @Assignable int expectedModCount = SubList.this.modCount;

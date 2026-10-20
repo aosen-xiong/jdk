@@ -203,7 +203,7 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      * @return an iterator over the elements in this set in ascending order
      */
     @SideEffectFree
-    public @PolyGrowShrink @PolyNonEmpty @ReceiverDependentMutable Iterator<E> iterator(@PolyGrowShrink @PolyNonEmpty @ReceiverDependentMutable TreeSet<E> this) {
+    public @PolyGrowShrink @PolyNonEmpty @Mutable Iterator<E> iterator(@PolyGrowShrink @PolyNonEmpty @ReceiverDependentMutable TreeSet<E> this) {
         return m.navigableKeySet().iterator();
     }
 
@@ -213,7 +213,7 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      * @return an iterator over the elements in this set in descending order
      * @since 1.6
      */
-    public @PolyGrowShrink @PolyNonEmpty @ReceiverDependentMutable Iterator<E> descendingIterator(@PolyGrowShrink @PolyNonEmpty @ReceiverDependentMutable TreeSet<E> this) {
+    public @PolyGrowShrink @PolyNonEmpty @Mutable Iterator<E> descendingIterator(@PolyGrowShrink @PolyNonEmpty @ReceiverDependentMutable TreeSet<E> this) {
         return m.descendingKeySet().iterator();
     }
 

@@ -96,7 +96,7 @@ public interface ListIterator<E> extends Iterator<E> {
      * @return the next element in the list
      * @throws NoSuchElementException if the iteration has no next element
      */
-    E next(@GuardSatisfied @NonEmpty @Readonly ListIterator<E> this);
+    E next(@GuardSatisfied @NonEmpty @Mutable ListIterator<E> this);
 
     /**
      * Returns {@code true} if this list iterator has more elements when
@@ -122,7 +122,7 @@ public interface ListIterator<E> extends Iterator<E> {
      * @throws NoSuchElementException if the iteration has no previous
      *         element
      */
-    E previous(@GuardSatisfied @Readonly ListIterator<E> this);
+    E previous(@GuardSatisfied @Mutable ListIterator<E> this);
 
     /**
      * Returns the index of the element that would be returned by a

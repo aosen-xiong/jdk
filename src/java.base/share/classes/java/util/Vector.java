@@ -1250,10 +1250,10 @@ public class Vector<E>
      *
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
-    public synchronized @ReceiverDependentMutable @PolyGrowShrink ListIterator<E> listIterator(@ReceiverDependentMutable @PolyGrowShrink Vector<E> this, @NonNegative int index) {
+    public synchronized @Mutable @PolyGrowShrink ListIterator<E> listIterator(@ReceiverDependentMutable @PolyGrowShrink Vector<E> this, @NonNegative int index) {
         if (index < 0 || index > elementCount)
             throw new IndexOutOfBoundsException("Index: "+index);
-        return new @ReceiverDependentMutable ListItr(index);
+        return new @Mutable ListItr(index);
     }
 
     /**
@@ -1264,8 +1264,8 @@ public class Vector<E>
      *
      * @see #listIterator(int)
      */
-    public synchronized @ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty ListIterator<E> listIterator(@ReceiverDependentMutable @PolyGrowShrink Vector<E> this) {
-        return new @ReceiverDependentMutable ListItr(0);
+    public synchronized @Mutable @PolyGrowShrink @PolyNonEmpty ListIterator<E> listIterator(@ReceiverDependentMutable @PolyGrowShrink Vector<E> this) {
+        return new @Mutable ListItr(0);
     }
 
     /**
@@ -1276,17 +1276,17 @@ public class Vector<E>
      * @return an iterator over the elements in this list in proper sequence
      */
     @SideEffectFree
-    public synchronized @ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty Vector<E> this) {
-        return new @ReceiverDependentMutable Itr();
+    public synchronized @Mutable @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty Vector<E> this) {
+        return new @Mutable Itr();
     }
 
     /**
      * An optimized version of AbstractList.Itr
      */
-    @ReceiverDependentMutable
+    @Mutable
     private class Itr implements Iterator<E> {
-        @Assignable int cursor;       // index of next element to return
-        @Assignable int lastRet = -1; // index of last element returned; -1 if no such
+        int cursor;       // index of next element to return
+        int lastRet = -1; // index of last element returned; -1 if no such
         int expectedModCount = modCount;
 
         @Pure
@@ -1297,7 +1297,7 @@ public class Vector<E>
             return cursor != elementCount;
         }
 
-        public E next(@NonEmpty @Readonly Itr this) {
+        public E next(@Readonly Vector<E>.@NonEmpty @Mutable Itr this) {
             synchronized (Vector.this) {
                 checkForComodification();
                 int i = cursor;
@@ -1321,7 +1321,7 @@ public class Vector<E>
         }
 
         @Override
-        public void forEachRemaining(@Readonly Itr this, Consumer<? super E> action) {
+        public void forEachRemaining(@Readonly Vector<E>.@Mutable Itr this, Consumer<? super E> action) {
             Objects.requireNonNull(action);
             synchronized (Vector.this) {
                 final int size = elementCount;
@@ -1350,7 +1350,7 @@ public class Vector<E>
     /**
      * An optimized version of AbstractList.ListItr
      */
-    @ReceiverDependentMutable
+    @Mutable
     final class ListItr extends Itr implements ListIterator<E> {
         ListItr(int index) {
             super();
@@ -1369,7 +1369,7 @@ public class Vector<E>
             return cursor - 1;
         }
 
-        public E previous(@Readonly ListItr this) {
+        public E previous(@Readonly Vector<E>.@Mutable ListItr this) {
             synchronized (Vector.this) {
                 checkForComodification();
                 int i = cursor - 1;

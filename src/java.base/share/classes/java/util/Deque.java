@@ -634,7 +634,7 @@ public interface Deque<E> extends Queue<E> {
      * @return an iterator over the elements in this deque in proper sequence
      */
     @SideEffectFree
-    @ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty Deque<E> this);
+    @Mutable @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty Deque<E> this);
 
     /**
      * Returns an iterator over the elements in this deque in reverse
@@ -644,6 +644,6 @@ public interface Deque<E> extends Queue<E> {
      * @return an iterator over the elements in this deque in reverse
      * sequence
      */
-    @ReceiverDependentMutable Iterator<E> descendingIterator(@ReceiverDependentMutable Deque<E> this);
+    @Mutable Iterator<E> descendingIterator(@ReceiverDependentMutable Deque<E> this);
 
 }

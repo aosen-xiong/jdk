@@ -91,7 +91,7 @@ public interface Iterator<E> {
      * @return the next element in the iteration
      * @throws NoSuchElementException if the iteration has no more elements
      */
-    E next(@GuardSatisfied @NonEmpty @Readonly Iterator<E> this);
+    E next(@GuardSatisfied @NonEmpty @Mutable Iterator<E> this);
 
     /**
      * Removes from the underlying collection the last element returned
@@ -118,6 +118,13 @@ public interface Iterator<E> {
      *         been called after the last call to the {@code next}
      *         method
      */
+    // Mutability: an iterator is a @Mutable cursor whose position is its own abstract state, so
+    // next() needs a @Mutable iterator. remove() also writes the collection the iterator came from.
+    // An implementation states that in its enclosing type, as in
+    // remove(@Mutable ArrayList<E>.@Mutable Itr this), but Iterator<E> cannot name the collection,
+    // and qualifiers on enclosing types are not yet checked
+    // (https://github.com/eisop/checker-framework/issues/2322). So remove() through an iterator
+    // over a non-mutable collection is not rejected here.
     default void remove(@Mutable @GuardSatisfied @CanShrink Iterator<E> this) {
         throw new UnsupportedOperationException("remove");
     }
@@ -147,7 +154,7 @@ public interface Iterator<E> {
      * @throws NullPointerException if the specified action is null
      * @since 1.8
      */
-     default void forEachRemaining(@Readonly Iterator<E> this, Consumer<? super E> action) {
+     default void forEachRemaining(@Mutable Iterator<E> this, Consumer<? super E> action) {
         Objects.requireNonNull(action);
         while (hasNext())
             action.accept(next());

@@ -99,7 +99,7 @@ public abstract class Dictionary<K,V> {
      * @see     java.util.Dictionary#elements()
      * @see     java.util.Enumeration
      */
-    public abstract @ReceiverDependentMutable Enumeration<K> keys();
+    public abstract @Mutable Enumeration<K> keys();
 
     /**
      * Returns an enumeration of the values in this dictionary. The general
@@ -111,7 +111,7 @@ public abstract class Dictionary<K,V> {
      * @see     java.util.Dictionary#keys()
      * @see     java.util.Enumeration
      */
-    public abstract @ReceiverDependentMutable Enumeration<V> elements();
+    public abstract @Mutable Enumeration<V> elements();
 
     /**
      * Returns the value to which the key is mapped in this dictionary.

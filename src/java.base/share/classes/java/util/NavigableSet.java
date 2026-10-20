@@ -181,7 +181,7 @@ public interface NavigableSet<E> extends SortedSet<E> {
      * @return an iterator over the elements in this set, in ascending order
      */
     @SideEffectFree
-    @ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty NavigableSet<E> this);
+    @Mutable @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty NavigableSet<E> this);
 
     /**
      * Returns a reverse order view of the elements contained in this set.
@@ -206,7 +206,7 @@ public interface NavigableSet<E> extends SortedSet<E> {
      *
      * @return an iterator over the elements in this set, in descending order
      */
-    @ReceiverDependentMutable Iterator<E> descendingIterator(@ReceiverDependentMutable NavigableSet<E> this);
+    @Mutable Iterator<E> descendingIterator(@ReceiverDependentMutable NavigableSet<E> this);
 
     /**
      * Returns a view of the portion of this set whose elements range from

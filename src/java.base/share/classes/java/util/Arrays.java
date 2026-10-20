@@ -4302,14 +4302,14 @@ public class Arrays {
         }
 
         @Override
-        public @ReceiverDependentMutable Iterator<E> iterator(@ReceiverDependentMutable ArrayList<E> this) {
-            return new @ReceiverDependentMutable ArrayItr<>(a);
+        public @Mutable Iterator<E> iterator(@ReceiverDependentMutable ArrayList<E> this) {
+            return new @Mutable ArrayItr<>(a);
         }
     }
 
     @ReceiverDependentMutable
     private static class ArrayItr<E> implements Iterator<E> {
-        private @Assignable int cursor;
+        private int cursor;
         private final E @Readonly [] a;
 
         @SuppressWarnings("mutability:initialization.fields.uninitialized") // Conservative
@@ -4325,7 +4325,7 @@ public class Arrays {
         }
 
         @Override
-        public E next(@NonEmpty @Readonly ArrayItr<E> this) {
+        public E next(@NonEmpty @Mutable ArrayItr<E> this) {
             int i = cursor;
             if (i >= a.length) {
                 throw new NoSuchElementException();

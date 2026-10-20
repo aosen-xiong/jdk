@@ -462,7 +462,7 @@ public final class Spliterators {
      * @return A spliterator from an iterator
      * @throws NullPointerException if the given iterator is {@code null}
      */
-    public static <T> Spliterator<T> spliterator(@Readonly Iterator<? extends T> iterator,
+    public static <T> Spliterator<T> spliterator(@Mutable Iterator<? extends T> iterator,
                                                  long size,
                                                  int characteristics) {
         return new IteratorSpliterator<>(Objects.requireNonNull(iterator), size,
@@ -490,7 +490,7 @@ public final class Spliterators {
      * @return A spliterator from an iterator
      * @throws NullPointerException if the given iterator is {@code null}
      */
-    public static <T> Spliterator<T> spliteratorUnknownSize(@Readonly Iterator<? extends T> iterator,
+    public static <T> Spliterator<T> spliteratorUnknownSize(@Mutable Iterator<? extends T> iterator,
                                                             int characteristics) {
         return new IteratorSpliterator<>(Objects.requireNonNull(iterator), characteristics);
     }
@@ -702,7 +702,7 @@ public final class Spliterators {
             }
 
             @Override
-            public T next(@NonEmpty Adapter this) {
+            public T next(@NonEmpty @Mutable Adapter this) {
                 if (!valueReady && !hasNext())
                     throw new NoSuchElementException();
                 else {
@@ -714,7 +714,7 @@ public final class Spliterators {
             }
 
             @Override
-            public void forEachRemaining(Consumer<? super T> action) {
+            public void forEachRemaining(@Mutable Adapter this, Consumer<? super T> action) {
                 Objects.requireNonNull(action);
                 if (valueReady) {
                     valueReady = false;
@@ -773,7 +773,7 @@ public final class Spliterators {
             }
 
             @Override
-            public void forEachRemaining(IntConsumer action) {
+            public void forEachRemaining(@Mutable Adapter this, IntConsumer action) {
                 Objects.requireNonNull(action);
                 if (valueReady) {
                     valueReady = false;
@@ -830,7 +830,7 @@ public final class Spliterators {
             }
 
             @Override
-            public void forEachRemaining(LongConsumer action) {
+            public void forEachRemaining(@Mutable Adapter this, LongConsumer action) {
                 Objects.requireNonNull(action);
                 if (valueReady) {
                     valueReady = false;
@@ -887,7 +887,7 @@ public final class Spliterators {
             }
 
             @Override
-            public void forEachRemaining(DoubleConsumer action) {
+            public void forEachRemaining(@Mutable Adapter this, DoubleConsumer action) {
                 Objects.requireNonNull(action);
                 if (valueReady) {
                     valueReady = false;
@@ -1761,7 +1761,7 @@ public final class Spliterators {
         static final int BATCH_UNIT = 1 << 10;  // batch array size increment
         static final int MAX_BATCH = 1 << 25;  // max batch array size;
         private final @Readonly Collection<? extends T> collection; // null OK
-        private @Readonly Iterator<? extends T> it;
+        private @Mutable Iterator<? extends T> it;
         private final int characteristics;
         private long est;             // size estimate
         private int batch;            // batch size for splits
@@ -1794,7 +1794,7 @@ public final class Spliterators {
          * @param characteristics properties of this spliterator's
          * source or elements.
          */
-        public IteratorSpliterator(@Readonly Iterator<? extends T> iterator, long size, int characteristics) {
+        public IteratorSpliterator(@Mutable Iterator<? extends T> iterator, long size, int characteristics) {
             this.collection = null;
             this.it = iterator;
             this.est = size;
@@ -1812,7 +1812,7 @@ public final class Spliterators {
          * @param characteristics properties of this spliterator's
          * source or elements.
          */
-        public IteratorSpliterator(@Readonly Iterator<? extends T> iterator, int characteristics) {
+        public IteratorSpliterator(@Mutable Iterator<? extends T> iterator, int characteristics) {
             this.collection = null;
             this.it = iterator;
             this.est = Long.MAX_VALUE;

@@ -422,8 +422,8 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
     @ReceiverDependentMutable
     private class KeySet extends AbstractSet<K> {
         @SideEffectFree
-        public @ReceiverDependentMutable Iterator<K> iterator(@ReceiverDependentMutable KeySet this) {
-            return new @ReceiverDependentMutable KeyIterator();
+        public @Mutable Iterator<K> iterator(@ReceiverDependentMutable KeySet this) {
+            return new @Mutable KeyIterator();
         }
         @Pure
         public @NonNegative int size(@Readonly KeySet this) {
@@ -466,8 +466,8 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
     @ReceiverDependentMutable
     private class Values extends AbstractCollection<V> {
         @SideEffectFree
-        public @ReceiverDependentMutable Iterator<V> iterator(@ReceiverDependentMutable Values this) {
-            return new @ReceiverDependentMutable ValueIterator();
+        public @Mutable Iterator<V> iterator(@ReceiverDependentMutable Values this) {
+            return new @Mutable ValueIterator();
         }
         @Pure
         public @NonNegative int size(@Readonly Values this) {
@@ -517,8 +517,8 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
     @ReceiverDependentMutable
     private class EntrySet extends AbstractSet<Map.@Readonly Entry<K,V>> {
         @SideEffectFree
-        public @ReceiverDependentMutable Iterator<Map.@Readonly Entry<K,V>> iterator(@ReceiverDependentMutable EntrySet this) {
-            return new @ReceiverDependentMutable EntryIterator();
+        public @Mutable Iterator<Map.@Readonly Entry<K,V>> iterator(@ReceiverDependentMutable EntrySet this) {
+            return new @Mutable EntryIterator();
         }
 
         @Pure
@@ -572,13 +572,13 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
         }
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     private abstract class EnumMapIterator<T> implements Iterator<T> {
         // Lower bound on index of next element to return
         @Assignable int index = 0;
 
         // Index of last returned element, or -1 if none
-        @Assignable int lastReturnedIndex = -1;
+        int lastReturnedIndex = -1;
 
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
@@ -604,9 +604,9 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
         }
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     private class KeyIterator extends EnumMapIterator<K> {
-        public K next(@NonEmpty @Readonly KeyIterator this) {
+        public K next(@NonEmpty @Mutable KeyIterator this) {
             if (!hasNext())
                 throw new NoSuchElementException();
             lastReturnedIndex = index++;
@@ -614,12 +614,12 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
         }
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     private class ValueIterator extends EnumMapIterator<V> {
         @CFComment({"nullness: Value returned by unmaskNull",
                     "will be of type V (not @Nullable V) for mapped value"})
         @SuppressWarnings({"nullness:return"})
-        public V next(@NonEmpty @Readonly ValueIterator this) {
+        public V next(@NonEmpty @Mutable ValueIterator this) {
             if (!hasNext())
                 throw new NoSuchElementException();
             lastReturnedIndex = index++;
@@ -627,14 +627,14 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
         }
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     private class EntryIterator extends EnumMapIterator<Map.@Readonly Entry<K,V>> {
-        private @Assignable Entry lastReturnedEntry;
+        private Entry lastReturnedEntry;
 
-        public Map.@Readonly Entry<K,V> next(@ReceiverDependentMutable @NonEmpty EntryIterator this) {
+        public Map.@Readonly Entry<K,V> next(@NonEmpty @Mutable EntryIterator this) {
             if (!hasNext())
                 throw new NoSuchElementException();
-            lastReturnedEntry = new @ReceiverDependentMutable Entry(index++);
+            lastReturnedEntry = new @Mutable Entry(index++);
             return lastReturnedEntry;
         }
 

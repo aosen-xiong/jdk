@@ -93,8 +93,8 @@ class RegularEnumSet<E extends Enum<E>> extends EnumSet<E> {
      *
      * @return an iterator over the elements contained in this set
      */
-    public @ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty RegularEnumSet<E> this) {
-        return new @ReceiverDependentMutable EnumSetIterator<>();
+    public @Mutable @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty RegularEnumSet<E> this) {
+        return new @Mutable EnumSetIterator<>();
     }
 
     @ReceiverDependentMutable
@@ -103,13 +103,13 @@ class RegularEnumSet<E extends Enum<E>> extends EnumSet<E> {
          * A bit vector representing the elements in the set not yet
          * returned by this iterator.
          */
-        @Assignable long unseen;
+        long unseen;
 
         /**
          * The bit representing the last element returned by this iterator
          * but not removed, or zero if no such element exists.
          */
-        @Assignable long lastReturned = 0;
+        long lastReturned = 0;
 
         EnumSetIterator() {
             unseen = elements;
@@ -122,7 +122,7 @@ class RegularEnumSet<E extends Enum<E>> extends EnumSet<E> {
         }
 
         @SuppressWarnings("unchecked")
-        public E next(@NonEmpty @Readonly EnumSetIterator<E> this) {
+        public E next(@NonEmpty @Mutable EnumSetIterator<E> this) {
             if (unseen == 0)
                 throw new NoSuchElementException();
             lastReturned = unseen & -unseen;

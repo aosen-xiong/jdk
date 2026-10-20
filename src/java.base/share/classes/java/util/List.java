@@ -216,7 +216,7 @@ public interface List<E> extends Collection<E> {
      * @return an iterator over the elements in this list in proper sequence
      */
     @SideEffectFree
-    @PolyNonEmpty @ReceiverDependentMutable @PolyGrowShrink Iterator<E> iterator(@ReceiverDependentMutable @PolyNonEmpty @PolyGrowShrink List<E> this);
+    @PolyNonEmpty @Mutable @PolyGrowShrink Iterator<E> iterator(@ReceiverDependentMutable @PolyNonEmpty @PolyGrowShrink List<E> this);
 
     /**
      * Returns an array containing all of the elements in this list in proper
@@ -733,7 +733,7 @@ public interface List<E> extends Collection<E> {
      * @return a list iterator over the elements in this list (in proper
      *         sequence)
      */
-    @ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty ListIterator<E> listIterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty List<E> this);
+    @Mutable @PolyGrowShrink @PolyNonEmpty ListIterator<E> listIterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty List<E> this);
 
     /**
      * Returns a list iterator over the elements in this list (in proper
@@ -750,7 +750,7 @@ public interface List<E> extends Collection<E> {
      * @throws IndexOutOfBoundsException if the index is out of range
      *         ({@code index < 0 || index > size()})
      */
-    @ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty ListIterator<E> listIterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty List<E> this, @IndexOrHigh({"this"}) int index);
+    @Mutable @PolyGrowShrink @PolyNonEmpty ListIterator<E> listIterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty List<E> this, @IndexOrHigh({"this"}) int index);
 
     // View
 

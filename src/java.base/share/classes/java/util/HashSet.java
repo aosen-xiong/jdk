@@ -195,7 +195,7 @@ import jdk.internal.access.SharedSecrets;
      * @see ConcurrentModificationException
      */
     @SideEffectFree
-    public @PolyGrowShrink @PolyNonEmpty @ReceiverDependentMutable Iterator<E> iterator(@PolyGrowShrink @PolyNonEmpty @ReceiverDependentMutable HashSet<E> this) {
+    public @PolyGrowShrink @PolyNonEmpty @Mutable Iterator<E> iterator(@PolyGrowShrink @PolyNonEmpty @ReceiverDependentMutable HashSet<E> this) {
         return map.keySet().iterator();
     }
 

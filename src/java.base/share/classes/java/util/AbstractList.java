@@ -326,8 +326,8 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
      * @return an iterator over the elements in this list in proper sequence
      */
     @SideEffectFree
-    public @ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty AbstractList<E> this) {
-        return new @ReceiverDependentMutable Itr();
+    public @Mutable @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty AbstractList<E> this) {
+        return new @Mutable Itr();
     }
 
     /**
@@ -338,7 +338,7 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
      *
      * @see #listIterator(int)
      */
-    public @ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty ListIterator<E> listIterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty AbstractList<E> this) {
+    public @Mutable @PolyGrowShrink @PolyNonEmpty ListIterator<E> listIterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty AbstractList<E> this) {
         return listIterator(0);
     }
 
@@ -365,25 +365,25 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
      *
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
-    public @ReceiverDependentMutable @PolyGrowShrink ListIterator<E> listIterator(@ReceiverDependentMutable @PolyGrowShrink AbstractList<E> this, final @IndexOrHigh({"this"}) int index) {
+    public @Mutable @PolyGrowShrink ListIterator<E> listIterator(@ReceiverDependentMutable @PolyGrowShrink AbstractList<E> this, final @IndexOrHigh({"this"}) int index) {
         rangeCheckForAdd(index);
 
-        return new @ReceiverDependentMutable ListItr(index);
+        return new @Mutable ListItr(index);
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     private class Itr implements Iterator<E> {
         /**
          * Index of element to be returned by subsequent call to next.
          */
-        @Assignable int cursor = 0;
+        int cursor = 0;
 
         /**
          * Index of element returned by most recent call to next or
          * previous.  Reset to -1 if this element is deleted by a call
          * to remove.
          */
-        @Assignable int lastRet = -1;
+        int lastRet = -1;
 
         /**
          * The modCount value that the iterator believes that the backing
@@ -398,7 +398,7 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
             return cursor != size();
         }
 
-        public E next(@NonEmpty @Readonly Itr this) {
+        public E next(@Readonly AbstractList<E>.@NonEmpty @Mutable Itr this) {
             checkForComodification();
             try {
                 int i = cursor;
@@ -434,7 +434,7 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
         }
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     private class ListItr extends Itr implements ListIterator<E> {
         ListItr(int index) {
             cursor = index;
@@ -444,7 +444,7 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
             return cursor != 0;
         }
 
-        public E previous(@Readonly ListItr this) {
+        public E previous(@Readonly AbstractList<E>.@Mutable ListItr this) {
             checkForComodification();
             try {
                 int i = cursor - 1;
@@ -867,15 +867,15 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
             return true;
         }
 
-        public @ReceiverDependentMutable Iterator<E> iterator(@ReceiverDependentMutable SubList<E> this) {
+        public @Mutable Iterator<E> iterator(@ReceiverDependentMutable SubList<E> this) {
             return listIterator();
         }
 
-        public @ReceiverDependentMutable ListIterator<E> listIterator(int index) {
+        public @Mutable ListIterator<E> listIterator(int index) {
             checkForComodification();
             rangeCheckForAdd(index);
 
-            return new @ReceiverDependentMutable ListIterator<E>() {
+            return new @Mutable ListIterator<E>() {
                 private final @Mutable ListIterator<E> i =
                         root.listIterator(offset + index);
 
