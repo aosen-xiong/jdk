@@ -25,6 +25,7 @@
 
 package java.lang;
 
+import org.checkerframework.checker.mutability.qual.Readonly;
 import org.checkerframework.checker.index.qual.GTENegativeOne;
 import org.checkerframework.checker.index.qual.IndexOrHigh;
 import org.checkerframework.checker.index.qual.NonNegative;
@@ -386,7 +387,7 @@ public final class StringBuffer
      * @since 1.5
      */
     @Override
-    public synchronized StringBuffer append(@LeakedToResult StringBuffer this, @NonLeaked @Nullable CharSequence s) {
+    public synchronized StringBuffer append(@LeakedToResult StringBuffer this, @NonLeaked @Nullable @Readonly CharSequence s) {
         toStringCache = null;
         super.append(s);
         return this;
@@ -397,7 +398,7 @@ public final class StringBuffer
      * @since      1.5
      */
     @Override
-    public synchronized StringBuffer append(@LeakedToResult StringBuffer this, @NonLeaked @Nullable CharSequence s, @IndexOrHigh({"#1"}) int start, @IndexOrHigh({"#1"}) int end)
+    public synchronized StringBuffer append(@LeakedToResult StringBuffer this, @NonLeaked @Nullable @Readonly CharSequence s, @IndexOrHigh({"#1"}) int start, @IndexOrHigh({"#1"}) int end)
     {
         toStringCache = null;
         super.append(s, start, end);

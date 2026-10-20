@@ -1101,7 +1101,7 @@ public class PrintWriter extends Writer {
      *
      * @since  1.5
      */
-    public @MustCallAlias PrintWriter append(@GuardSatisfied @MustCallAlias PrintWriter this, @Nullable CharSequence csq) {
+    public @MustCallAlias PrintWriter append(@GuardSatisfied @MustCallAlias PrintWriter this, @Nullable @Readonly CharSequence csq) {
         write(String.valueOf(csq));
         return this;
     }
@@ -1140,7 +1140,7 @@ public class PrintWriter extends Writer {
      *
      * @since  1.5
      */
-    public @MustCallAlias PrintWriter append(@GuardSatisfied @MustCallAlias PrintWriter this, @Nullable CharSequence csq, @IndexOrHigh({"#1"}) int start, @IndexOrHigh({"#1"}) int end) {
+    public @MustCallAlias PrintWriter append(@GuardSatisfied @MustCallAlias PrintWriter this, @Nullable @Readonly CharSequence csq, @IndexOrHigh({"#1"}) int start, @IndexOrHigh({"#1"}) int end) {
         if (csq == null) csq = "null";
         return append(csq.subSequence(start, end));
     }

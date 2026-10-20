@@ -3113,7 +3113,7 @@ public final class String
      */
     @SideEffectFree
     @StaticallyExecutable
-    public String replace(@GuardSatisfied CharSequence target, @GuardSatisfied CharSequence replacement) {
+    public String replace(@GuardSatisfied @Readonly CharSequence target, @GuardSatisfied @Readonly CharSequence replacement) {
         String trgtStr = target.toString();
         String replStr = replacement.toString();
         int thisLen = length();
