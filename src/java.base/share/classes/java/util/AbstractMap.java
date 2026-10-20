@@ -90,7 +90,7 @@ import java.util.Map.Entry;
 @CFComment("lock: Subclasses of this interface/class may opt to prohibit null elements")
 @AnnotatedFor({"lock", "nullness", "index", "mutability"})
 @ReceiverDependentMutable
-public abstract class AbstractMap<K extends @Immutable Object,V> implements Map<K,V> {
+public abstract class AbstractMap<K extends @Readonly Object,V> implements Map<K,V> {
     /**
      * Sole constructor.  (For invocation by subclass constructors, typically
      * implicit.)
@@ -659,7 +659,7 @@ public abstract class AbstractMap<K extends @Immutable Object,V> implements Map<
      *
      * @since 1.6
      */
-    public static class SimpleEntry<K extends @Immutable Object,V>
+    public static class SimpleEntry<K extends @Readonly Object,V>
         implements Entry<K,V>, java.io.Serializable
     {
         @java.io.Serial
@@ -807,7 +807,7 @@ public abstract class AbstractMap<K extends @Immutable Object,V> implements Map<
      *
      * @since 1.6
      */
-    @Immutable public static class SimpleImmutableEntry<K extends @Immutable Object,V>
+    @Immutable public static class SimpleImmutableEntry<K extends @Readonly Object,V>
         implements Entry<K,V>, java.io.Serializable
     {
         @java.io.Serial

@@ -1538,7 +1538,7 @@ public class Collections {
      * @return an unmodifiable view of the specified map.
      */
     @SuppressWarnings({"unchecked", "mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // mutability: one poly: the backing collection and the view are the same instantiation
-    public static <K extends @Immutable Object,V> @PolyNonEmpty @PolyMutable Map<K,V> unmodifiableMap(@PolyNonEmpty @PolyMutable Map<? extends K, ? extends V> m) {
+    public static <K extends @Readonly Object,V> @PolyNonEmpty @PolyMutable Map<K,V> unmodifiableMap(@PolyNonEmpty @PolyMutable Map<? extends K, ? extends V> m) {
         // Not checking for subclasses because of heap pollution and information leakage.
         if (m.getClass() == UnmodifiableMap.class) {
             return (@PolyMutable Map<K,V>) m;
@@ -1550,7 +1550,7 @@ public class Collections {
      * @serial include
      */
     @ReceiverDependentMutable
-    private static class UnmodifiableMap<K extends @Immutable Object,V> implements Map<K,V>, Serializable {
+    private static class UnmodifiableMap<K extends @Readonly Object,V> implements Map<K,V>, Serializable {
         @java.io.Serial
         private static final long serialVersionUID = -1034234728574286014L;
 
@@ -1689,7 +1689,7 @@ public class Collections {
          * @serial include
          */
         @ReceiverDependentMutable
-        static class UnmodifiableEntrySet<K extends @Immutable Object,V>
+        static class UnmodifiableEntrySet<K extends @Readonly Object,V>
             extends UnmodifiableSet<Map.@Readonly Entry<K,V>> {
             @java.io.Serial
             private static final long serialVersionUID = 7854390611657943733L;
@@ -1700,7 +1700,7 @@ public class Collections {
                 super((@ReceiverDependentMutable Set)s);
             }
 
-            static <K extends @Immutable Object, V> Consumer<Map.@Readonly Entry<? extends K, ? extends V>> entryConsumer(
+            static <K extends @Readonly Object, V> Consumer<Map.@Readonly Entry<? extends K, ? extends V>> entryConsumer(
                     Consumer<? super @Readonly Entry<K, V>> action) {
                 return e -> action.accept(new UnmodifiableEntry<>(e));
             }
@@ -1710,7 +1710,7 @@ public class Collections {
                 c.forEach(entryConsumer(action));
             }
 
-            static final class UnmodifiableEntrySetSpliterator<K extends @Immutable Object, V>
+            static final class UnmodifiableEntrySetSpliterator<K extends @Readonly Object, V>
                     implements Spliterator<@Readonly Entry<K,V>> {
                 final Spliterator<Map.@Readonly Entry<K, V>> s;
 
@@ -1871,7 +1871,7 @@ public class Collections {
              * an ill-behaved Map.Entry that attempts to modify another
              * Map Entry when asked to perform an equality check.
              */
-            @Immutable private static class UnmodifiableEntry<K extends @Immutable Object,V> implements Map.Entry<K,V> {
+            @Immutable private static class UnmodifiableEntry<K extends @Readonly Object,V> implements Map.Entry<K,V> {
                 private Map.@Readonly Entry<? extends K, ? extends V> e;
 
                 UnmodifiableEntry(Map.@Readonly Entry<? extends K, ? extends V> e)
@@ -1914,7 +1914,7 @@ public class Collections {
      * @return an unmodifiable view of the specified sorted map.
      */
     @SuppressWarnings({"unchecked", "mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // mutability: one poly: the backing collection and the view are the same instantiation
-    public static <K extends @Immutable Object,V> @PolyNonEmpty @PolyMutable SortedMap<K,V> unmodifiableSortedMap(@PolyNonEmpty @PolyMutable SortedMap<K, ? extends V> m) {
+    public static <K extends @Readonly Object,V> @PolyNonEmpty @PolyMutable SortedMap<K,V> unmodifiableSortedMap(@PolyNonEmpty @PolyMutable SortedMap<K, ? extends V> m) {
         // Not checking for subclasses because of heap pollution and information leakage.
         if (m.getClass() == UnmodifiableSortedMap.class) {
             return (@PolyMutable SortedMap<K,V>) m;
@@ -1925,7 +1925,7 @@ public class Collections {
     /**
      * @serial include
      */
-    @ReceiverDependentMutable static class UnmodifiableSortedMap<K extends @Immutable Object,V>
+    @ReceiverDependentMutable static class UnmodifiableSortedMap<K extends @Readonly Object,V>
           extends UnmodifiableMap<K,V>
           implements SortedMap<K,V>, Serializable {
         @java.io.Serial
@@ -1969,7 +1969,7 @@ public class Collections {
      * @since 1.8
      */
     @SuppressWarnings({"unchecked", "mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // mutability: one poly: the backing collection and the view are the same instantiation
-    public static <K extends @Immutable Object,V> @PolyNonEmpty @PolyMutable NavigableMap<K,V> unmodifiableNavigableMap(@PolyNonEmpty @PolyMutable NavigableMap<K, ? extends V> m) {
+    public static <K extends @Readonly Object,V> @PolyNonEmpty @PolyMutable NavigableMap<K,V> unmodifiableNavigableMap(@PolyNonEmpty @PolyMutable NavigableMap<K, ? extends V> m) {
         if (m.getClass() == UnmodifiableNavigableMap.class) {
             return (@PolyMutable NavigableMap<K,V>) m;
         }
@@ -1979,7 +1979,7 @@ public class Collections {
     /**
      * @serial include
      */
-    @ReceiverDependentMutable static class UnmodifiableNavigableMap<K extends @Immutable Object,V>
+    @ReceiverDependentMutable static class UnmodifiableNavigableMap<K extends @Readonly Object,V>
           extends UnmodifiableSortedMap<K,V>
           implements NavigableMap<K,V>, Serializable {
         @java.io.Serial
@@ -2748,14 +2748,14 @@ public class Collections {
      * @param  m the map to be "wrapped" in a synchronized map.
      * @return a synchronized view of the specified map.
      */
-    public static <K extends @Immutable Object,V> Map<K,V> synchronizedMap(Map<K,V> m) {
+    public static <K extends @Readonly Object,V> Map<K,V> synchronizedMap(Map<K,V> m) {
         return new SynchronizedMap<>(m);
     }
 
     /**
      * @serial include
      */
-    @ReceiverDependentMutable private static class SynchronizedMap<K extends @Immutable Object,V>
+    @ReceiverDependentMutable private static class SynchronizedMap<K extends @Readonly Object,V>
         implements Map<K,V>, Serializable {
         @java.io.Serial
         private static final long serialVersionUID = 1978198479659022715L;
@@ -2955,14 +2955,14 @@ public class Collections {
      * @param  m the sorted map to be "wrapped" in a synchronized sorted map.
      * @return a synchronized view of the specified sorted map.
      */
-    public static <K extends @Immutable Object,V> SortedMap<K,V> synchronizedSortedMap(SortedMap<K,V> m) {
+    public static <K extends @Readonly Object,V> SortedMap<K,V> synchronizedSortedMap(SortedMap<K,V> m) {
         return new SynchronizedSortedMap<>(m);
     }
 
     /**
      * @serial include
      */
-    @ReceiverDependentMutable static class SynchronizedSortedMap<K extends @Immutable Object,V>
+    @ReceiverDependentMutable static class SynchronizedSortedMap<K extends @Readonly Object,V>
         extends SynchronizedMap<K,V>
         implements SortedMap<K,V>
     {
@@ -3060,7 +3060,7 @@ public class Collections {
      * @return a synchronized view of the specified navigable map.
      * @since 1.8
      */
-    public static <K extends @Immutable Object,V> NavigableMap<K,V> synchronizedNavigableMap(NavigableMap<K,V> m) {
+    public static <K extends @Readonly Object,V> NavigableMap<K,V> synchronizedNavigableMap(NavigableMap<K,V> m) {
         return new SynchronizedNavigableMap<>(m);
     }
 
@@ -3069,7 +3069,7 @@ public class Collections {
      *
      * @serial include
      */
-    @ReceiverDependentMutable static class SynchronizedNavigableMap<K extends @Immutable Object,V>
+    @ReceiverDependentMutable static class SynchronizedNavigableMap<K extends @Readonly Object,V>
         extends SynchronizedSortedMap<K,V>
         implements NavigableMap<K,V>
     {
@@ -3830,7 +3830,7 @@ public class Collections {
      * @since 1.5
      */
     @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
-    public static <K extends @Immutable Object, V> @PolyMutable Map<K, V> checkedMap(@PolyMutable Map<K, V> m,
+    public static <K extends @Readonly Object, V> @PolyMutable Map<K, V> checkedMap(@PolyMutable Map<K, V> m,
                                               Class<K> keyType,
                                               Class<V> valueType) {
         return new @PolyMutable CheckedMap<>(m, keyType, valueType);
@@ -3841,7 +3841,7 @@ public class Collections {
      * @serial include
      */
     @ReceiverDependentMutable
-    private static class CheckedMap<K extends @Immutable Object,V>
+    private static class CheckedMap<K extends @Readonly Object,V>
         implements Map<K,V>, Serializable
     {
         @java.io.Serial
@@ -4021,7 +4021,7 @@ public class Collections {
          * @serial exclude
          */
         @ReceiverDependentMutable
-        static class CheckedEntrySet<K extends @Immutable Object,V> implements Set<Map.@ReceiverDependentMutable Entry<K,V>> {
+        static class CheckedEntrySet<K extends @Readonly Object,V> implements Set<Map.@ReceiverDependentMutable Entry<K,V>> {
             private final Set<Map.@ReceiverDependentMutable Entry<K,V>> s;
             private final Class<V> valueType;
 
@@ -4166,7 +4166,7 @@ public class Collections {
             }
 
             @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
-            static <K extends @Immutable Object,V,T> @PolyMutable CheckedEntry<K,V,T> checkedEntry(Map.@PolyMutable Entry<K,V> e,
+            static <K extends @Readonly Object,V,T> @PolyMutable CheckedEntry<K,V,T> checkedEntry(Map.@PolyMutable Entry<K,V> e,
                                                             Class<T> valueType) {
                 return new @PolyMutable CheckedEntry<>(e, valueType);
             }
@@ -4179,7 +4179,7 @@ public class Collections {
              * Map.Entry when asked to perform an equality check.
              */
             @ReceiverDependentMutable
-            private static class CheckedEntry<K extends @Immutable Object,V,T> implements Map.Entry<K,V> {
+            private static class CheckedEntry<K extends @Readonly Object,V,T> implements Map.Entry<K,V> {
                 private final Map.Entry<K, V> e;
                 private final Class<T> valueType;
 
@@ -4253,7 +4253,7 @@ public class Collections {
      * @since 1.5
      */
     @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
-    public static <K extends @Immutable Object,V> @PolyMutable SortedMap<K,V> checkedSortedMap(@PolyMutable SortedMap<K, V> m,
+    public static <K extends @Readonly Object,V> @PolyMutable SortedMap<K,V> checkedSortedMap(@PolyMutable SortedMap<K, V> m,
                                                         Class<K> keyType,
                                                         Class<V> valueType) {
         return new @PolyMutable CheckedSortedMap<>(m, keyType, valueType);
@@ -4262,7 +4262,7 @@ public class Collections {
     /**
      * @serial include
      */
-    @ReceiverDependentMutable static class CheckedSortedMap<K extends @Immutable Object,V> extends CheckedMap<K,V>
+    @ReceiverDependentMutable static class CheckedSortedMap<K extends @Readonly Object,V> extends CheckedMap<K,V>
         implements SortedMap<K,V>, Serializable
     {
         @java.io.Serial
@@ -4333,7 +4333,7 @@ public class Collections {
      * @since 1.8
      */
     @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
-    public static <K extends @Immutable Object,V> @PolyMutable NavigableMap<K,V> checkedNavigableMap(@PolyMutable NavigableMap<K, V> m,
+    public static <K extends @Readonly Object,V> @PolyMutable NavigableMap<K,V> checkedNavigableMap(@PolyMutable NavigableMap<K, V> m,
                                                         Class<K> keyType,
                                                         Class<V> valueType) {
         return new @PolyMutable CheckedNavigableMap<>(m, keyType, valueType);
@@ -4342,7 +4342,7 @@ public class Collections {
     /**
      * @serial include
      */
-    @ReceiverDependentMutable static class CheckedNavigableMap<K extends @Immutable Object,V> extends CheckedSortedMap<K,V>
+    @ReceiverDependentMutable static class CheckedNavigableMap<K extends @Readonly Object,V> extends CheckedSortedMap<K,V>
         implements NavigableMap<K,V>, Serializable
     {
         @java.io.Serial
@@ -4944,7 +4944,7 @@ public class Collections {
     /**
      * @serial include
      */
-    @Immutable private static class EmptyMap<K extends @Immutable Object,V>
+    @Immutable private static class EmptyMap<K extends @Readonly Object,V>
         extends AbstractMap<K,V>
         implements Serializable
     {

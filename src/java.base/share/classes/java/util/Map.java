@@ -188,7 +188,7 @@ import java.io.Serializable;
 @CFComment({"lock/nullness: Subclasses of this interface/class may opt to prohibit null elements"})
 @AnnotatedFor({"lock", "nullness", "index", "aliasing", "nonempty", "mutability"})
 @ReceiverDependentMutable
-public interface Map<K extends @Immutable Object, V> {
+public interface Map<K extends @Readonly Object, V> {
     // Query Operations
 
     /**
@@ -473,7 +473,7 @@ public interface Map<K extends @Immutable Object, V> {
      */
     @Covariant(0)
     @ReceiverDependentMutable
-    interface Entry<K extends @Immutable Object, V> {
+    interface Entry<K extends @Readonly Object, V> {
         /**
          * Returns the key corresponding to this entry.
          *

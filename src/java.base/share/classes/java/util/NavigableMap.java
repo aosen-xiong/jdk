@@ -109,7 +109,7 @@ import org.checkerframework.framework.qual.CFComment;
 @CFComment({"lock/nullness: Subclasses of this interface/class may opt to prohibit null elements"})
 @AnnotatedFor({"lock", "nullness", "mutability"})
 @ReceiverDependentMutable
-public interface NavigableMap<K extends @Immutable Object,V> extends SortedMap<K,V> {
+public interface NavigableMap<K extends @Readonly Object,V> extends SortedMap<K,V> {
     /**
      * Returns a key-value mapping associated with the greatest key
      * strictly less than the given key, or {@code null} if there is

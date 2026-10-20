@@ -162,7 +162,7 @@ import jdk.internal.access.SharedSecrets;
 @CFComment({"lock/nullness: This collection can only contain null values"})
 @AnnotatedFor({"lock", "nullness", "index"})
 @ReceiverDependentMutable
-public class IdentityHashMap<K extends @Immutable Object,V>
+public class IdentityHashMap<K extends @Readonly Object,V>
     extends AbstractMap<K,V>
     implements Map<K,V>, java.io.Serializable, Cloneable
 {
@@ -1457,7 +1457,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
      * and guestimates size as decreasing by half per split.
      */
     @ReceiverDependentMutable
-    static class IdentityHashMapSpliterator<K extends @Immutable Object,V> {
+    static class IdentityHashMapSpliterator<K extends @Readonly Object,V> {
         final @Readonly IdentityHashMap<K,V> map;
         int index;             // current index, modified on advance/split
         @Assignable /* should be @LazyFinal */ int fence;             // -1 until first use; then one past last index
@@ -1490,7 +1490,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
     }
 
     @ReceiverDependentMutable
-    static final class KeySpliterator<K extends @Immutable Object,V>
+    static final class KeySpliterator<K extends @Readonly Object,V>
         extends IdentityHashMapSpliterator<K,V>
         implements Spliterator<K> {
         KeySpliterator(@Readonly IdentityHashMap<K,V> map, int origin, int fence, int est,
@@ -1548,7 +1548,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
     }
 
     @ReceiverDependentMutable
-    static final class ValueSpliterator<K extends @Immutable Object,V>
+    static final class ValueSpliterator<K extends @Readonly Object,V>
         extends IdentityHashMapSpliterator<K,V>
         implements Spliterator<V> {
         ValueSpliterator(@Readonly IdentityHashMap<K,V> m, int origin, int fence, int est,
@@ -1608,7 +1608,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
     }
 
     @ReceiverDependentMutable
-    static final class EntrySpliterator<K extends @Immutable Object,V>
+    static final class EntrySpliterator<K extends @Readonly Object,V>
         extends IdentityHashMapSpliterator<K,V>
         implements Spliterator<Map.@Readonly Entry<K,V>> {
         EntrySpliterator(@Readonly IdentityHashMap<K,V> m, int origin, int fence, int est,
