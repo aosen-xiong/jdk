@@ -629,7 +629,7 @@ public class Collections {
      */
     @Pure
     @StaticallyExecutable
-    public static <T extends Object & Comparable<? super T>> T min(@Readonly Collection<? extends T> coll) {
+    public static <T extends @Readonly Object & Comparable<? super T>> T min(@Readonly Collection<? extends T> coll) {
         Iterator<? extends T> i = coll.iterator();
         T candidate = i.next();
 
@@ -706,7 +706,7 @@ public class Collections {
      */
     @Pure
     @StaticallyExecutable
-    public static <T extends Object & Comparable<? super T>> T max(@Readonly Collection<? extends T> coll) {
+    public static <T extends @Readonly Object & Comparable<? super T>> T max(@Readonly Collection<? extends T> coll) {
         Iterator<? extends T> i = coll.iterator();
         T candidate = i.next();
 
