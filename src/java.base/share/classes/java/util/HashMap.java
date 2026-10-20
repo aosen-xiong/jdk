@@ -1170,7 +1170,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
             return false;
         }
         @SideEffectFree
-        @SuppressWarnings("mutability:override.return.invalid") // EntrySpliterator reads the map through a @Readonly field, so it can only promise @Readonly entries. Promising the set's @ReceiverDependentMutable entries needs a receiver-dependent spliterator whose tryAdvance, forEachRemaining and trySplit take @Readonly receivers, as Iterator.next does
+        @SuppressWarnings("mutability:override.return.invalid") // EntrySpliterator reads the map's nodes through a @Readonly field, so it can only promise @Readonly entries. The set's entries are @ReceiverDependentMutable, but the implementation gives the checker no way to relate the nodes it reads to this set's receiver
         public final Spliterator<Map.@Readonly Entry<K,V>> spliterator(@ReceiverDependentMutable HashMap<K,V>.@ReceiverDependentMutable EntrySet this) {
             return new EntrySpliterator<>(HashMap.this, 0, -1, 0, 0);
         }

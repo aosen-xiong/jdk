@@ -154,7 +154,7 @@ public final class Spliterators {
      * @throws NullPointerException if the given array is {@code null}
      * @see Arrays#spliterator(Object[])
      */
-    public static <T> Spliterator<@PolyNull @PolyMutable T> spliterator(@PolyNull @PolyMutable Object @Readonly [] array,
+    public static <T> Spliterator<@PolyNull T> spliterator(@PolyNull @Readonly Object @Readonly [] array,
                                                  int additionalCharacteristics) {
         return new ArraySpliterator<>(Objects.requireNonNull(array),
                                       additionalCharacteristics);
@@ -189,7 +189,7 @@ public final class Spliterators {
      *         {@code toIndex} is greater than the array size
      * @see Arrays#spliterator(Object[], int, int)
      */
-    public static <T> Spliterator<@PolyNull @PolyMutable T> spliterator(@PolyNull @PolyMutable Object @Readonly [] array, int fromIndex, int toIndex,
+    public static <T> Spliterator<@PolyNull T> spliterator(@PolyNull @Readonly Object @Readonly [] array, int fromIndex, int toIndex,
                                                  int additionalCharacteristics) {
         checkFromToBounds(Objects.requireNonNull(array).length, fromIndex, toIndex);
         return new ArraySpliterator<>(array, fromIndex, toIndex, additionalCharacteristics);
