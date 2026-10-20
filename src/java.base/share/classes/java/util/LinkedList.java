@@ -1231,7 +1231,7 @@ public class LinkedList<E>
      */
     @SideEffectFree
     @Override
-    public Spliterator<E> spliterator(@Readonly LinkedList<E> this) {
+    public Spliterator<E> spliterator(@ReceiverDependentMutable LinkedList<E> this) {
         return new LLSpliterator<>(this, -1, 0);
     }
 

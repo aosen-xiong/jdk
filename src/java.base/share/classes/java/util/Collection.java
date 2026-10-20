@@ -764,7 +764,7 @@ public interface Collection<E> extends Iterable<E> {
      */
     @SideEffectFree
     @Override
-    default Spliterator<E> spliterator(@Readonly Collection<E> this) {
+    default Spliterator<E> spliterator(@ReceiverDependentMutable Collection<E> this) {
         return Spliterators.spliterator(this, 0);
     }
 

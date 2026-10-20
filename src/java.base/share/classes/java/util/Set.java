@@ -475,7 +475,7 @@ public interface Set<E> extends Collection<E> {
      * @since 1.8
      */
     @Override
-    default Spliterator<E> spliterator(@Readonly Set<E> this) {
+    default Spliterator<E> spliterator(@ReceiverDependentMutable Set<E> this) {
         return Spliterators.spliterator(this, Spliterator.DISTINCT);
     }
 

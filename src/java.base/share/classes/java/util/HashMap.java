@@ -1028,7 +1028,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
             return removeNode(hash(key), key, null, false, true) != null;
         }
         @SideEffectFree
-        public final Spliterator<K> spliterator(@Readonly KeySet this) {
+        public final Spliterator<K> spliterator(@ReceiverDependentMutable KeySet this) {
             return new KeySpliterator<>(HashMap.this, 0, -1, 0, 0);
         }
         // AOSEN: class polymorphism qualifier
@@ -1093,7 +1093,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
         @EnsuresNonEmptyIf(result = true, expression = "this")
         public final boolean contains(@Readonly Values this, @Nullable @UnknownSignedness @Readonly Object o) { return containsValue(o); }
         @SideEffectFree
-        public final Spliterator<V> spliterator(@Readonly Values this) {
+        public final Spliterator<V> spliterator(@ReceiverDependentMutable Values this) {
             return new ValueSpliterator<>(HashMap.this, 0, -1, 0, 0);
         }
 
@@ -1170,8 +1170,8 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
             return false;
         }
         @SideEffectFree
-        @SuppressWarnings("mutability:override.return.invalid") // the spliterator reads the map through a @Readonly field, so it can only promise @Readonly entries. Following the set's @ReceiverDependentMutable entries needs spliterators to carry their collection's mutability, which is deferred
-        public final Spliterator<Map.@Readonly Entry<K,V>> spliterator(@Readonly EntrySet this) {
+        @SuppressWarnings("mutability:override.return.invalid") // EntrySpliterator reads the map through a @Readonly field, so it can only promise @Readonly entries. Promising the set's @ReceiverDependentMutable entries needs a receiver-dependent spliterator whose tryAdvance, forEachRemaining and trySplit take @Readonly receivers, as Iterator.next does
+        public final Spliterator<Map.@Readonly Entry<K,V>> spliterator(@ReceiverDependentMutable HashMap<K,V>.@ReceiverDependentMutable EntrySet this) {
             return new EntrySpliterator<>(HashMap.this, 0, -1, 0, 0);
         }
         public final void forEach(@ReceiverDependentMutable HashMap<K,V>.@Readonly EntrySet this, Consumer<? super Map.@ReceiverDependentMutable Entry<K,V>> action) {

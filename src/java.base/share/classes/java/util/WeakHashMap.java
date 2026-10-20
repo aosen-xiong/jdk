@@ -950,7 +950,7 @@ public class WeakHashMap<K extends @Immutable Object,V>
         }
 
         @SideEffectFree
-        public Spliterator<K> spliterator(@Readonly KeySet this) {
+        public Spliterator<K> spliterator(@ReceiverDependentMutable KeySet this) {
             return new KeySpliterator<>(WeakHashMap.this, 0, -1, 0, 0);
         }
     }

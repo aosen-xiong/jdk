@@ -1487,7 +1487,7 @@ import jdk.internal.util.ArraysSupport;
         }
 
         @SideEffectFree
-        public Spliterator<E> spliterator(@Readonly SubList<E> this) {
+        public Spliterator<E> spliterator(@ReceiverDependentMutable SubList<E> this) {
             checkForComodification();
 
             // ArrayListSpliterator not used here due to late-binding
@@ -1591,7 +1591,7 @@ import jdk.internal.util.ArraysSupport;
      */
     @SideEffectFree
     @Override
-    public Spliterator<E> spliterator(@Readonly ArrayList<E> this) {
+    public Spliterator<E> spliterator(@ReceiverDependentMutable ArrayList<E> this) {
         return new ArrayListSpliterator(0, -1, 0);
     }
 

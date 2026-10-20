@@ -273,7 +273,7 @@ public interface SortedSet<E> extends Set<E> {
      * @since 1.8
      */
     @Override
-    default Spliterator<E> spliterator(@Readonly SortedSet<E> this) {
+    default Spliterator<E> spliterator(@ReceiverDependentMutable SortedSet<E> this) {
         return new Spliterators.IteratorSpliterator<E>(
                 this, Spliterator.DISTINCT | Spliterator.SORTED | Spliterator.ORDERED) {
             @Override

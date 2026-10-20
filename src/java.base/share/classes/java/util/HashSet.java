@@ -390,7 +390,7 @@ import jdk.internal.access.SharedSecrets;
      * @return a {@code Spliterator} over the elements in this set
      * @since 1.8
      */
-    public Spliterator<E> spliterator(@Readonly HashSet<E> this) {
+    public Spliterator<E> spliterator(@ReceiverDependentMutable HashSet<E> this) {
         return new HashMap.KeySpliterator<>(map, 0, -1, 0, 0);
     }
 

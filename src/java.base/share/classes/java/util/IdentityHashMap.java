@@ -1100,7 +1100,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
         }
 
         @SideEffectFree
-        public Spliterator<K> spliterator(@Readonly KeySet this) {
+        public Spliterator<K> spliterator(@ReceiverDependentMutable KeySet this) {
             return new KeySpliterator<>(IdentityHashMap.this, 0, -1, 0, 0);
         }
     }
@@ -1196,7 +1196,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
         }
 
         @SideEffectFree
-        public Spliterator<V> spliterator(@Readonly Values this) {
+        public Spliterator<V> spliterator(@ReceiverDependentMutable Values this) {
             return new ValueSpliterator<>(IdentityHashMap.this, 0, -1, 0, 0);
         }
     }
@@ -1325,7 +1325,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
         }
 
         @SideEffectFree
-        public Spliterator<Map.@Readonly Entry<K,V>> spliterator(@Readonly EntrySet this) {
+        public Spliterator<Map.@Readonly Entry<K,V>> spliterator(@ReceiverDependentMutable EntrySet this) {
             return new EntrySpliterator<>(IdentityHashMap.this, 0, -1, 0, 0);
         }
     }

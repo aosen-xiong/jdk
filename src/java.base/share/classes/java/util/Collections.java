@@ -2244,7 +2244,7 @@ public class Collections {
         }
         @SideEffectFree
         @Override
-        public Spliterator<E> spliterator(@Readonly SynchronizedCollection<E> this) {
+        public Spliterator<E> spliterator(@ReceiverDependentMutable SynchronizedCollection<E> this) {
             return c.spliterator(); // Must be manually synched by user!
         }
         @Override
@@ -6003,7 +6003,7 @@ public class Collections {
 
         @SideEffectFree
         @Override
-        public Spliterator<E> spliterator(@Readonly SetFromMap<E> this) {return s.spliterator();}
+        public Spliterator<E> spliterator(@ReceiverDependentMutable SetFromMap<E> this) {return s.spliterator();}
         @Override
         public Stream<E> stream(@Readonly SetFromMap<E> this)           {return s.stream();}
         @Override
