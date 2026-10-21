@@ -352,7 +352,7 @@ public abstract non-sealed class DynamicConstantDesc<T>
      *
      */
     @Override
-    public final boolean equals(Object o) {
+    public final boolean equals(@Readonly Object o) {
         if (this == o) return true;
         return (o instanceof DynamicConstantDesc<?> desc)
                 && Objects.equals(bootstrapMethod, desc.bootstrapMethod)
@@ -385,6 +385,7 @@ public abstract non-sealed class DynamicConstantDesc<T>
                              constantType.displayName());
     }
 
+    @Immutable
     private static class AnonymousDynamicConstantDesc<T> extends DynamicConstantDesc<T> {
         AnonymousDynamicConstantDesc(DirectMethodHandleDesc bootstrapMethod, String constantName, ClassDesc constantType, @Readonly ConstantDesc... bootstrapArgs) {
             super(bootstrapMethod, constantName, constantType, bootstrapArgs);

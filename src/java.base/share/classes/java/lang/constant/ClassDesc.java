@@ -30,6 +30,8 @@ import java.lang.invoke.TypeDescriptor;
 import java.util.stream.Stream;
 
 import sun.invoke.util.Wrapper;
+import org.checkerframework.checker.mutability.qual.Immutable;
+import org.checkerframework.checker.mutability.qual.Readonly;
 
 import static java.lang.constant.ConstantUtils.binaryToInternal;
 import static java.lang.constant.ConstantUtils.dropLastChar;
@@ -55,6 +57,7 @@ import static java.util.stream.Collectors.joining;
  *
  * @since 12
  */
+@Immutable
 public sealed interface ClassDesc
         extends ConstantDesc,
                 TypeDescriptor.OfField<ClassDesc>
@@ -328,5 +331,5 @@ public sealed interface ClassDesc
      * @param o the other object
      * @return whether this descriptor is equal to the other object
      */
-    boolean equals(Object o);
+    boolean equals(@Readonly Object o);
 }

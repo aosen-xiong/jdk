@@ -27,6 +27,7 @@ package java.lang.constant;
 import java.lang.invoke.MethodHandles;
 
 import sun.invoke.util.Wrapper;
+import org.checkerframework.checker.mutability.qual.Immutable;
 
 import static java.util.Objects.requireNonNull;
 
@@ -34,6 +35,7 @@ import static java.util.Objects.requireNonNull;
  * A <a href="package-summary.html#nominal">nominal descriptor</a> for the class
  * constant corresponding to a primitive type (e.g., {@code int.class}).
  */
+@Immutable
 final class PrimitiveClassDescImpl
         extends DynamicConstantDesc<Class<?>> implements ClassDesc {
 

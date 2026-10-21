@@ -28,6 +28,8 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.util.Objects;
+import org.checkerframework.checker.mutability.qual.Immutable;
+import org.checkerframework.checker.mutability.qual.Readonly;
 
 import static java.lang.constant.ConstantDescs.CD_void;
 import static java.lang.constant.ConstantUtils.validateClassOrInterface;
@@ -40,6 +42,7 @@ import static java.util.Objects.requireNonNull;
  * {@link MethodHandle}.  A {@linkplain DirectMethodHandleDescImpl} corresponds to
  * a {@code Constant_MethodHandle_info} entry in the constant pool of a classfile.
  */
+@Immutable
 final class DirectMethodHandleDescImpl implements DirectMethodHandleDesc {
 
     private final Kind kind;
@@ -181,7 +184,7 @@ final class DirectMethodHandleDescImpl implements DirectMethodHandleDesc {
      *      is equal to this {@code DirectMethodHandleDescImpl}.
      */
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Readonly Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DirectMethodHandleDescImpl desc = (DirectMethodHandleDescImpl) o;

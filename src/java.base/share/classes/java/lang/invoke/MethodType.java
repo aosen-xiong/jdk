@@ -53,6 +53,10 @@ import sun.invoke.util.BytecodeDescriptor;
 import sun.invoke.util.VerifyType;
 import sun.invoke.util.Wrapper;
 import sun.security.util.SecurityConstants;
+import org.checkerframework.checker.mutability.qual.Immutable;
+import org.checkerframework.checker.mutability.qual.Assignable;
+import org.checkerframework.checker.mutability.qual.Readonly;
+import org.checkerframework.checker.mutability.qual.Mutable;
 
 import static java.lang.invoke.MethodHandleStatics.UNSAFE;
 import static java.lang.invoke.MethodHandleStatics.newIllegalArgumentException;
@@ -138,6 +142,7 @@ import static java.lang.invoke.MethodType.fromDescriptor;
  * @author John Rose, JSR 292 EG
  * @since 1.7
  */
+@Immutable
 public final
 class MethodType
         implements Constable,
@@ -148,27 +153,27 @@ class MethodType
 
     // The rtype and ptypes fields define the structural identity of the method type:
     private final @Stable Class<?>   rtype;
-    private final @Stable Class<?>[] ptypes;
+    private final @Stable Class<?> @Readonly [] ptypes;
 
     // The remaining fields are caches of various sorts:
-    private @Stable MethodTypeForm form; // erased form, plus cached data about primitives
-    private @Stable Object wrapAlt;  // alternative wrapped/unwrapped version and
+    private @Assignable @Stable @Mutable MethodTypeForm form; // erased form, plus cached data about primitives
+    private @Assignable @Stable @Readonly Object wrapAlt;  // alternative wrapped/unwrapped version and
                                      // private communication for readObject and readResolve
-    private @Stable Invokers invokers;   // cache of handy higher-order adapters
-    private @Stable String methodDescriptor;  // cache for toMethodDescriptorString
+    private @Assignable @Stable @Mutable Invokers invokers;   // cache of handy higher-order adapters
+    private @Assignable @Stable String methodDescriptor;  // cache for toMethodDescriptorString
 
     /**
      * Constructor that performs no copying or validation.
      * Should only be called from the factory method makeImpl
      */
-    private MethodType(Class<?> rtype, Class<?>[] ptypes) {
+    private MethodType(Class<?> rtype, Class<?> @Readonly [] ptypes) {
         this.rtype = rtype;
         this.ptypes = ptypes;
     }
 
     /*trusted*/ MethodTypeForm form() { return form; }
     /*trusted*/ Class<?> rtype() { return rtype; }
-    /*trusted*/ Class<?>[] ptypes() { return ptypes; }
+    /*trusted*/ Class<?> @Readonly [] ptypes() { return ptypes; }
 
     void setForm(MethodTypeForm f) { form = f; }
 
@@ -206,7 +211,7 @@ class MethodType
     static final int MAX_MH_INVOKER_ARITY = MAX_MH_ARITY-1;  // deduct one more for invoker
 
     /** Return number of extra slots (count of long/double args). */
-    private static int checkPtypes(Class<?>[] ptypes) {
+    private static int checkPtypes(Class<?> @Readonly [] ptypes) {
         int slots = 0;
         for (Class<?> ptype : ptypes) {
             Objects.requireNonNull(ptype);
@@ -228,7 +233,7 @@ class MethodType
         if ((count & MAX_JVM_ARITY) != count)
             throw newIllegalArgumentException("bad parameter count "+count);
     }
-    private static IndexOutOfBoundsException newIndexOutOfBoundsException(Object num) {
+    private static IndexOutOfBoundsException newIndexOutOfBoundsException(@Readonly Object num) {
         if (num instanceof Integer)  num = "bad index: "+num;
         return new IndexOutOfBoundsException(num.toString());
     }
@@ -245,7 +250,7 @@ class MethodType
      * @throws NullPointerException if {@code rtype} or {@code ptypes} or any element of {@code ptypes} is null
      * @throws IllegalArgumentException if any element of {@code ptypes} is {@code void.class}
      */
-    public static MethodType methodType(Class<?> rtype, Class<?>[] ptypes) {
+    public static MethodType methodType(Class<?> rtype, Class<?> @Readonly [] ptypes) {
         return makeImpl(rtype, ptypes, false);
     }
 
@@ -258,12 +263,12 @@ class MethodType
      * @throws NullPointerException if {@code rtype} or {@code ptypes} or any element of {@code ptypes} is null
      * @throws IllegalArgumentException if any element of {@code ptypes} is {@code void.class}
      */
-    public static MethodType methodType(Class<?> rtype, List<Class<?>> ptypes) {
+    public static MethodType methodType(Class<?> rtype, @Readonly List<Class<?>> ptypes) {
         boolean notrust = false;  // random List impl. could return evil ptypes array
         return makeImpl(rtype, listToArray(ptypes), notrust);
     }
 
-    private static Class<?>[] listToArray(List<Class<?>> ptypes) {
+    private static Class<?>[] listToArray(@Readonly List<Class<?>> ptypes) {
         // sanity check the size before the toArray call, since size might be huge
         checkSlotCount(ptypes.size());
         return ptypes.toArray(NO_PTYPES);
@@ -339,7 +344,7 @@ class MethodType
      * @return the unique method type of the desired structure
      */
     /*trusted*/
-    static MethodType makeImpl(Class<?> rtype, Class<?>[] ptypes, boolean trusted) {
+    static MethodType makeImpl(Class<?> rtype, Class<?> @Readonly [] ptypes, boolean trusted) {
         if (ptypes.length == 0) {
             ptypes = NO_PTYPES; trusted = true;
         }
@@ -417,6 +422,7 @@ class MethodType
      * @throws IllegalArgumentException if {@code nptype} is {@code void.class}
      * @throws NullPointerException if {@code nptype} is null
      */
+    @SuppressWarnings("mutability:illegal.array.write") // ptypes.clone() is a fresh copy that only this method holds, but the checker gives the clone of a @Readonly array the @Readonly qualifier
     public MethodType changeParameterType(int num, Class<?> nptype) {
         if (parameterType(num) == nptype)  return this;
         Class<?>[] nptypes = ptypes.clone();
@@ -529,6 +535,7 @@ class MethodType
      * @return the resulting type
      */
     /*non-public*/
+    @SuppressWarnings("mutability:argument.type.incompatible") // ptypes.clone() is a fresh copy that only this method holds, but the checker gives the clone of a @Readonly array the @Readonly qualifier
     MethodType asSpreaderType(Class<?> arrayType, int pos, int arrayLength) {
         assert(parameterCount() >= arrayLength);
         int spreadPos = pos;
@@ -797,7 +804,7 @@ class MethodType
      * The list will be immutable.
      * @return the parameter types (as an immutable list)
      */
-    public List<Class<?>> parameterList() {
+    public @Readonly List<Class<?>> parameterList() {
         return Collections.unmodifiableList(Arrays.asList(ptypes.clone()));
     }
 
@@ -827,6 +834,7 @@ class MethodType
      * Changes to the array will not result in changes to the type.
      * @return the parameter types (as a fresh copy if necessary)
      */
+    @SuppressWarnings("mutability:return.type.incompatible") // ptypes.clone() is a fresh copy that only this method holds, but the checker gives the clone of a @Readonly array the @Readonly qualifier
     public Class<?>[] parameterArray() {
         return ptypes.clone();
     }
@@ -845,7 +853,7 @@ class MethodType
     @Override
     @Pure
     @EnsuresNonNullIf(expression="#1", result=true)
-    public boolean equals(@Nullable Object x) {
+    public boolean equals(@Nullable @Readonly Object x) {
         if (this == x) {
             return true;
         }
@@ -1029,7 +1037,7 @@ class MethodType
         }
     }
 
-    private boolean canConvertParameters(Class<?>[] srcTypes, Class<?>[] dstTypes) {
+    private boolean canConvertParameters(Class<?> @Readonly [] srcTypes, Class<?> @Readonly [] dstTypes) {
         for (int i = 0; i < srcTypes.length; i++) {
             if (!canConvert(srcTypes[i], dstTypes[i])) {
                 return false;
@@ -1337,12 +1345,12 @@ s.writeObject(this.parameterArray());
      * @return the fully initialized {@code MethodType} object
      */
     @java.io.Serial
-    private Object readResolve() {
+    private @Readonly Object readResolve() {
         // Do not use a trusted path for deserialization:
         //    return makeImpl(rtype, ptypes, true);
         // Verify all operands, and make sure ptypes is unshared:
         // Return a new validated MethodType for the rtype and ptypes passed from readObject.
-        MethodType mt = ((MethodType[])wrapAlt)[0];
+        MethodType mt = ((MethodType @Readonly [])wrapAlt)[0];
         wrapAlt = null;
         return mt;
     }
@@ -1437,7 +1445,7 @@ s.writeObject(this.parameterArray());
              * @see Object#equals(Object)
              */
             @Override
-            public boolean equals(Object obj) {
+            public boolean equals(@Readonly Object obj) {
                 Object mine = get();
                 if (obj instanceof WeakEntry) {
                     Object that = ((WeakEntry) obj).get();
