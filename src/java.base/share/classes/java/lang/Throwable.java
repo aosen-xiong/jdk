@@ -691,12 +691,10 @@ public @UsesObjectEquals class Throwable implements Serializable {
         printStackTrace(new WrappedPrintStream(s));
     }
 
-    // AOSEN: this is annoying that I have to make the receiver type as immutable to make sure the method type check
-    @SuppressWarnings("mutability:argument.type.incompatible") // Add readonly this to dejaVu set
     private void printStackTrace(@Readonly Throwable this, PrintStreamOrWriter s) {
         // Guard against malicious overrides of Throwable.equals by
         // using a Set with identity equality semantics.
-        Set<@Immutable Throwable> dejaVu = Collections.newSetFromMap(new IdentityHashMap<>());
+        Set<@Readonly Throwable> dejaVu = Collections.newSetFromMap(new IdentityHashMap<>());
         dejaVu.add(this);
 
         synchronized (s.lock()) {

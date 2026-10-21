@@ -2190,7 +2190,7 @@ public class Collections {
             synchronized (mutex) {return c.contains(o);}
         }
         @SideEffectFree
-        @SuppressWarnings("mutability") // poly does not work on field's type argument
+        @SuppressWarnings("mutability:return.type.incompatible") // poly does not work on field's type argument
         public @PolyNull @PolySigned @PolyMutable Object[] toArray(@Readonly SynchronizedCollection<@PolyNull @PolySigned @PolyMutable E> this) {
             synchronized (mutex) {return c.toArray();}
         }
@@ -3301,7 +3301,7 @@ public class Collections {
         @EnsuresNonEmptyIf(result = true, expression = "this")
         public boolean contains(@Readonly CheckedCollection<E> this, @UnknownSignedness @Readonly Object o)          { return c.contains(o); }
         @SideEffectFree
-        @SuppressWarnings("mutability") // poly does not work on field's type argument
+        @SuppressWarnings("mutability:return.type.incompatible") // poly does not work on field's type argument
         public @PolyNull @PolySigned @PolyMutable Object[] toArray(Collections.CheckedCollection<@PolyNull @PolySigned @PolyMutable E> this)                  { return c.toArray(); }
         @SideEffectFree
         public <T> @Nullable T[] toArray(@PolyNull T[] a)              { return c.toArray(a); }
@@ -3331,7 +3331,7 @@ public class Collections {
                 @EnsuresNonEmptyIf(result = true, expression = "this")
                 public boolean hasNext() { return it.hasNext(); }
                 public E next(/*@NonEmpty Iterator<E> this*/)          { return it.next(); }
-                @SuppressWarnings("mutability:method.invocation.invalid") // it is this collection's own iterator, with its mutability. remove() runs only on a @Mutable iterator, which only a @Mutable collection creates, but the anonymous class cannot state that it shares its mutability
+                @SuppressWarnings("mutability:method.invocation.invalid") // Iterator<E> cannot name the collection it was created from, so remove() through an iterator over a non-mutable collection is not caught (see the note on java.util.Iterator.remove): https://github.com/eisop/checker-framework/issues/2322
                 public void remove()     {        it.remove(); }
                 public void forEachRemaining(Consumer<? super E> action) {
                     it.forEachRemaining(action);
@@ -3728,11 +3728,10 @@ public class Collections {
         }
         public @Mutable ListIterator<E> listIterator(@ReceiverDependentMutable CheckedList<E> this)   { return listIterator(0); }
 
-        @SuppressWarnings("mutability") // receiver in anonymous class not denotable, see typetool#2433
         public @Mutable ListIterator<E> listIterator(@ReceiverDependentMutable CheckedList<E> this, final int index) {
-            final ListIterator<E> i = list.listIterator(index);
+            final @Mutable ListIterator<E> i = list.listIterator(index);
 
-            return new ListIterator<E>() {
+            return new @Mutable ListIterator<E>() {
                 @Pure
                 @EnsuresNonEmptyIf(result = true, expression = "this")
                 public boolean hasNext()     { return i.hasNext(); }
@@ -6085,7 +6084,7 @@ public class Collections {
         @SideEffectFree
         public @Mutable Iterator<E> iterator(@ReceiverDependentMutable AsLIFOQueue<E> this)               { return q.iterator(); }
         @SideEffectFree
-        @SuppressWarnings("mutability") // poly does not work on field's type argument
+        @SuppressWarnings("mutability:return.type.incompatible") // poly does not work on field's type argument
         public @PolyNull @PolySigned @PolyMutable Object[] toArray(Collections.AsLIFOQueue<@PolyNull @PolySigned @PolyMutable E> this)                   { return q.toArray(); }
         @SideEffectFree
         public <T> @Nullable T[] toArray(@PolyNull T[] a)               { return q.toArray(a); }

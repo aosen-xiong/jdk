@@ -82,6 +82,8 @@ import sun.reflect.annotation.TypeAnnotationParser;
 	    "initialization: using fully-initialized types should make the typical use case easier.",
 	    "lock: require @GuardSatisfied to ensure type system soundness."})
 @AnnotatedFor({"interning", "lock", "nullness", "mutability"})
+// mutability: set* take their target object @Readonly on purpose. Reflection is the sanctioned escape hatch below the type system,
+// so a @Readonly or @Immutable object can be written through it by design.
 @Immutable
 public final
 class Field extends AccessibleObject implements Member {
