@@ -1280,7 +1280,7 @@ public class Collections {
      * @return an unmodifiable view of the specified navigable set
      * @since 1.8
      */
-    @SuppressWarnings("mutability:type.arguments.not.inferred") // UnmodifiableNavigableSet bounds its E by @Immutable, which this method's T does not declare
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
     public static <T> @PolyNonEmpty @PolyMutable NavigableSet<T> unmodifiableNavigableSet(@PolyNonEmpty @PolyMutable NavigableSet<T> s) {
         if (s.getClass() == UnmodifiableNavigableSet.class) {
             return s;
@@ -1295,7 +1295,7 @@ public class Collections {
      * @serial include
      */
     @ReceiverDependentMutable
-    static class UnmodifiableNavigableSet<E extends @Immutable Object>
+    static class UnmodifiableNavigableSet<E>
                              extends UnmodifiableSortedSet<E>
                              implements NavigableSet<E>, Serializable {
 
@@ -5952,14 +5952,14 @@ public class Collections {
      * @since 1.6
      */
     @SideEffectFree
-    public static <E extends @Immutable Object> Set<E> newSetFromMap(Map<E, Boolean> map) {
+    public static <E extends @Readonly Object> Set<E> newSetFromMap(Map<E, Boolean> map) {
         return new SetFromMap<>(map);
     }
 
     /**
      * @serial include
      */
-    @ReceiverDependentMutable private static class SetFromMap<E extends @Immutable Object> extends AbstractSet<E>
+    @ReceiverDependentMutable private static class SetFromMap<E extends @Readonly Object> extends AbstractSet<E>
         implements Set<E>, Serializable
     {
         @SuppressWarnings("serial") // Conditionally serializable
@@ -5988,8 +5988,8 @@ public class Collections {
         @SideEffectFree
         public @Mutable Iterator<E> iterator(@ReceiverDependentMutable SetFromMap<E> this)     { return s.iterator(); }
         @SideEffectFree
-        @SuppressWarnings("mutability:override.return.invalid") // E extends @Immutable Object, so every element is @Immutable. That is the precise return, which an override of a @PolyMutable return cannot state
-        public @PolyNull @PolySigned @Immutable Object[] toArray(Collections.SetFromMap<@PolyNull @PolySigned E> this)         { return s.toArray(); }
+        @SuppressWarnings("mutability:override.return.invalid") // the elements are only @Readonly-bounded, so the precise return is @Readonly Object[], which an override of a @PolyMutable return cannot state
+        public @PolyNull @PolySigned @Readonly Object[] toArray(Collections.SetFromMap<@PolyNull @PolySigned E> this)         { return s.toArray(); }
         @SideEffectFree
         public <T> @Nullable T[] toArray(@PolyNull T[] a)     { return s.toArray(a); }
         public String toString(@Readonly SetFromMap<E> this)          { return s.toString(); }

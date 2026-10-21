@@ -1558,7 +1558,7 @@ final class CollSer implements Serializable {
      * @since 9
      */
     @java.io.Serial
-    @SuppressWarnings("mutability:argument.type.incompatible") // array component type
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:type.arguments.not.inferred"}) // array component type: the deserialized array holds @Readonly Objects, from which the @Immutable element and key bounds of Set.of and the maps cannot be recovered
     private @Immutable Object readResolve() throws ObjectStreamException {
         try {
             if (array == null) {

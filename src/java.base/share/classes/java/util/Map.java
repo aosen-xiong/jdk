@@ -574,7 +574,7 @@ public interface Map<K extends @Readonly Object, V> {
          */
         @Pure
         @SuppressWarnings("mutability") // covariant
-        public static <K extends @Immutable Comparable<? super K>, V> @Readonly Comparator<Map.@Readonly Entry<K, V>> comparingByKey() {
+        public static <K extends @Readonly Comparable<? super K>, V> @Readonly Comparator<Map.@Readonly Entry<K, V>> comparingByKey() {
             return (@Readonly Comparator<Map.@Readonly Entry<K, V>> & Serializable)
                 (c1, c2) -> c1.getKey().compareTo(c2.getKey());
         }
@@ -592,7 +592,7 @@ public interface Map<K extends @Readonly Object, V> {
          * @since 1.8
          */
         @Pure
-        public static <K extends @Immutable Object, V extends Comparable<? super V>> @Readonly Comparator<Map.@Readonly Entry<K, V>> comparingByValue() {
+        public static <K extends @Readonly Object, V extends Comparable<? super V>> @Readonly Comparator<Map.@Readonly Entry<K, V>> comparingByValue() {
             return (@Readonly Comparator<Map.@Readonly Entry<K, V>> & Serializable)
                 (c1, c2) -> c1.getValue().compareTo(c2.getValue());
         }
@@ -611,7 +611,7 @@ public interface Map<K extends @Readonly Object, V> {
          * @since 1.8
          */
         @Pure
-        public static <K extends @Immutable Object, V> @Readonly Comparator<Map.@Readonly Entry<K, V>> comparingByKey(@Readonly Comparator<? super K> cmp) {
+        public static <K extends @Readonly Object, V> @Readonly Comparator<Map.@Readonly Entry<K, V>> comparingByKey(@Readonly Comparator<? super K> cmp) {
             Objects.requireNonNull(cmp);
             return (@Readonly Comparator<Map.@Readonly Entry<K, V>> & Serializable)
                 (c1, c2) -> cmp.compare(c1.getKey(), c2.getKey());
@@ -631,7 +631,7 @@ public interface Map<K extends @Readonly Object, V> {
          * @since 1.8
          */
         @Pure
-        public static <K extends @Immutable Object, V> @Readonly Comparator<Map.@Readonly Entry<K, V>> comparingByValue(@Readonly Comparator<? super V> cmp) {
+        public static <K extends @Readonly Object, V> @Readonly Comparator<Map.@Readonly Entry<K, V>> comparingByValue(@Readonly Comparator<? super V> cmp) {
             Objects.requireNonNull(cmp);
             return (@Readonly Comparator<Map.@Readonly Entry<K, V>> & Serializable)
                 (c1, c2) -> cmp.compare(c1.getValue(), c2.getValue());

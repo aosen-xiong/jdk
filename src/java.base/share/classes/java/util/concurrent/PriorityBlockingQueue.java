@@ -47,6 +47,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
 import org.checkerframework.checker.mutability.qual.Mutable;
+import org.checkerframework.checker.mutability.qual.Immutable;
 import org.checkerframework.checker.signedness.qual.PolySigned;
 import org.checkerframework.checker.signedness.qual.UnknownSignedness;
 import org.checkerframework.dataflow.qual.Pure;
@@ -130,7 +131,7 @@ import jdk.internal.util.ArraysSupport;
  */
 @AnnotatedFor({"nullness"})
 @SuppressWarnings("unchecked")
-public class PriorityBlockingQueue<E extends Object> extends AbstractQueue<E>
+public class PriorityBlockingQueue<E extends @Immutable Object> extends AbstractQueue<E>
     implements BlockingQueue<E>, java.io.Serializable {
     private static final long serialVersionUID = 5595510919245408276L;
 

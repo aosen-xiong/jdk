@@ -36,6 +36,7 @@
 package java.util.concurrent;
 
 import org.checkerframework.checker.mutability.qual.Readonly;
+import org.checkerframework.checker.mutability.qual.Immutable;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nonempty.qual.EnsuresNonEmptyIf;
 import org.checkerframework.checker.nonempty.qual.NonEmpty;
@@ -124,7 +125,7 @@ import java.util.concurrent.atomic.LongAdder;
  * @since 1.6
  */
 @AnnotatedFor({"nullness"})
-public class ConcurrentSkipListMap<K,V> extends AbstractMap<K,V>
+public class ConcurrentSkipListMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
     implements ConcurrentNavigableMap<K,V>, Cloneable, Serializable {
     /*
      * This class implements a tree-like two-dimensionally linked skip
