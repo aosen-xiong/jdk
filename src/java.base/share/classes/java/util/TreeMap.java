@@ -1366,7 +1366,7 @@ public class TreeMap<K extends @Immutable Object,V>
             return TreeMap.this.containsValue(o);
         }
 
-        public boolean remove(@UnknownSignedness @Readonly Object o) {
+        public boolean remove(@Mutable TreeMap<K,V>.@Mutable Values this, @UnknownSignedness @Readonly Object o) {
             for (Entry<K,V> e = getFirstEntry(); e != null; e = successor(e)) {
                 if (valEquals(e.getValue(), o)) {
                     deleteEntry(e);
@@ -1376,7 +1376,7 @@ public class TreeMap<K extends @Immutable Object,V>
             return false;
         }
 
-        public void clear() {
+        public void clear(@Mutable TreeMap<K,V>.@Mutable Values this) {
             TreeMap.this.clear();
         }
 
@@ -1403,7 +1403,7 @@ public class TreeMap<K extends @Immutable Object,V>
             return p != null && valEquals(p.getValue(), value);
         }
 
-        public boolean remove(@UnknownSignedness @Readonly Object o) {
+        public boolean remove(@Mutable TreeMap<K,V>.@Mutable EntrySet this, @UnknownSignedness @Readonly Object o) {
             if (!(o instanceof Map.@Readonly  Entry<?, ?> entry))
                 return false;
             Object value = entry.getValue();
@@ -1420,7 +1420,7 @@ public class TreeMap<K extends @Immutable Object,V>
             return TreeMap.this.size();
         }
 
-        public void clear() {
+        public void clear(@Mutable TreeMap<K,V>.@Mutable EntrySet this) {
             TreeMap.this.clear();
         }
 

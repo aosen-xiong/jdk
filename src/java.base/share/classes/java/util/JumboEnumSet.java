@@ -37,6 +37,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.mutability.qual.ReceiverDependentMutable;
 import org.checkerframework.checker.mutability.qual.Readonly;
 import org.checkerframework.checker.mutability.qual.PolyMutable;
+import org.checkerframework.checker.mutability.qual.Assignable;
 import org.checkerframework.checker.mutability.qual.Mutable;
 import org.checkerframework.checker.signedness.qual.UnknownSignedness;
 import org.checkerframework.dataflow.qual.Pure;
@@ -55,6 +56,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @serial exclude
  */
 @AnnotatedFor({"index", "mutability"})
+@ReceiverDependentMutable
 class JumboEnumSet<E extends Enum<E>> extends EnumSet<E> {
     @java.io.Serial
     private static final long serialVersionUID = 334349849919042784L;
@@ -69,12 +71,12 @@ class JumboEnumSet<E extends Enum<E>> extends EnumSet<E> {
     // Redundant - maintained for performance
     private int size = 0;
 
-    JumboEnumSet(Class<E>elementType, Enum<?>[] universe) {
+    JumboEnumSet(Class<E>elementType, Enum<?> @ReceiverDependentMutable [] universe) {
         super(elementType, universe);
-        elements = new long[(universe.length + 63) >>> 6];
+        elements = new long @ReceiverDependentMutable [(universe.length + 63) >>> 6];
     }
 
-    void addRange(E from, E to) {
+    void addRange(@Mutable JumboEnumSet<E> this, E from, E to) {
         int fromIndex = from.ordinal() >>> 6;
         int toIndex = to.ordinal() >>> 6;
 
@@ -90,14 +92,14 @@ class JumboEnumSet<E extends Enum<E>> extends EnumSet<E> {
         size = to.ordinal() - from.ordinal() + 1;
     }
 
-    void addAll() {
+    void addAll(@Mutable JumboEnumSet<E> this) {
         for (int i = 0; i < elements.length; i++)
             elements[i] = -1;
         elements[elements.length - 1] >>>= -universe.length;
         size = universe.length;
     }
 
-    void complement() {
+    void complement(@Mutable JumboEnumSet<E> this) {
         for (int i = 0; i < elements.length; i++)
             elements[i] = ~elements[i];
         elements[elements.length - 1] &= (-1L >>> -universe.length);
@@ -113,21 +115,22 @@ class JumboEnumSet<E extends Enum<E>> extends EnumSet<E> {
      *
      * @return an iterator over the elements contained in this set
      */
-    public @Mutable @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@PolyGrowShrink @PolyNonEmpty JumboEnumSet<E> this) {
+    public @Mutable @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty JumboEnumSet<E> this) {
         return new @Mutable EnumSetIterator<>();
     }
 
+    @Mutable
     private class EnumSetIterator<E extends Enum<E>> implements Iterator<E> {
         /**
          * A bit vector representing the elements in the current "word"
          * of the set not yet returned by this iterator.
          */
-        long unseen;
+        @Assignable long unseen; // lookahead buffer: hasNext(@Readonly) skips empty words, which leaves the remaining sequence unchanged
 
         /**
          * The index corresponding to unseen in the elements array.
          */
-        int unseenIndex = 0;
+        @Assignable int unseenIndex = 0; // advanced by the same lookahead
 
         /**
          * The bit representing the last element returned by this iterator
@@ -147,7 +150,7 @@ class JumboEnumSet<E extends Enum<E>> extends EnumSet<E> {
         @Override
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
-        public boolean hasNext() {
+        public boolean hasNext(@Readonly EnumSetIterator<E> this) {
             while (unseen == 0 && unseenIndex < elements.length - 1)
                 unseen = elements[++unseenIndex];
             return unseen != 0;
@@ -166,7 +169,7 @@ class JumboEnumSet<E extends Enum<E>> extends EnumSet<E> {
         }
 
         @Override
-        public void remove() {
+        public void remove(@Mutable EnumSetIterator<E> this) {
             if (lastReturned == 0)
                 throw new IllegalStateException();
             final long oldElements = elements[lastReturnedIndex];
@@ -184,7 +187,7 @@ class JumboEnumSet<E extends Enum<E>> extends EnumSet<E> {
      * @return the number of elements in this set
      */
     @Pure
-    public @NonNegative int size() {
+    public @NonNegative int size(@Readonly JumboEnumSet<E> this) {
         return size;
     }
 
@@ -195,7 +198,7 @@ class JumboEnumSet<E extends Enum<E>> extends EnumSet<E> {
      */
     @Pure
     @EnsuresNonEmptyIf(result = false, expression = "this")
-    public boolean isEmpty() {
+    public boolean isEmpty(@Readonly JumboEnumSet<E> this) {
         return size == 0;
     }
 
@@ -207,7 +210,7 @@ class JumboEnumSet<E extends Enum<E>> extends EnumSet<E> {
      */
     @Pure
     @EnsuresNonEmptyIf(result = true, expression = "this")
-    public boolean contains(@GuardSatisfied @Nullable @UnknownSignedness @Readonly Object e) {
+    public boolean contains(@Readonly JumboEnumSet<E> this, @GuardSatisfied @Nullable @UnknownSignedness @Readonly Object e) {
         if (e == null)
             return false;
         Class<?> eClass = e.getClass();
@@ -229,7 +232,7 @@ class JumboEnumSet<E extends Enum<E>> extends EnumSet<E> {
      * @throws NullPointerException if {@code e} is null
      */
     @EnsuresNonEmpty("this")
-    public boolean add(E e) {
+    public boolean add(@Mutable JumboEnumSet<E> this, E e) {
         typeCheck(e);
 
         int eOrdinal = e.ordinal();
@@ -249,7 +252,7 @@ class JumboEnumSet<E extends Enum<E>> extends EnumSet<E> {
      * @param e element to be removed from this set, if present
      * @return {@code true} if the set contained the specified element
      */
-    public boolean remove(@GuardSatisfied @Nullable @UnknownSignedness @Readonly Object e) {
+    public boolean remove(@Mutable JumboEnumSet<E> this, @GuardSatisfied @Nullable @UnknownSignedness @Readonly Object e) {
         if (e == null)
             return false;
         Class<?> eClass = e.getClass();
@@ -278,7 +281,7 @@ class JumboEnumSet<E extends Enum<E>> extends EnumSet<E> {
      * @throws NullPointerException if the specified collection is null
      */
     @Pure
-    public boolean containsAll(@Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) {
+    public boolean containsAll(@Readonly JumboEnumSet<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) {
         if (!(c instanceof JumboEnumSet<?> es))
             return super.containsAll(c);
 
@@ -299,7 +302,7 @@ class JumboEnumSet<E extends Enum<E>> extends EnumSet<E> {
      * @throws NullPointerException if the specified collection or any of
      *     its elements are null
      */
-    public boolean addAll(@Readonly Collection<? extends E> c) {
+    public boolean addAll(@Mutable JumboEnumSet<E> this, @Readonly Collection<? extends E> c) {
         if (!(c instanceof JumboEnumSet<?> es))
             return super.addAll(c);
 
@@ -324,7 +327,7 @@ class JumboEnumSet<E extends Enum<E>> extends EnumSet<E> {
      * @return {@code true} if this set changed as a result of the call
      * @throws NullPointerException if the specified collection is null
      */
-    public boolean removeAll(@Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) {
+    public boolean removeAll(@Mutable JumboEnumSet<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) {
         if (!(c instanceof JumboEnumSet<?> es))
             return super.removeAll(c);
 
@@ -344,7 +347,7 @@ class JumboEnumSet<E extends Enum<E>> extends EnumSet<E> {
      * @return {@code true} if this set changed as a result of the call
      * @throws NullPointerException if the specified collection is null
      */
-    public boolean retainAll(@Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) {
+    public boolean retainAll(@Mutable JumboEnumSet<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) {
         if (!(c instanceof JumboEnumSet<?> es))
             return super.retainAll(c);
 
@@ -362,7 +365,7 @@ class JumboEnumSet<E extends Enum<E>> extends EnumSet<E> {
     /**
      * Removes all of the elements from this set.
      */
-    public void clear() {
+    public void clear(@Mutable JumboEnumSet<E> this) {
         Arrays.fill(elements, 0);
         size = 0;
     }
@@ -378,7 +381,7 @@ class JumboEnumSet<E extends Enum<E>> extends EnumSet<E> {
      */
     @Pure
     @EnsuresNonNullIf(expression="#1", result=true)
-    public boolean equals(@Nullable @Readonly Object o) {
+    public boolean equals(@Readonly JumboEnumSet<E> this, @Nullable @Readonly Object o) {
         if (!(o instanceof JumboEnumSet<?> es))
             return super.equals(o);
 
@@ -391,7 +394,7 @@ class JumboEnumSet<E extends Enum<E>> extends EnumSet<E> {
     /**
      * Recalculates the size of the set.  Returns true if it's changed.
      */
-    private boolean recalculateSize() {
+    private boolean recalculateSize(@Mutable JumboEnumSet<E> this) {
         int oldSize = size;
         size = 0;
         for (long elt : elements)

@@ -488,8 +488,7 @@ public @UsesObjectEquals class Throwable implements Serializable {
      *         been called on this throwable.
      * @since  1.4
      */
-    @SuppressWarnings("mutability:illegal.field.write") // should the receiver be underinitialization then?
-    public synchronized @PolyInitialized @ReceiverDependentMutable Throwable initCause(@PolyInitialized Throwable this, @Nullable @ReceiverDependentMutable Throwable cause) {
+    public synchronized @PolyInitialized @ReceiverDependentMutable Throwable initCause(@PolyInitialized @Mutable Throwable this, @Nullable @ReceiverDependentMutable Throwable cause) {
         if (this.cause != this)
             throw new @ReceiverDependentMutable IllegalStateException("Can't overwrite cause with " +
                                             Objects.toString(cause, "a null"), this);
