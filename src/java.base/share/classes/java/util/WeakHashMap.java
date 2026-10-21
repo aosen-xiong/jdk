@@ -885,8 +885,9 @@ public class WeakHashMap<K extends @Immutable Object,V>
     }
 
     @Mutable
-    private class EntryIterator extends HashIterator<Map.Entry<K,V>> {
-        public Map.Entry<K,V> next(@NonEmpty @Mutable EntryIterator this) {
+    private class EntryIterator extends HashIterator<Map.@ReceiverDependentMutable Entry<K,V>> {
+        @SuppressWarnings({"mutability:return.type.incompatible", "mutability:override.return.invalid"}) // the entries have the enclosing map's mutability, but the cursor reads them through the @Readonly enclosing map, and in the iterator's supertype a receiver-dependent qualifier is relative to the iterator, a fresh @Mutable cursor. There is no qualifier relative to the enclosing instance: https://github.com/eisop/checker-framework/issues/2322
+        public Map.@ReceiverDependentMutable Entry<K,V> next(@NonEmpty @Mutable EntryIterator this) {
             return nextEntry();
         }
     }
@@ -909,10 +910,10 @@ public class WeakHashMap<K extends @Immutable Object,V>
      * operations.
      */
     @SideEffectFree
-    public @PolyMutable Set<@KeyFor({"this"}) K> keySet(@GuardSatisfied @PolyMutable WeakHashMap<K, V> this) {
+    public @ReceiverDependentMutable Set<@KeyFor({"this"}) K> keySet(@GuardSatisfied @ReceiverDependentMutable WeakHashMap<K, V> this) {
         Set<K> ks = keySet;
         if (ks == null) {
-            ks = new @PolyMutable KeySet();
+            ks = new @ReceiverDependentMutable KeySet();
             keySet = ks;
         }
         return ks;
@@ -969,10 +970,10 @@ public class WeakHashMap<K extends @Immutable Object,V>
      * support the {@code add} or {@code addAll} operations.
      */
     @SideEffectFree
-    public @PolyMutable Collection<V> values(@GuardSatisfied @PolyMutable WeakHashMap<K, V> this) {
+    public @ReceiverDependentMutable Collection<V> values(@GuardSatisfied @ReceiverDependentMutable WeakHashMap<K, V> this) {
         Collection<V> vs = values;
         if (vs == null) {
-            vs = new Values();
+            vs = new @ReceiverDependentMutable Values();
             values = vs;
         }
         return vs;
@@ -1021,15 +1022,16 @@ public class WeakHashMap<K extends @Immutable Object,V>
      * {@code add} or {@code addAll} operations.
      */
     @SideEffectFree
-    public @PolyMutable Set<Map.@PolyMutable Entry<@KeyFor({"this"}) K,V>> entrySet(@GuardSatisfied @PolyMutable WeakHashMap<K, V> this) {
+    public @ReceiverDependentMutable Set<Map.@ReceiverDependentMutable Entry<@KeyFor({"this"}) K,V>> entrySet(@GuardSatisfied @ReceiverDependentMutable WeakHashMap<K, V> this) {
         Set<Map.Entry<K,V>> es = entrySet;
-        return es != null ? es : (entrySet = new EntrySet());
+        return es != null ? es : (entrySet = new @ReceiverDependentMutable EntrySet());
     }
 
     @ReceiverDependentMutable
-    private class EntrySet extends AbstractSet<Map.@Readonly Entry<K,V>> {
+    private class EntrySet extends AbstractSet<Map.@ReceiverDependentMutable Entry<K,V>> {
         @SideEffectFree
-        public @Mutable Iterator<Map.@Readonly Entry<K,V>> iterator(@ReceiverDependentMutable EntrySet this) {
+        @SuppressWarnings("mutability:return.type.incompatible") // the entries have the enclosing map's mutability, but in the iterator class's supertype a receiver-dependent qualifier is relative to the iterator, which is a fresh @Mutable cursor. There is no qualifier relative to the enclosing instance: https://github.com/eisop/checker-framework/issues/2322
+        public @Mutable Iterator<Map.@ReceiverDependentMutable Entry<K,V>> iterator(@ReceiverDependentMutable EntrySet this) {
             return new EntryIterator();
         }
 

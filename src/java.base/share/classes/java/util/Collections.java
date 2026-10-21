@@ -2749,8 +2749,9 @@ public class Collections {
      * @param  m the map to be "wrapped" in a synchronized map.
      * @return a synchronized view of the specified map.
      */
-    public static <K extends @Readonly Object,V> Map<K,V> synchronizedMap(Map<K,V> m) {
-        return new SynchronizedMap<>(m);
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
+    public static <K extends @Readonly Object,V> @PolyMutable Map<K,V> synchronizedMap(@PolyMutable Map<K,V> m) {
+        return new @PolyMutable SynchronizedMap<>(m);
     }
 
     /**
@@ -2956,8 +2957,9 @@ public class Collections {
      * @param  m the sorted map to be "wrapped" in a synchronized sorted map.
      * @return a synchronized view of the specified sorted map.
      */
-    public static <K extends @Readonly Object,V> SortedMap<K,V> synchronizedSortedMap(SortedMap<K,V> m) {
-        return new SynchronizedSortedMap<>(m);
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
+    public static <K extends @Readonly Object,V> @PolyMutable SortedMap<K,V> synchronizedSortedMap(@PolyMutable SortedMap<K,V> m) {
+        return new @PolyMutable SynchronizedSortedMap<>(m);
     }
 
     /**
@@ -3061,8 +3063,9 @@ public class Collections {
      * @return a synchronized view of the specified navigable map.
      * @since 1.8
      */
-    public static <K extends @Readonly Object,V> NavigableMap<K,V> synchronizedNavigableMap(NavigableMap<K,V> m) {
-        return new SynchronizedNavigableMap<>(m);
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
+    public static <K extends @Readonly Object,V> @PolyMutable NavigableMap<K,V> synchronizedNavigableMap(@PolyMutable NavigableMap<K,V> m) {
+        return new @PolyMutable SynchronizedNavigableMap<>(m);
     }
 
     /**
@@ -3249,9 +3252,10 @@ public class Collections {
      * @return a dynamically typesafe view of the specified collection
      * @since 1.5
      */
-    public static <E> @PolyGrowShrink @PolyNonEmpty Collection<E> checkedCollection(@PolyGrowShrink @PolyNonEmpty Collection<E> c,
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
+    public static <E> @PolyMutable @PolyGrowShrink @PolyNonEmpty Collection<E> checkedCollection(@PolyMutable @PolyGrowShrink @PolyNonEmpty Collection<E> c,
                                                       Class<E> type) {
-        return new CheckedCollection<>(c, type);
+        return new @PolyMutable CheckedCollection<>(c, type);
     }
 
     @SuppressWarnings("unchecked")
@@ -3420,8 +3424,9 @@ public class Collections {
      * @return a dynamically typesafe view of the specified queue
      * @since 1.8
      */
-    public static <E> @PolyGrowShrink @PolyNonEmpty Queue<E> checkedQueue(@PolyGrowShrink @PolyNonEmpty Queue<E> queue, Class<E> type) {
-        return new CheckedQueue<>(queue, type);
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
+    public static <E> @PolyMutable @PolyGrowShrink @PolyNonEmpty Queue<E> checkedQueue(@PolyMutable @PolyGrowShrink @PolyNonEmpty Queue<E> queue, Class<E> type) {
+        return new @PolyMutable CheckedQueue<>(queue, type);
     }
 
     /**
@@ -3480,8 +3485,9 @@ public class Collections {
      * @return a dynamically typesafe view of the specified set
      * @since 1.5
      */
-    public static <E> Set<E> checkedSet(Set<E> s, Class<E> type) {
-        return new CheckedSet<>(s, type);
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
+    public static <E> @PolyMutable Set<E> checkedSet(@PolyMutable Set<E> s, Class<E> type) {
+        return new @PolyMutable CheckedSet<>(s, type);
     }
 
     /**
@@ -3678,10 +3684,11 @@ public class Collections {
      * @return a dynamically typesafe view of the specified list
      * @since 1.5
      */
-    public static <E> @PolyGrowShrink @PolyNonEmpty List<E> checkedList(@PolyGrowShrink @PolyNonEmpty List<E> list, Class<E> type) {
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
+    public static <E> @PolyMutable @PolyGrowShrink @PolyNonEmpty List<E> checkedList(@PolyMutable @PolyGrowShrink @PolyNonEmpty List<E> list, Class<E> type) {
         return (list instanceof RandomAccess ?
-                new CheckedRandomAccessList<>(list, type) :
-                new CheckedList<>(list, type));
+                new @PolyMutable CheckedRandomAccessList<>(list, type) :
+                new @PolyMutable CheckedList<>(list, type));
     }
 
     /**
@@ -6042,8 +6049,9 @@ public class Collections {
      * @return the queue
      * @since  1.6
      */
-    public static <T> @Readonly @PolyGrowShrink @PolyNonEmpty Queue<T> asLifoQueue(@PolyGrowShrink @PolyNonEmpty Deque<T> deque) {
-        return new AsLIFOQueue<>(Objects.requireNonNull(deque));
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter", "mutability:type.arguments.not.inferred"}) // one poly: the argument and the created object are the same instantiation
+    public static <T> @PolyMutable @PolyGrowShrink @PolyNonEmpty Queue<T> asLifoQueue(@PolyMutable @PolyGrowShrink @PolyNonEmpty Deque<T> deque) {
+        return new @PolyMutable AsLIFOQueue<>(Objects.requireNonNull(deque));
     }
 
     /**
