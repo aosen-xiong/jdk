@@ -100,9 +100,9 @@ public abstract class EnumSet<E extends Enum<E>> extends AbstractSet<E>
     /**
      * All of the values comprising E.  (Cached for performance.)
      */
-    final transient Enum<?>[] universe;
+    final transient Enum<?> @Readonly [] universe; // the enum class's shared constants array, never written
 
-    EnumSet(Class<E>elementType, Enum<?> @ReceiverDependentMutable [] universe) {
+    EnumSet(Class<E>elementType, Enum<?> @Readonly [] universe) {
         this.elementType = elementType;
         this.universe    = universe;
     }
@@ -412,7 +412,7 @@ public abstract class EnumSet<E extends Enum<E>> extends AbstractSet<E>
      * Returns all of the values comprising E.
      * The result is uncloned, cached, and shared by all callers.
      */
-    private static <E extends Enum<E>> E[] getUniverse(Class<E> elementType) {
+    private static <E extends Enum<E>> E @Readonly [] getUniverse(Class<E> elementType) {
         return SharedSecrets.getJavaLangAccess()
                                         .getEnumConstantsShared(elementType);
     }

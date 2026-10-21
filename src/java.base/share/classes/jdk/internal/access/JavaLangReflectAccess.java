@@ -27,6 +27,7 @@ package jdk.internal.access;
 
 import java.lang.reflect.*;
 import jdk.internal.reflect.*;
+import org.checkerframework.checker.mutability.qual.Readonly;
 
 /** An interface which gives privileged packages Java-level access to
     internals of java.lang.reflect. */
@@ -74,7 +75,7 @@ public interface JavaLangReflectAccess {
     public byte[] getConstructorParameterAnnotations(Constructor<?> c);
 
     /** Gets the shared array of parameter types of an Executable. */
-    public Class<?>[] getExecutableSharedParameterTypes(Executable ex);
+    public Class<?> @Readonly [] getExecutableSharedParameterTypes(Executable ex);
 
     //
     // Copying routines, needed to quickly fabricate new Field,

@@ -314,7 +314,7 @@ public final class Method extends Executable {
     }
 
     @Override
-    Class<?>[] getSharedParameterTypes() {
+    Class<?> @Readonly [] getSharedParameterTypes() {
         return parameterTypes;
     }
 

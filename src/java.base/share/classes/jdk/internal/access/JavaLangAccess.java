@@ -49,6 +49,8 @@ import sun.reflect.annotation.AnnotationType;
 import sun.nio.ch.Interruptible;
 
 import org.checkerframework.checker.mutability.qual.ReceiverDependentMutable;
+import org.checkerframework.checker.mutability.qual.Readonly;
+import org.checkerframework.checker.mutability.qual.Immutable;
 
 public interface JavaLangAccess {
 
@@ -104,7 +106,7 @@ public interface JavaLangAccess {
      * Class object does not represent an enum type;
      * the result is uncloned, cached, and shared by all callers.
      */
-    <E extends Enum<E>> E @ReceiverDependentMutable [] getEnumConstantsShared(Class<E> klass);
+    <E extends Enum<E>> E @Readonly [] getEnumConstantsShared(Class<E> klass);
 
     /**
      * Set current thread's blocker field.
@@ -324,7 +326,7 @@ public interface JavaLangAccess {
      * @return the encoded bytes
      * @throws CharacterCodingException for malformed input or unmappable characters
      */
-    byte[] getBytesNoRepl(String s, Charset cs) throws CharacterCodingException;
+    byte @Immutable [] getBytesNoRepl(String s, Charset cs) throws CharacterCodingException;
 
     /**
      * Returns a new string by decoding from the given utf8 bytes array.

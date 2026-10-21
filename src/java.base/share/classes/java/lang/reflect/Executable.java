@@ -26,6 +26,7 @@
 package java.lang.reflect;
 
 import org.checkerframework.checker.mutability.qual.Immutable;
+import org.checkerframework.checker.mutability.qual.Readonly;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
@@ -231,7 +232,7 @@ public abstract sealed class Executable extends AccessibleObject
 
     // returns shared array of parameter types - must never give it out
     // to the untrusted code...
-    abstract Class<?>[] getSharedParameterTypes();
+    abstract Class<?> @Readonly [] getSharedParameterTypes();
 
     // returns shared array of exception types - must never give it out
     // to the untrusted code...

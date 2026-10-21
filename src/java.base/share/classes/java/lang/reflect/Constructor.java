@@ -26,6 +26,7 @@
 package java.lang.reflect;
 
 import org.checkerframework.checker.mutability.qual.Immutable;
+import org.checkerframework.checker.mutability.qual.Readonly;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -265,7 +266,7 @@ public final class Constructor<T> extends Executable {
 
 
     @Override
-    Class<?>[] getSharedParameterTypes() {
+    Class<?> @Readonly [] getSharedParameterTypes() {
         return parameterTypes;
     }
 

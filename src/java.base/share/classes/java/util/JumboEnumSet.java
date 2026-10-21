@@ -71,7 +71,7 @@ class JumboEnumSet<E extends Enum<E>> extends EnumSet<E> {
     // Redundant - maintained for performance
     private int size = 0;
 
-    JumboEnumSet(Class<E>elementType, Enum<?> @ReceiverDependentMutable [] universe) {
+    JumboEnumSet(Class<E>elementType, Enum<?> @Readonly [] universe) {
         super(elementType, universe);
         elements = new long @ReceiverDependentMutable [(universe.length + 63) >>> 6];
     }

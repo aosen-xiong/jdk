@@ -2311,7 +2311,7 @@ public final @UsesObjectEquals class System {
                 return Class.getExecutableTypeAnnotationBytes(executable);
             }
             public <E extends Enum<E>>
-            E[] getEnumConstantsShared(Class<E> klass) {
+            E @Readonly [] getEnumConstantsShared(Class<E> klass) {
                 return klass.getEnumConstantsShared();
             }
             public void blockedOn(Interruptible b) {

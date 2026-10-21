@@ -63,7 +63,7 @@ class RegularEnumSet<E extends Enum<E>> extends EnumSet<E> {
      */
     private long elements = 0L;
 
-    RegularEnumSet(Class<E>elementType, Enum<?> @ReceiverDependentMutable [] universe) {
+    RegularEnumSet(Class<E>elementType, Enum<?> @Readonly [] universe) {
         super(elementType, universe);
     }
 

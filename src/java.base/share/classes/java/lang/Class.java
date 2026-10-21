@@ -3890,7 +3890,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * uncloned, cached, and shared by all callers.
      */
     @SuppressWarnings("removal")
-    T[] getEnumConstantsShared() {
+    T @Readonly [] getEnumConstantsShared() {
         T[] constants = enumConstants;
         if (constants == null) {
             if (!isEnum()) return null;
