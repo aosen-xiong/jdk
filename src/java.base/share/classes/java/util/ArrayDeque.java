@@ -1218,7 +1218,7 @@ public class ArrayDeque<E extends @NonNull @Readonly Object> extends AbstractCol
      * first-to-last order.
      */
     @java.io.Serial
-    private void writeObject(@Mutable ArrayDeque<E> this, java.io.ObjectOutputStream s)
+    private void writeObject(@Readonly ArrayDeque<E> this, java.io.ObjectOutputStream s)
             throws java.io.IOException {
         s.defaultWriteObject();
 

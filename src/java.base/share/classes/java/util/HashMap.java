@@ -1550,7 +1550,7 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
      *             emitted in no particular order.
      */
     @java.io.Serial
-    private void writeObject(@Mutable HashMap<K,V> this, java.io.ObjectOutputStream s)
+    private void writeObject(@Readonly HashMap<K,V> this, java.io.ObjectOutputStream s)
         throws IOException {
         int buckets = capacity();
         // Write out the threshold, loadfactor, and any hidden stuff
@@ -1988,8 +1988,8 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
     void afterNodeRemoval(@Mutable HashMap<K,V> this, Node<K,V> p) { }
 
     // Called only from writeObject, to ensure compatible ordering.
-    void internalWriteEntries(@Mutable HashMap<K,V> this, java.io.ObjectOutputStream s) throws IOException {
-        Node<K,V>[] tab;
+    void internalWriteEntries(@Readonly HashMap<K,V> this, java.io.ObjectOutputStream s) throws IOException {
+        @Readonly Node<K,V>[] tab;
         if (size > 0 && (tab = table) != null) {
             for (Node<K,V> e : tab) {
                 for (; e != null; e = e.next) {

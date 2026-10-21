@@ -1344,7 +1344,7 @@ public class IdentityHashMap<K extends @Readonly Object,V>
      *          particular order.
      */
     @java.io.Serial
-    private void writeObject(@Mutable IdentityHashMap<K,V> this, java.io.ObjectOutputStream s)
+    private void writeObject(@Readonly IdentityHashMap<K,V> this, java.io.ObjectOutputStream s)
         throws java.io.IOException  {
         // Write out and any hidden stuff
         s.defaultWriteObject();

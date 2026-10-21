@@ -901,7 +901,7 @@ import jdk.internal.util.ArraysSupport;
      *             (each an {@code Object}) in the proper order.
      */
     @java.io.Serial
-    private void writeObject(@Mutable ArrayList<E> this, java.io.ObjectOutputStream s)
+    private void writeObject(@Readonly ArrayList<E> this, java.io.ObjectOutputStream s)
         throws java.io.IOException {
         // Write out element count, and any hidden stuff
         int expectedModCount = modCount;

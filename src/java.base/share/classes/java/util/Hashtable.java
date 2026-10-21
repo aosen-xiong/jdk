@@ -1265,7 +1265,7 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
      *             The key-value mappings are emitted in no particular order.
      */
     @java.io.Serial
-    private void writeObject(@Mutable Hashtable<K,V> this, java.io.ObjectOutputStream s)
+    private void writeObject(@Readonly Hashtable<K,V> this, java.io.ObjectOutputStream s)
             throws IOException {
         writeHashtable(s);
     }
@@ -1274,7 +1274,7 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
      * Perform serialization of the Hashtable to an ObjectOutputStream.
      * The Properties class overrides this method.
      */
-    void writeHashtable(@Mutable Hashtable<K,V> this, java.io.ObjectOutputStream s)
+    void writeHashtable(@Readonly Hashtable<K,V> this, java.io.ObjectOutputStream s)
             throws IOException {
         Entry<@Immutable Object, @Readonly Object> entryStack = null;
 

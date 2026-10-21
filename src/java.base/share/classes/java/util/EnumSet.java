@@ -446,7 +446,7 @@ public abstract class EnumSet<E extends Enum<E>> extends AbstractSet<E>
          */
         private final @Nullable Enum<?>[] elements;
 
-        SerializationProxy(EnumSet<E> set) {
+        SerializationProxy(@Readonly EnumSet<E> set) {
             elementType = set.elementType;
             elements = set.toArray(ZERO_LENGTH_ENUM_ARRAY);
         }
@@ -484,7 +484,7 @@ public abstract class EnumSet<E extends Enum<E>> extends AbstractSet<E>
      * representing the state of this instance
      */
     @java.io.Serial
-    Object writeReplace(@Mutable EnumSet<E> this) {
+    Object writeReplace(@Readonly EnumSet<E> this) {
         return new SerializationProxy<>(this);
     }
 

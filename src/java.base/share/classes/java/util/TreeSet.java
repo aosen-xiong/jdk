@@ -535,7 +535,7 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      *             the set has no Comparator).
      */
     @java.io.Serial
-    private void writeObject(@Mutable TreeSet<E> this, java.io.ObjectOutputStream s)
+    private void writeObject(@Readonly TreeSet<E> this, java.io.ObjectOutputStream s)
         throws java.io.IOException {
         // Write out any hidden stuff
         s.defaultWriteObject();

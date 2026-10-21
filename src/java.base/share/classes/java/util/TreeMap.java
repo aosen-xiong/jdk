@@ -2465,7 +2465,7 @@ public class TreeMap<K extends @Immutable Object,V>
         @SuppressWarnings("serial") // Conditionally serializable
         private @Assignable K toKey;
         @java.io.Serial
-        private Object readResolve(@Mutable SubMap this) {
+        private Object readResolve(@Readonly SubMap this) {
             return new AscendingSubMap<K,V>(TreeMap.this,
                                          fromStart, fromKey, true,
                                          toEnd, toKey, false);
@@ -2873,7 +2873,7 @@ public class TreeMap<K extends @Immutable Object,V>
      *             Comparator).
      */
     @java.io.Serial
-    private void writeObject(@Mutable TreeMap<K,V> this, java.io.ObjectOutputStream s)
+    private void writeObject(@Readonly TreeMap<K,V> this, java.io.ObjectOutputStream s)
         throws java.io.IOException {
         // Write out the Comparator and any hidden stuff
         s.defaultWriteObject();

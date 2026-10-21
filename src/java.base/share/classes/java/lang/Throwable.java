@@ -1035,7 +1035,7 @@ public @UsesObjectEquals class Throwable implements Serializable {
      * @throws IOException if an I/O error occurs
      */
     @java.io.Serial
-    private synchronized void writeObject(@Mutable Throwable this, ObjectOutputStream s)
+    private synchronized void writeObject(@Readonly Throwable this, ObjectOutputStream s)
         throws IOException {
         // Ensure that the stackTrace field is initialized to a
         // non-null value, if appropriate.  As of JDK 7, a null stack

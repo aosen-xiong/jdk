@@ -1225,7 +1225,7 @@ public class Vector<E>
      * @throws java.io.IOException if an I/O error occurs
      */
     @java.io.Serial
-    private void writeObject(@Mutable Vector<E> this, java.io.ObjectOutputStream s)
+    private void writeObject(@Readonly Vector<E> this, java.io.ObjectOutputStream s)
             throws java.io.IOException {
         final java.io.ObjectOutputStream.PutField fields = s.putFields();
         final @Readonly Object[] data;

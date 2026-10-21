@@ -1181,7 +1181,7 @@ public class LinkedList<E>
      *             elements (each an Object) in the proper order.
      */
     @java.io.Serial
-    private void writeObject(@Mutable LinkedList<E> this, java.io.ObjectOutputStream s)
+    private void writeObject(@Readonly LinkedList<E> this, java.io.ObjectOutputStream s)
         throws java.io.IOException {
         // Write out any hidden serialization magic
         s.defaultWriteObject();

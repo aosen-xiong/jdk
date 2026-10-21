@@ -2256,7 +2256,7 @@ public class Collections {
             return c.parallelStream(); // Must be manually synched by user!
         }
         @java.io.Serial
-        private void writeObject(@Mutable SynchronizedCollection<E> this, ObjectOutputStream s) throws IOException {
+        private void writeObject(@Readonly SynchronizedCollection<E> this, ObjectOutputStream s) throws IOException {
             synchronized (mutex) {s.defaultWriteObject();}
         }
     }
@@ -2673,9 +2673,9 @@ public class Collections {
          * SynchronizedList instances, as this method was missing in 1.4.
          */
         @java.io.Serial
-        private @Readonly Object readResolve(@Mutable SynchronizedList<E> this) {
+        private @ReceiverDependentMutable Object readResolve(@ReceiverDependentMutable SynchronizedList<E> this) {
             return (list instanceof RandomAccess
-                    ? new SynchronizedRandomAccessList<>(list)
+                    ? new @ReceiverDependentMutable SynchronizedRandomAccessList<>(list)
                     : this);
         }
     }
@@ -2713,8 +2713,8 @@ public class Collections {
          * deserialization.
          */
         @java.io.Serial
-        private Object writeReplace(@Mutable SynchronizedRandomAccessList<E> this) {
-            return new SynchronizedList<E>(list);
+        private @ReceiverDependentMutable Object writeReplace(@ReceiverDependentMutable SynchronizedRandomAccessList<E> this) {
+            return new @ReceiverDependentMutable SynchronizedList<E>(list);
         }
     }
 
@@ -2905,7 +2905,7 @@ public class Collections {
         }
 
         @java.io.Serial
-        private void writeObject(@Mutable SynchronizedMap<K,V> this, ObjectOutputStream s) throws IOException {
+        private void writeObject(@Readonly SynchronizedMap<K,V> this, ObjectOutputStream s) throws IOException {
             synchronized (mutex) {s.defaultWriteObject();}
         }
     }

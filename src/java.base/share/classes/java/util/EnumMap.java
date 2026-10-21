@@ -843,7 +843,7 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
      *             by the enum map.
      */
     @java.io.Serial
-    private void writeObject(@Mutable EnumMap<K,V> this, java.io.ObjectOutputStream s)
+    private void writeObject(@Readonly EnumMap<K,V> this, java.io.ObjectOutputStream s)
         throws java.io.IOException
     {
         // Write out the key type and any hidden stuff

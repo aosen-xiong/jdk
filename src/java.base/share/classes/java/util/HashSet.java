@@ -305,7 +305,7 @@ import jdk.internal.access.SharedSecrets;
      *             no particular order.
      */
     @java.io.Serial
-    private void writeObject(@Mutable HashSet<E> this, java.io.ObjectOutputStream s)
+    private void writeObject(@Readonly HashSet<E> this, java.io.ObjectOutputStream s)
         throws java.io.IOException {
         // Write out any hidden serialization magic
         s.defaultWriteObject();
