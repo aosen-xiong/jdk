@@ -1198,7 +1198,6 @@ public class TreeMap<K extends @Immutable Object,V>
      * {@code add} or {@code addAll} operations.
      */
     @SideEffectFree
-    @SuppressWarnings("mutability:return.type.incompatible") // class polymorphic qualifier
     public @ReceiverDependentMutable Set<Map.@ReceiverDependentMutable Entry<@KeyFor({"this"}) K,V>> entrySet(@GuardSatisfied @ReceiverDependentMutable TreeMap<K, V> this) {
         EntrySet es = entrySet;
         return (es != null) ? es : (entrySet = new @ReceiverDependentMutable EntrySet());
@@ -1387,9 +1386,10 @@ public class TreeMap<K extends @Immutable Object,V>
     }
 
     @ReceiverDependentMutable
-    class EntrySet extends AbstractSet<Map.@Readonly Entry<K,V>> {
+    class EntrySet extends AbstractSet<Map.@ReceiverDependentMutable Entry<K,V>> {
         @SideEffectFree
-        public @Mutable Iterator<Map.@Readonly Entry<K,V>> iterator() {
+        @SuppressWarnings("mutability:return.type.incompatible") // the entries have the enclosing map's mutability, but in the iterator class's supertype a receiver-dependent qualifier is relative to the iterator, which is a fresh @Mutable cursor. There is no qualifier relative to the enclosing instance: https://github.com/eisop/checker-framework/issues/2322
+        public @Mutable Iterator<Map.@ReceiverDependentMutable Entry<K,V>> iterator() {
             return new @Mutable EntryIterator(getFirstEntry());
         }
 
@@ -1425,6 +1425,7 @@ public class TreeMap<K extends @Immutable Object,V>
         }
 
         @SideEffectFree
+        @SuppressWarnings("mutability:override.return.invalid") // EntrySpliterator reads the map's nodes through a @Readonly field, so it can only promise @Readonly entries. The set's entries are @ReceiverDependentMutable, but the implementation gives the checker no way to relate the nodes it reads to this set's receiver
         public Spliterator<Map.@Readonly Entry<K,V>> spliterator() {
             return new EntrySpliterator<>(TreeMap.this, null, null, 0, -1, 0);
         }
@@ -1583,11 +1584,12 @@ public class TreeMap<K extends @Immutable Object,V>
     }
 
     @Mutable
-    final class EntryIterator extends PrivateEntryIterator<Map.@Readonly Entry<K,V>> {
+    final class EntryIterator extends PrivateEntryIterator<Map.@ReceiverDependentMutable Entry<K,V>> {
         EntryIterator(@Readonly Entry<K,V> first) {
             super(first);
         }
-        public Map.@Readonly Entry<K,V> next(@NonEmpty @Mutable EntryIterator this) {
+        @SuppressWarnings({"mutability:return.type.incompatible", "mutability:override.return.invalid"}) // the entries have the enclosing map's mutability, but the cursor reads them through the @Readonly enclosing map, and in the iterator's supertype a receiver-dependent qualifier is relative to the iterator, a fresh @Mutable cursor. There is no qualifier relative to the enclosing instance: https://github.com/eisop/checker-framework/issues/2322
+        public Map.@ReceiverDependentMutable Entry<K,V> next(@NonEmpty @Mutable EntryIterator this) {
             return nextEntry();
         }
     }
@@ -2023,7 +2025,7 @@ public class TreeMap<K extends @Immutable Object,V>
         // View classes
 
         @ReceiverDependentMutable
-        abstract class EntrySetView extends AbstractSet<Map.@Readonly Entry<K,V>> {
+        abstract class EntrySetView extends AbstractSet<Map.@ReceiverDependentMutable Entry<K,V>> {
             private transient @Assignable int size = -1, sizeModCount;
 
             @Pure
@@ -2102,8 +2104,7 @@ public class TreeMap<K extends @Immutable Object,V>
                 return next != null && next.key != fenceKey;
             }
 
-            @SuppressWarnings("mutability:return.type.incompatible") // outter receiver dependence
-            final TreeMap.@ReceiverDependentMutable Entry<K,V> nextEntry(@Readonly NavigableSubMap<K,V>.@Mutable SubMapIterator<T> this) {
+            final TreeMap.@Readonly Entry<K,V> nextEntry(@Readonly NavigableSubMap<K,V>.@Mutable SubMapIterator<T> this) {
                 TreeMap.Entry<K,V> e = next;
                 if (e == null || e.key == fenceKey)
                     throw new NoSuchElementException();
@@ -2152,12 +2153,13 @@ public class TreeMap<K extends @Immutable Object,V>
         }
 
         @Mutable
-        final class SubMapEntryIterator extends SubMapIterator<Map.@Readonly Entry<K,V>> {
+        final class SubMapEntryIterator extends SubMapIterator<Map.@ReceiverDependentMutable Entry<K,V>> {
             SubMapEntryIterator(TreeMap.@Readonly Entry<K,V> first,
                                 TreeMap.@Readonly Entry<K,V> fence) {
                 super(first, fence);
             }
-            public Map.@Readonly Entry<K,V> next(@Readonly NavigableSubMap<K,V>.@NonEmpty @Mutable SubMapEntryIterator this) {
+            @SuppressWarnings({"mutability:return.type.incompatible", "mutability:override.return.invalid"}) // the entries have the enclosing map's mutability, but the cursor reads them through the @Readonly enclosing map, and in the iterator's supertype a receiver-dependent qualifier is relative to the iterator, a fresh @Mutable cursor. There is no qualifier relative to the enclosing instance: https://github.com/eisop/checker-framework/issues/2322
+            public Map.@ReceiverDependentMutable Entry<K,V> next(@Readonly NavigableSubMap<K,V>.@NonEmpty @Mutable SubMapEntryIterator this) {
                 return nextEntry();
             }
             public void remove(@Mutable NavigableSubMap<K,V>.@Mutable SubMapEntryIterator this) {
@@ -2166,13 +2168,14 @@ public class TreeMap<K extends @Immutable Object,V>
         }
 
         @Mutable
-        final class DescendingSubMapEntryIterator extends SubMapIterator<Map.@Readonly Entry<K,V>> {
+        final class DescendingSubMapEntryIterator extends SubMapIterator<Map.@ReceiverDependentMutable Entry<K,V>> {
             DescendingSubMapEntryIterator(TreeMap.Entry<K,V> last,
                                           TreeMap.Entry<K,V> fence) {
                 super(last, fence);
             }
 
-            public Map.@Readonly Entry<K,V> next(@Readonly NavigableSubMap<K,V>.@NonEmpty @Mutable DescendingSubMapEntryIterator this) {
+            @SuppressWarnings({"mutability:return.type.incompatible", "mutability:override.return.invalid"}) // the entries have the enclosing map's mutability, but the cursor reads them through the @Readonly enclosing map, and in the iterator's supertype a receiver-dependent qualifier is relative to the iterator, a fresh @Mutable cursor. There is no qualifier relative to the enclosing instance: https://github.com/eisop/checker-framework/issues/2322
+            public Map.@ReceiverDependentMutable Entry<K,V> next(@Readonly NavigableSubMap<K,V>.@NonEmpty @Mutable DescendingSubMapEntryIterator this) {
                 return prevEntry();
             }
             public void remove(@Mutable NavigableSubMap<K,V>.@Mutable DescendingSubMapEntryIterator this) {
@@ -2329,13 +2332,13 @@ public class TreeMap<K extends @Immutable Object,V>
 
         @ReceiverDependentMutable
         final class AscendingEntrySetView extends EntrySetView {
-            public @Mutable Iterator<Map.@Readonly Entry<K,V>> iterator(@ReceiverDependentMutable AscendingEntrySetView this) {
+            @SuppressWarnings("mutability:return.type.incompatible") // the entries have the enclosing map's mutability, but in the iterator class's supertype a receiver-dependent qualifier is relative to the iterator, which is a fresh @Mutable cursor. There is no qualifier relative to the enclosing instance: https://github.com/eisop/checker-framework/issues/2322
+            public @Mutable Iterator<Map.@ReceiverDependentMutable Entry<K,V>> iterator(@ReceiverDependentMutable AscendingEntrySetView this) {
                 return new @Mutable SubMapEntryIterator(absLowest(), absHighFence());
             }
         }
 
         @SideEffectFree
-        @SuppressWarnings("mutability:return.type.incompatible") // polyq on supertype's type argument
         public @ReceiverDependentMutable Set<Map.@ReceiverDependentMutable Entry<K,V>> entrySet(@ReceiverDependentMutable AscendingSubMap<K,V> this) {
             EntrySetView es = entrySetView;
             return (es != null) ? es : (entrySetView = new @ReceiverDependentMutable AscendingEntrySetView());
@@ -2425,13 +2428,13 @@ public class TreeMap<K extends @Immutable Object,V>
 
         @ReceiverDependentMutable
         final class DescendingEntrySetView extends EntrySetView {
-            public @Mutable Iterator<Map.@Readonly Entry<K,V>> iterator(@ReceiverDependentMutable DescendingEntrySetView this) {
+            @SuppressWarnings("mutability:return.type.incompatible") // the entries have the enclosing map's mutability, but in the iterator class's supertype a receiver-dependent qualifier is relative to the iterator, which is a fresh @Mutable cursor. There is no qualifier relative to the enclosing instance: https://github.com/eisop/checker-framework/issues/2322
+            public @Mutable Iterator<Map.@ReceiverDependentMutable Entry<K,V>> iterator(@ReceiverDependentMutable DescendingEntrySetView this) {
                 return new @Mutable DescendingSubMapEntryIterator(absHighest(), absLowFence());
             }
         }
 
         @SideEffectFree
-        @SuppressWarnings("mutability:return.type.incompatible") // polyq on supertype's type argument
         public @ReceiverDependentMutable Set<Map.@ReceiverDependentMutable Entry<K,V>> entrySet(@ReceiverDependentMutable DescendingSubMap<K,V> this) {
             EntrySetView es = entrySetView;
             return (es != null) ? es : (entrySetView = new @ReceiverDependentMutable DescendingEntrySetView());

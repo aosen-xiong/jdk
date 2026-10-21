@@ -746,7 +746,6 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
      * @since 1.2
      */
     @SideEffectFree
-    @SuppressWarnings("mutability:argument.type.incompatible") // Aosen: class polymorphism qualifier
     public @ReceiverDependentMutable Set<Map.@ReceiverDependentMutable Entry<@KeyFor({"this"}) K,V>> entrySet(@GuardSatisfied @ReceiverDependentMutable Hashtable<K, V> this) {
         if (entrySet==null)
             entrySet = Collections.synchronizedSet(new @ReceiverDependentMutable EntrySet(), this);
@@ -754,14 +753,15 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
     }
 
     @ReceiverDependentMutable
-    private class EntrySet extends AbstractSet<Map.@Readonly Entry<K,V>> {
+    private class EntrySet extends AbstractSet<Map.@ReceiverDependentMutable Entry<K,V>> {
         @SideEffectFree
-        public @Mutable Iterator<Map.@Readonly Entry<K,V>> iterator(@ReceiverDependentMutable Hashtable<K,V>.@ReceiverDependentMutable EntrySet this) {
+        public @Mutable Iterator<Map.@ReceiverDependentMutable Entry<K,V>> iterator(@ReceiverDependentMutable Hashtable<K,V>.@ReceiverDependentMutable EntrySet this) {
             return getIterator(ENTRIES);
         }
 
         @EnsuresNonEmpty("this")
-        public boolean add(@Mutable EntrySet this, Map.@Readonly Entry<K,V> o) {
+        @SuppressWarnings("mutability:argument.type.incompatible") // the parameter is receiver-dependent to match the element type, but inside the body it is not adapted to the @Mutable receiver that super.add needs. super.add always throws here
+        public boolean add(@Mutable EntrySet this, Map.@ReceiverDependentMutable Entry<K,V> o) {
             return super.add(o);
         }
 

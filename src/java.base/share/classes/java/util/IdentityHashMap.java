@@ -881,12 +881,13 @@ public class IdentityHashMap<K extends @Readonly Object,V>
 
     @Mutable
     private class EntryIterator
-        extends IdentityHashMapIterator<Map.@Readonly Entry<K,V>>
+        extends IdentityHashMapIterator<Map.@ReceiverDependentMutable Entry<K,V>>
     {
         // @SuppressWarnings("mutability:initialization.field.uninitialized") // lazy
         private @Readonly Entry lastReturnedEntry;
 
-        public Map.@Readonly Entry<K,V> next(@Readonly IdentityHashMap<K,V>.@NonEmpty @Mutable EntryIterator this) {
+        @SuppressWarnings({"mutability:return.type.incompatible", "mutability:override.return.invalid"}) // the entries have the enclosing map's mutability, but the cursor reads them through the @Readonly enclosing map, and in the iterator's supertype a receiver-dependent qualifier is relative to the iterator, a fresh @Mutable cursor. There is no qualifier relative to the enclosing instance: https://github.com/eisop/checker-framework/issues/2322
+        public Map.@ReceiverDependentMutable Entry<K,V> next(@Readonly IdentityHashMap<K,V>.@NonEmpty @Mutable EntryIterator this) {
             lastReturnedEntry = new Entry(nextIndex());
             return lastReturnedEntry;
         }
@@ -1240,7 +1241,6 @@ public class IdentityHashMap<K extends @Readonly Object,V>
      * @return a set view of the identity-mappings contained in this map
      */
     @SideEffectFree
-    @SuppressWarnings("mutability:assignment.type.incompatible") // polyq on supertype's type argument
     public @ReceiverDependentMutable Set<Map.@ReceiverDependentMutable Entry<@KeyFor({"this"}) K,V>> entrySet(@GuardSatisfied @ReceiverDependentMutable IdentityHashMap<K, V> this) {
         Set<Map.@ReceiverDependentMutable Entry<K,V>> es = entrySet;
         if (es != null)
@@ -1250,9 +1250,10 @@ public class IdentityHashMap<K extends @Readonly Object,V>
     }
 
     @ReceiverDependentMutable
-    private class EntrySet extends AbstractSet<Map.@Readonly Entry<K,V>> {
+    private class EntrySet extends AbstractSet<Map.@ReceiverDependentMutable Entry<K,V>> {
         @SideEffectFree
-        public @Mutable Iterator<Map.@Readonly Entry<K,V>> iterator(@ReceiverDependentMutable EntrySet this) {
+        @SuppressWarnings("mutability:return.type.incompatible") // the entries have the enclosing map's mutability, but in the iterator class's supertype a receiver-dependent qualifier is relative to the iterator, which is a fresh @Mutable cursor. There is no qualifier relative to the enclosing instance: https://github.com/eisop/checker-framework/issues/2322
+        public @Mutable Iterator<Map.@ReceiverDependentMutable Entry<K,V>> iterator(@ReceiverDependentMutable EntrySet this) {
             return new @Mutable EntryIterator();
         }
         @Pure
@@ -1325,6 +1326,7 @@ public class IdentityHashMap<K extends @Readonly Object,V>
         }
 
         @SideEffectFree
+        @SuppressWarnings("mutability:override.return.invalid") // EntrySpliterator reads the map's nodes through a @Readonly field, so it can only promise @Readonly entries. The set's entries are @ReceiverDependentMutable, but the implementation gives the checker no way to relate the nodes it reads to this set's receiver
         public Spliterator<Map.@Readonly Entry<K,V>> spliterator(@ReceiverDependentMutable EntrySet this) {
             return new EntrySpliterator<>(IdentityHashMap.this, 0, -1, 0, 0);
         }

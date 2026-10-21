@@ -505,7 +505,6 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
      * @return a set view of the mappings contained in this enum map
      */
     @SideEffectFree
-    @SuppressWarnings("mutability:assignment.type.incompatible") // class polymorphism qualifier
     public @ReceiverDependentMutable Set<Map.@ReceiverDependentMutable Entry<K,V>> entrySet(@ReceiverDependentMutable EnumMap<K, V> this) {
         Set<Map.@ReceiverDependentMutable Entry<K,V>> es = entrySet;
         if (es != null)
@@ -515,9 +514,10 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
     }
 
     @ReceiverDependentMutable
-    private class EntrySet extends AbstractSet<Map.@Readonly Entry<K,V>> {
+    private class EntrySet extends AbstractSet<Map.@ReceiverDependentMutable Entry<K,V>> {
         @SideEffectFree
-        public @Mutable Iterator<Map.@Readonly Entry<K,V>> iterator(@ReceiverDependentMutable EntrySet this) {
+        @SuppressWarnings("mutability:return.type.incompatible") // the entries have the enclosing map's mutability, but in the iterator class's supertype a receiver-dependent qualifier is relative to the iterator, which is a fresh @Mutable cursor. There is no qualifier relative to the enclosing instance: https://github.com/eisop/checker-framework/issues/2322
+        public @Mutable Iterator<Map.@ReceiverDependentMutable Entry<K,V>> iterator(@ReceiverDependentMutable EntrySet this) {
             return new @Mutable EntryIterator();
         }
 
@@ -628,10 +628,11 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
     }
 
     @Mutable
-    private class EntryIterator extends EnumMapIterator<Map.@Readonly Entry<K,V>> {
+    private class EntryIterator extends EnumMapIterator<Map.@ReceiverDependentMutable Entry<K,V>> {
         private Entry lastReturnedEntry;
 
-        public Map.@Readonly Entry<K,V> next(@NonEmpty @Mutable EntryIterator this) {
+        @SuppressWarnings({"mutability:return.type.incompatible", "mutability:override.return.invalid"}) // the entries have the enclosing map's mutability, but the cursor reads them through the @Readonly enclosing map, and in the iterator's supertype a receiver-dependent qualifier is relative to the iterator, a fresh @Mutable cursor. There is no qualifier relative to the enclosing instance: https://github.com/eisop/checker-framework/issues/2322
+        public Map.@ReceiverDependentMutable Entry<K,V> next(@NonEmpty @Mutable EntryIterator this) {
             if (!hasNext())
                 throw new NoSuchElementException();
             lastReturnedEntry = new @Mutable Entry(index++);

@@ -712,19 +712,19 @@ public class LinkedHashMap<K extends @Immutable Object,V>
      * @return a set view of the mappings contained in this map
      */
     @SideEffectFree
-    @SuppressWarnings("mutability:assignment.type.incompatible") // class polymorphic qualifier
     public @ReceiverDependentMutable Set<Map.@ReceiverDependentMutable Entry<@KeyFor({"this"}) K,V>> entrySet(@GuardSatisfied @ReceiverDependentMutable LinkedHashMap<K, V> this) {
         Set<Map.@ReceiverDependentMutable Entry<K,V>> es;
         return (es = entrySet) == null ? (entrySet = new @ReceiverDependentMutable LinkedEntrySet()) : es;
     }
 
     @ReceiverDependentMutable
-    final class LinkedEntrySet extends AbstractSet<Map.@Readonly Entry<K,V>> {
+    final class LinkedEntrySet extends AbstractSet<Map.@ReceiverDependentMutable Entry<K,V>> {
         @Pure
         public final int size(@Readonly LinkedEntrySet this)                 { return size; }
         public final void clear(@Mutable LinkedHashMap<K,V>. @Mutable LinkedEntrySet this)               { LinkedHashMap.this.clear(); }
         @SideEffectFree
-        public final @Mutable Iterator<Map.@Readonly Entry<K,V>> iterator(@ReceiverDependentMutable LinkedEntrySet this) {
+        @SuppressWarnings("mutability:return.type.incompatible") // the entries have the enclosing map's mutability, but in the iterator class's supertype a receiver-dependent qualifier is relative to the iterator, which is a fresh @Mutable cursor. There is no qualifier relative to the enclosing instance: https://github.com/eisop/checker-framework/issues/2322
+        public final @Mutable Iterator<Map.@ReceiverDependentMutable Entry<K,V>> iterator(@ReceiverDependentMutable LinkedEntrySet this) {
             return new @Mutable LinkedEntryIterator();
         }
         @Pure
@@ -745,16 +745,16 @@ public class LinkedHashMap<K extends @Immutable Object,V>
             return false;
         }
         @SideEffectFree
-        public final Spliterator<Map.@Readonly Entry<K,V>> spliterator() {
+        public final Spliterator<Map.@ReceiverDependentMutable Entry<K,V>> spliterator() {
             return Spliterators.spliterator(this, Spliterator.SIZED |
                                             Spliterator.ORDERED |
                                             Spliterator.DISTINCT);
         }
-        public final void forEach(Consumer<? super Map.Entry<K,V>> action) {
+        public final void forEach(@ReceiverDependentMutable LinkedHashMap<K,V>.@Readonly LinkedEntrySet this, Consumer<? super Map.@ReceiverDependentMutable Entry<K,V>> action) {
             if (action == null)
                 throw new NullPointerException();
             int mc = modCount;
-            for (LinkedHashMap.Entry<K,V> e = head; e != null; e = e.after)
+            for (LinkedHashMap.@ReceiverDependentMutable Entry<K,V> e = head; e != null; e = e.after)
                 action.accept(e);
             if (modCount != mc)
                 throw new ConcurrentModificationException();
@@ -840,8 +840,9 @@ public class LinkedHashMap<K extends @Immutable Object,V>
 
     @Mutable
     final class LinkedEntryIterator extends LinkedHashIterator
-        implements Iterator<Map.@Readonly Entry<K,V>> {
-        public final Map.@Readonly Entry<K,V> next(@NonEmpty @Mutable LinkedEntryIterator this) { return nextNode(); }
+        implements Iterator<Map.@ReceiverDependentMutable Entry<K,V>> {
+        @SuppressWarnings({"mutability:return.type.incompatible", "mutability:override.return.invalid"}) // the entries have the enclosing map's mutability, but the cursor reads them through the @Readonly enclosing map, and in the iterator's supertype a receiver-dependent qualifier is relative to the iterator, a fresh @Mutable cursor. There is no qualifier relative to the enclosing instance: https://github.com/eisop/checker-framework/issues/2322
+        public final Map.@ReceiverDependentMutable Entry<K,V> next(@NonEmpty @Mutable LinkedEntryIterator this) { return nextNode(); }
     }
 
 
