@@ -54,6 +54,7 @@ import sun.security.util.SecurityConstants;
 
 import org.checkerframework.checker.mutability.qual.Immutable;
 import org.checkerframework.checker.mutability.qual.Readonly;
+import org.checkerframework.checker.mutability.qual.Assignable;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
 /**
@@ -727,7 +728,8 @@ public final class ModuleLayer {
                                               Function<String, ClassLoader> clf)
     {
         // HashMap allows null keys
-        Map<@Immutable ClassLoader, Set<String>> loaderToPackages = new HashMap<>();
+        @SuppressWarnings({"mutability:type.argument.type.incompatible", "mutability:type.arguments.not.inferred"}) // key type uses identity equals/hashCode
+        Map<ClassLoader, Set<String>> loaderToPackages = new HashMap<>();
         for (ResolvedModule resolvedModule : cf.modules()) {
             ModuleDescriptor descriptor = resolvedModule.reference().descriptor();
             ClassLoader loader = clf.apply(descriptor.name());
@@ -811,7 +813,7 @@ public final class ModuleLayer {
         return allLayers.stream();
     }
 
-    private volatile List<ModuleLayer> allLayers;
+    private volatile @Assignable List<ModuleLayer> allLayers; // lazily computed by layers()
 
     /**
      * Returns an unmodifiable set of the modules in this layer.
@@ -826,7 +828,7 @@ public final class ModuleLayer {
         return modules;
     }
 
-    private volatile Set<Module> modules;
+    private volatile @Assignable Set<Module> modules; // lazily computed by modules()
 
 
     /**
@@ -955,7 +957,7 @@ public final class ModuleLayer {
         return servicesCatalog;
     }
 
-    private volatile ServicesCatalog servicesCatalog;
+    private volatile @Assignable ServicesCatalog servicesCatalog; // lazily computed by getServicesCatalog()
 
 
     /**

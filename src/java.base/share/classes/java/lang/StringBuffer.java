@@ -311,7 +311,7 @@ public final class StringBuffer
     }
 
     @Override
-    public synchronized StringBuffer append(@LeakedToResult StringBuffer this, @NonLeaked @Nullable Object obj) {
+    public synchronized StringBuffer append(@LeakedToResult StringBuffer this, @NonLeaked @Nullable @Readonly Object obj) {
         toStringCache = null;
         super.append(String.valueOf(obj));
         return this;
@@ -553,7 +553,7 @@ public final class StringBuffer
      * @throws StringIndexOutOfBoundsException {@inheritDoc}
      */
     @Override
-    public synchronized StringBuffer insert(int offset, @Nullable Object obj) {
+    public synchronized StringBuffer insert(int offset, @Nullable @Readonly Object obj) {
         toStringCache = null;
         super.insert(offset, String.valueOf(obj));
         return this;
@@ -584,7 +584,7 @@ public final class StringBuffer
      * @since      1.5
      */
     @Override
-    public StringBuffer insert(int dstOffset, @Nullable CharSequence s) {
+    public StringBuffer insert(int dstOffset, @Nullable @Readonly CharSequence s) {
         // Note, synchronization achieved via invocations of other StringBuffer methods
         // after narrowing of s to specific type
         // Ditto for toStringCache clearing
@@ -597,7 +597,7 @@ public final class StringBuffer
      * @since      1.5
      */
     @Override
-    public synchronized StringBuffer insert(int dstOffset, @Nullable CharSequence s,
+    public synchronized StringBuffer insert(int dstOffset, @Nullable @Readonly CharSequence s,
             @IndexOrHigh({"#2"}) int start, @IndexOrHigh({"#2"}) int end)
     {
         toStringCache = null;

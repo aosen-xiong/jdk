@@ -168,7 +168,8 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
      * @param m the enum map from which to initialize this enum map
      * @throws NullPointerException if {@code m} is null
      */
-    public EnumMap(@ReceiverDependentMutable EnumMap<K, ? extends V> m) {
+    @SuppressWarnings("mutability:assignment.type.incompatible") // PICO constructor fix: m.vals.clone() is a fresh copy that only this map holds, but the checker types the clone of a @Readonly array as lost
+    public EnumMap(@Readonly EnumMap<K, ? extends V> m) {
         keyType = m.keyType;
         keyUniverse = m.keyUniverse;
         vals = m.vals.clone();
@@ -187,10 +188,10 @@ public class EnumMap<K extends Enum<K>, V> extends AbstractMap<K, V>
      *     {@code EnumMap} instance and contains no mappings
      * @throws NullPointerException if {@code m} is null
      */
-    @SuppressWarnings("mutability:method.invocation.invalid") // PICO constructor fix
+    @SuppressWarnings({"mutability:method.invocation.invalid", "mutability:assignment.type.incompatible"}) // PICO constructor fix: the constructor calls its own mutator while the object is being initialized, and em.vals.clone() is a fresh copy that only this map holds, but the checker types the clone of a @Readonly array as lost
     public EnumMap(@Readonly Map<K, ? extends V> m) {
         if (m instanceof EnumMap) {
-            EnumMap<K, ? extends V> em = (@ReceiverDependentMutable EnumMap<K, ? extends V>) m;
+            EnumMap<K, ? extends V> em = (@Readonly EnumMap<K, ? extends V>) m;
             keyType = em.keyType;
             keyUniverse = em.keyUniverse;
             vals = em.vals.clone();

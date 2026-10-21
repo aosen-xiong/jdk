@@ -360,7 +360,7 @@ public final class StringBuilder
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
     @Override
-    public StringBuilder insert(@NonNegative int dstOffset, @Nullable @Immutable CharSequence s) {
+    public StringBuilder insert(@NonNegative int dstOffset, @Nullable @Readonly CharSequence s) {
             super.insert(dstOffset, s);
             return this;
     }
@@ -369,7 +369,7 @@ public final class StringBuilder
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
     @Override
-    public StringBuilder insert(@NonNegative int dstOffset, @Nullable @Immutable CharSequence s,
+    public StringBuilder insert(@NonNegative int dstOffset, @Nullable @Readonly CharSequence s,
                                 @NonNegative int start, @NonNegative int end)
     {
         super.insert(dstOffset, s, start, end);
