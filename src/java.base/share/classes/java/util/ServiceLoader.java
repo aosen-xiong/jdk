@@ -25,6 +25,7 @@
 
 package java.util;
 
+import org.checkerframework.checker.mutability.qual.Mutable;
 import org.checkerframework.checker.mutability.qual.ReceiverDependentMutable;
 import org.checkerframework.checker.interning.qual.UsesObjectEquals;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
@@ -1382,7 +1383,7 @@ public final @UsesObjectEquals class ServiceLoader<S>
      * @revised 9
      */
     @SideEffectFree
-    public @ReceiverDependentMutable Iterator<S> iterator() {
+    public @Mutable Iterator<S> iterator() {
 
         // create lookup iterator if needed
         if (lookupIterator1 == null) {

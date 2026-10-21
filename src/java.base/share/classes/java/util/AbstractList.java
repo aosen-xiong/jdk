@@ -688,12 +688,12 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
     static final class RandomAccessSpliterator<E> implements Spliterator<E> {
 
         private final @Readonly List<E> list;
-        private @Assignable int index; // current index, modified on advance/split
-        private @Assignable int fence; // -1 until used; then one past last index
+        private int index; // current index, modified on advance/split
+        private int fence; // -1 until used; then one past last index
 
         // The following fields are valid if covering an AbstractList
         private final @Readonly AbstractList<E> alist;
-        private @Assignable int expectedModCount; // initialized when fence set
+        private int expectedModCount; // initialized when fence set
 
         RandomAccessSpliterator(@Readonly List<E> list) {
             assert list instanceof RandomAccess;

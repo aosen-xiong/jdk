@@ -82,7 +82,7 @@ public interface Enumeration<E> {
      */
     @Pure
     @EnsuresNonEmptyIf(result = true, expression = "this")
-    boolean hasMoreElements();
+    boolean hasMoreElements(@Readonly Enumeration<E> this);
 
     /**
      * Returns the next element of this enumeration if this enumeration
@@ -127,7 +127,7 @@ public interface Enumeration<E> {
      *
      * @since 9
      */
-    default Iterator<E> asIterator() {
+    default Iterator<E> asIterator(@Mutable Enumeration<E> this) {
         return new @Mutable Iterator<>() {
             @Pure
             @EnsuresNonEmptyIf(result = true, expression = "this")

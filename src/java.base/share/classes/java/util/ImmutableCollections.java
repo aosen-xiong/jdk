@@ -358,7 +358,7 @@ class ImmutableCollections {
         }
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     static final class ListItr<E> implements ListIterator<E> {
 
         @Stable
@@ -863,7 +863,7 @@ class ImmutableCollections {
         @Override
         public @Mutable Iterator<E> iterator() {
             return new @Mutable Iterator<E>() {
-                private @Assignable int idx = (e1 == EMPTY) ? 1 : 2;
+                private int idx = (e1 == EMPTY) ? 1 : 2;
 
                 @Override
                 @Pure

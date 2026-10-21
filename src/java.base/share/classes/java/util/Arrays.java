@@ -4307,7 +4307,7 @@ public class Arrays {
         }
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     private static class ArrayItr<E> implements Iterator<E> {
         private int cursor;
         private final E @Readonly [] a;

@@ -785,11 +785,11 @@ public class LinkedHashMap<K extends @Immutable Object,V>
 
     // Iterators
 
-    @ReceiverDependentMutable
+    @Mutable
     abstract class LinkedHashIterator {
-        @Assignable LinkedHashMap.@Readonly Entry<K,V> next;
-        @Assignable LinkedHashMap.@Readonly Entry<K,V> current;
-        @Assignable int expectedModCount;
+        LinkedHashMap.@Readonly Entry<K,V> next;
+        LinkedHashMap.@Readonly Entry<K,V> current;
+        int expectedModCount;
 
         LinkedHashIterator() {
             next = head;
@@ -803,7 +803,7 @@ public class LinkedHashMap<K extends @Immutable Object,V>
             return next != null;
         }
 
-        final LinkedHashMap.@Readonly Entry<K,V> nextNode(@NonEmpty @Readonly LinkedHashIterator this) {
+        final LinkedHashMap.@Readonly Entry<K,V> nextNode(@NonEmpty @Mutable LinkedHashIterator this) {
             LinkedHashMap.Entry<K,V> e = next;
             if (modCount != expectedModCount)
                 throw new ConcurrentModificationException();
@@ -826,22 +826,22 @@ public class LinkedHashMap<K extends @Immutable Object,V>
         }
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     final class LinkedKeyIterator extends LinkedHashIterator
         implements Iterator<K> {
-        public final K next(@NonEmpty @Readonly LinkedKeyIterator this) { return nextNode().getKey(); }
+        public final K next(@NonEmpty @Mutable LinkedKeyIterator this) { return nextNode().getKey(); }
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     final class LinkedValueIterator extends LinkedHashIterator
         implements Iterator<V> {
-        public final V next(@NonEmpty @Readonly LinkedValueIterator this) { return nextNode().value; }
+        public final V next(@NonEmpty @Mutable LinkedValueIterator this) { return nextNode().value; }
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     final class LinkedEntryIterator extends LinkedHashIterator
         implements Iterator<Map.@Readonly Entry<K,V>> {
-        public final Map.@Readonly Entry<K,V> next(@NonEmpty @Readonly LinkedEntryIterator this) { return nextNode(); }
+        public final Map.@Readonly Entry<K,V> next(@NonEmpty @Mutable LinkedEntryIterator this) { return nextNode(); }
     }
 
 

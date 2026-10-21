@@ -796,7 +796,7 @@ public class WeakHashMap<K extends @Immutable Object,V>
         }
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     private abstract class HashIterator<T> implements Iterator<T> {
         private int index;
         private Entry<K,V> entry;
@@ -870,23 +870,23 @@ public class WeakHashMap<K extends @Immutable Object,V>
 
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     private class ValueIterator extends HashIterator<V> {
-        public V next(@NonEmpty @Readonly ValueIterator this) {
+        public V next(@NonEmpty @Mutable ValueIterator this) {
             return nextEntry().value;
         }
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     private class KeyIterator extends HashIterator<K> {
-        public K next(@NonEmpty @Readonly KeyIterator this) {
+        public K next(@NonEmpty @Mutable KeyIterator this) {
             return nextEntry().getKey();
         }
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     private class EntryIterator extends HashIterator<Map.Entry<K,V>> {
-        public Map.Entry<K,V> next(@NonEmpty @Readonly EntryIterator this) {
+        public Map.Entry<K,V> next(@NonEmpty @Mutable EntryIterator this) {
             return nextEntry();
         }
     }
@@ -921,7 +921,7 @@ public class WeakHashMap<K extends @Immutable Object,V>
     @ReceiverDependentMutable
     private class KeySet extends AbstractSet<K> {
         @SideEffectFree
-        public @ReceiverDependentMutable Iterator<K> iterator(@ReceiverDependentMutable KeySet this) {
+        public @Mutable Iterator<K> iterator(@ReceiverDependentMutable KeySet this) {
             return new KeyIterator();
         }
 
@@ -981,7 +981,7 @@ public class WeakHashMap<K extends @Immutable Object,V>
     @ReceiverDependentMutable
     private class Values extends AbstractCollection<V> {
         @SideEffectFree
-        public @ReceiverDependentMutable Iterator<V> iterator(@ReceiverDependentMutable Values this) {
+        public @Mutable Iterator<V> iterator(@ReceiverDependentMutable Values this) {
             return new ValueIterator();
         }
 
@@ -1029,7 +1029,7 @@ public class WeakHashMap<K extends @Immutable Object,V>
     @ReceiverDependentMutable
     private class EntrySet extends AbstractSet<Map.@Readonly Entry<K,V>> {
         @SideEffectFree
-        public @ReceiverDependentMutable Iterator<Map.@Readonly Entry<K,V>> iterator(@ReceiverDependentMutable EntrySet this) {
+        public @Mutable Iterator<Map.@Readonly Entry<K,V>> iterator(@ReceiverDependentMutable EntrySet this) {
             return new EntryIterator();
         }
 
@@ -1125,7 +1125,7 @@ public class WeakHashMap<K extends @Immutable Object,V>
      * Similar form as other hash Spliterators, but skips dead
      * elements.
      */
-    @ReceiverDependentMutable
+    @Mutable
     static class WeakHashMapSpliterator<K extends @Immutable Object,V> {
         final @Readonly WeakHashMap<K,V> map;
         WeakHashMap.Entry<K,V> current; // current node
@@ -1161,7 +1161,7 @@ public class WeakHashMap<K extends @Immutable Object,V>
         }
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     static final class KeySpliterator<K extends @Immutable Object,V>
         extends WeakHashMapSpliterator<K,V>
         implements Spliterator<K> {
@@ -1177,7 +1177,7 @@ public class WeakHashMap<K extends @Immutable Object,V>
                                      expectedModCount);
         }
 
-        public void forEachRemaining(@Readonly KeySpliterator<K,V> this, Consumer<? super K> action) {
+        public void forEachRemaining(@Mutable KeySpliterator<K,V> this, Consumer<? super K> action) {
             int i, hi, mc;
             if (action == null)
                 throw new NullPointerException();
@@ -1242,7 +1242,7 @@ public class WeakHashMap<K extends @Immutable Object,V>
         }
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     static final class ValueSpliterator<K extends @Immutable Object,V>
         extends WeakHashMapSpliterator<K,V>
         implements Spliterator<V> {
@@ -1258,7 +1258,7 @@ public class WeakHashMap<K extends @Immutable Object,V>
                                        expectedModCount);
         }
 
-        public void forEachRemaining(@Readonly ValueSpliterator<K,V> this, Consumer<? super V> action) {
+        public void forEachRemaining(@Mutable ValueSpliterator<K,V> this, Consumer<? super V> action) {
             int i, hi, mc;
             if (action == null)
                 throw new NullPointerException();
@@ -1320,7 +1320,7 @@ public class WeakHashMap<K extends @Immutable Object,V>
         }
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     static final class EntrySpliterator<K extends @Immutable Object,V>
         extends WeakHashMapSpliterator<K,V>
         implements Spliterator<Map.Entry<K,V>> {
@@ -1337,7 +1337,7 @@ public class WeakHashMap<K extends @Immutable Object,V>
         }
 
 
-        public void forEachRemaining(@Readonly EntrySpliterator<K,V> this, Consumer<? super Map.Entry<K, V>> action) {
+        public void forEachRemaining(@Mutable EntrySpliterator<K,V> this, Consumer<? super Map.Entry<K, V>> action) {
             int i, hi, mc;
             if (action == null)
                 throw new NullPointerException();

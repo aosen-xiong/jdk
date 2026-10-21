@@ -97,7 +97,7 @@ class RegularEnumSet<E extends Enum<E>> extends EnumSet<E> {
         return new @Mutable EnumSetIterator<>();
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     private class EnumSetIterator<E extends Enum<E>> implements Iterator<E> {
         /**
          * A bit vector representing the elements in the set not yet

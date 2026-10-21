@@ -1236,14 +1236,14 @@ public class LinkedList<E>
     }
 
     /** A customized variant of Spliterators.IteratorSpliterator */
-    @ReceiverDependentMutable
+    @Mutable
     static final class LLSpliterator<E> implements Spliterator<E> {
         static final int BATCH_UNIT = 1 << 10;  // batch array size increment
         static final int MAX_BATCH = 1 << 25;  // max batch array size;
         final @Readonly LinkedList<E> list; // null OK unless traversed
-        @Assignable /* should be @LazyFinal */ @Readonly Node<E> current;      // current node; null until initialized
-        @Assignable /* should be @LazyFinal */ int est;              // size estimate; -1 until first needed
-        @Assignable /* should be @LazyFinal */ int expectedModCount; // initialized when est set
+        @Assignable @Readonly Node<E> current;      // current node; null until initialized by getEst(@Readonly), then advanced
+        @Assignable int est;              // size estimate; -1 until first needed, initialized by getEst(@Readonly)
+        @Assignable int expectedModCount; // initialized when est set, by getEst(@Readonly)
         int batch;            // batch size for splits
 
         LLSpliterator(@Readonly LinkedList<E> list, int est, int expectedModCount) {
@@ -1289,7 +1289,7 @@ public class LinkedList<E>
             return null;
         }
 
-        public void forEachRemaining(@Readonly LLSpliterator<E> this, Consumer<? super E> action) {
+        public void forEachRemaining(@Mutable LLSpliterator<E> this, Consumer<? super E> action) {
             Node<E> p; int n;
             if (action == null) throw new NullPointerException();
             if ((n = getEst()) > 0 && (p = current) != null) {

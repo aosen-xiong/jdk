@@ -357,9 +357,9 @@ public class Vector<E>
      * @return  an enumeration of the components of this vector
      * @see     Iterator
      */
-    public @ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty Enumeration<E> elements(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty Vector<E> this) {
-        return new @ReceiverDependentMutable Enumeration<E>() {
-            @Assignable int count = 0;
+    public @Mutable @PolyGrowShrink @PolyNonEmpty Enumeration<E> elements(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty Vector<E> this) {
+        return new @Mutable Enumeration<E>() {
+            int count = 0;
 
             @EnsuresNonEmptyIf(result = true, expression = "this")
             public boolean hasMoreElements() {

@@ -1456,13 +1456,13 @@ public class IdentityHashMap<K extends @Readonly Object,V>
      * Similar form as array-based Spliterators, but skips blank elements,
      * and guestimates size as decreasing by half per split.
      */
-    @ReceiverDependentMutable
+    @Mutable
     static class IdentityHashMapSpliterator<K extends @Readonly Object,V> {
         final @Readonly IdentityHashMap<K,V> map;
         int index;             // current index, modified on advance/split
-        @Assignable /* should be @LazyFinal */ int fence;             // -1 until first use; then one past last index
-        @Assignable /* should be @LazyFinal */ int est;               // size estimate
-        @Assignable /* should be @LazyFinal */ int expectedModCount;  // initialized when fence set
+        @Assignable int fence;             // -1 until first use; then one past last index, initialized by getFence(@Readonly)
+        @Assignable int est;               // size estimate, initialized by getFence(@Readonly), then halved by trySplit
+        @Assignable int expectedModCount;  // initialized when fence set, by getFence(@Readonly)
 
         IdentityHashMapSpliterator(@Readonly IdentityHashMap<K,V> map, int origin,
                                    int fence, int est, int expectedModCount) {
@@ -1489,7 +1489,7 @@ public class IdentityHashMap<K extends @Readonly Object,V>
         }
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     static final class KeySpliterator<K extends @Readonly Object,V>
         extends IdentityHashMapSpliterator<K,V>
         implements Spliterator<K> {
@@ -1547,7 +1547,7 @@ public class IdentityHashMap<K extends @Readonly Object,V>
         }
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     static final class ValueSpliterator<K extends @Readonly Object,V>
         extends IdentityHashMapSpliterator<K,V>
         implements Spliterator<V> {
@@ -1607,7 +1607,7 @@ public class IdentityHashMap<K extends @Readonly Object,V>
 
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     static final class EntrySpliterator<K extends @Readonly Object,V>
         extends IdentityHashMapSpliterator<K,V>
         implements Spliterator<Map.@Readonly Entry<K,V>> {

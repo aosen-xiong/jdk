@@ -1345,9 +1345,9 @@ import jdk.internal.util.ArraysSupport;
             rangeCheckForAdd(index);
 
             return new @Mutable ListIterator<E>() {
-                @Assignable int cursor = index;
-                @Assignable int lastRet = -1;
-                @Assignable int expectedModCount = SubList.this.modCount;
+                int cursor = index;
+                int lastRet = -1;
+                int expectedModCount = SubList.this.modCount;
 
                 @Pure
                 @EnsuresNonEmptyIf(result = true, expression = "this")
