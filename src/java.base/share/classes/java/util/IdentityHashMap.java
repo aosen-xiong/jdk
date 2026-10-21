@@ -1066,9 +1066,8 @@ public class IdentityHashMap<K extends @Readonly Object,V>
             return result;
         }
         @SideEffectFree
-        @SuppressWarnings("mutability:override.return.invalid") // K extends @Immutable Object, so every key is @Immutable. That is the precise return, which an override of a @PolyMutable return cannot state
-        public @Immutable Object[] toArray(@Readonly KeySet this) {
-            return toArray(new @Immutable Object[0]);
+        public @PolyMutable Object[] toArray(@Readonly IdentityHashMap<@PolyMutable K, V>.@Readonly KeySet this) {
+            return toArray(new @PolyMutable Object[0]);
         }
         @SuppressWarnings("unchecked")
         @SideEffectFree
