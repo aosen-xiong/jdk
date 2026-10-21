@@ -1871,7 +1871,8 @@ public class Collections {
              * an ill-behaved Map.Entry that attempts to modify another
              * Map Entry when asked to perform an equality check.
              */
-            @Immutable private static class UnmodifiableEntry<K extends @Readonly Object,V> implements Map.Entry<K,V> {
+            // an unmodifiable view of a live entry of the backing map: its getValue() changes when the map changes, so it is handed out @Readonly, never @Immutable
+            private static class UnmodifiableEntry<K extends @Readonly Object,V> implements Map.Entry<K,V> {
                 private Map.@Readonly Entry<? extends K, ? extends V> e;
 
                 UnmodifiableEntry(Map.@Readonly Entry<? extends K, ? extends V> e)
@@ -2030,7 +2031,7 @@ public class Collections {
         public K higherKey(K key)                 { return nm.higherKey(key); }
 
         @SuppressWarnings("unchecked")
-        public @Immutable Entry<K, V> lowerEntry(K key) {
+        public @Readonly Entry<K, V> lowerEntry(K key) {
             Entry<K,V> lower = (Entry<K, V>) nm.lowerEntry(key);
             return (null != lower)
                 ? new UnmodifiableEntrySet.UnmodifiableEntry<>(lower)
@@ -2038,7 +2039,7 @@ public class Collections {
         }
 
         @SuppressWarnings("unchecked")
-        public @Immutable Entry<K, V> floorEntry(K key) {
+        public @Readonly Entry<K, V> floorEntry(K key) {
             Entry<K,V> floor = (Entry<K, V>) nm.floorEntry(key);
             return (null != floor)
                 ? new UnmodifiableEntrySet.UnmodifiableEntry<>(floor)
@@ -2046,7 +2047,7 @@ public class Collections {
         }
 
         @SuppressWarnings("unchecked")
-        public @Immutable Entry<K, V> ceilingEntry(K key) {
+        public @Readonly Entry<K, V> ceilingEntry(K key) {
             Entry<K,V> ceiling = (Entry<K, V>) nm.ceilingEntry(key);
             return (null != ceiling)
                 ? new UnmodifiableEntrySet.UnmodifiableEntry<>(ceiling)
@@ -2055,7 +2056,7 @@ public class Collections {
 
 
         @SuppressWarnings("unchecked")
-        public @Immutable Entry<K, V> higherEntry(K key) {
+        public @Readonly Entry<K, V> higherEntry(K key) {
             Entry<K,V> higher = (Entry<K, V>) nm.higherEntry(key);
             return (null != higher)
                 ? new UnmodifiableEntrySet.UnmodifiableEntry<>(higher)
@@ -2063,7 +2064,7 @@ public class Collections {
         }
 
         @SuppressWarnings("unchecked")
-        public @Immutable Entry<K, V> firstEntry() {
+        public @Readonly Entry<K, V> firstEntry() {
             Entry<K,V> first = (Entry<K, V>) nm.firstEntry();
             return (null != first)
                 ? new UnmodifiableEntrySet.UnmodifiableEntry<>(first)
@@ -2071,16 +2072,16 @@ public class Collections {
         }
 
         @SuppressWarnings("unchecked")
-        public @Immutable Entry<K, V> lastEntry() {
+        public @Readonly Entry<K, V> lastEntry() {
             Entry<K,V> last = (Entry<K, V>) nm.lastEntry();
             return (null != last)
                 ? new UnmodifiableEntrySet.UnmodifiableEntry<>(last)
                 : null;
         }
 
-        public @Immutable Entry<K, V> pollFirstEntry()
+        public @Readonly Entry<K, V> pollFirstEntry()
                                  { throw new UnsupportedOperationException(); }
-        public @Immutable Entry<K, V> pollLastEntry()
+        public @Readonly Entry<K, V> pollLastEntry()
                                  { throw new UnsupportedOperationException(); }
         @SideEffectFree
         public @ReceiverDependentMutable NavigableMap<K, V> descendingMap()
@@ -5593,13 +5594,14 @@ public class Collections {
      * @see Comparable
      */
     @SuppressWarnings("unchecked")
-    public static <T> Comparator<T> reverseOrder() {
-        return (Comparator<T>) ReverseComparator.REVERSE_ORDER;
+    public static <T> @Immutable Comparator<T> reverseOrder() {
+        return (@Immutable Comparator<T>) ReverseComparator.REVERSE_ORDER;
     }
 
     /**
      * @serial include
      */
+    @Immutable // a stateless shared singleton
     private static class ReverseComparator
         implements Comparator<Comparable<Object>>, Serializable {
 
@@ -5614,7 +5616,7 @@ public class Collections {
         }
 
         @java.io.Serial
-        private Object readResolve() { return Collections.reverseOrder(); }
+        private @Immutable Object readResolve() { return Collections.reverseOrder(); }
 
         @Override
         public @Immutable Comparator<Comparable<Object>> reversed() {
@@ -5713,8 +5715,8 @@ public class Collections {
      * @return an enumeration over the specified collection.
      * @see Enumeration
      */
-    public static <T> @Readonly Enumeration<T> enumeration(final Collection<T> c) {
-        return new @Immutable Enumeration<T>() {
+    public static <T> @Mutable Enumeration<T> enumeration(final @Readonly Collection<T> c) {
+        return new @Mutable Enumeration<T>() {
             private final @Mutable Iterator<T> i = c.iterator();
 
             @EnsuresNonEmptyIf(result = true, expression = "this")

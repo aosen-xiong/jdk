@@ -659,10 +659,10 @@ public interface Map<K extends @Readonly Object, V> {
          * @since 17
          */
         @SuppressWarnings("unchecked")
-        public static <K extends @Immutable Object, V extends @Readonly Object> Map.@Readonly Entry<K, V> copyOf(Map.@Readonly Entry<? extends K, ? extends V> e) {
+        public static <K extends @Immutable Object, V extends @Readonly Object> Map.@Immutable Entry<K, V> copyOf(Map.@Readonly Entry<? extends K, ? extends V> e) {
             Objects.requireNonNull(e);
             if (e instanceof KeyValueHolder) {
-                return (Map.@Readonly Entry<K, V>) e;
+                return (Map.@Immutable Entry<K, V>) e;
             } else {
                 return Map.entry(e.getKey(), e.getValue());
             }
@@ -1712,7 +1712,7 @@ public interface Map<K extends @Readonly Object, V> {
      */
     @SafeVarargs
     @SuppressWarnings("varargs")
-    static <K extends @Immutable Object, V extends @Readonly Object> @PolyNonEmpty @Immutable Map<K, V> ofEntries(Entry<? extends K, ? extends V> @Readonly @PolyNonEmpty... entries) {
+    static <K extends @Immutable Object, V extends @Readonly Object> @PolyNonEmpty @Immutable Map<K, V> ofEntries(@Readonly Entry<? extends K, ? extends V> @Readonly @PolyNonEmpty... entries) {
         if (entries.length == 0) { // implicit null check of entries array
             @SuppressWarnings("unchecked")
             var map = (@Immutable Map<K,V>) ImmutableCollections.EMPTY_MAP;
@@ -1768,7 +1768,7 @@ public interface Map<K extends @Readonly Object, V> {
      * @see Map#ofEntries Map.ofEntries()
      * @since 9
      */
-    static <K extends @Immutable Object, V extends @Readonly Object> @Readonly Entry<K, V> entry(K k, V v) {
+    static <K extends @Immutable Object, V extends @Readonly Object> @Immutable Entry<K, V> entry(K k, V v) {
         // KeyValueHolder checks for nulls
         return new KeyValueHolder<>(k, v);
     }
