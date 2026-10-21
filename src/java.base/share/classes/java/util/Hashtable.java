@@ -1421,7 +1421,7 @@ public class Hashtable<K extends @NonNull @Immutable Object,V extends @NonNull O
         final int hash;
         final K key;
         V value;
-        @Assignable Entry<K,V> next;
+        Entry<K,V> next;
 
         protected Entry(int hash, K key, V value, @ReceiverDependentMutable Entry<K,V> next) {
             this.hash = hash;

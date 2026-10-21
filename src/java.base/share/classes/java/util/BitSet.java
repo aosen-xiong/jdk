@@ -112,7 +112,7 @@ public class BitSet implements Cloneable, java.io.Serializable {
     /**
      * The number of words in the logical size of this BitSet.
      */
-    private transient @Assignable int wordsInUse = 0;
+    private transient int wordsInUse = 0;
 
     /**
      * Whether the size of "words" is user-specified.  If so, we assume

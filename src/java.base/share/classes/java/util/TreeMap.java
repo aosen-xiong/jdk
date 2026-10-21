@@ -148,7 +148,7 @@ public class TreeMap<K extends @Immutable Object,V>
     @SuppressWarnings("serial") // Conditionally serializable
     private final @Readonly Comparator<? super K> comparator;
 
-    private transient @Assignable Entry<K,V> root;
+    private transient Entry<K,V> root;
 
     /**
      * The number of entries in the tree
@@ -2498,10 +2498,10 @@ public class TreeMap<K extends @Immutable Object,V>
     static final class Entry<K extends @Immutable Object,V> implements Map.Entry<K,V> {
         K key;
         V value;
-        @Assignable Entry<K,V> left;
-        @Assignable Entry<K,V> right;
-        @Assignable Entry<K,V> parent;
-        @Assignable boolean color = BLACK;
+        Entry<K,V> left;
+        Entry<K,V> right;
+        Entry<K,V> parent;
+        boolean color = BLACK;
 
         /**
          * Make a new cell with given key, value, and parent, and with
@@ -2650,7 +2650,7 @@ public class TreeMap<K extends @Immutable Object,V>
         return (p == null ? null: p.parent);
     }
 
-    private static <K extends @Immutable Object,V> void setColor(@Readonly Entry<K,V> p, boolean c) {
+    private static <K extends @Immutable Object,V> void setColor(@Mutable Entry<K,V> p, boolean c) {
         if (p != null)
             p.color = c;
     }

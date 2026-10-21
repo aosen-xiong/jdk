@@ -212,7 +212,7 @@ public class LinkedHashMap<K extends @Immutable Object,V>
      */
     @ReceiverDependentMutable
     static class Entry<K extends @Immutable Object,V> extends HashMap.Node<K,V> {
-        @Assignable Entry<K,V> before, after;
+        Entry<K,V> before, after;
         Entry(int hash, K key, V value, @ReceiverDependentMutable Node<K,V> next) {
             super(hash, key, value, next);
         }
@@ -224,12 +224,12 @@ public class LinkedHashMap<K extends @Immutable Object,V>
     /**
      * The head (eldest) of the doubly linked list.
      */
-    transient @Assignable LinkedHashMap.Entry<K,V> head;
+    transient LinkedHashMap.Entry<K,V> head;
 
     /**
      * The tail (youngest) of the doubly linked list.
      */
-    transient @Assignable LinkedHashMap.Entry<K,V> tail;
+    transient LinkedHashMap.Entry<K,V> tail;
 
     /**
      * The iteration ordering method for this linked hash map: {@code true}
@@ -326,7 +326,7 @@ public class LinkedHashMap<K extends @Immutable Object,V>
         }
     }
 
-    @SuppressWarnings("mutability") // Still can not type this as readonly
+    @SuppressWarnings({"mutability:illegal.field.write", "mutability:mutability.lost.lhs", "mutability:assignment.type.incompatible"}) // documented exception: in an access-ordered map "merely querying the map with get is a structural modification" (class Javadoc), so get(@Readonly) relinks the entries and changes the observable iteration order through a read-only receiver
     void afterNodeAccess(@Readonly LinkedHashMap<K,V> this, @Readonly Node<K,V> e) { // move node to last
         LinkedHashMap.Entry<K,V> last;
         if (accessOrder && (last = tail) != e) {

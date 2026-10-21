@@ -2010,11 +2010,11 @@ public class HashMap<K extends @Immutable Object,V> extends AbstractMap<K,V>
      */
     @ReceiverDependentMutable
     static final class TreeNode<K extends @Immutable Object,V> extends LinkedHashMap.Entry<K,V> {
-        @Assignable TreeNode<K,V> parent;  // red-black tree links
-        @Assignable TreeNode<K,V> left;
-        @Assignable TreeNode<K,V> right;
-        @Assignable TreeNode<K,V> prev;    // needed to unlink next upon deletion
-        @Assignable boolean red;
+        TreeNode<K,V> parent;  // red-black tree links
+        TreeNode<K,V> left;
+        TreeNode<K,V> right;
+        TreeNode<K,V> prev;    // needed to unlink next upon deletion
+        boolean red;
         TreeNode(int hash, K key, V val, @ReceiverDependentMutable Node<K,V> next) {
             super(hash, key, val, next);
         }
