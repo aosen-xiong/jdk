@@ -670,7 +670,7 @@ public final @UsesObjectEquals class System {
     @SideEffectFree
     @IntrinsicCandidate
     public static native void arraycopy(@PolySigned @GuardSatisfied @Readonly Object src,  @NonNegative int  srcPos,
-                                        @PolySigned @GuardSatisfied @Readonly Object dest, @NonNegative int destPos,
+                                        @PolySigned @GuardSatisfied @Mutable Object dest, @NonNegative int destPos,
                                         @LTLengthOf(value={"#1", "#3"}, offset={"#2 - 1", "#4 - 1"}) @NonNegative int length);
 
     /**

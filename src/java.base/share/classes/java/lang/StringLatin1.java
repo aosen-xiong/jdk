@@ -92,7 +92,7 @@ final class StringLatin1 {
         inflate(value, srcBegin, dst, dstBegin, srcEnd - srcBegin);
     }
 
-    public static void getBytes(byte @Readonly [] value, int srcBegin, int srcEnd, byte dst @Readonly [], int dstBegin) {
+    public static void getBytes(byte @Readonly [] value, int srcBegin, int srcEnd, byte dst[], int dstBegin) {
         System.arraycopy(value, srcBegin, dst, dstBegin, srcEnd - srcBegin);
     }
 
