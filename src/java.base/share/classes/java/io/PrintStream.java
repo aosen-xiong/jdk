@@ -35,7 +35,6 @@ import org.checkerframework.checker.mustcall.qual.MustCallAlias;
 import org.checkerframework.checker.mustcall.qual.NotOwning;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.mutability.qual.Readonly;
-import org.checkerframework.checker.mutability.qual.ReceiverDependentMutable;
 import org.checkerframework.checker.signedness.qual.PolySigned;
 import org.checkerframework.framework.qual.AnnotatedFor;
 import org.checkerframework.framework.qual.CFComment;
@@ -77,7 +76,6 @@ import java.nio.charset.UnsupportedCharsetException;
 
 @CFComment({"lock: TODO: Should parameters be @GuardSatisfied, or is the default of @GuardedBy({}) appropriate? (@GuardedBy({}) is more conservative.)"})
 @AnnotatedFor({"formatter", "i18n", "index", "initialization", "lock", "mustcall", "nullness", "signedness"})
-@ReceiverDependentMutable
 public class PrintStream extends FilterOutputStream
     implements Appendable, Closeable
 {

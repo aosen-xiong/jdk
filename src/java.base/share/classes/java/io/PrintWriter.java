@@ -33,7 +33,6 @@ import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.mustcall.qual.MustCallAlias;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.mutability.qual.Readonly;
-import org.checkerframework.checker.mutability.qual.ReceiverDependentMutable;
 
 import org.checkerframework.framework.qual.AnnotatedFor;
 
@@ -71,7 +70,6 @@ import java.nio.charset.UnsupportedCharsetException;
  */
 
 @AnnotatedFor({"formatter", "index", "initialization", "lock", "mustcall", "nullness"})
-@ReceiverDependentMutable
 public class PrintWriter extends Writer {
 
     /**
