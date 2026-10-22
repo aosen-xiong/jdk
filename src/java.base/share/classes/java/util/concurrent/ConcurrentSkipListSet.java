@@ -35,6 +35,8 @@
 
 package java.util.concurrent;
 
+import org.checkerframework.checker.mutability.qual.Readonly;
+import org.checkerframework.checker.mutability.qual.Immutable;
 import org.checkerframework.checker.index.qual.PolyGrowShrink;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nonempty.qual.EnsuresNonEmpty;
@@ -107,7 +109,7 @@ import java.util.Spliterator;
  * @since 1.6
  */
 @AnnotatedFor({"nullness"})
-public class ConcurrentSkipListSet<E extends @NonNull Object>
+public class ConcurrentSkipListSet<E extends @NonNull @Immutable Object>
     extends AbstractSet<E>
     implements NavigableSet<E>, Cloneable, java.io.Serializable {
 
@@ -152,7 +154,7 @@ public class ConcurrentSkipListSet<E extends @NonNull Object>
      * @throws NullPointerException if the specified collection or any
      *         of its elements are null
      */
-    public ConcurrentSkipListSet(Collection<? extends E> c) {
+    public ConcurrentSkipListSet(@Readonly Collection<? extends E> c) {
         m = new ConcurrentSkipListMap<E,Object>();
         addAll(c);
     }
@@ -165,7 +167,7 @@ public class ConcurrentSkipListSet<E extends @NonNull Object>
      * @throws NullPointerException if the specified sorted set or any
      *         of its elements are null
      */
-    public ConcurrentSkipListSet(SortedSet<E> s) {
+    public ConcurrentSkipListSet(@Readonly SortedSet<E> s) {
         m = new ConcurrentSkipListMap<E,Object>(s.comparator());
         addAll(s);
     }

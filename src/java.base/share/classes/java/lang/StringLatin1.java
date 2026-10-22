@@ -92,7 +92,7 @@ final class StringLatin1 {
         inflate(value, srcBegin, dst, dstBegin, srcEnd - srcBegin);
     }
 
-    public static void getBytes(byte @Readonly [] value, int srcBegin, int srcEnd, byte dst @Readonly [], int dstBegin) {
+    public static void getBytes(byte @Readonly [] value, int srcBegin, int srcEnd, byte dst[], int dstBegin) {
         System.arraycopy(value, srcBegin, dst, dstBegin, srcEnd - srcBegin);
     }
 
@@ -654,7 +654,7 @@ final class StringLatin1 {
         return (right != value.length) ? newString(value, 0, right) : null;
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     private static final class LinesSpliterator implements Spliterator<String> {
         private byte @Readonly [] value;
         private int index;        // current index, modified on advance/split
@@ -801,7 +801,7 @@ final class StringLatin1 {
         StringUTF16.inflate(src, srcOff, dst, dstOff, len);
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     static class CharsSpliterator implements Spliterator.OfInt {
         private final byte @Readonly [] array;
         private int index;        // current index, modified on advance/split

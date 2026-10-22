@@ -30,6 +30,7 @@ import org.checkerframework.checker.index.qual.NonNegative;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nonempty.qual.EnsuresNonEmptyIf;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.mutability.qual.PolyMutable;
 import org.checkerframework.checker.mutability.qual.Assignable;
 import org.checkerframework.checker.mutability.qual.Mutable;
 import org.checkerframework.checker.mutability.qual.Readonly;
@@ -111,7 +112,7 @@ public class BitSet implements Cloneable, java.io.Serializable {
     /**
      * The number of words in the logical size of this BitSet.
      */
-    private transient @Assignable int wordsInUse = 0;
+    private transient int wordsInUse = 0;
 
     /**
      * Whether the size of "words" is user-specified.  If so, we assume
@@ -182,6 +183,7 @@ public class BitSet implements Cloneable, java.io.Serializable {
         sizeIsSticky = true;
     }
 
+    @SuppressWarnings("mutability:illegal.field.write") // called only from constructors, on the bit set they are building
     private void initWords(BitSet this, int nbits) {
         words = new long @ReceiverDependentMutable [wordIndex(nbits-1) + 1];
     }
@@ -1125,7 +1127,8 @@ public class BitSet implements Cloneable, java.io.Serializable {
      * @see    #size()
      */
     @SideEffectFree
-    public Object clone(@GuardSatisfied @Mutable BitSet this) {
+    @SuppressWarnings({"mutability:return.type.incompatible", "mutability:assignment.type.incompatible", "mutability:method.invocation.invalid"}) // fresh unaliased copy: the body replaces every field it shared; its own state shares this's one poly. trimToSize() writes this.words even when this is @Immutable: it replaces the array with a shorter copy holding the same bits, a write that changes no bit but can change size(), which the Javadoc of trimToSize documents, so it is a documented exception the annotations cannot express
+    public @PolyMutable Object clone(@GuardSatisfied @PolyMutable BitSet this) {
         if (! sizeIsSticky)
             trimToSize();
 

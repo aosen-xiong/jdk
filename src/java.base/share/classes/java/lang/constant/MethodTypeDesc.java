@@ -31,6 +31,8 @@ import java.lang.invoke.TypeDescriptor;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.checkerframework.checker.mutability.qual.Immutable;
+import org.checkerframework.checker.mutability.qual.Readonly;
 
 /**
  * A <a href="package-summary.html#nominal">nominal descriptor</a> for a
@@ -38,6 +40,7 @@ import java.util.stream.Stream;
  *
  * @since 12
  */
+@Immutable
 public sealed interface MethodTypeDesc
         extends ConstantDesc,
                 TypeDescriptor.OfMethod<ClassDesc, MethodTypeDesc>
@@ -67,7 +70,8 @@ public sealed interface MethodTypeDesc
      * @throws IllegalArgumentException if any element of {@code paramDescs} is a
      * {@link ClassDesc} for {@code void}
      */
-    static MethodTypeDesc of(ClassDesc returnDesc, ClassDesc... paramDescs) {
+    // The array is stored without a copy, so the caller can still write it: @Readonly, not @Immutable.
+    static MethodTypeDesc of(ClassDesc returnDesc, ClassDesc @Readonly ... paramDescs) {
         return new MethodTypeDescImpl(returnDesc, paramDescs);
     }
 
@@ -101,7 +105,7 @@ public sealed interface MethodTypeDesc
      *
      * @return a {@link List} of {@link ClassDesc} describing the parameter types
      */
-    List<ClassDesc> parameterList();
+    @Immutable List<ClassDesc> parameterList();
 
     /**
      * Returns the parameter types as an array.
@@ -199,5 +203,5 @@ public sealed interface MethodTypeDesc
      * @param o the other object
      * @return whether this descriptor is equal to the other object
      */
-    boolean equals(Object o);
+    boolean equals(@Readonly Object o);
 }

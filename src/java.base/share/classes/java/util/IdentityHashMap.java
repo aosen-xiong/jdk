@@ -162,7 +162,7 @@ import jdk.internal.access.SharedSecrets;
 @CFComment({"lock/nullness: This collection can only contain null values"})
 @AnnotatedFor({"lock", "nullness", "index"})
 @ReceiverDependentMutable
-public class IdentityHashMap<K extends @Immutable Object,V>
+public class IdentityHashMap<K extends @Readonly Object,V>
     extends AbstractMap<K,V>
     implements Map<K,V>, java.io.Serializable, Cloneable
 {
@@ -291,7 +291,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
      * @throws NullPointerException if the specified map is null
      */
     @SuppressWarnings("mutability") // PICO constructor fix
-    public IdentityHashMap(Map<? extends K, ? extends V> m) {
+    public IdentityHashMap(@Readonly Map<? extends K, ? extends V> m) {
         // Allow for a bit of growth
         this((int) ((1 + m.size()) * 1.1));
         putAll(m);
@@ -675,7 +675,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
      * @see Object#equals(Object)
      */
     @Pure
-    public boolean equals(@GuardSatisfied @Readonly IdentityHashMap<K, V> this, @GuardSatisfied @Nullable @Readonly Object o) {
+    public boolean equals(@GuardSatisfied @ReceiverDependentMutable IdentityHashMap<K, V> this, @GuardSatisfied @Nullable @Readonly Object o) {
         if (o == this) {
             return true;
         } else if (o instanceof @Readonly IdentityHashMap<?, ?> m) {
@@ -737,7 +737,8 @@ public class IdentityHashMap<K extends @Immutable Object,V>
      * @return a shallow copy of this map
      */
     @SideEffectFree
-    public Object clone(@GuardSatisfied @Mutable IdentityHashMap<K, V> this) {
+    @SuppressWarnings({"mutability:return.type.incompatible", "mutability:assignment.type.incompatible"}) // fresh unaliased copy: the body replaces every field it shared
+    public @PolyMutable Object clone(@GuardSatisfied @PolyMutable IdentityHashMap<K, V> this) {
         try {
             IdentityHashMap<?,?> m = (IdentityHashMap<?,?>) super.clone();
             m.entrySet = null;
@@ -748,7 +749,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
         }
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     private abstract class IdentityHashMapIterator<T> implements Iterator<T> {
         @Assignable int index = (size != 0 ? 0 : table.length); // current slot.
         int expectedModCount = modCount; // to support fast-fail
@@ -772,7 +773,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
             return false;
         }
 
-        protected int nextIndex(@NonEmpty @Mutable IdentityHashMapIterator<T> this) {
+        protected int nextIndex(@Readonly IdentityHashMap<K,V>.@NonEmpty @Mutable IdentityHashMapIterator<T> this) {
             if (modCount != expectedModCount)
                 throw new ConcurrentModificationException();
             if (!indexValid && !hasNext())
@@ -862,7 +863,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
         }
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     private class KeyIterator extends IdentityHashMapIterator<K> {
         @SuppressWarnings("unchecked")
         public K next(@NonEmpty @Mutable KeyIterator this) {
@@ -870,7 +871,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
         }
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     private class ValueIterator extends IdentityHashMapIterator<V> {
         @SuppressWarnings("unchecked")
         public V next(@NonEmpty @Mutable ValueIterator this) {
@@ -878,14 +879,15 @@ public class IdentityHashMap<K extends @Immutable Object,V>
         }
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     private class EntryIterator
-        extends IdentityHashMapIterator<Map.@Readonly Entry<K,V>>
+        extends IdentityHashMapIterator<Map.@ReceiverDependentMutable Entry<K,V>>
     {
         // @SuppressWarnings("mutability:initialization.field.uninitialized") // lazy
         private @Readonly Entry lastReturnedEntry;
 
-        public Map.@Readonly Entry<K,V> next(@NonEmpty @Mutable EntryIterator this) {
+        @SuppressWarnings({"mutability:return.type.incompatible", "mutability:override.return.invalid"}) // the entries have the enclosing map's mutability, but the cursor reads them through the @Readonly enclosing map, and in the iterator's supertype a receiver-dependent qualifier is relative to the iterator, a fresh @Mutable cursor. There is no qualifier relative to the enclosing instance: https://github.com/eisop/checker-framework/issues/2322
+        public Map.@ReceiverDependentMutable Entry<K,V> next(@Readonly IdentityHashMap<K,V>.@NonEmpty @Mutable EntryIterator this) {
             lastReturnedEntry = new Entry(nextIndex());
             return lastReturnedEntry;
         }
@@ -1009,10 +1011,10 @@ public class IdentityHashMap<K extends @Immutable Object,V>
      * @see System#identityHashCode(Object)
      */
     @SideEffectFree
-    public @PolyMutable Set<@KeyFor({"this"}) K> keySet(@GuardSatisfied @PolyMutable IdentityHashMap<K, V> this) {
+    public @ReceiverDependentMutable Set<@KeyFor({"this"}) K> keySet(@GuardSatisfied @ReceiverDependentMutable IdentityHashMap<K, V> this) {
         Set<K> ks = keySet;
         if (ks == null) {
-            ks = new @PolyMutable KeySet();
+            ks = new @ReceiverDependentMutable KeySet();
             keySet = ks;
         }
         return ks;
@@ -1021,8 +1023,8 @@ public class IdentityHashMap<K extends @Immutable Object,V>
     @ReceiverDependentMutable
     private class KeySet extends AbstractSet<K> {
         @SideEffectFree
-        public Iterator<K> iterator(@Readonly KeySet this) {
-            return new KeyIterator();
+        public @Mutable Iterator<K> iterator(@ReceiverDependentMutable KeySet this) {
+            return new @Mutable KeyIterator();
         }
         @Pure
         public @NonNegative int size(@Readonly KeySet this) {
@@ -1064,8 +1066,8 @@ public class IdentityHashMap<K extends @Immutable Object,V>
             return result;
         }
         @SideEffectFree
-        public Object[] toArray() {
-            return toArray(new Object[0]);
+        public @PolyMutable Object[] toArray(@Readonly IdentityHashMap<@PolyMutable K, V>.@Readonly KeySet this) {
+            return toArray(new @PolyMutable Object[0]);
         }
         @SuppressWarnings("unchecked")
         @SideEffectFree
@@ -1098,7 +1100,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
         }
 
         @SideEffectFree
-        public Spliterator<K> spliterator(@Readonly KeySet this) {
+        public Spliterator<K> spliterator(@ReceiverDependentMutable KeySet this) {
             return new KeySpliterator<>(IdentityHashMap.this, 0, -1, 0, 0);
         }
     }
@@ -1124,10 +1126,10 @@ public class IdentityHashMap<K extends @Immutable Object,V>
      * {@code containsAll} methods.</b>
      */
     @SideEffectFree
-    public @PolyMutable Collection<V> values(@GuardSatisfied @PolyMutable IdentityHashMap<K, V> this) {
+    public @ReceiverDependentMutable Collection<V> values(@GuardSatisfied @ReceiverDependentMutable IdentityHashMap<K, V> this) {
         Collection<V> vs = values;
         if (vs == null) {
-            vs = new @PolyMutable Values();
+            vs = new @ReceiverDependentMutable Values();
             values = vs;
         }
         return vs;
@@ -1136,8 +1138,8 @@ public class IdentityHashMap<K extends @Immutable Object,V>
     @ReceiverDependentMutable
     private class Values extends AbstractCollection<V> {
         @SideEffectFree
-        public Iterator<V> iterator(@Readonly Values this) {
-            return new ValueIterator();
+        public @Mutable Iterator<V> iterator(@ReceiverDependentMutable Values this) {
+            return new @Mutable ValueIterator();
         }
         @Pure
         public @NonNegative int size(@Readonly Values this) {
@@ -1161,8 +1163,8 @@ public class IdentityHashMap<K extends @Immutable Object,V>
             IdentityHashMap.this.clear();
         }
         @SideEffectFree
-        public Object[] toArray() {
-            return toArray(new Object[0]);
+        public @PolyMutable Object[] toArray(@Readonly IdentityHashMap<K, @PolyMutable V>.@Readonly Values this) {
+            return toArray(new @PolyMutable Object[0]);
         }
         @SuppressWarnings("unchecked")
         @SideEffectFree
@@ -1194,7 +1196,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
         }
 
         @SideEffectFree
-        public Spliterator<V> spliterator(@Readonly Values this) {
+        public Spliterator<V> spliterator(@ReceiverDependentMutable Values this) {
             return new ValueSpliterator<>(IdentityHashMap.this, 0, -1, 0, 0);
         }
     }
@@ -1238,20 +1240,20 @@ public class IdentityHashMap<K extends @Immutable Object,V>
      * @return a set view of the identity-mappings contained in this map
      */
     @SideEffectFree
-    @SuppressWarnings("mutability:assignment.type.incompatible") // polyq on supertype's type argument
-    public @PolyMutable Set<Map.@PolyMutable Entry<@KeyFor({"this"}) K,V>> entrySet(@GuardSatisfied @PolyMutable IdentityHashMap<K, V> this) {
-        Set<Map.@PolyMutable Entry<K,V>> es = entrySet;
+    public @ReceiverDependentMutable Set<Map.@ReceiverDependentMutable Entry<@KeyFor({"this"}) K,V>> entrySet(@GuardSatisfied @ReceiverDependentMutable IdentityHashMap<K, V> this) {
+        Set<Map.@ReceiverDependentMutable Entry<K,V>> es = entrySet;
         if (es != null)
             return es;
         else
-            return entrySet = new @PolyMutable EntrySet();
+            return entrySet = new @ReceiverDependentMutable EntrySet();
     }
 
     @ReceiverDependentMutable
-    private class EntrySet extends AbstractSet<Map.@Readonly Entry<K,V>> {
+    private class EntrySet extends AbstractSet<Map.@ReceiverDependentMutable Entry<K,V>> {
         @SideEffectFree
-        public Iterator<Map.@Readonly Entry<K,V>> iterator(@Readonly EntrySet this) {
-            return new EntryIterator();
+        @SuppressWarnings("mutability:return.type.incompatible") // the entries have the enclosing map's mutability, but in the iterator class's supertype a receiver-dependent qualifier is relative to the iterator, which is a fresh @Mutable cursor. There is no qualifier relative to the enclosing instance: https://github.com/eisop/checker-framework/issues/2322
+        public @Mutable Iterator<Map.@ReceiverDependentMutable Entry<K,V>> iterator(@ReceiverDependentMutable EntrySet this) {
+            return new @Mutable EntryIterator();
         }
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
@@ -1288,8 +1290,8 @@ public class IdentityHashMap<K extends @Immutable Object,V>
         }
 
         @SideEffectFree
-        public Object[] toArray() {
-            return toArray(new Object[0]);
+        public @PolyMutable Object[] toArray(@Readonly IdentityHashMap<K, V>.@Readonly EntrySet this) {
+            return toArray(new @PolyMutable Object[0]);
         }
 
         @SuppressWarnings({"unchecked", "mutability:argument.type.incompatible"}) // overappoximation
@@ -1323,7 +1325,8 @@ public class IdentityHashMap<K extends @Immutable Object,V>
         }
 
         @SideEffectFree
-        public Spliterator<Map.Entry<K,V>> spliterator(@Readonly EntrySet this) {
+        @SuppressWarnings("mutability:override.return.invalid") // EntrySpliterator reads the map's nodes through a @Readonly field, so it can only promise @Readonly entries. The set's entries are @ReceiverDependentMutable, but the implementation gives the checker no way to relate the nodes it reads to this set's receiver
+        public Spliterator<Map.@Readonly Entry<K,V>> spliterator(@ReceiverDependentMutable EntrySet this) {
             return new EntrySpliterator<>(IdentityHashMap.this, 0, -1, 0, 0);
         }
     }
@@ -1342,7 +1345,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
      *          particular order.
      */
     @java.io.Serial
-    private void writeObject(@Mutable IdentityHashMap<K,V> this, java.io.ObjectOutputStream s)
+    private void writeObject(@Readonly IdentityHashMap<K,V> this, java.io.ObjectOutputStream s)
         throws java.io.IOException  {
         // Write out and any hidden stuff
         s.defaultWriteObject();
@@ -1414,7 +1417,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
 
     @SuppressWarnings("unchecked")
     @Override
-    public void forEach(@Mutable IdentityHashMap<K,V> this, BiConsumer<? super K, ? super V> action) {
+    public void forEach(@Readonly IdentityHashMap<K,V> this, BiConsumer<? super K, ? super V> action) {
         Objects.requireNonNull(action);
         int expectedModCount = modCount;
 
@@ -1454,13 +1457,13 @@ public class IdentityHashMap<K extends @Immutable Object,V>
      * Similar form as array-based Spliterators, but skips blank elements,
      * and guestimates size as decreasing by half per split.
      */
-    @ReceiverDependentMutable
-    static class IdentityHashMapSpliterator<K extends @Immutable Object,V> {
+    @Mutable
+    static class IdentityHashMapSpliterator<K extends @Readonly Object,V> {
         final @Readonly IdentityHashMap<K,V> map;
         int index;             // current index, modified on advance/split
-        @Assignable /* should be @LazyFinal */ int fence;             // -1 until first use; then one past last index
-        @Assignable /* should be @LazyFinal */ int est;               // size estimate
-        @Assignable /* should be @LazyFinal */ int expectedModCount;  // initialized when fence set
+        @Assignable int fence;             // -1 until first use; then one past last index, initialized by getFence(@Readonly)
+        @Assignable int est;               // size estimate, initialized by getFence(@Readonly), then halved by trySplit
+        @Assignable int expectedModCount;  // initialized when fence set, by getFence(@Readonly)
 
         IdentityHashMapSpliterator(@Readonly IdentityHashMap<K,V> map, int origin,
                                    int fence, int est, int expectedModCount) {
@@ -1487,8 +1490,8 @@ public class IdentityHashMap<K extends @Immutable Object,V>
         }
     }
 
-    @ReceiverDependentMutable
-    static final class KeySpliterator<K extends @Immutable Object,V>
+    @Mutable
+    static final class KeySpliterator<K extends @Readonly Object,V>
         extends IdentityHashMapSpliterator<K,V>
         implements Spliterator<K> {
         KeySpliterator(@Readonly IdentityHashMap<K,V> map, int origin, int fence, int est,
@@ -1545,8 +1548,8 @@ public class IdentityHashMap<K extends @Immutable Object,V>
         }
     }
 
-    @ReceiverDependentMutable
-    static final class ValueSpliterator<K extends @Immutable Object,V>
+    @Mutable
+    static final class ValueSpliterator<K extends @Readonly Object,V>
         extends IdentityHashMapSpliterator<K,V>
         implements Spliterator<V> {
         ValueSpliterator(@Readonly IdentityHashMap<K,V> m, int origin, int fence, int est,
@@ -1605,10 +1608,10 @@ public class IdentityHashMap<K extends @Immutable Object,V>
 
     }
 
-    @ReceiverDependentMutable
-    static final class EntrySpliterator<K extends @Immutable Object,V>
+    @Mutable
+    static final class EntrySpliterator<K extends @Readonly Object,V>
         extends IdentityHashMapSpliterator<K,V>
-        implements Spliterator<Map.Entry<K,V>> {
+        implements Spliterator<Map.@Readonly Entry<K,V>> {
         EntrySpliterator(@Readonly IdentityHashMap<K,V> m, int origin, int fence, int est,
                          int expectedModCount) {
             super(m, origin, fence, est, expectedModCount);
@@ -1621,7 +1624,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
                                        expectedModCount);
         }
 
-        public void forEachRemaining(@Mutable EntrySpliterator<K,V> this, Consumer<? super Map.@Immutable Entry<K, V>> action) {
+        public void forEachRemaining(@Mutable EntrySpliterator<K,V> this, Consumer<? super Map.@Readonly Entry<K, V>> action) {
             if (action == null)
                 throw new NullPointerException();
             int i, hi, mc;
@@ -1645,7 +1648,7 @@ public class IdentityHashMap<K extends @Immutable Object,V>
             throw new ConcurrentModificationException();
         }
 
-        public boolean tryAdvance(@Mutable EntrySpliterator<K,V> this, Consumer<? super Map.@Immutable Entry<K,V>> action) {
+        public boolean tryAdvance(@Mutable EntrySpliterator<K,V> this, Consumer<? super Map.@Readonly Entry<K,V>> action) {
             if (action == null)
                 throw new NullPointerException();
             @Readonly Object[] a = map.table;

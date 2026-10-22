@@ -385,8 +385,8 @@ final class StringConcatHelper {
      * @param indexCoder    remaining index (should be zero) and coder
      * @return String       resulting string
      */
-    @SuppressWarnings("mutability:argument.type.incompatible") // cast from @Unique @Mutable to @Immutable
-    static String newString(byte @Readonly [] buf, long indexCoder) {
+    @SuppressWarnings("mutability:argument.type.incompatible") // freeze: the caller hands over its fresh @Mutable buffer, which the non-copying String constructor makes @Immutable
+    static String newString(byte[] buf, long indexCoder) {
         // Use the private, non-copying constructor (unsafe!)
         if (indexCoder == LATIN1) {
             return new String(buf, String.LATIN1);

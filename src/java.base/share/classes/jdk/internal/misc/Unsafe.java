@@ -55,6 +55,10 @@ import org.checkerframework.checker.mutability.qual.Readonly;
  * @see #getUnsafe
  */
 
+// mutability: the Object targets of put*, compareAndSet*, compareAndExchange*, weakCompareAndSet*, getAndSet*, getAndAdd*,
+// getAndBitwise*, setMemory and copyMemory's destBase are declared @Readonly on purpose. Unsafe is the sanctioned escape hatch
+// below the type system, used to implement @Assignable fields, atomics and lazy initialization, so a @Readonly or @Immutable
+// object can be written through it by design.
 public final class Unsafe {
 
     private static native void registerNatives();

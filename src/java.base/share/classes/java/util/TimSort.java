@@ -28,6 +28,7 @@ package java.util;
 
 import org.checkerframework.checker.interning.qual.UsesObjectEquals;
 import org.checkerframework.checker.mutability.qual.Mutable;
+import org.checkerframework.checker.mutability.qual.Readonly;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
 /**
@@ -93,7 +94,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
     /**
      * The comparator for this sort.
      */
-    private final Comparator<? super T> c;
+    private final @Readonly Comparator<? super T> c;
 
     /**
      * When we get into galloping mode, we stay there until both runs win less
@@ -149,7 +150,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
      * @param workBase origin of usable space in work array
      * @param workLen usable size of work array
      */
-    private TimSort(T[] a, Comparator<? super T> c, T[] work, int workBase, int workLen) {
+    private TimSort(T[] a, @Readonly Comparator<? super T> c, T[] work, int workBase, int workLen) {
         this.a = a;
         this.c = c;
 
@@ -213,7 +214,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
      * @param workLen usable size of work array
      * @since 1.8
      */
-    static <T> void sort(T[] a, int lo, int hi, Comparator<? super T> c,
+    static <T> void sort(T[] a, int lo, int hi, @Readonly Comparator<? super T> c,
                          T[] work, int workBase, int workLen) {
         assert c != null && a != null && lo >= 0 && lo <= hi && hi <= a.length;
 
@@ -281,7 +282,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
      */
     @SuppressWarnings("fallthrough")
     private static <T> void binarySort(T[] a, int lo, int hi, int start,
-                                       Comparator<? super T> c) {
+                                       @Readonly Comparator<? super T> c) {
         assert lo <= start && start <= hi;
         if (start == lo)
             start++;
@@ -351,7 +352,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
      *          the specified array
      */
     private static <T> int countRunAndMakeAscending(T[] a, int lo, int hi,
-                                                    Comparator<? super T> c) {
+                                                    @Readonly Comparator<? super T> c) {
         assert lo < hi;
         int runHi = lo + 1;
         if (runHi == hi)
@@ -545,7 +546,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
      *    should follow it.
      */
     private static <T> int gallopLeft(T key, T[] a, int base, int len, int hint,
-                                      Comparator<? super T> c) {
+                                      @Readonly Comparator<? super T> c) {
         assert len > 0 && hint >= 0 && hint < len;
         int lastOfs = 0;
         int ofs = 1;
@@ -615,7 +616,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
      * @return the int k,  0 <= k <= n such that a[b + k - 1] <= key < a[b + k]
      */
     private static <T> int gallopRight(T key, T[] a, int base, int len,
-                                       int hint, Comparator<? super T> c) {
+                                       int hint, @Readonly Comparator<? super T> c) {
         assert len > 0 && hint >= 0 && hint < len;
 
         int ofs = 1;
@@ -711,7 +712,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
             return;
         }
 
-        Comparator<? super T> c = this.c;  // Use local variable for performance
+        @Readonly Comparator<? super T> c = this.c;  // Use local variable for performance
         int minGallop = this.minGallop;    //  "    "       "     "      "
     outer:
         while (true) {
@@ -831,7 +832,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
             return;
         }
 
-        Comparator<? super T> c = this.c;  // Use local variable for performance
+        @Readonly Comparator<? super T> c = this.c;  // Use local variable for performance
         int minGallop = this.minGallop;    //  "    "       "     "      "
     outer:
         while (true) {

@@ -30,7 +30,9 @@ import org.checkerframework.checker.interning.qual.Interned;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.lock.qual.ReleasesNoLocks;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.checkerframework.checker.mutability.qual.ReceiverDependentMutable;
+import org.checkerframework.checker.mutability.qual.Assignable;
+import org.checkerframework.checker.mutability.qual.Immutable;
+import org.checkerframework.checker.mutability.qual.Readonly;
 import org.checkerframework.checker.regex.qual.Regex;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
@@ -164,7 +166,7 @@ import sun.security.action.GetPropertyAction;
 "EnsuresNonNullIf(expression={\"list()\",\"list(FilenameFilter)\",\"listFiles()\",\"listFiles(FilenameFilter)\",\"listFiles(FileFilter)\"}, result=true)\""
 })
 @AnnotatedFor({"index", "initialization", "interning", "lock", "nullness"})
-@ReceiverDependentMutable
+@Immutable // "Instances of the File class are immutable" (class Javadoc)
 public class File
     implements Serializable, Comparable<File>
 {
@@ -191,7 +193,7 @@ public class File
     /**
      * The flag indicating whether the file path is invalid.
      */
-    private transient PathStatus status = null;
+    private transient @Assignable PathStatus status = null; // lazily computed validity cache
 
     /**
      * Check if the file has an invalid path. Currently, the inspection of
@@ -2322,7 +2324,7 @@ public class File
      * @see java.nio.file.Files#isSameFile(Path,Path)
      */
     @Pure
-    public boolean equals(@GuardSatisfied File this, @GuardSatisfied @Nullable Object obj) {
+    public boolean equals(@GuardSatisfied File this, @GuardSatisfied @Nullable @Readonly Object obj) {
         if (obj instanceof File file) {
             return compareTo(file) == 0;
         }
@@ -2414,7 +2416,7 @@ public class File
 
     // -- Integration with java.nio.file --
 
-    private transient volatile Path filePath;
+    private transient volatile @Assignable Path filePath; // lazily computed by toPath()
 
     /**
      * Returns a {@link Path java.nio.file.Path} object constructed from

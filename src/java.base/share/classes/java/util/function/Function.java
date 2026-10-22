@@ -24,6 +24,7 @@
  */
 package java.util.function;
 
+import org.checkerframework.checker.mutability.qual.Readonly;
 import org.checkerframework.checker.mutability.qual.ReceiverDependentMutable;
 import org.checkerframework.framework.qual.AnnotatedFor;
 import org.checkerframework.framework.qual.Covariant;
@@ -70,7 +71,7 @@ public interface Function<T, R> {
      *
      * @see #andThen(Function)
      */
-    default <V> Function<V, R> compose(Function<? super V, ? extends T> before) {
+    default <V> Function<V, R> compose(@Readonly Function<? super V, ? extends T> before) {
         Objects.requireNonNull(before);
         return (V v) -> apply(before.apply(v));
     }
@@ -90,7 +91,7 @@ public interface Function<T, R> {
      *
      * @see #compose(Function)
      */
-    default <V> Function<T, V> andThen(Function<? super R, ? extends V> after) {
+    default <V> Function<T, V> andThen(@Readonly Function<? super R, ? extends V> after) {
         Objects.requireNonNull(after);
         return (T t) -> after.apply(apply(t));
     }

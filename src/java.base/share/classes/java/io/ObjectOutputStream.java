@@ -1007,7 +1007,7 @@ public class ObjectOutputStream
          * are being written, or if the type of the named field is not a
          * reference type
          */
-        public abstract void put(String name, @Nullable Object val);
+        public abstract void put(String name, @Nullable @Readonly Object val);
 
         /**
          * Write the data and fields to the specified ObjectOutput stream,
@@ -1680,7 +1680,7 @@ public class ObjectOutputStream
             Bits.putDouble(primVals, getFieldOffset(name, Double.TYPE), val);
         }
 
-        public void put(String name, Object val) {
+        public void put(String name, @Readonly Object val) {
             objVals[getFieldOffset(name, Object.class)] = val;
         }
 

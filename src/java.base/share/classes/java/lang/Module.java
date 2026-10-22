@@ -977,7 +977,7 @@ public final class Module implements AnnotatedElement {
      *
      * @apiNote Used during startup to open packages for illegal access.
      */
-    @SuppressWarnings("mutability") // cast from @Unique @Mutable to @Immutable
+    @SuppressWarnings("mutability") // replaces this.openPackages through an @Immutable receiver: a module's opens and exports are updated after construction (addOpens, addExports), a documented exception to its immutability
     void implAddOpensToAllUnnamed(Set<String> concealedPkgs, Set<String> exportedPkgs) {
         if (jdk.internal.misc.VM.isModuleSystemInited()) {
             throw new IllegalStateException("Module system already initialized");
@@ -1154,7 +1154,8 @@ public final class Module implements AnnotatedElement {
 
         // record that we want to bind the layer to non-boot and non-platform
         // module loaders as a final step
-        HashSet<@Immutable ClassLoader> toBindLoaders = new HashSet<>(4);
+        @SuppressWarnings({"mutability:type.argument.type.incompatible", "mutability:type.arguments.not.inferred"}) // key type uses identity equals/hashCode
+        HashSet<ClassLoader> toBindLoaders = new HashSet<>(4);
         boolean hasPlatformModules = false;
 
         // map each module to a class loader

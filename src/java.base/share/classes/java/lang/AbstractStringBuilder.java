@@ -135,7 +135,7 @@ abstract @UsesObjectEquals class AbstractStringBuilder implements Appendable, Ch
      *
      * @param      seq   the sequence to copy.
      */
-    AbstractStringBuilder(CharSequence seq) {
+    AbstractStringBuilder(@Readonly CharSequence seq) {
         int length = seq.length();
         if (length < 0) {
             throw new NegativeArraySizeException("Negative length: " + length);

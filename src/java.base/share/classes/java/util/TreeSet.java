@@ -160,7 +160,7 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      *        If {@code null}, the {@linkplain Comparable natural
      *        ordering} of the elements will be used.
      */
-    public TreeSet(@Nullable Comparator<? super E> comparator) {
+    public TreeSet(@Nullable @Readonly Comparator<? super E> comparator) {
         this(new @ReceiverDependentMutable TreeMap<E, @Readonly Object>(comparator));
     }
 
@@ -179,7 +179,7 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      * @throws NullPointerException if the specified collection is null
      */
     @SuppressWarnings("mutability:method.invocation.invalid") // PICO constructor fix
-    public @PolyNonEmpty TreeSet(@PolyNonEmpty Collection<? extends E> c) {
+    public @PolyNonEmpty TreeSet(@PolyNonEmpty @Readonly Collection<? extends E> c) {
         this();
         addAll(c);
     }
@@ -192,7 +192,7 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      * @throws NullPointerException if the specified sorted set is null
      */
     @SuppressWarnings("mutability:method.invocation.invalid") // PICO constructor fix
-    public @PolyNonEmpty TreeSet(@PolyNonEmpty SortedSet<E> s) {
+    public @PolyNonEmpty TreeSet(@PolyNonEmpty @Readonly SortedSet<E> s) {
         this(s.comparator());
         addAll(s);
     }
@@ -203,8 +203,7 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      * @return an iterator over the elements in this set in ascending order
      */
     @SideEffectFree
-    @SuppressWarnings("mutability:method.invocation.invalid") // lost can not invoke poly method.
-    public @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@PolyGrowShrink @PolyNonEmpty @Readonly TreeSet<E> this) {
+    public @PolyGrowShrink @PolyNonEmpty @Mutable Iterator<E> iterator(@PolyGrowShrink @PolyNonEmpty @ReceiverDependentMutable TreeSet<E> this) {
         return m.navigableKeySet().iterator();
     }
 
@@ -214,16 +213,15 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      * @return an iterator over the elements in this set in descending order
      * @since 1.6
      */
-    @SuppressWarnings("mutability:method.invocation.invalid") // lost can not invoke poly method.
-    public @PolyGrowShrink @PolyNonEmpty Iterator<E> descendingIterator(@PolyGrowShrink @PolyNonEmpty @Readonly TreeSet<E> this) {
+    public @PolyGrowShrink @PolyNonEmpty @Mutable Iterator<E> descendingIterator(@PolyGrowShrink @PolyNonEmpty @ReceiverDependentMutable TreeSet<E> this) {
         return m.descendingKeySet().iterator();
     }
 
     /**
      * @since 1.6
      */
-    public @PolyMutable NavigableSet<E> descendingSet(@PolyMutable TreeSet<E> this) {
-        return new @PolyMutable TreeSet<>(m.descendingMap());
+    public @ReceiverDependentMutable NavigableSet<E> descendingSet(@ReceiverDependentMutable TreeSet<E> this) {
+        return new @ReceiverDependentMutable TreeSet<>(m.descendingMap());
     }
 
     /**
@@ -353,9 +351,9 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      * @since 1.6
      */
     @SideEffectFree
-    public @PolyMutable @PolyGrowShrink NavigableSet<E> subSet(@GuardSatisfied @PolyMutable @PolyGrowShrink TreeSet<E> this, @GuardSatisfied E fromElement, boolean fromInclusive,
+    public @ReceiverDependentMutable @PolyGrowShrink NavigableSet<E> subSet(@GuardSatisfied @ReceiverDependentMutable @PolyGrowShrink TreeSet<E> this, @GuardSatisfied E fromElement, boolean fromInclusive,
                                   @GuardSatisfied E toElement,   boolean toInclusive) {
-        return new @PolyMutable TreeSet<>(m.subMap(fromElement, fromInclusive,
+        return new @ReceiverDependentMutable TreeSet<>(m.subMap(fromElement, fromInclusive,
                                        toElement,   toInclusive));
     }
 
@@ -368,8 +366,8 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      * @since 1.6
      */
     @SideEffectFree
-    public @PolyMutable @PolyGrowShrink NavigableSet<E> headSet(@GuardSatisfied @PolyMutable @PolyGrowShrink TreeSet<E> this, @GuardSatisfied E toElement, boolean inclusive) {
-        return new @PolyMutable TreeSet<>(m.headMap(toElement, inclusive));
+    public @ReceiverDependentMutable @PolyGrowShrink NavigableSet<E> headSet(@GuardSatisfied @ReceiverDependentMutable @PolyGrowShrink TreeSet<E> this, @GuardSatisfied E toElement, boolean inclusive) {
+        return new @ReceiverDependentMutable TreeSet<>(m.headMap(toElement, inclusive));
     }
 
     /**
@@ -381,8 +379,8 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      * @since 1.6
      */
     @SideEffectFree
-    public @PolyMutable @PolyGrowShrink NavigableSet<E> tailSet(@GuardSatisfied @PolyMutable @PolyGrowShrink TreeSet<E> this, @GuardSatisfied E fromElement, boolean inclusive) {
-        return new @PolyMutable TreeSet<>(m.tailMap(fromElement, inclusive));
+    public @ReceiverDependentMutable @PolyGrowShrink NavigableSet<E> tailSet(@GuardSatisfied @ReceiverDependentMutable @PolyGrowShrink TreeSet<E> this, @GuardSatisfied E fromElement, boolean inclusive) {
+        return new @ReceiverDependentMutable TreeSet<>(m.tailMap(fromElement, inclusive));
     }
 
     /**
@@ -393,7 +391,7 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      * @throws IllegalArgumentException {@inheritDoc}
      */
     @SideEffectFree
-    public @PolyMutable @PolyGrowShrink SortedSet<E> subSet(@GuardSatisfied @PolyMutable @PolyGrowShrink TreeSet<E> this, @GuardSatisfied E fromElement, @GuardSatisfied E toElement) {
+    public @ReceiverDependentMutable @PolyGrowShrink SortedSet<E> subSet(@GuardSatisfied @ReceiverDependentMutable @PolyGrowShrink TreeSet<E> this, @GuardSatisfied E fromElement, @GuardSatisfied E toElement) {
         return subSet(fromElement, true, toElement, false);
     }
 
@@ -405,7 +403,7 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      * @throws IllegalArgumentException {@inheritDoc}
      */
     @SideEffectFree
-    public @PolyMutable @PolyGrowShrink SortedSet<E> headSet(@GuardSatisfied @PolyMutable @PolyGrowShrink TreeSet<E> this, E toElement) {
+    public @ReceiverDependentMutable @PolyGrowShrink SortedSet<E> headSet(@GuardSatisfied @ReceiverDependentMutable @PolyGrowShrink TreeSet<E> this, E toElement) {
         return headSet(toElement, false);
     }
 
@@ -417,12 +415,12 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      * @throws IllegalArgumentException {@inheritDoc}
      */
     @SideEffectFree
-    public @PolyMutable @PolyGrowShrink SortedSet<E> tailSet(@GuardSatisfied @PolyMutable @PolyGrowShrink TreeSet<E> this, E fromElement) {
+    public @ReceiverDependentMutable @PolyGrowShrink SortedSet<E> tailSet(@GuardSatisfied @ReceiverDependentMutable @PolyGrowShrink TreeSet<E> this, E fromElement) {
         return tailSet(fromElement, true);
     }
 
     @Pure
-    public @Nullable Comparator<? super E> comparator(@GuardSatisfied @Readonly TreeSet<E> this) {
+    public @Nullable @Readonly Comparator<? super E> comparator(@GuardSatisfied @Readonly TreeSet<E> this) {
         return m.comparator();
     }
 
@@ -511,8 +509,8 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      * @return a shallow copy of this set
      */
     @SideEffectFree
-    @SuppressWarnings("unchecked")
-    public Object clone(@GuardSatisfied @Mutable TreeSet<E> this) {
+    @SuppressWarnings({"unchecked", "mutability:return.type.incompatible", "mutability:argument.type.incompatible"}) // fresh unaliased copy: the body replaces every field it shared; its own state shares this's one poly
+    public @PolyMutable Object clone(@GuardSatisfied @PolyMutable TreeSet<E> this) {
         TreeSet<E> clone;
         try {
             clone = (TreeSet<E>) super.clone();
@@ -537,7 +535,7 @@ public class TreeSet<E extends @Immutable Object> extends AbstractSet<E>
      *             the set has no Comparator).
      */
     @java.io.Serial
-    private void writeObject(@Mutable TreeSet<E> this, java.io.ObjectOutputStream s)
+    private void writeObject(@Readonly TreeSet<E> this, java.io.ObjectOutputStream s)
         throws java.io.IOException {
         // Write out any hidden stuff
         s.defaultWriteObject();

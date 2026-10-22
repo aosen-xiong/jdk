@@ -25,6 +25,8 @@
 
 package java.lang.reflect;
 
+import org.checkerframework.checker.mutability.qual.Immutable;
+import org.checkerframework.checker.mutability.qual.Readonly;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
@@ -50,7 +52,8 @@ import sun.reflect.generics.repository.ConstructorRepository;
  *
  * @since 1.8
  */
-@AnnotatedFor({"nullness"})
+@AnnotatedFor({"nullness", "mutability"})
+@Immutable
 public abstract sealed class Executable extends AccessibleObject
     implements Member, GenericDeclaration permits Constructor, Method {
     /*
@@ -229,7 +232,7 @@ public abstract sealed class Executable extends AccessibleObject
 
     // returns shared array of parameter types - must never give it out
     // to the untrusted code...
-    abstract Class<?>[] getSharedParameterTypes();
+    abstract Class<?> @Readonly [] getSharedParameterTypes();
 
     // returns shared array of exception types - must never give it out
     // to the untrusted code...

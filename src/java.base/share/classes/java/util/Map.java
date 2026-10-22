@@ -188,7 +188,7 @@ import java.io.Serializable;
 @CFComment({"lock/nullness: Subclasses of this interface/class may opt to prohibit null elements"})
 @AnnotatedFor({"lock", "nullness", "index", "aliasing", "nonempty", "mutability"})
 @ReceiverDependentMutable
-public interface Map<K extends @Immutable Object, V> {
+public interface Map<K extends @Readonly Object, V> {
     // Query Operations
 
     /**
@@ -400,7 +400,7 @@ public interface Map<K extends @Immutable Object, V> {
      * @return a set view of the keys contained in this map
      */
     @SideEffectFree
-    @PolyNonEmpty @PolyMutable Set<@KeyFor({"this"}) K> keySet(@GuardSatisfied @PolyNonEmpty @PolyMutable Map<K, V> this);
+    @PolyNonEmpty @ReceiverDependentMutable Set<@KeyFor({"this"}) K> keySet(@GuardSatisfied @PolyNonEmpty @ReceiverDependentMutable Map<K, V> this);
 
     /**
      * Returns a {@link Collection} view of the values contained in this map.
@@ -418,7 +418,7 @@ public interface Map<K extends @Immutable Object, V> {
      * @return a collection view of the values contained in this map
      */
     @SideEffectFree
-    @PolyNonEmpty @PolyMutable Collection<V> values(@GuardSatisfied @PolyNonEmpty @PolyMutable Map<K, V> this);
+    @PolyNonEmpty @ReceiverDependentMutable Collection<V> values(@GuardSatisfied @PolyNonEmpty @ReceiverDependentMutable Map<K, V> this);
 
     /**
      * Returns a {@link Set} view of the mappings contained in this map.
@@ -437,7 +437,7 @@ public interface Map<K extends @Immutable Object, V> {
      * @return a set view of the mappings contained in this map
      */
     @SideEffectFree
-    @PolyNonEmpty @PolyMutable Set<Map.@PolyMutable Entry<@KeyFor({"this"}) K, V>> entrySet(@GuardSatisfied @PolyNonEmpty @PolyMutable Map<K, V> this);
+    @PolyNonEmpty @ReceiverDependentMutable Set<Map.@ReceiverDependentMutable Entry<@KeyFor({"this"}) K, V>> entrySet(@GuardSatisfied @PolyNonEmpty @ReceiverDependentMutable Map<K, V> this);
 
     /**
      * A map entry (key-value pair). The Entry may be unmodifiable, or the
@@ -473,7 +473,7 @@ public interface Map<K extends @Immutable Object, V> {
      */
     @Covariant(0)
     @ReceiverDependentMutable
-    interface Entry<K extends @Immutable Object, V> {
+    interface Entry<K extends @Readonly Object, V> {
         /**
          * Returns the key corresponding to this entry.
          *
@@ -574,8 +574,8 @@ public interface Map<K extends @Immutable Object, V> {
          */
         @Pure
         @SuppressWarnings("mutability") // covariant
-        public static <K extends @Immutable Comparable<? super K>, V> Comparator<Map.Entry<K, V>> comparingByKey() {
-            return (Comparator<Map.Entry<K, V>> & Serializable)
+        public static <K extends @Readonly Comparable<? super K>, V> @Readonly Comparator<Map.@Readonly Entry<K, V>> comparingByKey() {
+            return (@Readonly Comparator<Map.@Readonly Entry<K, V>> & Serializable)
                 (c1, c2) -> c1.getKey().compareTo(c2.getKey());
         }
 
@@ -592,8 +592,8 @@ public interface Map<K extends @Immutable Object, V> {
          * @since 1.8
          */
         @Pure
-        public static <K extends @Immutable Object, V extends Comparable<? super V>> Comparator<Map.Entry<K, V>> comparingByValue() {
-            return (Comparator<Map.Entry<K, V>> & Serializable)
+        public static <K extends @Readonly Object, V extends Comparable<? super V>> @Readonly Comparator<Map.@Readonly Entry<K, V>> comparingByValue() {
+            return (@Readonly Comparator<Map.@Readonly Entry<K, V>> & Serializable)
                 (c1, c2) -> c1.getValue().compareTo(c2.getValue());
         }
 
@@ -611,9 +611,9 @@ public interface Map<K extends @Immutable Object, V> {
          * @since 1.8
          */
         @Pure
-        public static <K extends @Immutable Object, V> Comparator<Map.Entry<K, V>> comparingByKey(Comparator<? super K> cmp) {
+        public static <K extends @Readonly Object, V> @Readonly Comparator<Map.@Readonly Entry<K, V>> comparingByKey(@Readonly Comparator<? super K> cmp) {
             Objects.requireNonNull(cmp);
-            return (Comparator<Map.Entry<K, V>> & Serializable)
+            return (@Readonly Comparator<Map.@Readonly Entry<K, V>> & Serializable)
                 (c1, c2) -> cmp.compare(c1.getKey(), c2.getKey());
         }
 
@@ -631,9 +631,9 @@ public interface Map<K extends @Immutable Object, V> {
          * @since 1.8
          */
         @Pure
-        public static <K extends @Immutable Object, V> Comparator<Map.Entry<K, V>> comparingByValue(Comparator<? super V> cmp) {
+        public static <K extends @Readonly Object, V> @Readonly Comparator<Map.@Readonly Entry<K, V>> comparingByValue(@Readonly Comparator<? super V> cmp) {
             Objects.requireNonNull(cmp);
-            return (Comparator<Map.Entry<K, V>> & Serializable)
+            return (@Readonly Comparator<Map.@Readonly Entry<K, V>> & Serializable)
                 (c1, c2) -> cmp.compare(c1.getValue(), c2.getValue());
         }
 
@@ -659,10 +659,10 @@ public interface Map<K extends @Immutable Object, V> {
          * @since 17
          */
         @SuppressWarnings("unchecked")
-        public static <K extends @Immutable Object, V extends @Readonly Object> Map.@Readonly Entry<K, V> copyOf(Map.@Readonly Entry<? extends K, ? extends V> e) {
+        public static <K extends @Immutable Object, V extends @Readonly Object> Map.@Immutable Entry<K, V> copyOf(Map.@Readonly Entry<? extends K, ? extends V> e) {
             Objects.requireNonNull(e);
             if (e instanceof KeyValueHolder) {
-                return (Map.@Readonly Entry<K, V>) e;
+                return (Map.@Immutable Entry<K, V>) e;
             } else {
                 return Map.entry(e.getKey(), e.getValue());
             }
@@ -1712,7 +1712,7 @@ public interface Map<K extends @Immutable Object, V> {
      */
     @SafeVarargs
     @SuppressWarnings("varargs")
-    static <K extends @Immutable Object, V extends @Readonly Object> @PolyNonEmpty @Immutable Map<K, V> ofEntries(Entry<? extends K, ? extends V> @Readonly @PolyNonEmpty... entries) {
+    static <K extends @Immutable Object, V extends @Readonly Object> @PolyNonEmpty @Immutable Map<K, V> ofEntries(@Readonly Entry<? extends K, ? extends V> @Readonly @PolyNonEmpty... entries) {
         if (entries.length == 0) { // implicit null check of entries array
             @SuppressWarnings("unchecked")
             var map = (@Immutable Map<K,V>) ImmutableCollections.EMPTY_MAP;
@@ -1768,7 +1768,7 @@ public interface Map<K extends @Immutable Object, V> {
      * @see Map#ofEntries Map.ofEntries()
      * @since 9
      */
-    static <K extends @Immutable Object, V extends @Readonly Object> @Readonly Entry<K, V> entry(K k, V v) {
+    static <K extends @Immutable Object, V extends @Readonly Object> @Immutable Entry<K, V> entry(K k, V v) {
         // KeyValueHolder checks for nulls
         return new KeyValueHolder<>(k, v);
     }

@@ -25,6 +25,8 @@
 
 package java.lang.reflect;
 
+import org.checkerframework.checker.mutability.qual.Immutable;
+
 /**
  * {@code GenericArrayType} represents an array type whose component
  * type is either a parameterized type or a type variable.
@@ -32,6 +34,7 @@ package java.lang.reflect;
  * @jls 10.1 Array Types
  * @since 1.5
  */
+@Immutable
 public interface GenericArrayType extends Type {
     /**
      * Returns a {@code Type} object representing the component type

@@ -834,7 +834,7 @@ public @UsesObjectEquals class Runtime {
      *
      * @since  9
      */
-    @SuppressWarnings("mutability:argument.type.incompatible") //AOSEN: there is no VersionProps in our JDK?
+    @SuppressWarnings("mutability:argument.type.incompatible") // VersionProps is generated from VersionProps.java.template and is not annotated, so versionNumbers() is seen as a List of @Mutable elements
     public static Version version() {
         var v = version;
         if (v == null) {

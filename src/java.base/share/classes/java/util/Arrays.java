@@ -38,6 +38,7 @@ import org.checkerframework.checker.nonempty.qual.NonEmpty;
 import org.checkerframework.checker.nonempty.qual.PolyNonEmpty;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
+import org.checkerframework.checker.mutability.qual.Assignable;
 import org.checkerframework.checker.mutability.qual.Immutable;
 import org.checkerframework.checker.mutability.qual.Mutable;
 import org.checkerframework.checker.mutability.qual.PolyMutable;
@@ -1254,7 +1255,7 @@ public class Arrays {
      *         found to violate the {@link Comparator} contract
      */
     @CFComment("A comparator that can handle the array elements needs to be provided. Otherwise, use method without comparator.")
-    public static <T> void sort(@UnknownSignedness T[] a, Comparator<? super T> c) {
+    public static <T> void sort(@UnknownSignedness T[] a, @Readonly Comparator<? super T> c) {
         if (c == null) {
             sort(a);
         } else {
@@ -1266,7 +1267,7 @@ public class Arrays {
     }
 
     /** To be removed in a future release. */
-    private static <T> void legacyMergeSort(T[] a, Comparator<? super T> c) {
+    private static <T> void legacyMergeSort(T[] a, @Readonly Comparator<? super T> c) {
         T[] aux = a.clone();
         if (c==null)
             mergeSort(aux, a, 0, a.length, 0);
@@ -1328,7 +1329,7 @@ public class Arrays {
      */
     @CFComment("A comparator that can handle the array elements needs to be provided. Otherwise, use method without comparator.")
     public static <T> void sort(@UnknownSignedness T[] a, @IndexOrHigh({"#1"}) int fromIndex, @IndexOrHigh({"#1"}) int toIndex,
-                                Comparator<? super T> c) {
+                                @Readonly Comparator<? super T> c) {
         if (c == null) {
             sort(a, fromIndex, toIndex);
         } else {
@@ -1342,7 +1343,7 @@ public class Arrays {
 
     /** To be removed in a future release. */
     private static <T> void legacyMergeSort(T[] a, @IndexOrHigh({"#1"}) int fromIndex, @IndexOrHigh({"#1"}) int toIndex,
-                                            Comparator<? super T> c) {
+                                            @Readonly Comparator<? super T> c) {
         T[] aux = copyOfRange(a, fromIndex, toIndex);
         if (c==null)
             mergeSort(aux, a, fromIndex, toIndex, -fromIndex);
@@ -1362,7 +1363,7 @@ public class Arrays {
     private static void mergeSort(@Readonly Object[] src,
                                   @Readonly Object[] dest,
                                   int low, int high, int off,
-                                  Comparator c) {
+                                  @Readonly Comparator c) {
         int length = high - low;
 
         // Insertion sort on smallest arrays
@@ -3524,7 +3525,7 @@ public class Arrays {
      * @since 1.6
      */
     @SideEffectFree
-    @SuppressWarnings({"unchecked", "mutability:argument.type.incompatible"}) // getClass error
+    @SuppressWarnings("unchecked")
     @CFComment("The return type is refined when safe. See " +
             "https://github.com/eisop/checker-framework/blob/17991582bc3a35509f15065b051d8e4c45c3e9ae/checker/src/main/java/org/checkerframework/checker/nullness/NullnessNoInitAnnotatedTypeFactory.java#L756")
     public static <T> @Nullable T[] copyOf(T @Readonly [] original, @NonNegative int newLength) {
@@ -3559,7 +3560,7 @@ public class Arrays {
     @IntrinsicCandidate
     @CFComment("The return type is refined when safe. See " +
             "https://github.com/eisop/checker-framework/blob/17991582bc3a35509f15065b051d8e4c45c3e9ae/checker/src/main/java/org/checkerframework/checker/nullness/NullnessNoInitAnnotatedTypeFactory.java#L756")
-    public static <T,U> @Nullable T[] copyOf(U @Readonly [] original, @NonNegative int newLength, Class<? extends T[]> newType) {
+    public static <T,U> @Nullable T[] copyOf(U @Readonly [] original, @NonNegative int newLength, Class<? extends T @Readonly []> newType) {
         @SuppressWarnings("unchecked")
         T[] copy = ((Object)newType == (Object)Object[].class)
             ? (T[]) new Object[newLength]
@@ -4189,7 +4190,7 @@ public class Arrays {
      */
     @SafeVarargs
     @SideEffectFree
-    @SuppressWarnings("varargs")
+    @SuppressWarnings({"varargs", "mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created list are the same instantiation
     @CFComment({"array covariance: if a reference to the argument is retained, array covariance could allow",
         "adding a null value to an array of non-null types."})
     public static <T> @PolyNonEmpty @PolyMutable List<T> asList(T @PolyNonEmpty @PolyMutable... a) {
@@ -4301,12 +4302,12 @@ public class Arrays {
         }
 
         @Override
-        public Iterator<E> iterator(@Readonly ArrayList<E> this) {
-            return new ArrayItr<>(a);
+        public @Mutable Iterator<E> iterator(@ReceiverDependentMutable ArrayList<E> this) {
+            return new @Mutable ArrayItr<>(a);
         }
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     private static class ArrayItr<E> implements Iterator<E> {
         private int cursor;
         private final E @Readonly [] a;
@@ -5086,7 +5087,6 @@ public class Arrays {
         return buf.toString();
     }
 
-    @SuppressWarnings("mutability:static.receiverdependentmutable.forbidden") // getClass error
     private static void deepToString(@Readonly Object @Readonly [] a, StringBuilder buf,
                                      Set<@Readonly Object @Readonly []> dejaVu) {
         if (a == null) {

@@ -25,6 +25,7 @@
 
 package java.lang.reflect;
 
+import org.checkerframework.checker.mutability.qual.Immutable;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.framework.qual.AnnotatedFor;
@@ -50,6 +51,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
  * @since 1.5
  */
 @AnnotatedFor({"nullness"})
+@Immutable
 public interface ParameterizedType extends Type {
     /**
      * Returns an array of {@code Type} objects representing the actual type

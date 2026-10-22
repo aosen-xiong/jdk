@@ -35,6 +35,7 @@
 
 package java.util.concurrent;
 
+import org.checkerframework.checker.mutability.qual.Readonly;
 import org.checkerframework.checker.index.qual.PolyGrowShrink;
 import org.checkerframework.checker.index.qual.CanShrink;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
@@ -799,7 +800,7 @@ public class ConcurrentLinkedDeque<E extends @NonNull Object>
      * @throws NullPointerException if the specified collection or any
      *         of its elements are null
      */
-    public ConcurrentLinkedDeque(Collection<? extends E> c) {
+    public ConcurrentLinkedDeque(@Readonly Collection<? extends E> c) {
         // Copy c into a private chain of Nodes
         Node<E> h = null, t = null;
         for (E e : c) {
@@ -1636,7 +1637,7 @@ public class ConcurrentLinkedDeque<E extends @NonNull Object>
     /**
      * @throws NullPointerException {@inheritDoc}
      */
-    public boolean removeIf(@CanShrink ConcurrentLinkedDeque<E> this, Predicate<? super E> filter) {
+    public boolean removeIf(@CanShrink ConcurrentLinkedDeque<E> this, @Readonly Predicate<? super E> filter) {
         Objects.requireNonNull(filter);
         return bulkRemove(filter);
     }
@@ -1658,7 +1659,7 @@ public class ConcurrentLinkedDeque<E extends @NonNull Object>
     }
 
     /** Implementation of bulk remove methods. */
-    private boolean bulkRemove(Predicate<? super E> filter) {
+    private boolean bulkRemove(@Readonly Predicate<? super E> filter) {
         boolean removed = false;
         for (Node<E> p = first(), succ; p != null; p = succ) {
             succ = succ(p);

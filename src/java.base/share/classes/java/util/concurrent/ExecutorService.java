@@ -35,6 +35,7 @@
 
 package java.util.concurrent;
 
+import org.checkerframework.checker.mutability.qual.Readonly;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
@@ -183,7 +184,7 @@ public interface ExecutorService extends Executor {
      *         or the security manager's {@code checkAccess} method
      *         denies access.
      */
-    List<Runnable> shutdownNow();
+    @Readonly List<Runnable> shutdownNow();
 
     /**
      * Returns {@code true} if this executor has been shut down.
@@ -289,7 +290,7 @@ public interface ExecutorService extends Executor {
      * @throws RejectedExecutionException if any task cannot be
      *         scheduled for execution
      */
-    <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks)
+    <T> List<Future<T>> invokeAll(@Readonly Collection<? extends Callable<T>> tasks)
         throws InterruptedException;
 
     /**
@@ -320,7 +321,7 @@ public interface ExecutorService extends Executor {
      * @throws RejectedExecutionException if any task cannot be scheduled
      *         for execution
      */
-    <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks,
+    <T> List<Future<T>> invokeAll(@Readonly Collection<? extends Callable<T>> tasks,
                                   long timeout, TimeUnit unit)
         throws InterruptedException;
 
@@ -343,7 +344,7 @@ public interface ExecutorService extends Executor {
      * @throws RejectedExecutionException if tasks cannot be scheduled
      *         for execution
      */
-    <T> T invokeAny(Collection<? extends Callable<T>> tasks)
+    <T> T invokeAny(@Readonly Collection<? extends Callable<T>> tasks)
         throws InterruptedException, ExecutionException;
 
     /**
@@ -369,7 +370,7 @@ public interface ExecutorService extends Executor {
      * @throws RejectedExecutionException if tasks cannot be scheduled
      *         for execution
      */
-    <T> T invokeAny(Collection<? extends Callable<T>> tasks,
+    <T> T invokeAny(@Readonly Collection<? extends Callable<T>> tasks,
                     long timeout, TimeUnit unit)
         throws InterruptedException, ExecutionException, TimeoutException;
 }

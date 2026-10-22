@@ -30,6 +30,8 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.List;
+import org.checkerframework.checker.mutability.qual.Immutable;
+import org.checkerframework.checker.mutability.qual.Readonly;
 
 import static java.util.Objects.requireNonNull;
 
@@ -38,9 +40,10 @@ import static java.util.Objects.requireNonNull;
  * {@link MethodType}.  A {@linkplain MethodTypeDescImpl} corresponds to a
  * {@code Constant_MethodType_info} entry in the constant pool of a classfile.
  */
+@Immutable
 final class MethodTypeDescImpl implements MethodTypeDesc {
     private final ClassDesc returnType;
-    private final ClassDesc[] argTypes;
+    private final ClassDesc @Readonly [] argTypes;
 
     /**
      * Constructs a {@linkplain MethodTypeDesc} with the specified return type
@@ -49,7 +52,7 @@ final class MethodTypeDescImpl implements MethodTypeDesc {
      * @param returnType a {@link ClassDesc} describing the return type
      * @param argTypes {@link ClassDesc}s describing the parameter types
      */
-    MethodTypeDescImpl(ClassDesc returnType, ClassDesc[] argTypes) {
+    MethodTypeDescImpl(ClassDesc returnType, ClassDesc @Readonly [] argTypes) {
         this.returnType = requireNonNull(returnType);
         this.argTypes = requireNonNull(argTypes);
 
@@ -90,11 +93,12 @@ final class MethodTypeDescImpl implements MethodTypeDesc {
     }
 
     @Override
-    public List<ClassDesc> parameterList() {
+    public @Immutable List<ClassDesc> parameterList() {
         return List.of(argTypes);
     }
 
     @Override
+    @SuppressWarnings("mutability:return.type.incompatible") // argTypes.clone() is a fresh copy that only this method holds, but the checker gives the clone of a @Readonly array the @Readonly qualifier
     public ClassDesc[] parameterArray() {
         return argTypes.clone();
     }
@@ -105,6 +109,7 @@ final class MethodTypeDescImpl implements MethodTypeDesc {
     }
 
     @Override
+    @SuppressWarnings("mutability:illegal.array.write") // argTypes.clone() is a fresh copy that only this method holds, but the checker gives the clone of a @Readonly array the @Readonly qualifier
     public MethodTypeDesc changeParameterType(int index, ClassDesc paramType) {
         ClassDesc[] newArgs = argTypes.clone();
         newArgs[index] = paramType;
@@ -163,7 +168,7 @@ final class MethodTypeDescImpl implements MethodTypeDesc {
      *      is equal to this {@code MethodTypeDescImpl}.
      */
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Readonly Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 

@@ -55,7 +55,7 @@ public interface Iterable<T> {
      *
      * @return an Iterator.
      */
-    @PolyGrowShrink @PolyNonEmpty Iterator<T> iterator(@Readonly @PolyGrowShrink @PolyNonEmpty Iterable<T> this);
+    @PolyNonEmpty @Mutable @PolyGrowShrink Iterator<T> iterator(@ReceiverDependentMutable @PolyNonEmpty @PolyGrowShrink Iterable<T> this);
 
     /**
      * Performs the given action for each element of the {@code Iterable}
@@ -107,7 +107,7 @@ public interface Iterable<T> {
      * {@code Iterable}.
      * @since 1.8
      */
-    default Spliterator<T> spliterator(@Readonly @PolyNonEmpty Iterable<T> this) {
+    default Spliterator<T> spliterator(@ReceiverDependentMutable @PolyNonEmpty Iterable<T> this) {
         return Spliterators.spliteratorUnknownSize(iterator(), 0);
     }
 }

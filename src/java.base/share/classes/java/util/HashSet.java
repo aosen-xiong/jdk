@@ -195,8 +195,7 @@ import jdk.internal.access.SharedSecrets;
      * @see ConcurrentModificationException
      */
     @SideEffectFree
-    @SuppressWarnings("mutability") // lost can not invoke poly method.
-    public @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@PolyGrowShrink @PolyNonEmpty @Readonly HashSet<E> this) {
+    public @PolyGrowShrink @PolyNonEmpty @Mutable Iterator<E> iterator(@PolyGrowShrink @PolyNonEmpty @ReceiverDependentMutable HashSet<E> this) {
         return map.keySet().iterator();
     }
 
@@ -284,8 +283,8 @@ import jdk.internal.access.SharedSecrets;
      * @return a shallow copy of this set
      */
     @SideEffectFree
-    @SuppressWarnings("unchecked")
-    public Object clone(@GuardSatisfied @Mutable HashSet<E> this) {
+    @SuppressWarnings({"unchecked", "mutability:return.type.incompatible", "mutability:mutability.lost.receiver"}) // fresh unaliased copy: the body replaces every field it shared; its own state shares this's one poly
+    public @PolyMutable Object clone(@GuardSatisfied @PolyMutable HashSet<E> this) {
         try {
             HashSet<E> newSet = (HashSet<E>) super.clone();
             newSet.map = (HashMap<E, @Readonly Object>) map.clone();
@@ -306,7 +305,7 @@ import jdk.internal.access.SharedSecrets;
      *             no particular order.
      */
     @java.io.Serial
-    private void writeObject(@Mutable HashSet<E> this, java.io.ObjectOutputStream s)
+    private void writeObject(@Readonly HashSet<E> this, java.io.ObjectOutputStream s)
         throws java.io.IOException {
         // Write out any hidden serialization magic
         s.defaultWriteObject();
@@ -391,11 +390,12 @@ import jdk.internal.access.SharedSecrets;
      * @return a {@code Spliterator} over the elements in this set
      * @since 1.8
      */
-    public Spliterator<E> spliterator(@Readonly HashSet<E> this) {
+    public Spliterator<E> spliterator(@ReceiverDependentMutable HashSet<E> this) {
         return new HashMap.KeySpliterator<>(map, 0, -1, 0, 0);
     }
 
     @Override
+    @SuppressWarnings("mutability:override.return.invalid") // E extends @Immutable Object, so every element is @Immutable. That is the precise return, which an override of a @PolyMutable return cannot state
     public @Immutable Object[] toArray(@Readonly HashSet<E> this) {
         return map.keysToArray(new @Immutable Object[map.size()]);
     }

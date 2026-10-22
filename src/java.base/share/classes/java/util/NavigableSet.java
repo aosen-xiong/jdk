@@ -181,7 +181,7 @@ public interface NavigableSet<E> extends SortedSet<E> {
      * @return an iterator over the elements in this set, in ascending order
      */
     @SideEffectFree
-    @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@Readonly @PolyGrowShrink @PolyNonEmpty NavigableSet<E> this);
+    @Mutable @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty NavigableSet<E> this);
 
     /**
      * Returns a reverse order view of the elements contained in this set.
@@ -198,7 +198,7 @@ public interface NavigableSet<E> extends SortedSet<E> {
      *
      * @return a reverse order view of this set
      */
-    @PolyMutable NavigableSet<E> descendingSet(@PolyMutable NavigableSet<E> this);
+    @ReceiverDependentMutable NavigableSet<E> descendingSet(@ReceiverDependentMutable NavigableSet<E> this);
 
     /**
      * Returns an iterator over the elements in this set, in descending order.
@@ -206,7 +206,7 @@ public interface NavigableSet<E> extends SortedSet<E> {
      *
      * @return an iterator over the elements in this set, in descending order
      */
-    Iterator<E> descendingIterator(@Readonly NavigableSet<E> this);
+    @Mutable Iterator<E> descendingIterator(@ReceiverDependentMutable NavigableSet<E> this);
 
     /**
      * Returns a view of the portion of this set whose elements range from
@@ -244,7 +244,7 @@ public interface NavigableSet<E> extends SortedSet<E> {
      *         {@code toElement} lies outside the bounds of the range.
      */
     @SideEffectFree
-    @PolyMutable NavigableSet<E> subSet(@GuardSatisfied @PolyMutable NavigableSet<E> this, @GuardSatisfied E fromElement, boolean fromInclusive,
+    @ReceiverDependentMutable NavigableSet<E> subSet(@GuardSatisfied @ReceiverDependentMutable NavigableSet<E> this, @GuardSatisfied E fromElement, boolean fromInclusive,
                            @GuardSatisfied E toElement,   boolean toInclusive);
 
     /**
@@ -275,7 +275,7 @@ public interface NavigableSet<E> extends SortedSet<E> {
      *         bounds of the range
      */
     @SideEffectFree
-    @PolyMutable NavigableSet<E> headSet(@GuardSatisfied @PolyMutable NavigableSet<E> this, @GuardSatisfied E toElement, boolean inclusive);
+    @ReceiverDependentMutable NavigableSet<E> headSet(@GuardSatisfied @ReceiverDependentMutable NavigableSet<E> this, @GuardSatisfied E toElement, boolean inclusive);
 
     /**
      * Returns a view of the portion of this set whose elements are greater
@@ -305,7 +305,7 @@ public interface NavigableSet<E> extends SortedSet<E> {
      *         bounds of the range
      */
     @SideEffectFree
-    @PolyMutable NavigableSet<E> tailSet(@GuardSatisfied @PolyMutable NavigableSet<E> this, @GuardSatisfied E fromElement, boolean inclusive);
+    @ReceiverDependentMutable NavigableSet<E> tailSet(@GuardSatisfied @ReceiverDependentMutable NavigableSet<E> this, @GuardSatisfied E fromElement, boolean inclusive);
 
     /**
      * {@inheritDoc}
@@ -317,7 +317,7 @@ public interface NavigableSet<E> extends SortedSet<E> {
      * @throws IllegalArgumentException {@inheritDoc}
      */
     @SideEffectFree
-    @PolyMutable SortedSet<E> subSet(@GuardSatisfied @PolyMutable NavigableSet<E> this, @GuardSatisfied E fromElement, @GuardSatisfied E toElement);
+    @ReceiverDependentMutable SortedSet<E> subSet(@GuardSatisfied @ReceiverDependentMutable NavigableSet<E> this, @GuardSatisfied E fromElement, @GuardSatisfied E toElement);
 
     /**
      * {@inheritDoc}
@@ -329,7 +329,7 @@ public interface NavigableSet<E> extends SortedSet<E> {
      * @throws IllegalArgumentException {@inheritDoc}
      */
     @SideEffectFree
-    @PolyMutable SortedSet<E> headSet(@GuardSatisfied @PolyMutable NavigableSet<E> this, E toElement);
+    @ReceiverDependentMutable SortedSet<E> headSet(@GuardSatisfied @ReceiverDependentMutable NavigableSet<E> this, E toElement);
 
     /**
      * {@inheritDoc}
@@ -341,5 +341,5 @@ public interface NavigableSet<E> extends SortedSet<E> {
      * @throws IllegalArgumentException {@inheritDoc}
      */
     @SideEffectFree
-    @PolyMutable SortedSet<E> tailSet(@GuardSatisfied @PolyMutable NavigableSet<E> this, E fromElement);
+    @ReceiverDependentMutable SortedSet<E> tailSet(@GuardSatisfied @ReceiverDependentMutable NavigableSet<E> this, E fromElement);
 }

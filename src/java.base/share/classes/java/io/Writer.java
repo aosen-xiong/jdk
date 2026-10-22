@@ -25,6 +25,7 @@
 
 package java.io;
 
+import org.checkerframework.checker.mutability.qual.Readonly;
 import org.checkerframework.checker.index.qual.IndexOrHigh;
 import org.checkerframework.checker.index.qual.LTLengthOf;
 import org.checkerframework.checker.index.qual.NonNegative;
@@ -104,13 +105,13 @@ public abstract @UsesObjectEquals class Writer implements Appendable, Closeable,
             }
 
             @Override
-            public Writer append(CharSequence csq) throws IOException {
+            public Writer append(@Readonly CharSequence csq) throws IOException {
                 ensureOpen();
                 return this;
             }
 
             @Override
-            public Writer append(CharSequence csq, int start, int end) throws IOException {
+            public Writer append(@Readonly CharSequence csq, int start, int end) throws IOException {
                 ensureOpen();
                 if (csq != null) {
                     Objects.checkFromToIndex(start, end, csq.length());
@@ -326,7 +327,7 @@ public abstract @UsesObjectEquals class Writer implements Appendable, Closeable,
      *
      * @since  1.5
      */
-    public @MustCallAlias Writer append(@MustCallAlias Writer this, @Nullable CharSequence csq) throws IOException {
+    public @MustCallAlias Writer append(@MustCallAlias Writer this, @Nullable @Readonly CharSequence csq) throws IOException {
         write(String.valueOf(csq));
         return this;
     }
@@ -369,7 +370,7 @@ public abstract @UsesObjectEquals class Writer implements Appendable, Closeable,
      *
      * @since  1.5
      */
-    public @MustCallAlias Writer append(@MustCallAlias Writer this, @Nullable CharSequence csq, @IndexOrHigh({"#1"}) int start, @IndexOrHigh({"#1"}) int end) throws IOException {
+    public @MustCallAlias Writer append(@MustCallAlias Writer this, @Nullable @Readonly CharSequence csq, @IndexOrHigh({"#1"}) int start, @IndexOrHigh({"#1"}) int end) throws IOException {
         if (csq == null) csq = "null";
         return append(csq.subSequence(start, end));
     }

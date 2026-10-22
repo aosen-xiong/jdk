@@ -488,8 +488,7 @@ public @UsesObjectEquals class Throwable implements Serializable {
      *         been called on this throwable.
      * @since  1.4
      */
-    @SuppressWarnings("mutability:illegal.field.write") // should the receiver be underinitialization then?
-    public synchronized @PolyInitialized @ReceiverDependentMutable Throwable initCause(@PolyInitialized Throwable this, @Nullable @ReceiverDependentMutable Throwable cause) {
+    public synchronized @PolyInitialized @ReceiverDependentMutable Throwable initCause(@PolyInitialized @Mutable Throwable this, @Nullable @ReceiverDependentMutable Throwable cause) {
         if (this.cause != this)
             throw new @ReceiverDependentMutable IllegalStateException("Can't overwrite cause with " +
                                             Objects.toString(cause, "a null"), this);
@@ -692,12 +691,10 @@ public @UsesObjectEquals class Throwable implements Serializable {
         printStackTrace(new WrappedPrintStream(s));
     }
 
-    // AOSEN: this is annoying that I have to make the receiver type as immutable to make sure the method type check
-    @SuppressWarnings("mutability:argument.type.incompatible") // Add readonly this to dejaVu set
     private void printStackTrace(@Readonly Throwable this, PrintStreamOrWriter s) {
         // Guard against malicious overrides of Throwable.equals by
         // using a Set with identity equality semantics.
-        Set<@Immutable Throwable> dejaVu = Collections.newSetFromMap(new IdentityHashMap<>());
+        Set<@Readonly Throwable> dejaVu = Collections.newSetFromMap(new IdentityHashMap<>());
         dejaVu.add(this);
 
         synchronized (s.lock()) {
@@ -1036,7 +1033,7 @@ public @UsesObjectEquals class Throwable implements Serializable {
      * @throws IOException if an I/O error occurs
      */
     @java.io.Serial
-    private synchronized void writeObject(@Mutable Throwable this, ObjectOutputStream s)
+    private synchronized void writeObject(@Readonly Throwable this, ObjectOutputStream s)
         throws IOException {
         // Ensure that the stackTrace field is initialized to a
         // non-null value, if appropriate.  As of JDK 7, a null stack

@@ -164,7 +164,6 @@ public class Vector<E>
      * @throws IllegalArgumentException if the specified initial capacity
      *         is negative
      */
-    @SuppressWarnings("mutability:assignment.type.incompatible") // array component type
     public Vector(@NonNegative int initialCapacity, int capacityIncrement) {
         super();
         if (initialCapacity < 0)
@@ -206,7 +205,7 @@ public class Vector<E>
      * @since   1.2
      */
     @SuppressWarnings("mutability") // cast from @Unique @Mutable to @RDM and class literal
-    public @PolyNonEmpty Vector(@PolyNonEmpty Collection<? extends E> c) {
+    public @PolyNonEmpty Vector(@PolyNonEmpty @Readonly Collection<? extends E> c) {
         @Readonly Object @ReceiverDependentMutable [] a = c.toArray();
         elementCount = a.length;
         if (c.getClass() == ArrayList.class) {
@@ -358,8 +357,8 @@ public class Vector<E>
      * @return  an enumeration of the components of this vector
      * @see     Iterator
      */
-    public @PolyGrowShrink @PolyNonEmpty Enumeration<E> elements(@Readonly @PolyGrowShrink @PolyNonEmpty Vector<E> this) {
-        return new Enumeration<E>() {
+    public @Mutable @PolyGrowShrink @PolyNonEmpty Enumeration<E> elements(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty Vector<E> this) {
+        return new @Mutable Enumeration<E>() {
             int count = 0;
 
             @EnsuresNonEmptyIf(result = true, expression = "this")
@@ -701,7 +700,8 @@ public class Vector<E>
      * @return  a clone of this vector
      */
     @SideEffectFree
-    public synchronized Object clone(@GuardSatisfied Vector<E> this) {
+    @SuppressWarnings("mutability:return.type.incompatible") // fresh unaliased copy: the body replaces every field it shared
+    public synchronized @PolyMutable Object clone(@GuardSatisfied @PolyMutable Vector<E> this) {
         try {
             @SuppressWarnings("unchecked")
             Vector<E> v = (Vector<E>) super.clone();
@@ -721,8 +721,9 @@ public class Vector<E>
      * @since 1.2
      */
     @SideEffectFree
-    public synchronized @PolyNull @PolySigned @Readonly Object[] toArray(Vector<@PolyNull @PolySigned E> this) {
-        return Arrays.<@Readonly Object>copyOf(elementData, elementCount);
+    @SuppressWarnings("mutability:argument.type.incompatible") // elementData holds this vector's elements, of the receiver's @PolyMutable E, but a field read is typed by its declared Object[]
+    public synchronized @PolyNull @PolySigned @PolyMutable Object[] toArray(Vector<@PolyNull @PolySigned @PolyMutable E> this) {
+        return Arrays.<@PolyMutable Object>copyOf(elementData, elementCount);
     }
 
     /**
@@ -752,7 +753,7 @@ public class Vector<E>
      * @since 1.2
      */
     @SideEffectFree
-    @SuppressWarnings({"unchecked", "mutability:argument.type.incompatible"}) // getClass error
+    @SuppressWarnings("unchecked")
     public synchronized <T> @Nullable T[] toArray(@PolyNull T[] a) {
         if (a.length < elementCount)
             return (T[]) Arrays.copyOf(elementData, elementCount, a.getClass());
@@ -994,7 +995,7 @@ public class Vector<E>
      *         or if the specified collection is null
      * @since 1.2
      */
-    public boolean retainAll(@Mutable @GuardSatisfied @CanShrink Vector<E> this, Collection<? extends @UnknownSignedness @Readonly Object> c) {
+    public boolean retainAll(@Mutable @GuardSatisfied @CanShrink Vector<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) {
         Objects.requireNonNull(c);
         return bulkRemove(e -> !c.contains(e));
     }
@@ -1004,7 +1005,7 @@ public class Vector<E>
      */
     @SuppressWarnings({"unchecked"})
     @Override
-    public boolean removeIf(@Mutable @CanShrink Vector<E> this, Predicate<? super E> filter) {
+    public boolean removeIf(@Mutable @CanShrink Vector<E> this, @Readonly Predicate<? super E> filter) {
         Objects.requireNonNull(filter);
         return bulkRemove(filter);
     }
@@ -1021,7 +1022,7 @@ public class Vector<E>
         return (bits[i >> 6] & (1L << i)) == 0;
     }
 
-    private synchronized boolean bulkRemove(@Mutable Vector<E> this, Predicate<? super E> filter) {
+    private synchronized boolean bulkRemove(@Mutable Vector<E> this, @Readonly Predicate<? super E> filter) {
         int expectedModCount = modCount;
         final @Readonly Object[] es = elementData;
         final int end = elementCount;
@@ -1166,7 +1167,7 @@ public class Vector<E>
      *         {@code (fromIndex > toIndex)}
      */
     @SideEffectFree
-    public synchronized @PolyMutable @PolyGrowShrink List<E> subList(@GuardSatisfied @PolyMutable @PolyGrowShrink Vector<E> this, int fromIndex, int toIndex) {
+    public synchronized @ReceiverDependentMutable @PolyGrowShrink List<E> subList(@GuardSatisfied @ReceiverDependentMutable @PolyGrowShrink Vector<E> this, int fromIndex, int toIndex) {
         return Collections.synchronizedList(super.subList(fromIndex, toIndex),
                                             this);
     }
@@ -1224,7 +1225,7 @@ public class Vector<E>
      * @throws java.io.IOException if an I/O error occurs
      */
     @java.io.Serial
-    private void writeObject(@Mutable Vector<E> this, java.io.ObjectOutputStream s)
+    private void writeObject(@Readonly Vector<E> this, java.io.ObjectOutputStream s)
             throws java.io.IOException {
         final java.io.ObjectOutputStream.PutField fields = s.putFields();
         final @Readonly Object[] data;
@@ -1249,10 +1250,10 @@ public class Vector<E>
      *
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
-    public synchronized @PolyGrowShrink ListIterator<E> listIterator(@PolyGrowShrink Vector<E> this, @NonNegative int index) {
+    public synchronized @Mutable @PolyGrowShrink ListIterator<E> listIterator(@ReceiverDependentMutable @PolyGrowShrink Vector<E> this, @NonNegative int index) {
         if (index < 0 || index > elementCount)
             throw new IndexOutOfBoundsException("Index: "+index);
-        return new ListItr(index);
+        return new @Mutable ListItr(index);
     }
 
     /**
@@ -1263,8 +1264,8 @@ public class Vector<E>
      *
      * @see #listIterator(int)
      */
-    public synchronized @PolyGrowShrink @PolyNonEmpty ListIterator<E> listIterator(@PolyGrowShrink Vector<E> this) {
-        return new ListItr(0);
+    public synchronized @Mutable @PolyGrowShrink @PolyNonEmpty ListIterator<E> listIterator(@ReceiverDependentMutable @PolyGrowShrink Vector<E> this) {
+        return new @Mutable ListItr(0);
     }
 
     /**
@@ -1275,16 +1276,16 @@ public class Vector<E>
      * @return an iterator over the elements in this list in proper sequence
      */
     @SideEffectFree
-    public synchronized @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@Readonly @PolyGrowShrink @PolyNonEmpty Vector<E> this) {
-        return new Itr();
+    public synchronized @Mutable @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty Vector<E> this) {
+        return new @Mutable Itr();
     }
 
     /**
      * An optimized version of AbstractList.Itr
      */
-    @ReceiverDependentMutable
+    @Mutable
     private class Itr implements Iterator<E> {
-        @Assignable int cursor;       // index of next element to return
+        int cursor;       // index of next element to return
         int lastRet = -1; // index of last element returned; -1 if no such
         int expectedModCount = modCount;
 
@@ -1296,7 +1297,7 @@ public class Vector<E>
             return cursor != elementCount;
         }
 
-        public E next(@NonEmpty @Mutable Itr this) {
+        public E next(@Readonly Vector<E>.@NonEmpty @Mutable Itr this) {
             synchronized (Vector.this) {
                 checkForComodification();
                 int i = cursor;
@@ -1320,7 +1321,7 @@ public class Vector<E>
         }
 
         @Override
-        public void forEachRemaining(@Mutable Itr this, Consumer<? super E> action) {
+        public void forEachRemaining(@Readonly Vector<E>.@Mutable Itr this, Consumer<? super E> action) {
             Objects.requireNonNull(action);
             synchronized (Vector.this) {
                 final int size = elementCount;
@@ -1349,7 +1350,7 @@ public class Vector<E>
     /**
      * An optimized version of AbstractList.ListItr
      */
-    @ReceiverDependentMutable
+    @Mutable
     final class ListItr extends Itr implements ListIterator<E> {
         ListItr(int index) {
             super();
@@ -1368,7 +1369,7 @@ public class Vector<E>
             return cursor - 1;
         }
 
-        public E previous(@Mutable ListItr this) {
+        public E previous(@Readonly Vector<E>.@Mutable ListItr this) {
             synchronized (Vector.this) {
                 checkForComodification();
                 int i = cursor - 1;

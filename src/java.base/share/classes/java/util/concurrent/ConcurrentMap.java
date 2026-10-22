@@ -82,7 +82,7 @@ import java.util.function.Function;
  */
 @AnnotatedFor({"nullness"})
 @ReceiverDependentMutable
-public interface ConcurrentMap<K extends @NonNull @Immutable Object,V extends @NonNull @Readonly Object> extends Map<K,V> {
+public interface ConcurrentMap<K extends @NonNull @Readonly Object,V extends @NonNull @Readonly Object> extends Map<K,V> {
 
     /**
      * {@inheritDoc}
