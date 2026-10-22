@@ -184,7 +184,7 @@ public interface ExecutorService extends Executor {
      *         or the security manager's {@code checkAccess} method
      *         denies access.
      */
-    List<Runnable> shutdownNow();
+    @Readonly List<Runnable> shutdownNow();
 
     /**
      * Returns {@code true} if this executor has been shut down.

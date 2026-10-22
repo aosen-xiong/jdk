@@ -149,7 +149,7 @@ public final class StringBuilder
      *
      * @param      seq   the sequence to copy.
      */
-    public StringBuilder(CharSequence seq) {
+    public StringBuilder(@Readonly CharSequence seq) {
         super(seq);
     }
 

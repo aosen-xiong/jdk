@@ -3221,7 +3221,7 @@ public class ForkJoinPool extends AbstractExecutorService {
      *         because it does not hold {@link
      *         java.lang.RuntimePermission}{@code ("modifyThread")}
      */
-    public List<Runnable> shutdownNow() {
+    public @Readonly List<Runnable> shutdownNow() {
         checkPermission();
         if (this != common)
             tryTerminate(true, true);

@@ -729,7 +729,7 @@ public @UsesObjectEquals class Executors {
             } finally { reachabilityFence(this); }
         }
         public void shutdown() { e.shutdown(); }
-        public List<Runnable> shutdownNow() {
+        public @Readonly List<Runnable> shutdownNow() {
             try {
                 return e.shutdownNow();
             } finally { reachabilityFence(this); }
