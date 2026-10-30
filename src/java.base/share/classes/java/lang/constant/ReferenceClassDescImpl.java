@@ -25,6 +25,8 @@
 package java.lang.constant;
 
 import java.lang.invoke.MethodHandles;
+import org.checkerframework.checker.mutability.qual.Immutable;
+import org.checkerframework.checker.mutability.qual.Readonly;
 
 import static java.lang.constant.ConstantUtils.dropFirstAndLastChar;
 import static java.lang.constant.ConstantUtils.internalToBinary;
@@ -35,6 +37,7 @@ import static java.util.Objects.requireNonNull;
  * interface, or array type.  A {@linkplain ReferenceClassDescImpl} corresponds to a
  * {@code Constant_Class_info} entry in the constant pool of a classfile.
  */
+@Immutable
 final class ReferenceClassDescImpl implements ClassDesc {
     private final String descriptor;
 
@@ -91,7 +94,7 @@ final class ReferenceClassDescImpl implements ClassDesc {
      *      is equal to this {@code ClassDesc}.
      */
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Readonly Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 

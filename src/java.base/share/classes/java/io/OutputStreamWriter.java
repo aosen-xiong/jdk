@@ -25,6 +25,7 @@
 
 package java.io;
 
+import org.checkerframework.checker.mutability.qual.Readonly;
 import org.checkerframework.checker.index.qual.IndexOrHigh;
 import org.checkerframework.checker.index.qual.LTLengthOf;
 import org.checkerframework.checker.index.qual.NonNegative;
@@ -232,13 +233,13 @@ public class OutputStreamWriter extends Writer {
     }
 
     @Override
-    public @MustCallAlias Writer append(@MustCallAlias OutputStreamWriter this, CharSequence csq, int start, int end) throws IOException {
+    public @MustCallAlias Writer append(@MustCallAlias OutputStreamWriter this, @Readonly CharSequence csq, int start, int end) throws IOException {
         if (csq == null) csq = "null";
         return append(csq.subSequence(start, end));
     }
 
     @Override
-    public @MustCallAlias Writer append(@MustCallAlias OutputStreamWriter this, CharSequence csq) throws IOException {
+    public @MustCallAlias Writer append(@MustCallAlias OutputStreamWriter this, @Readonly CharSequence csq) throws IOException {
         if (csq instanceof CharBuffer) {
             se.write((CharBuffer) csq);
         } else {

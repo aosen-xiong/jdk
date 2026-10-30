@@ -28,6 +28,7 @@ package java.lang.reflect;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.mutability.qual.Readonly;
 import org.checkerframework.checker.mutability.qual.ReceiverDependentMutable;
+import org.checkerframework.checker.mutability.qual.PolyMutable;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
@@ -100,7 +101,7 @@ public class InvocationTargetException extends ReflectiveOperationException {
      *
      * @return the thrown target exception (cause of this exception).
      */
-    public @Nullable Throwable getTargetException(@Readonly InvocationTargetException this) {
+    public @Nullable @PolyMutable Throwable getTargetException(@PolyMutable InvocationTargetException this) {
         return target;
     }
 
@@ -112,7 +113,7 @@ public class InvocationTargetException extends ReflectiveOperationException {
      * @since   1.4
      */
     @Override
-    public @Nullable Throwable getCause(@Readonly InvocationTargetException this) {
+    public @Nullable @PolyMutable Throwable getCause(@PolyMutable InvocationTargetException this) {
         return target;
     }
 }

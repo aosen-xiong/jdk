@@ -30,6 +30,7 @@ import java.util.OptionalInt;
 import java.util.stream.Stream;
 
 import jdk.internal.vm.annotation.Stable;
+import org.checkerframework.checker.mutability.qual.Immutable;
 
 import static java.lang.invoke.MethodHandleInfo.REF_getField;
 import static java.lang.invoke.MethodHandleInfo.REF_getStatic;
@@ -48,6 +49,7 @@ import static java.lang.invoke.MethodHandleInfo.REF_putStatic;
  *
  * @since 12
  */
+@Immutable
 public sealed interface DirectMethodHandleDesc
         extends MethodHandleDesc
         permits DirectMethodHandleDescImpl {

@@ -25,6 +25,8 @@
 
 package java.lang.reflect;
 
+import org.checkerframework.checker.mutability.qual.Immutable;
+import org.checkerframework.checker.mutability.qual.Readonly;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -76,7 +78,8 @@ import java.util.StringJoiner;
 "meaning, but are unrelated by the Java type hierarchy.",
 "@Covariant makes Constructor<@NonNull String> a subtype of Constructor<@Nullable String>."
 })
-@AnnotatedFor({"lock", "nullness"})
+@AnnotatedFor({"lock", "nullness", "mutability"})
+@Immutable
 @Covariant({0})
 public final class Constructor<T> extends Executable {
     private Class<T>            clazz;
@@ -263,7 +266,7 @@ public final class Constructor<T> extends Executable {
 
 
     @Override
-    Class<?>[] getSharedParameterTypes() {
+    Class<?> @Readonly [] getSharedParameterTypes() {
         return parameterTypes;
     }
 
@@ -493,7 +496,7 @@ public final class Constructor<T> extends Executable {
     @NewInstance
     @CallerSensitive
     @ForceInline // to ensure Reflection.getCallerClass optimization
-    public @NonNull T newInstance(Object ... initargs)
+    public @NonNull T newInstance(@Readonly Object ... initargs)
         throws InstantiationException, IllegalAccessException,
                IllegalArgumentException, InvocationTargetException
     {

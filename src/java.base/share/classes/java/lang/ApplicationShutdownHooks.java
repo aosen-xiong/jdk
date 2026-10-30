@@ -39,10 +39,8 @@ import java.util.*;
  */
 
 @AnnotatedFor({"interning"})
-@SuppressWarnings("mutability:type.arguments.not.inferred")
 @UsesObjectEquals class ApplicationShutdownHooks {
     /* The set of registered hooks */
-    @SuppressWarnings("mutability:type.argument.type.incompatible") // AOSEN: special case?
     private static IdentityHashMap<Thread, Thread> hooks;
     static {
         try {

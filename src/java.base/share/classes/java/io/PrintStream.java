@@ -35,7 +35,6 @@ import org.checkerframework.checker.mustcall.qual.MustCallAlias;
 import org.checkerframework.checker.mustcall.qual.NotOwning;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.mutability.qual.Readonly;
-import org.checkerframework.checker.mutability.qual.ReceiverDependentMutable;
 import org.checkerframework.checker.signedness.qual.PolySigned;
 import org.checkerframework.framework.qual.AnnotatedFor;
 import org.checkerframework.framework.qual.CFComment;
@@ -77,7 +76,6 @@ import java.nio.charset.UnsupportedCharsetException;
 
 @CFComment({"lock: TODO: Should parameters be @GuardSatisfied, or is the default of @GuardedBy({}) appropriate? (@GuardedBy({}) is more conservative.)"})
 @AnnotatedFor({"formatter", "i18n", "index", "initialization", "lock", "mustcall", "nullness", "signedness"})
-@ReceiverDependentMutable
 public class PrintStream extends FilterOutputStream
     implements Appendable, Closeable
 {
@@ -1322,7 +1320,7 @@ public class PrintStream extends FilterOutputStream
      *
      * @since  1.5
      */
-    public @MustCallAlias PrintStream append(@MustCallAlias PrintStream this, @Nullable CharSequence csq) {
+    public @MustCallAlias PrintStream append(@MustCallAlias PrintStream this, @Nullable @Readonly CharSequence csq) {
         print(String.valueOf(csq));
         return this;
     }
@@ -1362,7 +1360,7 @@ public class PrintStream extends FilterOutputStream
      *
      * @since  1.5
      */
-    public @MustCallAlias PrintStream append(@MustCallAlias PrintStream this, @Nullable CharSequence csq, @IndexOrHigh({"#1"}) int start, @IndexOrHigh({"#1"}) int end) {
+    public @MustCallAlias PrintStream append(@MustCallAlias PrintStream this, @Nullable @Readonly CharSequence csq, @IndexOrHigh({"#1"}) int start, @IndexOrHigh({"#1"}) int end) {
         if (csq == null) csq = "null";
         return append(csq.subSequence(start, end));
     }

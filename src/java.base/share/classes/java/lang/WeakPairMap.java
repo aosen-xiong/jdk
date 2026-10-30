@@ -56,7 +56,7 @@ import java.util.function.BiFunction;
 final class WeakPairMap<K1 extends @Immutable Object, K2 extends @Immutable Object, V> {
 
     private final ConcurrentHashMap<@Immutable Pair<K1, K2>, V> map = new @ReceiverDependentMutable ConcurrentHashMap<>();
-    private final ReferenceQueue<@Readonly Object> queue = new @ReceiverDependentMutable ReferenceQueue<>();
+    private final @Mutable ReferenceQueue<@Readonly Object> queue = new ReferenceQueue<>(); // GC bookkeeping, not part of the abstract state
 
     /**
      * Tests if the specified pair of keys are associated with a value
@@ -195,7 +195,7 @@ final class WeakPairMap<K1 extends @Immutable Object, K2 extends @Immutable Obje
      * keys in key pair has been found weakly-reachable and corresponding
      * WeakRefPeer(s) enqueued. Called as part of each public operation.
      */
-    @SuppressWarnings("mutability:method.invocation.invalid") // need to refactor the code because PICO does not typecheck
+    @SuppressWarnings("mutability:method.invocation.invalid") // expunging associations whose keys were collected is GC bookkeeping reached from read paths. It removes nothing a query could still observe
     private void expungeStaleAssociations(@Readonly WeakPairMap<K1, K2, V> this) {
         WeakRefPeer<?> peer;
         while ((peer = (WeakRefPeer<?>) queue.poll()) != null) {

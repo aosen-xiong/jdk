@@ -383,7 +383,7 @@ public interface Spliterator<T> {
      * @return a {@code Spliterator} covering some portion of the
      * elements, or {@code null} if this spliterator cannot be split
      */
-    @Nullable Spliterator<T> trySplit(@Readonly Spliterator<T> this);
+    @Nullable Spliterator<T> trySplit(@Mutable Spliterator<T> this);
 
     /**
      * Returns an estimate of the number of elements that would be
@@ -478,7 +478,7 @@ public interface Spliterator<T> {
      *         a characteristic of {@code SORTED}.
      */
     @Pure
-    default @Nullable Comparator<? super T> getComparator(@Readonly Spliterator<T> this) {
+    default @Nullable @Readonly Comparator<? super T> getComparator(@Readonly Spliterator<T> this) {
         throw new IllegalStateException();
     }
 

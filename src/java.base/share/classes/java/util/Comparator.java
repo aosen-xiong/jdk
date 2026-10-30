@@ -355,7 +355,7 @@ public interface Comparator<T extends @Readonly Object> {
      * @see Comparable
      * @since 1.8
      */
-    public static <T extends Comparable<? super T>> Comparator<T> reverseOrder() {
+    public static <T extends Comparable<? super T>> @Immutable Comparator<T> reverseOrder() {
         return Collections.reverseOrder();
     }
 

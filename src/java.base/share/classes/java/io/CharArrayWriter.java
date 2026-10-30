@@ -25,6 +25,7 @@
 
 package java.io;
 
+import org.checkerframework.checker.mutability.qual.Readonly;
 import org.checkerframework.checker.index.qual.IndexOrHigh;
 import org.checkerframework.checker.index.qual.LTLengthOf;
 import org.checkerframework.checker.index.qual.NonNegative;
@@ -183,7 +184,7 @@ public class CharArrayWriter extends Writer {
      *
      * @since  1.5
      */
-    public CharArrayWriter append(@Nullable CharSequence csq) {
+    public CharArrayWriter append(@Nullable @Readonly CharSequence csq) {
         String s = String.valueOf(csq);
         write(s, 0, s.length());
         return this;
@@ -222,7 +223,7 @@ public class CharArrayWriter extends Writer {
      *
      * @since  1.5
      */
-    public CharArrayWriter append(@Nullable CharSequence csq, @IndexOrHigh({"#1"}) int start, @IndexOrHigh({"#1"}) int end) {
+    public CharArrayWriter append(@Nullable @Readonly CharSequence csq, @IndexOrHigh({"#1"}) int start, @IndexOrHigh({"#1"}) int end) {
         if (csq == null) csq = "null";
         return append(csq.subSequence(start, end));
     }

@@ -27,6 +27,8 @@ package java.lang.constant;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import org.checkerframework.checker.mutability.qual.Immutable;
+import org.checkerframework.checker.mutability.qual.Readonly;
 
 import static java.lang.constant.ConstantDescs.CD_void;
 import static java.lang.constant.DirectMethodHandleDesc.Kind.CONSTRUCTOR;
@@ -37,6 +39,7 @@ import static java.lang.constant.DirectMethodHandleDesc.Kind.CONSTRUCTOR;
  *
  * @since 12
  */
+@Immutable
 public sealed interface MethodHandleDesc
         extends ConstantDesc
         permits AsTypeMethodHandleDesc,
@@ -213,5 +216,5 @@ public sealed interface MethodHandleDesc
      * @param o the other object
      * @return whether this descriptor is equal to the other object
      */
-    boolean equals(Object o);
+    boolean equals(@Readonly Object o);
 }

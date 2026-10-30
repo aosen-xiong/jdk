@@ -212,7 +212,7 @@ public class LinkedBlockingDeque<E extends @Readonly Object>
      * @throws NullPointerException if the specified collection or any
      *         of its elements are null
      */
-    public LinkedBlockingDeque(Collection<? extends E> c) {
+    public LinkedBlockingDeque(@Readonly Collection<? extends E> c) {
         this(Integer.MAX_VALUE);
         addAll(c);
     }
@@ -1356,7 +1356,7 @@ public class LinkedBlockingDeque<E extends @Readonly Object>
     /**
      * @throws NullPointerException {@inheritDoc}
      */
-    public boolean removeIf(@CanShrink LinkedBlockingDeque<E> this, Predicate<? super E> filter) {
+    public boolean removeIf(@CanShrink LinkedBlockingDeque<E> this, @Readonly Predicate<? super E> filter) {
         Objects.requireNonNull(filter);
         return bulkRemove(filter);
     }
@@ -1379,7 +1379,7 @@ public class LinkedBlockingDeque<E extends @Readonly Object>
 
     /** Implementation of bulk remove methods. */
     @SuppressWarnings("unchecked")
-    private boolean bulkRemove(Predicate<? super E> filter) {
+    private boolean bulkRemove(@Readonly Predicate<? super E> filter) {
         boolean removed = false;
         final ReentrantLock lock = this.lock;
         Node<E> p = null;

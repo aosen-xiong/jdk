@@ -80,6 +80,8 @@ import java.util.StringJoiner;
  */
 @AnnotatedFor({"interning", "lock", "nullness", "mutability"})
 @SuppressWarnings({"rawtypes"})
+// mutability: invoke takes its target object @Readonly on purpose. Reflection is the sanctioned escape hatch below the type system,
+// so a @Readonly or @Immutable object can be written through it by design.
 @Immutable
 public final class Method extends Executable {
     @Stable
@@ -314,7 +316,7 @@ public final class Method extends Executable {
     }
 
     @Override
-    Class<?>[] getSharedParameterTypes() {
+    Class<?> @Readonly [] getSharedParameterTypes() {
         return parameterTypes;
     }
 

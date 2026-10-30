@@ -30,7 +30,8 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.invoke.VarHandle.VarHandleDesc;
 
-import org.checkerframework.checker.mutability.qual.ReceiverDependentMutable;
+import org.checkerframework.checker.mutability.qual.Immutable;
+import org.checkerframework.checker.mutability.qual.Readonly;
 
 /**
  * A <a href="package-summary.html#nominal">nominal descriptor</a> for a loadable
@@ -77,7 +78,7 @@ import org.checkerframework.checker.mutability.qual.ReceiverDependentMutable;
  *
  * @since 12
  */
-@ReceiverDependentMutable
+@Immutable
 public sealed interface ConstantDesc
         permits ClassDesc,
                 MethodHandleDesc,
@@ -108,5 +109,5 @@ public sealed interface ConstantDesc
      * @jvms 5.4.3 Resolution
      * @jvms 5.4.4 Access Control
      */
-    Object resolveConstantDesc(MethodHandles.Lookup lookup) throws ReflectiveOperationException;
+    @Readonly Object resolveConstantDesc(MethodHandles.Lookup lookup) throws ReflectiveOperationException;
 }

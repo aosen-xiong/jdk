@@ -27,6 +27,7 @@ package java.lang.invoke;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.mutability.qual.Immutable;
 import java.util.List;
+import org.checkerframework.checker.mutability.qual.Readonly;
 
 /**
  * An entity that has a type descriptor.
@@ -108,6 +109,7 @@ public interface TypeDescriptor {
      * @jvms 4.3.3 Method Descriptors
      * @since 12
      */
+    @Immutable
     interface OfMethod<F extends TypeDescriptor.OfField<F>, M extends TypeDescriptor.OfMethod<F, M>>
             extends TypeDescriptor {
 
@@ -146,7 +148,7 @@ public interface TypeDescriptor {
          * described by this descriptor
          * @return field descriptors for the parameter types
          */
-        List<F> parameterList();
+        @Readonly List<F> parameterList();
 
         /**
          * Return a method descriptor that is identical to this one, except that the return

@@ -298,7 +298,8 @@ public final class StackWalker {
         LOCALS_AND_OPERANDS
     };
 
-    static final @Mutable EnumSet<Option> DEFAULT_EMPTY_OPTION = EnumSet.noneOf(Option.class);
+    @SuppressWarnings("mutability:assignment.type.incompatible") // freeze: a fresh empty set, shared by every default walker and never modified
+    static final @Immutable EnumSet<Option> DEFAULT_EMPTY_OPTION = EnumSet.noneOf(Option.class);
 
     private static final StackWalker DEFAULT_WALKER =
         new StackWalker(DEFAULT_EMPTY_OPTION);
@@ -413,13 +414,13 @@ public final class StackWalker {
     }
 
     // ----- private constructors ------
-    private StackWalker(EnumSet<Option> options) {
+    private StackWalker(@Immutable EnumSet<Option> options) {
         this(options, 0, null);
     }
-    private StackWalker(EnumSet<Option> options, int estimateDepth) {
+    private StackWalker(@Immutable EnumSet<Option> options, int estimateDepth) {
         this(options, estimateDepth, null);
     }
-    private StackWalker(EnumSet<Option> options, int estimateDepth, ExtendedOption extendedOption) {
+    private StackWalker(@Immutable EnumSet<Option> options, int estimateDepth, ExtendedOption extendedOption) {
         this.options = options;
         this.estimateDepth = estimateDepth;
         this.extendedOption = extendedOption;
@@ -440,7 +441,8 @@ public final class StackWalker {
     /*
      * Returns a defensive copy
      */
-    private static EnumSet<Option> toEnumSet(@Readonly Set<Option> options) {
+    @SuppressWarnings("mutability:return.type.incompatible") // freeze: EnumSet.copyOf is a fresh defensive copy that only the new walker holds
+    private static @Immutable EnumSet<Option> toEnumSet(@Readonly Set<Option> options) {
         Objects.requireNonNull(options);
         if (options.isEmpty()) {
             return DEFAULT_EMPTY_OPTION;

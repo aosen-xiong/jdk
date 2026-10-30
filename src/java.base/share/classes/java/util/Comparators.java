@@ -24,6 +24,7 @@
  */
 package java.util;
 
+import org.checkerframework.checker.mutability.qual.Immutable;
 import org.checkerframework.checker.mutability.qual.Readonly;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
@@ -57,7 +58,7 @@ class Comparators {
         }
 
         @Override
-        public Comparator<Comparable<Object>> reversed() {
+        public @Immutable Comparator<Comparable<Object>> reversed() {
             return Comparator.reverseOrder();
         }
     }
@@ -91,7 +92,7 @@ class Comparators {
         }
 
         @Override
-        public @Readonly Comparator<T> thenComparing(@Readonly Comparator<? super T> other) {
+        public Comparator<T> thenComparing(@Readonly Comparator<? super T> other) {
             Objects.requireNonNull(other);
             return new NullComparator<>(nullFirst, real == null ? other : real.thenComparing(other));
         }

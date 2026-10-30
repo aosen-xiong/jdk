@@ -35,6 +35,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
 import org.checkerframework.framework.qual.AnnotatedFor;
 import org.checkerframework.framework.qual.CFComment;
+import org.checkerframework.checker.mutability.qual.Readonly;
 
 /**
  * {@code InvocationHandler} is the interface implemented by
@@ -105,7 +106,7 @@ public interface InvocationHandler {
     @CFComment("nullness: A null return is allowed only if the Method points to a method whose"
         + " return value may be null. We don't know whether it does, so we conservatively omit"
         + " @Nullable on the return type")
-    public Object invoke(Object proxy, Method method, @PolyNull Object @Nullable [] args)
+    public @Readonly Object invoke(Object proxy, Method method, @PolyNull Object @Nullable [] args)
         throws Throwable;
 
     /**

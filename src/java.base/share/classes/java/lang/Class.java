@@ -690,7 +690,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
         }
     }
 
-    private transient volatile @Assignable /* should be @LazyFinal */ @Mutable Constructor<T> cachedConstructor;
+    private transient volatile @Assignable /* should be @LazyFinal */ Constructor<T> cachedConstructor;
 
     /**
      * Determines if the specified {@code Object} is assignment-compatible
@@ -3890,7 +3890,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * uncloned, cached, and shared by all callers.
      */
     @SuppressWarnings("removal")
-    T[] getEnumConstantsShared() {
+    T @Readonly [] getEnumConstantsShared() {
         T[] constants = enumConstants;
         if (constants == null) {
             if (!isEnum()) return null;

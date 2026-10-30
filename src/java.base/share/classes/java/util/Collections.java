@@ -295,7 +295,7 @@ public class Collections {
      * Gets the ith element from the given list by repositioning the specified
      * list listIterator.
      */
-    private static <T> T get(ListIterator<? extends T> i, int index) {
+    private static <T> T get(@Mutable ListIterator<? extends T> i, int index) {
         T obj = null;
         int pos = i.nextIndex();
         if (pos <= index) {
@@ -346,7 +346,7 @@ public class Collections {
      *         elements of the list using this comparator.
      */
     @SuppressWarnings("unchecked")
-    public static <T> int binarySearch(@Readonly List<? extends T> list, T key, @Nullable Comparator<? super T> c) {
+    public static <T> int binarySearch(@Readonly List<? extends T> list, T key, @Nullable @Readonly Comparator<? super T> c) {
         if (c==null)
             return binarySearch((@Readonly List<? extends Comparable<? super T>>) list, key);
 
@@ -356,7 +356,7 @@ public class Collections {
             return Collections.iteratorBinarySearch(list, key, c);
     }
 
-    private static <T> int indexedBinarySearch(@Readonly List<? extends T> l, T key, Comparator<? super T> c) {
+    private static <T> int indexedBinarySearch(@Readonly List<? extends T> l, T key, @Readonly Comparator<? super T> c) {
         int low = 0;
         int high = l.size()-1;
 
@@ -375,7 +375,7 @@ public class Collections {
         return -(low + 1);  // key not found
     }
 
-    private static <T> int iteratorBinarySearch(@Readonly List<? extends T> l, T key, Comparator<? super T> c) {
+    private static <T> int iteratorBinarySearch(@Readonly List<? extends T> l, T key, @Readonly Comparator<? super T> c) {
         int low = 0;
         int high = l.size()-1;
         ListIterator<? extends T> i = l.listIterator();
@@ -484,7 +484,7 @@ public class Collections {
      * @throws UnsupportedOperationException if the specified list or its
      *         list-iterator does not support the {@code set} operation.
      */
-    @SuppressWarnings({"rawtypes", "unchecked", "mutability:argument.type.incompatible"}) // Revisit later, seems to be a bug
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public static void shuffle(@GuardSatisfied List<? extends @Readonly Object> list, Random rnd) {
         int size = list.size();
         if (size < SHUFFLE_THRESHOLD || list instanceof RandomAccess) {
@@ -629,7 +629,7 @@ public class Collections {
      */
     @Pure
     @StaticallyExecutable
-    public static <T extends Object & Comparable<? super T>> T min(@Readonly Collection<? extends T> coll) {
+    public static <T extends @Readonly Object & Comparable<? super T>> T min(@Readonly Collection<? extends T> coll) {
         Iterator<? extends T> i = coll.iterator();
         T candidate = i.next();
 
@@ -706,7 +706,7 @@ public class Collections {
      */
     @Pure
     @StaticallyExecutable
-    public static <T extends Object & Comparable<? super T>> T max(@Readonly Collection<? extends T> coll) {
+    public static <T extends @Readonly Object & Comparable<? super T>> T max(@Readonly Collection<? extends T> coll) {
         Iterator<? extends T> i = coll.iterator();
         T candidate = i.next();
 
@@ -1055,27 +1055,27 @@ public class Collections {
      *         returned.
      * @return an unmodifiable view of the specified collection.
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // mutability: one poly: the backing collection and the view are the same instantiation
     @SideEffectFree
-    public static <T> @PolyGrowShrink @PolyNonEmpty @Immutable Collection<T> unmodifiableCollection(@PolyGrowShrink @PolyNonEmpty @Readonly Collection<? extends T> c) {
+    public static <T> @PolyNonEmpty @PolyMutable @PolyGrowShrink Collection<T> unmodifiableCollection(@PolyNonEmpty @PolyMutable @PolyGrowShrink Collection<? extends T> c) {
         if (c.getClass() == UnmodifiableCollection.class) {
-            return (@Immutable Collection<T>) c;
+            return (@PolyMutable Collection<T>) c;
         }
-        return new UnmodifiableCollection<>(c);
+        return new @PolyMutable UnmodifiableCollection<>(c);
     }
 
     /**
      * @serial include
      */
-    @Immutable
+    @ReceiverDependentMutable
     static class UnmodifiableCollection<E> implements Collection<E>, Serializable {
         @java.io.Serial
         private static final long serialVersionUID = 1820017752578914078L;
 
         @SuppressWarnings("serial") // Conditionally serializable
-        final @Readonly Collection<? extends E> c;
+        final @ReceiverDependentMutable Collection<? extends E> c;
 
-        @PolyNonEmpty UnmodifiableCollection(@PolyNonEmpty @Readonly Collection<? extends E> c) {
+        @PolyNonEmpty UnmodifiableCollection(@PolyNonEmpty @ReceiverDependentMutable Collection<? extends E> c) {
             if (c==null)
                 throw new NullPointerException();
             this.c = c;
@@ -1088,7 +1088,7 @@ public class Collections {
         public boolean isEmpty()                   {return c.isEmpty();}
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
-        public boolean contains(@UnknownSignedness Object o)          {return c.contains(o);}
+        public boolean contains(@UnknownSignedness @Readonly Object o)          {return c.contains(o);}
         @SideEffectFree
         @SuppressWarnings("mutability:return.type.incompatible") // poly does not work on field's type argument
         public @PolyNull @PolySigned @PolyMutable Object[] toArray(Collections.UnmodifiableCollection<@PolyNull @PolySigned @PolyMutable E> this)                  {return c.toArray();}
@@ -1098,9 +1098,9 @@ public class Collections {
         public String toString()                   {return c.toString();}
 
         @SideEffectFree
-        public @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@PolyGrowShrink @PolyNonEmpty UnmodifiableCollection<E> this) {
-            return new Iterator<E>() {
-                private final Iterator<? extends E> i = c.iterator();
+        public @PolyNonEmpty @Mutable @PolyGrowShrink Iterator<E> iterator(@PolyNonEmpty @PolyGrowShrink UnmodifiableCollection<E> this) {
+            return new @Mutable Iterator<E>() {
+                private final @Mutable Iterator<? extends E> i = c.iterator();
 
                 @Pure
                 @EnsuresNonEmptyIf(result = true, expression = "this")
@@ -1121,21 +1121,21 @@ public class Collections {
         public boolean add(E e) {
             throw new UnsupportedOperationException();
         }
-        public boolean remove(@UnknownSignedness Object o) {
+        public boolean remove(@UnknownSignedness @Readonly Object o) {
             throw new UnsupportedOperationException();
         }
 
         @Pure
-        public boolean containsAll(Collection<? extends @UnknownSignedness @Readonly Object> coll) {
+        public boolean containsAll(@Readonly Collection<? extends @UnknownSignedness @Readonly Object> coll) {
             return c.containsAll(coll);
         }
-        public boolean addAll(Collection<? extends E> coll) {
+        public boolean addAll(@Readonly Collection<? extends E> coll) {
             throw new UnsupportedOperationException();
         }
-        public boolean removeAll(Collection<? extends @UnknownSignedness Object> coll) {
+        public boolean removeAll(@Readonly Collection<? extends @UnknownSignedness @Readonly Object> coll) {
             throw new UnsupportedOperationException();
         }
-        public boolean retainAll(Collection<? extends @UnknownSignedness Object> coll) {
+        public boolean retainAll(@Readonly Collection<? extends @UnknownSignedness @Readonly Object> coll) {
             throw new UnsupportedOperationException();
         }
         public void clear() {
@@ -1148,7 +1148,7 @@ public class Collections {
             c.forEach(action);
         }
         @Override
-        public boolean removeIf(Predicate<? super E> filter) {
+        public boolean removeIf(@Readonly Predicate<? super E> filter) {
             throw new UnsupportedOperationException();
         }
         @SideEffectFree
@@ -1185,23 +1185,24 @@ public class Collections {
      */
     // @SuppressWarnings({"unchecked", "mutability"}) // PICO Flow
     @SideEffectFree
-    public static <T> @PolyNonEmpty @Immutable Set<T> unmodifiableSet(@PolyNonEmpty @Readonly Set<? extends T> s) {
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // mutability: one poly: the backing collection and the view are the same instantiation
+    public static <T> @PolyNonEmpty @PolyMutable Set<T> unmodifiableSet(@PolyNonEmpty @PolyMutable Set<? extends T> s) {
         // Not checking for subclasses because of heap pollution and information leakage.
         if (s.getClass() == UnmodifiableSet.class) {
-            return (@Immutable Set<T>) s;
+            return (@PolyMutable Set<T>) s;
         }
-        return new UnmodifiableSet<>(s);
+        return new @PolyMutable UnmodifiableSet<>(s);
     }
 
     /**
      * @serial include
      */
-    @Immutable static class UnmodifiableSet<E> extends UnmodifiableCollection<E>
+    @ReceiverDependentMutable static class UnmodifiableSet<E> extends UnmodifiableCollection<E>
                                  implements Set<E>, Serializable {
         @java.io.Serial
         private static final long serialVersionUID = -9215047833775013803L;
 
-        UnmodifiableSet(@Readonly Set<? extends E> s)     {super(s);}
+        UnmodifiableSet(@ReceiverDependentMutable Set<? extends E> s)     {super(s);}
         public boolean equals(@Readonly Object o) {return o == this || c.equals(o);}
         public int hashCode()           {return c.hashCode();}
     }
@@ -1223,38 +1224,38 @@ public class Collections {
      *        returned.
      * @return an unmodifiable view of the specified sorted set.
      */
-    @SuppressWarnings("mutability") // PICO Flow
-    public static <T> @PolyNonEmpty @Immutable SortedSet<T> unmodifiableSortedSet(@PolyNonEmpty @Readonly SortedSet<T> s) {
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // mutability: one poly: the backing collection and the view are the same instantiation
+    public static <T> @PolyNonEmpty @PolyMutable SortedSet<T> unmodifiableSortedSet(@PolyNonEmpty @PolyMutable SortedSet<T> s) {
         // Not checking for subclasses because of heap pollution and information leakage.
         if (s.getClass() == UnmodifiableSortedSet.class) {
             return s;
         }
-        return new UnmodifiableSortedSet<>(s);
+        return new @PolyMutable UnmodifiableSortedSet<>(s);
     }
 
     /**
      * @serial include
      */
-    @Immutable static class UnmodifiableSortedSet<E>
+    @ReceiverDependentMutable static class UnmodifiableSortedSet<E>
                              extends UnmodifiableSet<E>
                              implements SortedSet<E>, Serializable {
         @java.io.Serial
         private static final long serialVersionUID = -4929149591599911165L;
         @SuppressWarnings("serial") // Conditionally serializable
-        private final @Readonly SortedSet<E> ss;
+        private final @ReceiverDependentMutable SortedSet<E> ss;
 
-        UnmodifiableSortedSet(@Readonly SortedSet<E> s) {super(s); ss = s;}
+        UnmodifiableSortedSet(@ReceiverDependentMutable SortedSet<E> s) {super(s); ss = s;}
 
-        public Comparator<? super E> comparator() {return ss.comparator();}
+        public @Readonly Comparator<? super E> comparator() {return ss.comparator();}
 
-        public @Immutable SortedSet<E> subSet(E fromElement, E toElement) {
-            return new UnmodifiableSortedSet<>(ss.subSet(fromElement,toElement));
+        public @ReceiverDependentMutable SortedSet<E> subSet(E fromElement, E toElement) {
+            return new @ReceiverDependentMutable UnmodifiableSortedSet<>(ss.subSet(fromElement,toElement));
         }
-        public @Immutable SortedSet<E> headSet(E toElement) {
-            return new UnmodifiableSortedSet<>(ss.headSet(toElement));
+        public @ReceiverDependentMutable SortedSet<E> headSet(E toElement) {
+            return new @ReceiverDependentMutable UnmodifiableSortedSet<>(ss.headSet(toElement));
         }
-        public @Immutable SortedSet<E> tailSet(E fromElement) {
-            return new UnmodifiableSortedSet<>(ss.tailSet(fromElement));
+        public @ReceiverDependentMutable SortedSet<E> tailSet(E fromElement) {
+            return new @ReceiverDependentMutable UnmodifiableSortedSet<>(ss.tailSet(fromElement));
         }
 
         public E first()                   {return ss.first();}
@@ -1279,12 +1280,12 @@ public class Collections {
      * @return an unmodifiable view of the specified navigable set
      * @since 1.8
      */
-    @SuppressWarnings("mutability") // PICO Flow
-    public static <T> @PolyNonEmpty @Immutable NavigableSet<T> unmodifiableNavigableSet(@PolyNonEmpty @Readonly NavigableSet<T> s) {
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
+    public static <T> @PolyNonEmpty @PolyMutable NavigableSet<T> unmodifiableNavigableSet(@PolyNonEmpty @PolyMutable NavigableSet<T> s) {
         if (s.getClass() == UnmodifiableNavigableSet.class) {
             return s;
         }
-        return new UnmodifiableNavigableSet<>(s);
+        return new @PolyMutable UnmodifiableNavigableSet<>(s);
     }
 
     /**
@@ -1293,8 +1294,8 @@ public class Collections {
      * @param <E> type of elements
      * @serial include
      */
-    @Immutable
-    static class UnmodifiableNavigableSet<E extends @Immutable Object>
+    @ReceiverDependentMutable
+    static class UnmodifiableNavigableSet<E>
                              extends UnmodifiableSortedSet<E>
                              implements NavigableSet<E>, Serializable {
 
@@ -1330,9 +1331,9 @@ public class Collections {
          * The instance we are protecting.
          */
         @SuppressWarnings("serial") // Conditionally serializable
-        private final @Readonly NavigableSet<E> ns;
+        private final @ReceiverDependentMutable NavigableSet<E> ns;
 
-        UnmodifiableNavigableSet(@Readonly NavigableSet<E> s)         {super(s); ns = s;}
+        UnmodifiableNavigableSet(@ReceiverDependentMutable NavigableSet<E> s)         {super(s); ns = s;}
 
         public E lower(E e)                             { return ns.lower(e); }
         public E floor(E e)                             { return ns.floor(e); }
@@ -1340,23 +1341,23 @@ public class Collections {
         public E higher(E e)                           { return ns.higher(e); }
         public E pollFirst()     { throw new UnsupportedOperationException(); }
         public E pollLast()      { throw new UnsupportedOperationException(); }
-        public @Immutable NavigableSet<E> descendingSet()
-                 { return new UnmodifiableNavigableSet<>(ns.descendingSet()); }
-        public Iterator<E> descendingIterator()
+        public @ReceiverDependentMutable NavigableSet<E> descendingSet()
+                 { return new @ReceiverDependentMutable UnmodifiableNavigableSet<>(ns.descendingSet()); }
+        public @Mutable Iterator<E> descendingIterator()
                                          { return descendingSet().iterator(); }
 
-        public @Immutable NavigableSet<E> subSet(E fromElement, boolean fromInclusive, E toElement, boolean toInclusive) {
-            return new UnmodifiableNavigableSet<>(
+        public @ReceiverDependentMutable NavigableSet<E> subSet(E fromElement, boolean fromInclusive, E toElement, boolean toInclusive) {
+            return new @ReceiverDependentMutable UnmodifiableNavigableSet<>(
                 ns.subSet(fromElement, fromInclusive, toElement, toInclusive));
         }
 
-        public @Immutable NavigableSet<E> headSet(E toElement, boolean inclusive) {
-            return new UnmodifiableNavigableSet<>(
+        public @ReceiverDependentMutable NavigableSet<E> headSet(E toElement, boolean inclusive) {
+            return new @ReceiverDependentMutable UnmodifiableNavigableSet<>(
                 ns.headSet(toElement, inclusive));
         }
 
-        public @Immutable NavigableSet<E> tailSet(E fromElement, boolean inclusive) {
-            return new UnmodifiableNavigableSet<>(
+        public @ReceiverDependentMutable NavigableSet<E> tailSet(E fromElement, boolean inclusive) {
+            return new @ReceiverDependentMutable UnmodifiableNavigableSet<>(
                 ns.tailSet(fromElement, inclusive));
         }
     }
@@ -1377,29 +1378,29 @@ public class Collections {
      * @param  list the list for which an unmodifiable view is to be returned.
      * @return an unmodifiable view of the specified list.
      */
-    @SuppressWarnings("unchecked")
-    public static <T> @PolyGrowShrink @PolyNonEmpty @Immutable List<T> unmodifiableList(@PolyGrowShrink @PolyNonEmpty @Readonly List<? extends T> list) {
+    @SuppressWarnings({"unchecked", "mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // mutability: one poly: the backing collection and the view are the same instantiation
+    public static <T> @PolyGrowShrink @PolyNonEmpty @PolyMutable List<T> unmodifiableList(@PolyGrowShrink @PolyNonEmpty @PolyMutable List<? extends T> list) {
         if (list.getClass() == UnmodifiableList.class || list.getClass() == UnmodifiableRandomAccessList.class) {
-           return (@Immutable List<T>) list;
+           return (@PolyMutable List<T>) list;
         }
 
         return (list instanceof RandomAccess ?
-                new UnmodifiableRandomAccessList<>(list) :
-                new UnmodifiableList<>(list));
+                new @PolyMutable UnmodifiableRandomAccessList<>(list) :
+                new @PolyMutable UnmodifiableList<>(list));
     }
 
     /**
      * @serial include
      */
-    @Immutable static class UnmodifiableList<E> extends UnmodifiableCollection<E>
+    @ReceiverDependentMutable static class UnmodifiableList<E> extends UnmodifiableCollection<E>
                                   implements List<E> {
         @java.io.Serial
         private static final long serialVersionUID = -283967356065247728L;
 
         @SuppressWarnings("serial") // Conditionally serializable
-        final @Readonly List<? extends E> list;
+        final @ReceiverDependentMutable List<? extends E> list;
 
-        UnmodifiableList(@Readonly List<? extends E> list) {
+        UnmodifiableList(@ReceiverDependentMutable List<? extends E> list) {
             super(list);
             this.list = list;
         }
@@ -1417,9 +1418,9 @@ public class Collections {
         public E remove(int index) {
             throw new UnsupportedOperationException();
         }
-        public int indexOf(Object o)            {return list.indexOf(o);}
-        public int lastIndexOf(Object o)        {return list.lastIndexOf(o);}
-        public boolean addAll(int index, Collection<? extends E> c) {
+        public int indexOf(@Readonly Object o)            {return list.indexOf(o);}
+        public int lastIndexOf(@Readonly Object o)        {return list.lastIndexOf(o);}
+        public boolean addAll(int index, @Readonly Collection<? extends E> c) {
             throw new UnsupportedOperationException();
         }
 
@@ -1432,11 +1433,11 @@ public class Collections {
             throw new UnsupportedOperationException();
         }
 
-        public @PolyGrowShrink @PolyNonEmpty ListIterator<E> listIterator(@PolyGrowShrink @PolyNonEmpty @Readonly UnmodifiableList<E> this)   {return listIterator(0);}
+        public @PolyNonEmpty @Mutable @PolyGrowShrink ListIterator<E> listIterator(@PolyNonEmpty @PolyGrowShrink UnmodifiableList<E> this)   {return listIterator(0);}
 
-        public ListIterator<E> listIterator(@Readonly UnmodifiableList<E> this, final int index) {
-            return new ListIterator<E>() {
-                private final ListIterator<? extends E> i
+        public @Mutable ListIterator<E> listIterator(UnmodifiableList<E> this, final int index) {
+            return new @Mutable ListIterator<E>() {
+                private final @Mutable ListIterator<? extends E> i
                     = list.listIterator(index);
 
                 @Pure
@@ -1466,8 +1467,8 @@ public class Collections {
             };
         }
 
-        public @Immutable List<E> subList(int fromIndex, int toIndex) {
-            return new UnmodifiableList<>(list.subList(fromIndex, toIndex));
+        public @ReceiverDependentMutable List<E> subList(int fromIndex, int toIndex) {
+            return new @ReceiverDependentMutable UnmodifiableList<>(list.subList(fromIndex, toIndex));
         }
 
         /**
@@ -1483,9 +1484,9 @@ public class Collections {
          * UnmodifiableList instances, as this method was missing in 1.4.
          */
         @java.io.Serial
-        private @Immutable Object readResolve() {
+        private @ReceiverDependentMutable Object readResolve() {
             return (list instanceof RandomAccess
-                    ? new UnmodifiableRandomAccessList<>(list)
+                    ? new @ReceiverDependentMutable UnmodifiableRandomAccessList<>(list)
                     : this);
         }
     }
@@ -1493,15 +1494,15 @@ public class Collections {
     /**
      * @serial include
      */
-    @Immutable static class UnmodifiableRandomAccessList<E> extends UnmodifiableList<E>
+    @ReceiverDependentMutable static class UnmodifiableRandomAccessList<E> extends UnmodifiableList<E>
                                               implements RandomAccess
     {
-        UnmodifiableRandomAccessList(@Readonly List<? extends E> list) {
+        UnmodifiableRandomAccessList(@ReceiverDependentMutable List<? extends E> list) {
             super(list);
         }
 
-        public @Immutable List<E> subList(int fromIndex, int toIndex) {
-            return new UnmodifiableRandomAccessList<>(
+        public @ReceiverDependentMutable List<E> subList(int fromIndex, int toIndex) {
+            return new @ReceiverDependentMutable UnmodifiableRandomAccessList<>(
                 list.subList(fromIndex, toIndex));
         }
 
@@ -1515,8 +1516,8 @@ public class Collections {
          * deserialization.
          */
         @java.io.Serial
-        private @Immutable Object writeReplace() {
-            return new UnmodifiableList<>(list);
+        private @ReceiverDependentMutable Object writeReplace() {
+            return new @ReceiverDependentMutable UnmodifiableList<>(list);
         }
     }
 
@@ -1536,27 +1537,27 @@ public class Collections {
      * @param  m the map for which an unmodifiable view is to be returned.
      * @return an unmodifiable view of the specified map.
      */
-    @SuppressWarnings("unchecked")
-    public static <K extends @Immutable Object,V> @PolyNonEmpty @Immutable Map<K,V> unmodifiableMap(@PolyNonEmpty @Readonly Map<? extends K, ? extends V> m) {
+    @SuppressWarnings({"unchecked", "mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // mutability: one poly: the backing collection and the view are the same instantiation
+    public static <K extends @Readonly Object,V> @PolyNonEmpty @PolyMutable Map<K,V> unmodifiableMap(@PolyNonEmpty @PolyMutable Map<? extends K, ? extends V> m) {
         // Not checking for subclasses because of heap pollution and information leakage.
         if (m.getClass() == UnmodifiableMap.class) {
-            return (@Immutable Map<K,V>) m;
+            return (@PolyMutable Map<K,V>) m;
         }
-        return new UnmodifiableMap<>(m);
+        return new @PolyMutable UnmodifiableMap<>(m);
     }
 
     /**
      * @serial include
      */
-    @Immutable
-    private static class UnmodifiableMap<K extends @Immutable Object,V> implements Map<K,V>, Serializable {
+    @ReceiverDependentMutable
+    private static class UnmodifiableMap<K extends @Readonly Object,V> implements Map<K,V>, Serializable {
         @java.io.Serial
         private static final long serialVersionUID = -1034234728574286014L;
 
         @SuppressWarnings("serial") // Conditionally serializable
-        private final @Readonly Map<? extends K, ? extends V> m;
+        private final @ReceiverDependentMutable Map<? extends K, ? extends V> m;
 
-        UnmodifiableMap(@Readonly Map<? extends K, ? extends V> m) {
+        UnmodifiableMap(@ReceiverDependentMutable Map<? extends K, ? extends V> m) {
             if (m==null)
                 throw new NullPointerException();
             this.m = m;
@@ -1572,40 +1573,41 @@ public class Collections {
         public boolean containsKey(@UnknownSignedness @Readonly Object key)   {return m.containsKey(key);}
         @Pure
         public boolean containsValue(@UnknownSignedness @Readonly Object val) {return m.containsValue(val);}
-        public V get(Object key)                 {return m.get(key);}
+        public V get(@Readonly Object key)                 {return m.get(key);}
 
         @EnsuresKeyFor(value={"#1"}, map={"this"})
         public V put(K key, V value) {
             throw new UnsupportedOperationException();
         }
-        public V remove(Object key) {
+        public V remove(@Readonly Object key) {
             throw new UnsupportedOperationException();
         }
-        public void putAll(Map<? extends K, ? extends V> m) {
+        public void putAll(@Readonly Map<? extends K, ? extends V> m) {
             throw new UnsupportedOperationException();
         }
         public void clear() {
             throw new UnsupportedOperationException();
         }
 
-        private transient @Assignable /* should be @LazyFinal */ @Readonly Set<K> keySet;
-        private transient @Assignable /* should be @LazyFinal */ @Readonly Set<Map.@Readonly Entry<K,V>> entrySet;
-        private transient @Assignable /* should be @LazyFinal */ @Readonly Collection<V> values;
+        private transient @Assignable /* should be @LazyFinal */ @ReceiverDependentMutable Set<K> keySet;
+        private transient @Assignable /* should be @LazyFinal */ @ReceiverDependentMutable Set<Map.@Readonly Entry<K,V>> entrySet;
+        private transient @Assignable /* should be @LazyFinal */ @ReceiverDependentMutable Collection<V> values;
 
-        public @Readonly Set<K> keySet() {
+        public @ReceiverDependentMutable Set<K> keySet() {
             if (keySet==null)
                 keySet = unmodifiableSet(m.keySet());
             return keySet;
         }
 
         @SideEffectFree
-        public @Readonly Set<Map.@Readonly Entry<K,V>> entrySet() {
+        @SuppressWarnings("mutability:override.return.invalid") // the entries are UnmodifiableEntry wrappers over live entries of the backing map: their setValue throws, so they are @Readonly. @ReceiverDependentMutable entries would need the static entryConsumer and the entry spliterator to carry the map's mutability
+        public @ReceiverDependentMutable Set<Map.@Readonly Entry<K,V>> entrySet() {
             if (entrySet==null)
-                entrySet = new UnmodifiableEntrySet<>(m.entrySet());
+                entrySet = new @ReceiverDependentMutable UnmodifiableEntrySet<>(m.entrySet());
             return entrySet;
         }
 
-        public @Readonly Collection<V> values() {
+        public @ReceiverDependentMutable Collection<V> values() {
             if (values==null)
                 values = unmodifiableCollection(m.values());
             return values;
@@ -1686,19 +1688,19 @@ public class Collections {
          *
          * @serial include
          */
-        @Immutable
-        static class UnmodifiableEntrySet<K extends @Immutable Object,V>
+        @ReceiverDependentMutable
+        static class UnmodifiableEntrySet<K extends @Readonly Object,V>
             extends UnmodifiableSet<Map.@Readonly Entry<K,V>> {
             @java.io.Serial
             private static final long serialVersionUID = 7854390611657943733L;
 
             @SuppressWarnings({"unchecked", "rawtypes"})
-            UnmodifiableEntrySet(@Readonly Set<? extends Map.@Readonly Entry<? extends K, ? extends V>> s) {
+            UnmodifiableEntrySet(@ReceiverDependentMutable Set<? extends Map.@Readonly Entry<? extends K, ? extends V>> s) {
                 // Need to cast to raw in order to work around a limitation in the type system
-                super((@Readonly Set)s);
+                super((@ReceiverDependentMutable Set)s);
             }
 
-            static <K extends @Immutable Object, V> Consumer<Map.@Readonly Entry<? extends K, ? extends V>> entryConsumer(
+            static <K extends @Readonly Object, V> Consumer<Map.@Readonly Entry<? extends K, ? extends V>> entryConsumer(
                     Consumer<? super @Readonly Entry<K, V>> action) {
                 return e -> action.accept(new UnmodifiableEntry<>(e));
             }
@@ -1708,7 +1710,7 @@ public class Collections {
                 c.forEach(entryConsumer(action));
             }
 
-            static final class UnmodifiableEntrySetSpliterator<K extends @Immutable Object, V>
+            static final class UnmodifiableEntrySetSpliterator<K extends @Readonly Object, V>
                     implements Spliterator<@Readonly Entry<K,V>> {
                 final Spliterator<Map.@Readonly Entry<K, V>> s;
 
@@ -1757,7 +1759,7 @@ public class Collections {
                 }
 
                 @Override
-                public Comparator<? super Entry<K, V>> getComparator() {
+                public @Readonly Comparator<? super @Readonly Entry<K, V>> getComparator() {
                     return s.getComparator();
                 }
             }
@@ -1778,9 +1780,9 @@ public class Collections {
                 return StreamSupport.stream(spliterator(), true);
             }
 
-            public Iterator<Map.Entry<K,V>> iterator() {
-                return new Iterator<Map.Entry<K,V>>() {
-                    private final Iterator<? extends Map.@Readonly Entry<? extends K, ? extends V>> i = c.iterator();
+            public @Mutable Iterator<Map.@Readonly Entry<K,V>> iterator() {
+                return new @Mutable Iterator<Map.@Readonly Entry<K,V>>() {
+                    private final @Mutable Iterator<? extends Map.@Readonly Entry<? extends K, ? extends V>> i = c.iterator();
 
                     @Pure
                     @EnsuresNonEmptyIf(result = true, expression = "this")
@@ -1799,7 +1801,7 @@ public class Collections {
                 };
             }
 
-            @SuppressWarnings("unchecked")
+            @SuppressWarnings({"unchecked", "mutability:override.return.invalid"}) // mutability: every element is replaced by a new UnmodifiableEntry over a live entry of the backing map, so the elements are @Readonly, which an override of a @PolyMutable return cannot state
             public @Readonly Object[] toArray() {
                 @Readonly Object[] a = c.toArray();
                 for (int i=0; i<a.length; i++)
@@ -1869,7 +1871,8 @@ public class Collections {
              * an ill-behaved Map.Entry that attempts to modify another
              * Map Entry when asked to perform an equality check.
              */
-            @Immutable private static class UnmodifiableEntry<K extends @Immutable Object,V> implements Map.Entry<K,V> {
+            // an unmodifiable view of a live entry of the backing map: its getValue() changes when the map changes, so it is handed out @Readonly, never @Immutable
+            private static class UnmodifiableEntry<K extends @Readonly Object,V> implements Map.Entry<K,V> {
                 private Map.@Readonly Entry<? extends K, ? extends V> e;
 
                 UnmodifiableEntry(Map.@Readonly Entry<? extends K, ? extends V> e)
@@ -1911,38 +1914,38 @@ public class Collections {
      *        returned.
      * @return an unmodifiable view of the specified sorted map.
      */
-    @SuppressWarnings("unchecked")
-    public static <K extends @Immutable Object,V> @PolyNonEmpty @Immutable SortedMap<K,V> unmodifiableSortedMap(@PolyNonEmpty @Readonly SortedMap<K, ? extends V> m) {
+    @SuppressWarnings({"unchecked", "mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // mutability: one poly: the backing collection and the view are the same instantiation
+    public static <K extends @Readonly Object,V> @PolyNonEmpty @PolyMutable SortedMap<K,V> unmodifiableSortedMap(@PolyNonEmpty @PolyMutable SortedMap<K, ? extends V> m) {
         // Not checking for subclasses because of heap pollution and information leakage.
         if (m.getClass() == UnmodifiableSortedMap.class) {
-            return (@Immutable SortedMap<K,V>) m;
+            return (@PolyMutable SortedMap<K,V>) m;
         }
-        return new UnmodifiableSortedMap<>(m);
+        return new @PolyMutable UnmodifiableSortedMap<>(m);
     }
 
     /**
      * @serial include
      */
-    @Immutable static class UnmodifiableSortedMap<K extends @Immutable Object,V>
+    @ReceiverDependentMutable static class UnmodifiableSortedMap<K extends @Readonly Object,V>
           extends UnmodifiableMap<K,V>
           implements SortedMap<K,V>, Serializable {
         @java.io.Serial
         private static final long serialVersionUID = -8806743815996713206L;
 
         @SuppressWarnings("serial") // Conditionally serializable
-        private final @Readonly SortedMap<K, ? extends V> sm;
+        private final @ReceiverDependentMutable SortedMap<K, ? extends V> sm;
 
-        UnmodifiableSortedMap(@Readonly SortedMap<K, ? extends V> m) {super(m); sm = m; }
-        public Comparator<? super K> comparator()   { return sm.comparator(); }
+        UnmodifiableSortedMap(@ReceiverDependentMutable SortedMap<K, ? extends V> m) {super(m); sm = m; }
+        public @Readonly Comparator<? super K> comparator()   { return sm.comparator(); }
         @SideEffectFree
-        public @Immutable SortedMap<K,V> subMap(K fromKey, K toKey)
-             { return new UnmodifiableSortedMap<>(sm.subMap(fromKey, toKey)); }
+        public @ReceiverDependentMutable SortedMap<K,V> subMap(K fromKey, K toKey)
+             { return new @ReceiverDependentMutable UnmodifiableSortedMap<>(sm.subMap(fromKey, toKey)); }
         @SideEffectFree
-        public @Immutable SortedMap<K,V> headMap(K toKey)
-                     { return new UnmodifiableSortedMap<>(sm.headMap(toKey)); }
+        public @ReceiverDependentMutable SortedMap<K,V> headMap(K toKey)
+                     { return new @ReceiverDependentMutable UnmodifiableSortedMap<>(sm.headMap(toKey)); }
         @SideEffectFree
-        public @Immutable SortedMap<K,V> tailMap(K fromKey)
-                   { return new UnmodifiableSortedMap<>(sm.tailMap(fromKey)); }
+        public @ReceiverDependentMutable SortedMap<K,V> tailMap(K fromKey)
+                   { return new @ReceiverDependentMutable UnmodifiableSortedMap<>(sm.tailMap(fromKey)); }
         public K firstKey()                           { return sm.firstKey(); }
         public K lastKey()                             { return sm.lastKey(); }
     }
@@ -1966,18 +1969,18 @@ public class Collections {
      * @return an unmodifiable view of the specified navigable map
      * @since 1.8
      */
-    @SuppressWarnings("unchecked")
-    public static <K extends @Immutable Object,V> @PolyNonEmpty @Immutable NavigableMap<K,V> unmodifiableNavigableMap(@PolyNonEmpty @Readonly NavigableMap<K, ? extends V> m) {
+    @SuppressWarnings({"unchecked", "mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // mutability: one poly: the backing collection and the view are the same instantiation
+    public static <K extends @Readonly Object,V> @PolyNonEmpty @PolyMutable NavigableMap<K,V> unmodifiableNavigableMap(@PolyNonEmpty @PolyMutable NavigableMap<K, ? extends V> m) {
         if (m.getClass() == UnmodifiableNavigableMap.class) {
-            return (@Immutable NavigableMap<K,V>) m;
+            return (@PolyMutable NavigableMap<K,V>) m;
         }
-        return new UnmodifiableNavigableMap<>(m);
+        return new @PolyMutable UnmodifiableNavigableMap<>(m);
     }
 
     /**
      * @serial include
      */
-    @Immutable static class UnmodifiableNavigableMap<K extends @Immutable Object,V>
+    @ReceiverDependentMutable static class UnmodifiableNavigableMap<K extends @Readonly Object,V>
           extends UnmodifiableSortedMap<K,V>
           implements NavigableMap<K,V>, Serializable {
         @java.io.Serial
@@ -2017,9 +2020,9 @@ public class Collections {
          * The instance we wrap and protect.
          */
         @SuppressWarnings("serial") // Conditionally serializable
-        private final @Readonly NavigableMap<K, ? extends V> nm;
+        private final @ReceiverDependentMutable NavigableMap<K, ? extends V> nm;
 
-        UnmodifiableNavigableMap(@Readonly NavigableMap<K, ? extends V> m)
+        UnmodifiableNavigableMap(@ReceiverDependentMutable NavigableMap<K, ? extends V> m)
                                                             {super(m); nm = m;}
 
         public K lowerKey(K key)                   { return nm.lowerKey(key); }
@@ -2028,7 +2031,7 @@ public class Collections {
         public K higherKey(K key)                 { return nm.higherKey(key); }
 
         @SuppressWarnings("unchecked")
-        public @Immutable Entry<K, V> lowerEntry(K key) {
+        public @Readonly Entry<K, V> lowerEntry(K key) {
             Entry<K,V> lower = (Entry<K, V>) nm.lowerEntry(key);
             return (null != lower)
                 ? new UnmodifiableEntrySet.UnmodifiableEntry<>(lower)
@@ -2036,7 +2039,7 @@ public class Collections {
         }
 
         @SuppressWarnings("unchecked")
-        public @Immutable Entry<K, V> floorEntry(K key) {
+        public @Readonly Entry<K, V> floorEntry(K key) {
             Entry<K,V> floor = (Entry<K, V>) nm.floorEntry(key);
             return (null != floor)
                 ? new UnmodifiableEntrySet.UnmodifiableEntry<>(floor)
@@ -2044,7 +2047,7 @@ public class Collections {
         }
 
         @SuppressWarnings("unchecked")
-        public @Immutable Entry<K, V> ceilingEntry(K key) {
+        public @Readonly Entry<K, V> ceilingEntry(K key) {
             Entry<K,V> ceiling = (Entry<K, V>) nm.ceilingEntry(key);
             return (null != ceiling)
                 ? new UnmodifiableEntrySet.UnmodifiableEntry<>(ceiling)
@@ -2053,7 +2056,7 @@ public class Collections {
 
 
         @SuppressWarnings("unchecked")
-        public @Immutable Entry<K, V> higherEntry(K key) {
+        public @Readonly Entry<K, V> higherEntry(K key) {
             Entry<K,V> higher = (Entry<K, V>) nm.higherEntry(key);
             return (null != higher)
                 ? new UnmodifiableEntrySet.UnmodifiableEntry<>(higher)
@@ -2061,7 +2064,7 @@ public class Collections {
         }
 
         @SuppressWarnings("unchecked")
-        public @Immutable Entry<K, V> firstEntry() {
+        public @Readonly Entry<K, V> firstEntry() {
             Entry<K,V> first = (Entry<K, V>) nm.firstEntry();
             return (null != first)
                 ? new UnmodifiableEntrySet.UnmodifiableEntry<>(first)
@@ -2069,38 +2072,38 @@ public class Collections {
         }
 
         @SuppressWarnings("unchecked")
-        public @Immutable Entry<K, V> lastEntry() {
+        public @Readonly Entry<K, V> lastEntry() {
             Entry<K,V> last = (Entry<K, V>) nm.lastEntry();
             return (null != last)
                 ? new UnmodifiableEntrySet.UnmodifiableEntry<>(last)
                 : null;
         }
 
-        public Entry<K, V> pollFirstEntry()
+        public @Readonly Entry<K, V> pollFirstEntry()
                                  { throw new UnsupportedOperationException(); }
-        public Entry<K, V> pollLastEntry()
+        public @Readonly Entry<K, V> pollLastEntry()
                                  { throw new UnsupportedOperationException(); }
         @SideEffectFree
-        public @Immutable NavigableMap<K, V> descendingMap()
+        public @ReceiverDependentMutable NavigableMap<K, V> descendingMap()
                        { return unmodifiableNavigableMap(nm.descendingMap()); }
         @SideEffectFree
-        public @Immutable NavigableSet<K> navigableKeySet()
+        public @ReceiverDependentMutable NavigableSet<K> navigableKeySet()
                      { return unmodifiableNavigableSet(nm.navigableKeySet()); }
         @SideEffectFree
-        public @Immutable NavigableSet<K> descendingKeySet()
+        public @ReceiverDependentMutable NavigableSet<K> descendingKeySet()
                     { return unmodifiableNavigableSet(nm.descendingKeySet()); }
 
         @SideEffectFree
-        public @Immutable NavigableMap<K, V> subMap(K fromKey, boolean fromInclusive, K toKey, boolean toInclusive) {
+        public @ReceiverDependentMutable NavigableMap<K, V> subMap(K fromKey, boolean fromInclusive, K toKey, boolean toInclusive) {
             return unmodifiableNavigableMap(
                 nm.subMap(fromKey, fromInclusive, toKey, toInclusive));
         }
 
         @SideEffectFree
-        public @Immutable NavigableMap<K, V> headMap(K toKey, boolean inclusive)
+        public @ReceiverDependentMutable NavigableMap<K, V> headMap(K toKey, boolean inclusive)
              { return unmodifiableNavigableMap(nm.headMap(toKey, inclusive)); }
         @SideEffectFree
-        public @Immutable NavigableMap<K, V> tailMap(K fromKey, boolean inclusive)
+        public @ReceiverDependentMutable NavigableMap<K, V> tailMap(K fromKey, boolean inclusive)
            { return unmodifiableNavigableMap(nm.tailMap(fromKey, inclusive)); }
     }
 
@@ -2139,10 +2142,12 @@ public class Collections {
      * @param  c the collection to be "wrapped" in a synchronized collection.
      * @return a synchronized view of the specified collection.
      */
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
     public static <T> @PolyMutable @PolyGrowShrink @PolyNonEmpty Collection<T> synchronizedCollection(@PolyMutable @PolyGrowShrink @PolyNonEmpty Collection<T> c) {
         return new @PolyMutable SynchronizedCollection<>(c);
     }
 
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
     static <T> @PolyMutable @PolyGrowShrink @PolyNonEmpty Collection<T> synchronizedCollection(@PolyMutable @PolyGrowShrink @PolyNonEmpty Collection<T> c, @Readonly Object mutex) {
         return new @PolyMutable SynchronizedCollection<>(c, mutex);
     }
@@ -2185,7 +2190,7 @@ public class Collections {
             synchronized (mutex) {return c.contains(o);}
         }
         @SideEffectFree
-        @SuppressWarnings("mutability") // poly does not work on field's type argument
+        @SuppressWarnings("mutability:return.type.incompatible") // poly does not work on field's type argument
         public @PolyNull @PolySigned @PolyMutable Object[] toArray(@Readonly SynchronizedCollection<@PolyNull @PolySigned @PolyMutable E> this) {
             synchronized (mutex) {return c.toArray();}
         }
@@ -2198,7 +2203,7 @@ public class Collections {
         }
 
         @SideEffectFree
-        public Iterator<E> iterator(@Readonly SynchronizedCollection<E> this) {
+        public @Mutable Iterator<E> iterator(@ReceiverDependentMutable SynchronizedCollection<E> this) {
             return c.iterator(); // Must be manually synched by user!
         }
 
@@ -2211,16 +2216,16 @@ public class Collections {
         }
 
         @Pure
-        public boolean containsAll(@Readonly SynchronizedCollection<E> this, @Readonly Collection<? extends @UnknownSignedness Object> coll) {
+        public boolean containsAll(@Readonly SynchronizedCollection<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> coll) {
             synchronized (mutex) {return c.containsAll(coll);}
         }
         public boolean addAll(@Mutable SynchronizedCollection<E> this, @Readonly Collection<? extends E> coll) {
             synchronized (mutex) {return c.addAll(coll);}
         }
-        public boolean removeAll(@Mutable SynchronizedCollection<E> this, @Readonly Collection<? extends @UnknownSignedness Object> coll) {
+        public boolean removeAll(@Mutable SynchronizedCollection<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> coll) {
             synchronized (mutex) {return c.removeAll(coll);}
         }
-        public boolean retainAll(@Mutable SynchronizedCollection<E> this, @Readonly Collection<? extends @UnknownSignedness Object> coll) {
+        public boolean retainAll(@Mutable SynchronizedCollection<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> coll) {
             synchronized (mutex) {return c.retainAll(coll);}
         }
         public void clear(@Mutable SynchronizedCollection<E> this) {
@@ -2231,16 +2236,16 @@ public class Collections {
         }
         // Override default methods in Collection
         @Override
-        public void forEach(@Mutable SynchronizedCollection<E> this, Consumer<? super E> consumer) {
+        public void forEach(@Readonly SynchronizedCollection<E> this, Consumer<? super E> consumer) {
             synchronized (mutex) {c.forEach(consumer);}
         }
         @Override
-        public boolean removeIf(@Mutable SynchronizedCollection<E> this, Predicate<? super E> filter) {
+        public boolean removeIf(@Mutable SynchronizedCollection<E> this, @Readonly Predicate<? super E> filter) {
             synchronized (mutex) {return c.removeIf(filter);}
         }
         @SideEffectFree
         @Override
-        public Spliterator<E> spliterator(@Readonly SynchronizedCollection<E> this) {
+        public Spliterator<E> spliterator(@ReceiverDependentMutable SynchronizedCollection<E> this) {
             return c.spliterator(); // Must be manually synched by user!
         }
         @Override
@@ -2252,7 +2257,7 @@ public class Collections {
             return c.parallelStream(); // Must be manually synched by user!
         }
         @java.io.Serial
-        private void writeObject(@Mutable SynchronizedCollection<E> this, ObjectOutputStream s) throws IOException {
+        private void writeObject(@Readonly SynchronizedCollection<E> this, ObjectOutputStream s) throws IOException {
             synchronized (mutex) {s.defaultWriteObject();}
         }
     }
@@ -2284,10 +2289,12 @@ public class Collections {
      * @param  s the set to be "wrapped" in a synchronized set.
      * @return a synchronized view of the specified set.
      */
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
     public static <T> @PolyMutable Set<T> synchronizedSet(@PolyMutable Set<T> s) {
         return new @PolyMutable SynchronizedSet<>(s);
     }
 
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
     static <T> @PolyMutable Set<T> synchronizedSet(@PolyMutable Set<T> s, @Readonly Object mutex) {
         return new @PolyMutable SynchronizedSet<>(s, mutex);
     }
@@ -2357,6 +2364,7 @@ public class Collections {
      * @param  s the sorted set to be "wrapped" in a synchronized sorted set.
      * @return a synchronized view of the specified sorted set.
      */
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
     public static <T> @PolyMutable SortedSet<T> synchronizedSortedSet(@PolyMutable SortedSet<T> s) {
         return new @PolyMutable SynchronizedSortedSet<>(s);
     }
@@ -2384,24 +2392,24 @@ public class Collections {
             ss = s;
         }
 
-        public Comparator<? super E> comparator(@Readonly SynchronizedSortedSet<E> this) {
+        public @Readonly Comparator<? super E> comparator(@Readonly SynchronizedSortedSet<E> this) {
             synchronized (mutex) {return ss.comparator();}
         }
 
-        public @PolyMutable SortedSet<E> subSet(@PolyMutable SynchronizedSortedSet<E> this, E fromElement, E toElement) {
+        public @ReceiverDependentMutable SortedSet<E> subSet(@ReceiverDependentMutable SynchronizedSortedSet<E> this, E fromElement, E toElement) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedSortedSet<>(
+                return new @ReceiverDependentMutable SynchronizedSortedSet<>(
                     ss.subSet(fromElement, toElement), mutex);
             }
         }
-        public @PolyMutable SortedSet<E> headSet(@PolyMutable SynchronizedSortedSet<E> this, E toElement) {
+        public @ReceiverDependentMutable SortedSet<E> headSet(@ReceiverDependentMutable SynchronizedSortedSet<E> this, E toElement) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedSortedSet<>(ss.headSet(toElement), mutex);
+                return new @ReceiverDependentMutable SynchronizedSortedSet<>(ss.headSet(toElement), mutex);
             }
         }
-        public @PolyMutable SortedSet<E> tailSet(@PolyMutable SynchronizedSortedSet<E> this, E fromElement) {
+        public @ReceiverDependentMutable SortedSet<E> tailSet(@ReceiverDependentMutable SynchronizedSortedSet<E> this, E fromElement) {
             synchronized (mutex) {
-               return new @PolyMutable SynchronizedSortedSet<>(ss.tailSet(fromElement),mutex);
+               return new @ReceiverDependentMutable SynchronizedSortedSet<>(ss.tailSet(fromElement),mutex);
             }
         }
 
@@ -2454,6 +2462,7 @@ public class Collections {
      * @return a synchronized view of the specified navigable set
      * @since 1.8
      */
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
     public static <T> @PolyMutable NavigableSet<T> synchronizedNavigableSet(@PolyMutable NavigableSet<T> s) {
         return new @PolyMutable SynchronizedNavigableSet<>(s);
     }
@@ -2488,46 +2497,46 @@ public class Collections {
         public E pollFirst(@Mutable SynchronizedNavigableSet<E> this)  { synchronized (mutex) {return ns.pollFirst();} }
         public E pollLast(@Mutable SynchronizedNavigableSet<E> this)    { synchronized (mutex) {return ns.pollLast();} }
 
-        public @PolyMutable NavigableSet<E> descendingSet(@PolyMutable SynchronizedNavigableSet<E> this) {
+        public @ReceiverDependentMutable NavigableSet<E> descendingSet(@ReceiverDependentMutable SynchronizedNavigableSet<E> this) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedNavigableSet<>(ns.descendingSet(), mutex);
+                return new @ReceiverDependentMutable SynchronizedNavigableSet<>(ns.descendingSet(), mutex);
             }
         }
 
-        public Iterator<E> descendingIterator(@Readonly SynchronizedNavigableSet<E> this)
+        public @Mutable Iterator<E> descendingIterator(@ReceiverDependentMutable SynchronizedNavigableSet<E> this)
                  { synchronized (mutex) { return descendingSet().iterator(); } }
 
-        public @PolyMutable NavigableSet<E> subSet(@PolyMutable SynchronizedNavigableSet<E> this, E fromElement, E toElement) {
+        public @ReceiverDependentMutable NavigableSet<E> subSet(@ReceiverDependentMutable SynchronizedNavigableSet<E> this, E fromElement, E toElement) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedNavigableSet<>(ns.subSet(fromElement, true, toElement, false), mutex);
+                return new @ReceiverDependentMutable SynchronizedNavigableSet<>(ns.subSet(fromElement, true, toElement, false), mutex);
             }
         }
-        public @PolyMutable NavigableSet<E> headSet(@PolyMutable SynchronizedNavigableSet<E> this, E toElement) {
+        public @ReceiverDependentMutable NavigableSet<E> headSet(@ReceiverDependentMutable SynchronizedNavigableSet<E> this, E toElement) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedNavigableSet<>(ns.headSet(toElement, false), mutex);
+                return new @ReceiverDependentMutable SynchronizedNavigableSet<>(ns.headSet(toElement, false), mutex);
             }
         }
-        public @PolyMutable NavigableSet<E> tailSet(@PolyMutable SynchronizedNavigableSet<E> this, E fromElement) {
+        public @ReceiverDependentMutable NavigableSet<E> tailSet(@ReceiverDependentMutable SynchronizedNavigableSet<E> this, E fromElement) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedNavigableSet<>(ns.tailSet(fromElement, true), mutex);
-            }
-        }
-
-        public @PolyMutable NavigableSet<E> subSet(@PolyMutable SynchronizedNavigableSet<E> this, E fromElement, boolean fromInclusive, E toElement, boolean toInclusive) {
-            synchronized (mutex) {
-                return new @PolyMutable SynchronizedNavigableSet<>(ns.subSet(fromElement, fromInclusive, toElement, toInclusive), mutex);
+                return new @ReceiverDependentMutable SynchronizedNavigableSet<>(ns.tailSet(fromElement, true), mutex);
             }
         }
 
-        public @PolyMutable NavigableSet<E> headSet(@PolyMutable SynchronizedNavigableSet<E> this, E toElement, boolean inclusive) {
+        public @ReceiverDependentMutable NavigableSet<E> subSet(@ReceiverDependentMutable SynchronizedNavigableSet<E> this, E fromElement, boolean fromInclusive, E toElement, boolean toInclusive) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedNavigableSet<>(ns.headSet(toElement, inclusive), mutex);
+                return new @ReceiverDependentMutable SynchronizedNavigableSet<>(ns.subSet(fromElement, fromInclusive, toElement, toInclusive), mutex);
             }
         }
 
-        public @PolyMutable NavigableSet<E> tailSet(@PolyMutable SynchronizedNavigableSet<E> this, E fromElement, boolean inclusive) {
+        public @ReceiverDependentMutable NavigableSet<E> headSet(@ReceiverDependentMutable SynchronizedNavigableSet<E> this, E toElement, boolean inclusive) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedNavigableSet<>(ns.tailSet(fromElement, inclusive), mutex);
+                return new @ReceiverDependentMutable SynchronizedNavigableSet<>(ns.headSet(toElement, inclusive), mutex);
+            }
+        }
+
+        public @ReceiverDependentMutable NavigableSet<E> tailSet(@ReceiverDependentMutable SynchronizedNavigableSet<E> this, E fromElement, boolean inclusive) {
+            synchronized (mutex) {
+                return new @ReceiverDependentMutable SynchronizedNavigableSet<>(ns.tailSet(fromElement, inclusive), mutex);
             }
         }
     }
@@ -2559,12 +2568,14 @@ public class Collections {
      * @param  list the list to be "wrapped" in a synchronized list.
      * @return a synchronized view of the specified list.
      */
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
     public static <T> @PolyMutable @PolyGrowShrink @PolyNonEmpty List<T> synchronizedList(@PolyMutable @PolyGrowShrink @PolyNonEmpty List<T> list) {
         return (list instanceof RandomAccess ?
                 new @PolyMutable SynchronizedRandomAccessList<>(list) :
                 new @PolyMutable SynchronizedList<>(list));
     }
 
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
     static <T> @PolyMutable @PolyGrowShrink @PolyNonEmpty List<T> synchronizedList(@PolyMutable @PolyGrowShrink @PolyNonEmpty List<T> list, @Readonly Object mutex) {
         return (list instanceof RandomAccess ?
                 new @PolyMutable SynchronizedRandomAccessList<>(list, mutex) :
@@ -2626,17 +2637,17 @@ public class Collections {
             synchronized (mutex) {return list.addAll(index, c);}
         }
 
-        public ListIterator<E> listIterator(@Readonly SynchronizedList<E> this) {
+        public @Mutable ListIterator<E> listIterator(@ReceiverDependentMutable SynchronizedList<E> this) {
             return list.listIterator(); // Must be manually synched by user
         }
 
-        public ListIterator<E> listIterator(@Readonly SynchronizedList<E> this, int index) {
+        public @Mutable ListIterator<E> listIterator(@ReceiverDependentMutable SynchronizedList<E> this, int index) {
             return list.listIterator(index); // Must be manually synched by user
         }
 
-        public @PolyMutable List<E> subList(@PolyMutable SynchronizedList<E> this, int fromIndex, int toIndex) {
+        public @ReceiverDependentMutable List<E> subList(@ReceiverDependentMutable SynchronizedList<E> this, int fromIndex, int toIndex) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedList<>(list.subList(fromIndex, toIndex),
+                return new @ReceiverDependentMutable SynchronizedList<>(list.subList(fromIndex, toIndex),
                                             mutex);
             }
         }
@@ -2663,9 +2674,9 @@ public class Collections {
          * SynchronizedList instances, as this method was missing in 1.4.
          */
         @java.io.Serial
-        private @Readonly Object readResolve(@Mutable SynchronizedList<E> this) {
+        private @ReceiverDependentMutable Object readResolve(@ReceiverDependentMutable SynchronizedList<E> this) {
             return (list instanceof RandomAccess
-                    ? new SynchronizedRandomAccessList<>(list)
+                    ? new @ReceiverDependentMutable SynchronizedRandomAccessList<>(list)
                     : this);
         }
     }
@@ -2686,9 +2697,9 @@ public class Collections {
             super(list, mutex);
         }
 
-        public @PolyMutable List<E> subList(@PolyMutable SynchronizedRandomAccessList<E> this, int fromIndex, int toIndex) {
+        public @ReceiverDependentMutable List<E> subList(@ReceiverDependentMutable SynchronizedRandomAccessList<E> this, int fromIndex, int toIndex) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedRandomAccessList<>(
+                return new @ReceiverDependentMutable SynchronizedRandomAccessList<>(
                     list.subList(fromIndex, toIndex), mutex);
             }
         }
@@ -2703,8 +2714,8 @@ public class Collections {
          * deserialization.
          */
         @java.io.Serial
-        private Object writeReplace(@Mutable SynchronizedRandomAccessList<E> this) {
-            return new SynchronizedList<E>(list);
+        private @ReceiverDependentMutable Object writeReplace(@ReceiverDependentMutable SynchronizedRandomAccessList<E> this) {
+            return new @ReceiverDependentMutable SynchronizedList<E>(list);
         }
     }
 
@@ -2738,14 +2749,15 @@ public class Collections {
      * @param  m the map to be "wrapped" in a synchronized map.
      * @return a synchronized view of the specified map.
      */
-    public static <K extends @Immutable Object,V> Map<K,V> synchronizedMap(Map<K,V> m) {
-        return new SynchronizedMap<>(m);
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
+    public static <K extends @Readonly Object,V> @PolyMutable Map<K,V> synchronizedMap(@PolyMutable Map<K,V> m) {
+        return new @PolyMutable SynchronizedMap<>(m);
     }
 
     /**
      * @serial include
      */
-    @ReceiverDependentMutable private static class SynchronizedMap<K extends @Immutable Object,V>
+    @ReceiverDependentMutable private static class SynchronizedMap<K extends @Readonly Object,V>
         implements Map<K,V>, Serializable {
         @java.io.Serial
         private static final long serialVersionUID = 1978198479659022715L;
@@ -2805,27 +2817,27 @@ public class Collections {
         private transient @Assignable /* should be @LazyFinal */ Set<Map.@ReceiverDependentMutable Entry<K,V>> entrySet;
         private transient @Assignable /* should be @LazyFinal */ Collection<V> values;
 
-        public @PolyMutable Set<K> keySet(@PolyMutable SynchronizedMap<K,V> this) {
+        public @ReceiverDependentMutable Set<K> keySet(@ReceiverDependentMutable SynchronizedMap<K,V> this) {
             synchronized (mutex) {
                 if (keySet==null)
-                    keySet = new @PolyMutable SynchronizedSet<>(m.keySet(), mutex);
+                    keySet = new @ReceiverDependentMutable SynchronizedSet<>(m.keySet(), mutex);
                 return keySet;
             }
         }
 
         @SideEffectFree
-        public @PolyMutable Set<Map.@PolyMutable Entry<K,V>> entrySet(@PolyMutable SynchronizedMap<K,V> this) {
+        public @ReceiverDependentMutable Set<Map.@ReceiverDependentMutable Entry<K,V>> entrySet(@ReceiverDependentMutable SynchronizedMap<K,V> this) {
             synchronized (mutex) {
                 if (entrySet==null)
-                    entrySet = new @PolyMutable SynchronizedSet<>(m.entrySet(), mutex);
+                    entrySet = new @ReceiverDependentMutable SynchronizedSet<>(m.entrySet(), mutex);
                 return entrySet;
             }
         }
 
-        public @PolyMutable Collection<V> values(@PolyMutable SynchronizedMap<K,V> this) {
+        public @ReceiverDependentMutable Collection<V> values(@ReceiverDependentMutable SynchronizedMap<K,V> this) {
             synchronized (mutex) {
                 if (values==null)
-                    values = new @PolyMutable SynchronizedCollection<>(m.values(), mutex);
+                    values = new @ReceiverDependentMutable SynchronizedCollection<>(m.values(), mutex);
                 return values;
             }
         }
@@ -2849,7 +2861,7 @@ public class Collections {
             synchronized (mutex) {return m.getOrDefault(k, defaultValue);}
         }
         @Override
-        public void forEach(@Mutable SynchronizedMap<K,V> this, BiConsumer<? super K, ? super V> action) {
+        public void forEach(@Readonly SynchronizedMap<K,V> this, BiConsumer<? super K, ? super V> action) {
             synchronized (mutex) {m.forEach(action);}
         }
         @Override
@@ -2895,7 +2907,7 @@ public class Collections {
         }
 
         @java.io.Serial
-        private void writeObject(@Mutable SynchronizedMap<K,V> this, ObjectOutputStream s) throws IOException {
+        private void writeObject(@Readonly SynchronizedMap<K,V> this, ObjectOutputStream s) throws IOException {
             synchronized (mutex) {s.defaultWriteObject();}
         }
     }
@@ -2945,14 +2957,15 @@ public class Collections {
      * @param  m the sorted map to be "wrapped" in a synchronized sorted map.
      * @return a synchronized view of the specified sorted map.
      */
-    public static <K extends @Immutable Object,V> SortedMap<K,V> synchronizedSortedMap(SortedMap<K,V> m) {
-        return new SynchronizedSortedMap<>(m);
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
+    public static <K extends @Readonly Object,V> @PolyMutable SortedMap<K,V> synchronizedSortedMap(@PolyMutable SortedMap<K,V> m) {
+        return new @PolyMutable SynchronizedSortedMap<>(m);
     }
 
     /**
      * @serial include
      */
-    @ReceiverDependentMutable static class SynchronizedSortedMap<K extends @Immutable Object,V>
+    @ReceiverDependentMutable static class SynchronizedSortedMap<K extends @Readonly Object,V>
         extends SynchronizedMap<K,V>
         implements SortedMap<K,V>
     {
@@ -2971,27 +2984,27 @@ public class Collections {
             sm = m;
         }
 
-        public Comparator<? super K> comparator() {
+        public @Readonly Comparator<? super K> comparator() {
             synchronized (mutex) {return sm.comparator();}
         }
 
         @SideEffectFree
-        public @PolyMutable SortedMap<K,V> subMap(@PolyMutable SynchronizedSortedMap<K,V> this, K fromKey, K toKey) {
+        public @ReceiverDependentMutable SortedMap<K,V> subMap(@ReceiverDependentMutable SynchronizedSortedMap<K,V> this, K fromKey, K toKey) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedSortedMap<>(
+                return new @ReceiverDependentMutable SynchronizedSortedMap<>(
                     sm.subMap(fromKey, toKey), mutex);
             }
         }
         @SideEffectFree
-        public @PolyMutable SortedMap<K,V> headMap(@PolyMutable SynchronizedSortedMap<K,V> this, K toKey) {
+        public @ReceiverDependentMutable SortedMap<K,V> headMap(@ReceiverDependentMutable SynchronizedSortedMap<K,V> this, K toKey) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedSortedMap<>(sm.headMap(toKey), mutex);
+                return new @ReceiverDependentMutable SynchronizedSortedMap<>(sm.headMap(toKey), mutex);
             }
         }
         @SideEffectFree
-        public @PolyMutable SortedMap<K,V> tailMap(@PolyMutable SynchronizedSortedMap<K,V> this, K fromKey) {
+        public @ReceiverDependentMutable SortedMap<K,V> tailMap(@ReceiverDependentMutable SynchronizedSortedMap<K,V> this, K fromKey) {
             synchronized (mutex) {
-               return new @PolyMutable SynchronizedSortedMap<>(sm.tailMap(fromKey),mutex);
+               return new @ReceiverDependentMutable SynchronizedSortedMap<>(sm.tailMap(fromKey),mutex);
             }
         }
 
@@ -3050,8 +3063,9 @@ public class Collections {
      * @return a synchronized view of the specified navigable map.
      * @since 1.8
      */
-    public static <K extends @Immutable Object,V> NavigableMap<K,V> synchronizedNavigableMap(NavigableMap<K,V> m) {
-        return new SynchronizedNavigableMap<>(m);
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
+    public static <K extends @Readonly Object,V> @PolyMutable NavigableMap<K,V> synchronizedNavigableMap(@PolyMutable NavigableMap<K,V> m) {
+        return new @PolyMutable SynchronizedNavigableMap<>(m);
     }
 
     /**
@@ -3059,7 +3073,7 @@ public class Collections {
      *
      * @serial include
      */
-    @ReceiverDependentMutable static class SynchronizedNavigableMap<K extends @Immutable Object,V>
+    @ReceiverDependentMutable static class SynchronizedNavigableMap<K extends @Readonly Object,V>
         extends SynchronizedSortedMap<K,V>
         implements NavigableMap<K,V>
     {
@@ -3078,98 +3092,98 @@ public class Collections {
             nm = m;
         }
 
-        public @PolyMutable Entry<K, V> lowerEntry(@PolyMutable SynchronizedNavigableMap<K,V> this, K key)
+        public @Readonly Entry<K, V> lowerEntry(@Readonly SynchronizedNavigableMap<K,V> this, K key)
                         { synchronized (mutex) { return nm.lowerEntry(key); } }
         public K lowerKey(@Readonly SynchronizedNavigableMap<K,V> this, K key)
                           { synchronized (mutex) { return nm.lowerKey(key); } }
-        public @PolyMutable Entry<K, V> floorEntry(@PolyMutable SynchronizedNavigableMap<K,V> this, K key)
+        public @Readonly Entry<K, V> floorEntry(@Readonly SynchronizedNavigableMap<K,V> this, K key)
                         { synchronized (mutex) { return nm.floorEntry(key); } }
         public K floorKey(@Readonly SynchronizedNavigableMap<K,V> this, K key)
                           { synchronized (mutex) { return nm.floorKey(key); } }
-        public @PolyMutable Entry<K, V> ceilingEntry(@PolyMutable SynchronizedNavigableMap<K,V> this, K key)
+        public @Readonly Entry<K, V> ceilingEntry(@Readonly SynchronizedNavigableMap<K,V> this, K key)
                       { synchronized (mutex) { return nm.ceilingEntry(key); } }
         public K ceilingKey(@Readonly SynchronizedNavigableMap<K,V> this, K key)
                         { synchronized (mutex) { return nm.ceilingKey(key); } }
-        public @PolyMutable Entry<K, V> higherEntry(@PolyMutable SynchronizedNavigableMap<K,V> this, K key)
+        public @Readonly Entry<K, V> higherEntry(@Readonly SynchronizedNavigableMap<K,V> this, K key)
                        { synchronized (mutex) { return nm.higherEntry(key); } }
-        public K higherKey(@Mutable SynchronizedNavigableMap<K,V> this, K key)
+        public K higherKey(@Readonly SynchronizedNavigableMap<K,V> this, K key)
                          { synchronized (mutex) { return nm.higherKey(key); } }
-        public @PolyMutable Entry<K, V> firstEntry(@PolyMutable SynchronizedNavigableMap<K,V> this)
+        public @Readonly Entry<K, V> firstEntry(@Readonly SynchronizedNavigableMap<K,V> this)
                            { synchronized (mutex) { return nm.firstEntry(); } }
-        public @PolyMutable Entry<K, V> lastEntry(@PolyMutable SynchronizedNavigableMap<K,V> this)
+        public @Readonly Entry<K, V> lastEntry(@Readonly SynchronizedNavigableMap<K,V> this)
                             { synchronized (mutex) { return nm.lastEntry(); } }
-        public Entry<K, V> pollFirstEntry(@Mutable SynchronizedNavigableMap<K,V> this)
+        public @Readonly Entry<K, V> pollFirstEntry(@Mutable SynchronizedNavigableMap<K,V> this)
                        { synchronized (mutex) { return nm.pollFirstEntry(); } }
-        public Entry<K, V> pollLastEntry(@Mutable SynchronizedNavigableMap<K,V> this)
+        public @Readonly Entry<K, V> pollLastEntry(@Mutable SynchronizedNavigableMap<K,V> this)
                         { synchronized (mutex) { return nm.pollLastEntry(); } }
 
         @SideEffectFree
-        public @PolyMutable NavigableMap<K, V> descendingMap(@PolyMutable SynchronizedNavigableMap<K,V> this) {
+        public @ReceiverDependentMutable NavigableMap<K, V> descendingMap(@ReceiverDependentMutable SynchronizedNavigableMap<K,V> this) {
             synchronized (mutex) {
                 return
-                    new @PolyMutable SynchronizedNavigableMap<>(nm.descendingMap(), mutex);
+                    new @ReceiverDependentMutable SynchronizedNavigableMap<>(nm.descendingMap(), mutex);
             }
         }
 
-        public @PolyMutable NavigableSet<K> keySet(@PolyMutable SynchronizedNavigableMap<K,V> this) {
+        public @ReceiverDependentMutable NavigableSet<K> keySet(@ReceiverDependentMutable SynchronizedNavigableMap<K,V> this) {
             return navigableKeySet();
         }
 
         @SideEffectFree
-        public @PolyMutable NavigableSet<K> navigableKeySet(@PolyMutable SynchronizedNavigableMap<K,V> this) {
+        public @ReceiverDependentMutable NavigableSet<K> navigableKeySet(@ReceiverDependentMutable SynchronizedNavigableMap<K,V> this) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedNavigableSet<>(nm.navigableKeySet(), mutex);
+                return new @ReceiverDependentMutable SynchronizedNavigableSet<>(nm.navigableKeySet(), mutex);
             }
         }
 
         @SideEffectFree
-        public @PolyMutable NavigableSet<K> descendingKeySet(@PolyMutable SynchronizedNavigableMap<K,V> this) {
+        public @ReceiverDependentMutable NavigableSet<K> descendingKeySet(@ReceiverDependentMutable SynchronizedNavigableMap<K,V> this) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedNavigableSet<>(nm.descendingKeySet(), mutex);
+                return new @ReceiverDependentMutable SynchronizedNavigableSet<>(nm.descendingKeySet(), mutex);
             }
         }
 
 
         @SideEffectFree
-        public @PolyMutable SortedMap<K,V> subMap(@PolyMutable SynchronizedNavigableMap<K,V> this, K fromKey, K toKey) {
+        public @ReceiverDependentMutable SortedMap<K,V> subMap(@ReceiverDependentMutable SynchronizedNavigableMap<K,V> this, K fromKey, K toKey) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedNavigableMap<>(
+                return new @ReceiverDependentMutable SynchronizedNavigableMap<>(
                     nm.subMap(fromKey, true, toKey, false), mutex);
             }
         }
         @SideEffectFree
-        public @PolyMutable SortedMap<K,V> headMap(@PolyMutable SynchronizedNavigableMap<K,V> this, K toKey) {
+        public @ReceiverDependentMutable SortedMap<K,V> headMap(@ReceiverDependentMutable SynchronizedNavigableMap<K,V> this, K toKey) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedNavigableMap<>(nm.headMap(toKey, false), mutex);
+                return new @ReceiverDependentMutable SynchronizedNavigableMap<>(nm.headMap(toKey, false), mutex);
             }
         }
         @SideEffectFree
-        public @PolyMutable SortedMap<K,V> tailMap(@PolyMutable SynchronizedNavigableMap<K,V> this, K fromKey) {
+        public @ReceiverDependentMutable SortedMap<K,V> tailMap(@ReceiverDependentMutable SynchronizedNavigableMap<K,V> this, K fromKey) {
             synchronized (mutex) {
-        return new @PolyMutable SynchronizedNavigableMap<>(nm.tailMap(fromKey, true),mutex);
+        return new @ReceiverDependentMutable SynchronizedNavigableMap<>(nm.tailMap(fromKey, true),mutex);
             }
         }
 
         @SideEffectFree
-        public @PolyMutable NavigableMap<K, V> subMap(@PolyMutable SynchronizedNavigableMap<K,V> this, K fromKey, boolean fromInclusive, K toKey, boolean toInclusive) {
+        public @ReceiverDependentMutable NavigableMap<K, V> subMap(@ReceiverDependentMutable SynchronizedNavigableMap<K,V> this, K fromKey, boolean fromInclusive, K toKey, boolean toInclusive) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedNavigableMap<>(
+                return new @ReceiverDependentMutable SynchronizedNavigableMap<>(
                     nm.subMap(fromKey, fromInclusive, toKey, toInclusive), mutex);
             }
         }
 
         @SideEffectFree
-        public @PolyMutable NavigableMap<K, V> headMap(@PolyMutable SynchronizedNavigableMap<K,V> this, K toKey, boolean inclusive) {
+        public @ReceiverDependentMutable NavigableMap<K, V> headMap(@ReceiverDependentMutable SynchronizedNavigableMap<K,V> this, K toKey, boolean inclusive) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedNavigableMap<>(
+                return new @ReceiverDependentMutable SynchronizedNavigableMap<>(
                         nm.headMap(toKey, inclusive), mutex);
             }
         }
 
         @SideEffectFree
-        public @PolyMutable NavigableMap<K, V> tailMap(@PolyMutable SynchronizedNavigableMap<K,V> this, K fromKey, boolean inclusive) {
+        public @ReceiverDependentMutable NavigableMap<K, V> tailMap(@ReceiverDependentMutable SynchronizedNavigableMap<K,V> this, K fromKey, boolean inclusive) {
             synchronized (mutex) {
-                return new @PolyMutable SynchronizedNavigableMap<>(
+                return new @ReceiverDependentMutable SynchronizedNavigableMap<>(
                     nm.tailMap(fromKey, inclusive), mutex);
             }
         }
@@ -3238,9 +3252,10 @@ public class Collections {
      * @return a dynamically typesafe view of the specified collection
      * @since 1.5
      */
-    public static <E> @PolyGrowShrink @PolyNonEmpty Collection<E> checkedCollection(@PolyGrowShrink @PolyNonEmpty Collection<E> c,
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
+    public static <E> @PolyMutable @PolyGrowShrink @PolyNonEmpty Collection<E> checkedCollection(@PolyMutable @PolyGrowShrink @PolyNonEmpty Collection<E> c,
                                                       Class<E> type) {
-        return new CheckedCollection<>(c, type);
+        return new @PolyMutable CheckedCollection<>(c, type);
     }
 
     @SuppressWarnings("unchecked")
@@ -3286,7 +3301,7 @@ public class Collections {
         @EnsuresNonEmptyIf(result = true, expression = "this")
         public boolean contains(@Readonly CheckedCollection<E> this, @UnknownSignedness @Readonly Object o)          { return c.contains(o); }
         @SideEffectFree
-        @SuppressWarnings("mutability") // poly does not work on field's type argument
+        @SuppressWarnings("mutability:return.type.incompatible") // poly does not work on field's type argument
         public @PolyNull @PolySigned @PolyMutable Object[] toArray(Collections.CheckedCollection<@PolyNull @PolySigned @PolyMutable E> this)                  { return c.toArray(); }
         @SideEffectFree
         public <T> @Nullable T[] toArray(@PolyNull T[] a)              { return c.toArray(a); }
@@ -3307,15 +3322,16 @@ public class Collections {
         }
 
         @SideEffectFree
-        public Iterator<E> iterator(@Readonly CheckedCollection<E> this) {
+        public @Mutable Iterator<E> iterator(@ReceiverDependentMutable CheckedCollection<E> this) {
             // JDK-6363904 - unwrapped iterator could be typecast to
             // ListIterator with unsafe set()
             final Iterator<E> it = c.iterator();
-            return new Iterator<E>() {
+            return new @Mutable Iterator<E>() {
                 @Pure
                 @EnsuresNonEmptyIf(result = true, expression = "this")
                 public boolean hasNext() { return it.hasNext(); }
                 public E next(/*@NonEmpty Iterator<E> this*/)          { return it.next(); }
+                @SuppressWarnings("mutability:method.invocation.invalid") // Iterator<E> cannot name the collection it was created from, so remove() through an iterator over a non-mutable collection is not caught (see the note on java.util.Iterator.remove): https://github.com/eisop/checker-framework/issues/2322
                 public void remove()     {        it.remove(); }
                 public void forEachRemaining(Consumer<? super E> action) {
                     it.forEachRemaining(action);
@@ -3334,7 +3350,7 @@ public class Collections {
                 (zeroLengthElementArray = zeroLengthArray(type));
         }
 
-        @SuppressWarnings({"unchecked", "mutability:argument.type.incompatible"}) // getClass error
+        @SuppressWarnings("unchecked")
         Collection<E> checkedCopyOf(@Mutable CheckedCollection<E> this, @Readonly Collection<? extends E> coll) {
             @Readonly Object[] a;
             try {
@@ -3367,9 +3383,9 @@ public class Collections {
 
         // Override default methods in Collection
         @Override
-        public void forEach(@Mutable CheckedCollection<E> this, Consumer<? super E> action) {c.forEach(action);}
+        public void forEach(@Readonly CheckedCollection<E> this, Consumer<? super E> action) {c.forEach(action);}
         @Override
-        public boolean removeIf(@Mutable CheckedCollection<E> this, Predicate<? super E> filter) {
+        public boolean removeIf(@Mutable CheckedCollection<E> this, @Readonly Predicate<? super E> filter) {
             return c.removeIf(filter);
         }
         @SideEffectFree
@@ -3408,8 +3424,9 @@ public class Collections {
      * @return a dynamically typesafe view of the specified queue
      * @since 1.8
      */
-    public static <E> @PolyGrowShrink @PolyNonEmpty Queue<E> checkedQueue(@PolyGrowShrink @PolyNonEmpty Queue<E> queue, Class<E> type) {
-        return new CheckedQueue<>(queue, type);
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
+    public static <E> @PolyMutable @PolyGrowShrink @PolyNonEmpty Queue<E> checkedQueue(@PolyMutable @PolyGrowShrink @PolyNonEmpty Queue<E> queue, Class<E> type) {
+        return new @PolyMutable CheckedQueue<>(queue, type);
     }
 
     /**
@@ -3435,7 +3452,7 @@ public class Collections {
         @Pure
         public int hashCode(@Readonly CheckedQueue<E> this)           {return c.hashCode();}
         @Pure
-        public E peek(@Mutable CheckedQueue<E> this)                 {return queue.peek();}
+        public E peek(@Readonly CheckedQueue<E> this)                 {return queue.peek();}
         public E poll(@Mutable CheckedQueue<E> this)                 {return queue.poll();}
         public E remove(@Mutable CheckedQueue<E> this)               {return queue.remove();}
         public boolean offer(@Mutable CheckedQueue<E> this, E e)       {return queue.offer(typeCheck(e));}
@@ -3468,8 +3485,9 @@ public class Collections {
      * @return a dynamically typesafe view of the specified set
      * @since 1.5
      */
-    public static <E> Set<E> checkedSet(Set<E> s, Class<E> type) {
-        return new CheckedSet<>(s, type);
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
+    public static <E> @PolyMutable Set<E> checkedSet(@PolyMutable Set<E> s, Class<E> type) {
+        return new @PolyMutable CheckedSet<>(s, type);
     }
 
     /**
@@ -3516,6 +3534,7 @@ public class Collections {
      * @return a dynamically typesafe view of the specified sorted set
      * @since 1.5
      */
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
     public static <E> @PolyMutable SortedSet<E> checkedSortedSet(@PolyMutable SortedSet<E> s,
                                                     Class<E> type) {
         return new @PolyMutable CheckedSortedSet<>(s, type);
@@ -3538,17 +3557,17 @@ public class Collections {
             ss = s;
         }
 
-        public Comparator<? super E> comparator(@Readonly CheckedSortedSet<E> this) { return ss.comparator(); }
+        public @Readonly Comparator<? super E> comparator(@Readonly CheckedSortedSet<E> this) { return ss.comparator(); }
         public E first(@Readonly CheckedSortedSet<E> this)                   { return ss.first(); }
         public E last(@Readonly CheckedSortedSet<E> this)                    { return ss.last(); }
 
-        public @PolyMutable SortedSet<E> subSet(@PolyMutable CheckedSortedSet<E> this, E fromElement, E toElement) {
+        public @ReceiverDependentMutable SortedSet<E> subSet(@ReceiverDependentMutable CheckedSortedSet<E> this, E fromElement, E toElement) {
             return checkedSortedSet(ss.subSet(fromElement,toElement), type);
         }
-        public @PolyMutable SortedSet<E> headSet(@PolyMutable CheckedSortedSet<E> this, E toElement) {
+        public @ReceiverDependentMutable SortedSet<E> headSet(@ReceiverDependentMutable CheckedSortedSet<E> this, E toElement) {
             return checkedSortedSet(ss.headSet(toElement), type);
         }
-        public @PolyMutable SortedSet<E> tailSet(@PolyMutable CheckedSortedSet<E> this, E fromElement) {
+        public @ReceiverDependentMutable SortedSet<E> tailSet(@ReceiverDependentMutable CheckedSortedSet<E> this, E fromElement) {
             return checkedSortedSet(ss.tailSet(fromElement), type);
         }
     }
@@ -3581,6 +3600,7 @@ public class Collections {
      * @return a dynamically typesafe view of the specified navigable set
      * @since 1.8
      */
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
     public static <E> @PolyMutable NavigableSet<E> checkedNavigableSet(@PolyMutable NavigableSet<E> s,
                                                     Class<E> type) {
         return new @PolyMutable CheckedNavigableSet<>(s, type);
@@ -3609,31 +3629,30 @@ public class Collections {
         public E higher(@Readonly CheckedNavigableSet<E> this, E e)                           { return ns.higher(e); }
         public E pollFirst(@Mutable CheckedNavigableSet<E> this)                         { return ns.pollFirst(); }
         public E pollLast(@Mutable CheckedNavigableSet<E> this)                            {return ns.pollLast(); }
-        public @PolyMutable NavigableSet<E> descendingSet(@PolyMutable CheckedNavigableSet<E> this)
+        public @ReceiverDependentMutable NavigableSet<E> descendingSet(@ReceiverDependentMutable CheckedNavigableSet<E> this)
                       { return checkedNavigableSet(ns.descendingSet(), type); }
-        @SuppressWarnings("mutability") // lost can not invoke poly method.
-        public Iterator<E> descendingIterator(@Readonly CheckedNavigableSet<E> this)
+        public @Mutable Iterator<E> descendingIterator(@ReceiverDependentMutable CheckedNavigableSet<E> this)
             {return checkedNavigableSet(ns.descendingSet(), type).iterator(); }
 
-        public @PolyMutable NavigableSet<E> subSet(@PolyMutable CheckedNavigableSet<E> this, E fromElement, E toElement) {
+        public @ReceiverDependentMutable NavigableSet<E> subSet(@ReceiverDependentMutable CheckedNavigableSet<E> this, E fromElement, E toElement) {
             return checkedNavigableSet(ns.subSet(fromElement, true, toElement, false), type);
         }
-        public @PolyMutable NavigableSet<E> headSet(@PolyMutable CheckedNavigableSet<E> this, E toElement) {
+        public @ReceiverDependentMutable NavigableSet<E> headSet(@ReceiverDependentMutable CheckedNavigableSet<E> this, E toElement) {
             return checkedNavigableSet(ns.headSet(toElement, false), type);
         }
-        public @PolyMutable NavigableSet<E> tailSet(@PolyMutable CheckedNavigableSet<E> this, E fromElement) {
+        public @ReceiverDependentMutable NavigableSet<E> tailSet(@ReceiverDependentMutable CheckedNavigableSet<E> this, E fromElement) {
             return checkedNavigableSet(ns.tailSet(fromElement, true), type);
         }
 
-        public @PolyMutable NavigableSet<E> subSet(@PolyMutable CheckedNavigableSet<E> this, E fromElement, boolean fromInclusive, E toElement, boolean toInclusive) {
+        public @ReceiverDependentMutable NavigableSet<E> subSet(@ReceiverDependentMutable CheckedNavigableSet<E> this, E fromElement, boolean fromInclusive, E toElement, boolean toInclusive) {
             return checkedNavigableSet(ns.subSet(fromElement, fromInclusive, toElement, toInclusive), type);
         }
 
-        public @PolyMutable NavigableSet<E> headSet(@PolyMutable CheckedNavigableSet<E> this, E toElement, boolean inclusive) {
+        public @ReceiverDependentMutable NavigableSet<E> headSet(@ReceiverDependentMutable CheckedNavigableSet<E> this, E toElement, boolean inclusive) {
             return checkedNavigableSet(ns.headSet(toElement, inclusive), type);
         }
 
-        public @PolyMutable NavigableSet<E> tailSet(@PolyMutable CheckedNavigableSet<E> this, E fromElement, boolean inclusive) {
+        public @ReceiverDependentMutable NavigableSet<E> tailSet(@ReceiverDependentMutable CheckedNavigableSet<E> this, E fromElement, boolean inclusive) {
             return checkedNavigableSet(ns.tailSet(fromElement, inclusive), type);
         }
     }
@@ -3665,10 +3684,11 @@ public class Collections {
      * @return a dynamically typesafe view of the specified list
      * @since 1.5
      */
-    public static <E> @PolyGrowShrink @PolyNonEmpty List<E> checkedList(@PolyGrowShrink @PolyNonEmpty List<E> list, Class<E> type) {
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
+    public static <E> @PolyMutable @PolyGrowShrink @PolyNonEmpty List<E> checkedList(@PolyMutable @PolyGrowShrink @PolyNonEmpty List<E> list, Class<E> type) {
         return (list instanceof RandomAccess ?
-                new CheckedRandomAccessList<>(list, type) :
-                new CheckedList<>(list, type));
+                new @PolyMutable CheckedRandomAccessList<>(list, type) :
+                new @PolyMutable CheckedList<>(list, type));
     }
 
     /**
@@ -3706,13 +3726,12 @@ public class Collections {
         public boolean addAll(@Mutable CheckedList<E> this, int index, @Readonly Collection<? extends E> c) {
             return list.addAll(index, checkedCopyOf(c));
         }
-        public ListIterator<E> listIterator(@Readonly CheckedList<E> this)   { return listIterator(0); }
+        public @Mutable ListIterator<E> listIterator(@ReceiverDependentMutable CheckedList<E> this)   { return listIterator(0); }
 
-        @SuppressWarnings("mutability") // receiver in anonymous class not denotable, see typetool#2433
-        public ListIterator<E> listIterator(@Readonly CheckedList<E> this, final int index) {
-            final ListIterator<E> i = list.listIterator(index);
+        public @Mutable ListIterator<E> listIterator(@ReceiverDependentMutable CheckedList<E> this, final int index) {
+            final @Mutable ListIterator<E> i = list.listIterator(index);
 
-            return new ListIterator<E>() {
+            return new @Mutable ListIterator<E>() {
                 @Pure
                 @EnsuresNonEmptyIf(result = true, expression = "this")
                 public boolean hasNext()     { return i.hasNext(); }
@@ -3738,8 +3757,8 @@ public class Collections {
             };
         }
 
-        public @PolyMutable List<E> subList(@PolyMutable CheckedList<E> this, int fromIndex, int toIndex) {
-            return new @PolyMutable CheckedList<>(list.subList(fromIndex, toIndex), type);
+        public @ReceiverDependentMutable List<E> subList(@ReceiverDependentMutable CheckedList<E> this, int fromIndex, int toIndex) {
+            return new @ReceiverDependentMutable CheckedList<>(list.subList(fromIndex, toIndex), type);
         }
 
         /**
@@ -3775,8 +3794,8 @@ public class Collections {
             super(list, type);
         }
 
-        public @PolyMutable List<E> subList(@PolyMutable CheckedRandomAccessList<E> this, int fromIndex, int toIndex) {
-            return new @PolyMutable CheckedRandomAccessList<>(
+        public @ReceiverDependentMutable List<E> subList(@ReceiverDependentMutable CheckedRandomAccessList<E> this, int fromIndex, int toIndex) {
+            return new @ReceiverDependentMutable CheckedRandomAccessList<>(
                     list.subList(fromIndex, toIndex), type);
         }
     }
@@ -3817,7 +3836,8 @@ public class Collections {
      * @return a dynamically typesafe view of the specified map
      * @since 1.5
      */
-    public static <K extends @Immutable Object, V> @PolyMutable Map<K, V> checkedMap(@PolyMutable Map<K, V> m,
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
+    public static <K extends @Readonly Object, V> @PolyMutable Map<K, V> checkedMap(@PolyMutable Map<K, V> m,
                                               Class<K> keyType,
                                               Class<V> valueType) {
         return new @PolyMutable CheckedMap<>(m, keyType, valueType);
@@ -3828,7 +3848,7 @@ public class Collections {
      * @serial include
      */
     @ReceiverDependentMutable
-    private static class CheckedMap<K extends @Immutable Object,V>
+    private static class CheckedMap<K extends @Readonly Object,V>
         implements Map<K,V>, Serializable
     {
         @java.io.Serial
@@ -3888,8 +3908,8 @@ public class Collections {
         public V get(@Readonly CheckedMap<K,V> this, @Readonly Object key)               { return m.get(key); }
         public V remove(@Mutable CheckedMap<K,V> this, @Readonly Object key)            { return m.remove(key); }
         public void clear(@Mutable CheckedMap<K,V> this)                    { m.clear(); }
-        public @PolyMutable Set<K> keySet(@PolyMutable CheckedMap<K,V> this)                 { return m.keySet(); }
-        public @PolyMutable Collection<V> values(@PolyMutable CheckedMap<K,V> this)          { return m.values(); }
+        public @ReceiverDependentMutable Set<K> keySet(@ReceiverDependentMutable CheckedMap<K,V> this)                 { return m.keySet(); }
+        public @ReceiverDependentMutable Collection<V> values(@ReceiverDependentMutable CheckedMap<K,V> this)          { return m.values(); }
         public boolean equals(@Readonly CheckedMap<K,V> this, @Readonly Object o)        { return o == this || m.equals(o); }
         public int hashCode(@Readonly CheckedMap<K,V> this)                  { return m.hashCode(); }
         public String toString(@Readonly CheckedMap<K,V> this)               { return m.toString(); }
@@ -3900,7 +3920,7 @@ public class Collections {
             return m.put(key, value);
         }
 
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({"unchecked", "mutability:method.invocation.invalid"}) // mutability: t is only read. Its entry set reads as @MutabilityLost through the @Readonly map, and toArray's @PolyMutable cannot be instantiated with @MutabilityLost
         public void putAll(@Mutable CheckedMap<K,V> this, @Readonly Map<? extends K, ? extends V> t) {
             // Satisfy the following goals:
             // - good diagnostics in case of type mismatch
@@ -3924,16 +3944,15 @@ public class Collections {
         private transient @Assignable /* should be @LazyFinal */ Set<Map.@ReceiverDependentMutable Entry<K,V>> entrySet;
 
         @SideEffectFree
-        @SuppressWarnings("mutability:assignment.type.incompatible") // polyq on supertype's type argument
-        public @PolyMutable Set<Map.@PolyMutable Entry<K,V>> entrySet(@PolyMutable CheckedMap<K,V> this) {
+        public @ReceiverDependentMutable Set<Map.@ReceiverDependentMutable Entry<K,V>> entrySet(@ReceiverDependentMutable CheckedMap<K,V> this) {
             if (entrySet==null)
-                entrySet = new @PolyMutable CheckedEntrySet<>(m.entrySet(), valueType);
+                entrySet = new @ReceiverDependentMutable CheckedEntrySet<>(m.entrySet(), valueType);
             return entrySet;
         }
 
         // Override default methods in Map
         @Override
-        public void forEach(@Mutable CheckedMap<K,V> this, BiConsumer<? super K, ? super V> action) {
+        public void forEach(@Readonly CheckedMap<K,V> this, BiConsumer<? super K, ? super V> action) {
             m.forEach(action);
         }
 
@@ -4009,7 +4028,7 @@ public class Collections {
          * @serial exclude
          */
         @ReceiverDependentMutable
-        static class CheckedEntrySet<K extends @Immutable Object,V> implements Set<Map.@ReceiverDependentMutable Entry<K,V>> {
+        static class CheckedEntrySet<K extends @Readonly Object,V> implements Set<Map.@ReceiverDependentMutable Entry<K,V>> {
             private final Set<Map.@ReceiverDependentMutable Entry<K,V>> s;
             private final Class<V> valueType;
 
@@ -4019,12 +4038,12 @@ public class Collections {
             }
 
             @Pure
-            public int size(@Readonly CheckedEntrySet<K,V> this)        { return s.size(); }
+            public int size(@ReceiverDependentMutable CheckedEntrySet<K,V> this)        { return s.size(); }
             @Pure
             @EnsuresNonEmptyIf(result = false, expression = "this")
-            public boolean isEmpty(@Readonly CheckedEntrySet<K,V> this) { return s.isEmpty(); }
+            public boolean isEmpty(@ReceiverDependentMutable CheckedEntrySet<K,V> this) { return s.isEmpty(); }
             public String toString(@Readonly CheckedEntrySet<K,V> this) { return s.toString(); }
-            public int hashCode(@Readonly CheckedEntrySet<K,V> this)    { return s.hashCode(); }
+            public int hashCode(@ReceiverDependentMutable CheckedEntrySet<K,V> this)    { return s.hashCode(); }
             public void clear(@Mutable CheckedEntrySet<K,V> this)      {        s.clear(); }
 
             @EnsuresNonEmpty("this")
@@ -4035,40 +4054,42 @@ public class Collections {
                 throw new UnsupportedOperationException();
             }
 
-            public Iterator<Map.Entry<K,V>> iterator(@Mutable CheckedEntrySet<K,V> this) {
-                final Iterator<Map.Entry<K, V>> i = s.iterator();
+            @SuppressWarnings({"mutability:return.type.incompatible", "mutability:override.return.invalid", "mutability:override.param.invalid"}) // the entries have the enclosing map's mutability, but in the iterator class's supertype a receiver-dependent qualifier is relative to the iterator, which is a fresh @Mutable cursor. There is no qualifier relative to the enclosing instance: https://github.com/eisop/checker-framework/issues/2322
+            public @Mutable Iterator<Map.@ReceiverDependentMutable Entry<K,V>> iterator(@ReceiverDependentMutable CheckedEntrySet<K,V> this) {
+                final Iterator<Map.@ReceiverDependentMutable Entry<K, V>> i = s.iterator();
 
-                return new Iterator<Map.Entry<K,V>>() {
+                return new @Mutable Iterator<Map.@ReceiverDependentMutable Entry<K,V>>() {
                     @Pure
                     @EnsuresNonEmptyIf(result = true, expression = "this")
                     public boolean hasNext() { return i.hasNext(); }
+                    @SuppressWarnings("mutability:method.invocation.invalid") // i is this collection's own iterator, with its mutability. remove() runs only on a @Mutable iterator, which only a @Mutable collection creates, but the anonymous class cannot state that i shares its mutability
                     public void remove()     { i.remove(); }
 
-                    public Map.Entry<K,V> next(/*@NonEmpty Iterator<Map.Entry<K,V>> this*/) {
+                    public Map.@ReceiverDependentMutable Entry<K,V> next(/*@NonEmpty Iterator<Map.Entry<K,V>> this*/) {
                         return checkedEntry(i.next(), valueType);
                     }
 
-                    public void forEachRemaining(Consumer<? super Entry<K, V>> action) {
+                    public void forEachRemaining(Consumer<? super @ReceiverDependentMutable Entry<K, V>> action) {
                         i.forEachRemaining(
                             e -> action.accept(checkedEntry(e, valueType)));
                     }
                 };
             }
 
-            @SuppressWarnings({"unchecked", "mutability:type.arguments.not.inferred"}) // Aosen: not sure how to fix this
-            public Object[] toArray(@Mutable CheckedEntrySet<K,V> this) {
-                Object[] source = s.toArray();
+            @SuppressWarnings({"unchecked", "mutability:type.arguments.not.inferred", "mutability:method.invocation.invalid", "mutability:assignment.type.incompatible", "mutability:override.return.invalid"}) // mutability: s's entries, and the CheckedEntry wrappers that write through to them, share this set's mutability. A @PolyMutable call such as s.toArray() or checkedEntry(...) cannot be instantiated with @ReceiverDependentMutable, and @ReceiverDependentMutable is the precise return, which an override of a @PolyMutable return cannot state
+            public @ReceiverDependentMutable Object[] toArray(@ReceiverDependentMutable CheckedEntrySet<K,V> this) {
+                @ReceiverDependentMutable Object[] source = s.toArray();
 
                 /*
                  * Ensure that we don't get an ArrayStoreException even if
                  * s.toArray returns an array of something other than Object
                  */
-                Object[] dest = (source.getClass() == Object[].class)
+                @ReceiverDependentMutable Object[] dest = (source.getClass() == Object[].class)
                     ? source
-                    : new Object[source.length];
+                    : new @ReceiverDependentMutable Object[source.length];
 
                 for (int i = 0; i < source.length; i++)
-                    dest[i] = checkedEntry((Map.Entry<K,V>)source[i],
+                    dest[i] = checkedEntry((Map.@ReceiverDependentMutable Entry<K,V>)source[i],
                                            valueType);
                 return dest;
             }
@@ -4100,7 +4121,7 @@ public class Collections {
              */
             @Pure
             @EnsuresNonEmptyIf(result = true, expression = "this")
-            public boolean contains(@Readonly CheckedEntrySet<K,V> this, @UnknownSignedness @Readonly Object o) {
+            public boolean contains(@ReceiverDependentMutable CheckedEntrySet<K,V> this, @UnknownSignedness @Readonly Object o) {
                 return o instanceof Map.@Readonly Entry<?, ?> e
                         && s.contains((e instanceof CheckedEntry) ? e : checkedEntry(e, valueType));
             }
@@ -4144,7 +4165,7 @@ public class Collections {
                 return modified;
             }
 
-            public boolean equals(@Readonly CheckedEntrySet<K,V> this, @Readonly Object o) {
+            public boolean equals(@ReceiverDependentMutable CheckedEntrySet<K,V> this, @Readonly Object o) {
                 if (o == this)
                     return true;
                 return o instanceof @Readonly Set<?> that
@@ -4152,7 +4173,8 @@ public class Collections {
                         && containsAll(that); // Invokes safe containsAll() above
             }
 
-            static <K extends @Immutable Object,V,T> @PolyMutable CheckedEntry<K,V,T> checkedEntry(Map.@PolyMutable Entry<K,V> e,
+            @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
+            static <K extends @Readonly Object,V,T> @PolyMutable CheckedEntry<K,V,T> checkedEntry(Map.@PolyMutable Entry<K,V> e,
                                                             Class<T> valueType) {
                 return new @PolyMutable CheckedEntry<>(e, valueType);
             }
@@ -4165,7 +4187,7 @@ public class Collections {
              * Map.Entry when asked to perform an equality check.
              */
             @ReceiverDependentMutable
-            private static class CheckedEntry<K extends @Immutable Object,V,T> implements Map.Entry<K,V> {
+            private static class CheckedEntry<K extends @Readonly Object,V,T> implements Map.Entry<K,V> {
                 private final Map.Entry<K, V> e;
                 private final Class<T> valueType;
 
@@ -4238,7 +4260,8 @@ public class Collections {
      * @return a dynamically typesafe view of the specified map
      * @since 1.5
      */
-    public static <K extends @Immutable Object,V> @PolyMutable SortedMap<K,V> checkedSortedMap(@PolyMutable SortedMap<K, V> m,
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
+    public static <K extends @Readonly Object,V> @PolyMutable SortedMap<K,V> checkedSortedMap(@PolyMutable SortedMap<K, V> m,
                                                         Class<K> keyType,
                                                         Class<V> valueType) {
         return new @PolyMutable CheckedSortedMap<>(m, keyType, valueType);
@@ -4247,7 +4270,7 @@ public class Collections {
     /**
      * @serial include
      */
-    @ReceiverDependentMutable static class CheckedSortedMap<K extends @Immutable Object,V> extends CheckedMap<K,V>
+    @ReceiverDependentMutable static class CheckedSortedMap<K extends @Readonly Object,V> extends CheckedMap<K,V>
         implements SortedMap<K,V>, Serializable
     {
         @java.io.Serial
@@ -4262,21 +4285,21 @@ public class Collections {
             sm = m;
         }
 
-        public Comparator<? super K> comparator(@Readonly CheckedSortedMap<K,V> this) { return sm.comparator(); }
+        public @Readonly Comparator<? super K> comparator(@Readonly CheckedSortedMap<K,V> this) { return sm.comparator(); }
         public K firstKey(@Readonly CheckedSortedMap<K,V> this)                       { return sm.firstKey(); }
         public K lastKey(@Readonly CheckedSortedMap<K,V> this)                        { return sm.lastKey(); }
 
         @SideEffectFree
-        public @PolyMutable SortedMap<K,V> subMap(@PolyMutable CheckedSortedMap<K,V> this, K fromKey, K toKey) {
+        public @ReceiverDependentMutable SortedMap<K,V> subMap(@ReceiverDependentMutable CheckedSortedMap<K,V> this, K fromKey, K toKey) {
             return checkedSortedMap(sm.subMap(fromKey, toKey),
                                     keyType, valueType);
         }
         @SideEffectFree
-        public @PolyMutable SortedMap<K,V> headMap(@PolyMutable CheckedSortedMap<K,V> this, K toKey) {
+        public @ReceiverDependentMutable SortedMap<K,V> headMap(@ReceiverDependentMutable CheckedSortedMap<K,V> this, K toKey) {
             return checkedSortedMap(sm.headMap(toKey), keyType, valueType);
         }
         @SideEffectFree
-        public @PolyMutable SortedMap<K,V> tailMap(@PolyMutable CheckedSortedMap<K,V> this, K fromKey) {
+        public @ReceiverDependentMutable SortedMap<K,V> tailMap(@ReceiverDependentMutable CheckedSortedMap<K,V> this, K fromKey) {
             return checkedSortedMap(sm.tailMap(fromKey), keyType, valueType);
         }
     }
@@ -4317,7 +4340,8 @@ public class Collections {
      * @return a dynamically typesafe view of the specified map
      * @since 1.8
      */
-    public static <K extends @Immutable Object,V> @PolyMutable NavigableMap<K,V> checkedNavigableMap(@PolyMutable NavigableMap<K, V> m,
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter"}) // one poly: the argument and the created object are the same instantiation
+    public static <K extends @Readonly Object,V> @PolyMutable NavigableMap<K,V> checkedNavigableMap(@PolyMutable NavigableMap<K, V> m,
                                                         Class<K> keyType,
                                                         Class<V> valueType) {
         return new @PolyMutable CheckedNavigableMap<>(m, keyType, valueType);
@@ -4326,7 +4350,7 @@ public class Collections {
     /**
      * @serial include
      */
-    @ReceiverDependentMutable static class CheckedNavigableMap<K extends @Immutable Object,V> extends CheckedSortedMap<K,V>
+    @ReceiverDependentMutable static class CheckedNavigableMap<K extends @Readonly Object,V> extends CheckedSortedMap<K,V>
         implements NavigableMap<K,V>, Serializable
     {
         @java.io.Serial
@@ -4341,124 +4365,132 @@ public class Collections {
             nm = m;
         }
 
-        public Comparator<? super K> comparator(@Readonly CheckedNavigableMap<K,V> this)   { return nm.comparator(); }
+        public @Readonly Comparator<? super K> comparator(@Readonly CheckedNavigableMap<K,V> this)   { return nm.comparator(); }
         public K firstKey(@Readonly CheckedNavigableMap<K,V> this)                           { return nm.firstKey(); }
         public K lastKey(@Readonly CheckedNavigableMap<K,V> this)                             { return nm.lastKey(); }
 
-        public @PolyMutable Entry<K, V> lowerEntry(@PolyMutable CheckedNavigableMap<K,V> this, K key) {
+        @SuppressWarnings("mutability:argument.type.incompatible") // a CheckedEntry cannot be created @Readonly: it wraps the backing map's @Readonly entry, and the method returns it @Readonly
+        public @Readonly Entry<K, V> lowerEntry(@Readonly CheckedNavigableMap<K,V> this, K key) {
             Entry<K,V> lower = nm.lowerEntry(key);
             return (null != lower)
-                ? new CheckedMap.CheckedEntrySet.@PolyMutable CheckedEntry<>(lower, valueType)
+                ? new CheckedMap.CheckedEntrySet.@Immutable CheckedEntry<>(lower, valueType)
                 : null;
         }
 
         public K lowerKey(@Readonly CheckedNavigableMap<K,V> this, K key)                   { return nm.lowerKey(key); }
 
-        public @PolyMutable Entry<K, V> floorEntry(@PolyMutable CheckedNavigableMap<K,V> this, K key) {
+        @SuppressWarnings("mutability:argument.type.incompatible") // a CheckedEntry cannot be created @Readonly: it wraps the backing map's @Readonly entry, and the method returns it @Readonly
+        public @Readonly Entry<K, V> floorEntry(@Readonly CheckedNavigableMap<K,V> this, K key) {
             Entry<K,V> floor = nm.floorEntry(key);
             return (null != floor)
-                ? new CheckedMap.CheckedEntrySet.@PolyMutable CheckedEntry<>(floor, valueType)
+                ? new CheckedMap.CheckedEntrySet.@Immutable CheckedEntry<>(floor, valueType)
                 : null;
         }
 
         public K floorKey(@Readonly CheckedNavigableMap<K,V> this, K key)                   { return nm.floorKey(key); }
 
-        public @PolyMutable Entry<K, V> ceilingEntry(@PolyMutable CheckedNavigableMap<K,V> this, K key) {
+        @SuppressWarnings("mutability:argument.type.incompatible") // a CheckedEntry cannot be created @Readonly: it wraps the backing map's @Readonly entry, and the method returns it @Readonly
+        public @Readonly Entry<K, V> ceilingEntry(@Readonly CheckedNavigableMap<K,V> this, K key) {
             Entry<K,V> ceiling = nm.ceilingEntry(key);
             return (null != ceiling)
-                ? new CheckedMap.CheckedEntrySet.@PolyMutable CheckedEntry<>(ceiling, valueType)
+                ? new CheckedMap.CheckedEntrySet.@Immutable CheckedEntry<>(ceiling, valueType)
                 : null;
         }
 
         public K ceilingKey(@Readonly CheckedNavigableMap<K,V> this, K key)               { return nm.ceilingKey(key); }
 
-        public @PolyMutable Entry<K, V> higherEntry(@PolyMutable CheckedNavigableMap<K,V> this, K key) {
+        @SuppressWarnings("mutability:argument.type.incompatible") // a CheckedEntry cannot be created @Readonly: it wraps the backing map's @Readonly entry, and the method returns it @Readonly
+        public @Readonly Entry<K, V> higherEntry(@Readonly CheckedNavigableMap<K,V> this, K key) {
             Entry<K,V> higher = nm.higherEntry(key);
             return (null != higher)
-                ? new CheckedMap.CheckedEntrySet.@PolyMutable CheckedEntry<>(higher, valueType)
+                ? new CheckedMap.CheckedEntrySet.@Immutable CheckedEntry<>(higher, valueType)
                 : null;
         }
 
         public K higherKey(@Readonly CheckedNavigableMap<K,V> this, K key)                 { return nm.higherKey(key); }
 
-        public @PolyMutable Entry<K, V> firstEntry(@PolyMutable CheckedNavigableMap<K,V> this) {
+        @SuppressWarnings("mutability:argument.type.incompatible") // a CheckedEntry cannot be created @Readonly: it wraps the backing map's @Readonly entry, and the method returns it @Readonly
+        public @Readonly Entry<K, V> firstEntry(@Readonly CheckedNavigableMap<K,V> this) {
             Entry<K,V> first = nm.firstEntry();
             return (null != first)
-                ? new CheckedMap.CheckedEntrySet.@PolyMutable CheckedEntry<>(first, valueType)
+                ? new CheckedMap.CheckedEntrySet.@Immutable CheckedEntry<>(first, valueType)
                 : null;
         }
 
-        public @PolyMutable Entry<K, V> lastEntry(@PolyMutable CheckedNavigableMap<K,V> this) {
+        @SuppressWarnings("mutability:argument.type.incompatible") // a CheckedEntry cannot be created @Readonly: it wraps the backing map's @Readonly entry, and the method returns it @Readonly
+        public @Readonly Entry<K, V> lastEntry(@Readonly CheckedNavigableMap<K,V> this) {
             Entry<K,V> last = nm.lastEntry();
             return (null != last)
-                ? new CheckedMap.CheckedEntrySet.@PolyMutable CheckedEntry<>(last, valueType)
+                ? new CheckedMap.CheckedEntrySet.@Immutable CheckedEntry<>(last, valueType)
                 : null;
         }
 
-        public Entry<K, V> pollFirstEntry(@Mutable CheckedNavigableMap<K,V> this) {
+        @SuppressWarnings("mutability:argument.type.incompatible") // a CheckedEntry cannot be created @Readonly: it wraps the backing map's @Readonly entry, and the method returns it @Readonly
+        public @Readonly Entry<K, V> pollFirstEntry(@Mutable CheckedNavigableMap<K,V> this) {
             Entry<K,V> entry = nm.pollFirstEntry();
             return (null == entry)
                 ? null
-                : new CheckedMap.CheckedEntrySet.CheckedEntry<>(entry, valueType);
+                : new CheckedMap.CheckedEntrySet.@Immutable CheckedEntry<>(entry, valueType);
         }
 
-        public Entry<K, V> pollLastEntry(@Mutable CheckedNavigableMap<K,V> this) {
+        @SuppressWarnings("mutability:argument.type.incompatible") // a CheckedEntry cannot be created @Readonly: it wraps the backing map's @Readonly entry, and the method returns it @Readonly
+        public @Readonly Entry<K, V> pollLastEntry(@Mutable CheckedNavigableMap<K,V> this) {
             Entry<K,V> entry = nm.pollLastEntry();
             return (null == entry)
                 ? null
-                : new CheckedMap.CheckedEntrySet.CheckedEntry<>(entry, valueType);
+                : new CheckedMap.CheckedEntrySet.@Immutable CheckedEntry<>(entry, valueType);
         }
 
         @SideEffectFree
-        public @PolyMutable NavigableMap<K, V> descendingMap(@PolyMutable CheckedNavigableMap<K,V> this) {
+        public @ReceiverDependentMutable NavigableMap<K, V> descendingMap(@ReceiverDependentMutable CheckedNavigableMap<K,V> this) {
             return checkedNavigableMap(nm.descendingMap(), keyType, valueType);
         }
 
-        public @PolyMutable NavigableSet<K> keySet(@PolyMutable CheckedNavigableMap<K,V> this) {
+        public @ReceiverDependentMutable NavigableSet<K> keySet(@ReceiverDependentMutable CheckedNavigableMap<K,V> this) {
             return navigableKeySet();
         }
 
         @SideEffectFree
-        public @PolyMutable NavigableSet<K> navigableKeySet(@PolyMutable CheckedNavigableMap<K,V> this) {
+        public @ReceiverDependentMutable NavigableSet<K> navigableKeySet(@ReceiverDependentMutable CheckedNavigableMap<K,V> this) {
             return checkedNavigableSet(nm.navigableKeySet(), keyType);
         }
 
         @SideEffectFree
-        public @PolyMutable NavigableSet<K> descendingKeySet(@PolyMutable CheckedNavigableMap<K,V> this) {
+        public @ReceiverDependentMutable NavigableSet<K> descendingKeySet(@ReceiverDependentMutable CheckedNavigableMap<K,V> this) {
             return checkedNavigableSet(nm.descendingKeySet(), keyType);
         }
 
         @Override
         @SideEffectFree
-        public @PolyMutable NavigableMap<K,V> subMap(@PolyMutable CheckedNavigableMap<K,V> this, K fromKey, K toKey) {
+        public @ReceiverDependentMutable NavigableMap<K,V> subMap(@ReceiverDependentMutable CheckedNavigableMap<K,V> this, K fromKey, K toKey) {
             return checkedNavigableMap(nm.subMap(fromKey, true, toKey, false),
                                     keyType, valueType);
         }
 
         @Override
         @SideEffectFree
-        public @PolyMutable NavigableMap<K,V> headMap(@PolyMutable CheckedNavigableMap<K,V> this, K toKey) {
+        public @ReceiverDependentMutable NavigableMap<K,V> headMap(@ReceiverDependentMutable CheckedNavigableMap<K,V> this, K toKey) {
             return checkedNavigableMap(nm.headMap(toKey, false), keyType, valueType);
         }
 
         @Override
         @SideEffectFree
-        public @PolyMutable NavigableMap<K,V> tailMap(@PolyMutable CheckedNavigableMap<K,V> this, K fromKey) {
+        public @ReceiverDependentMutable NavigableMap<K,V> tailMap(@ReceiverDependentMutable CheckedNavigableMap<K,V> this, K fromKey) {
             return checkedNavigableMap(nm.tailMap(fromKey, true), keyType, valueType);
         }
 
         @SideEffectFree
-        public @PolyMutable NavigableMap<K, V> subMap(@PolyMutable CheckedNavigableMap<K,V> this, K fromKey, boolean fromInclusive, K toKey, boolean toInclusive) {
+        public @ReceiverDependentMutable NavigableMap<K, V> subMap(@ReceiverDependentMutable CheckedNavigableMap<K,V> this, K fromKey, boolean fromInclusive, K toKey, boolean toInclusive) {
             return checkedNavigableMap(nm.subMap(fromKey, fromInclusive, toKey, toInclusive), keyType, valueType);
         }
 
         @SideEffectFree
-        public @PolyMutable NavigableMap<K, V> headMap(@PolyMutable CheckedNavigableMap<K,V> this, K toKey, boolean inclusive) {
+        public @ReceiverDependentMutable NavigableMap<K, V> headMap(@ReceiverDependentMutable CheckedNavigableMap<K,V> this, K toKey, boolean inclusive) {
             return checkedNavigableMap(nm.headMap(toKey, inclusive), keyType, valueType);
         }
 
         @SideEffectFree
-        public @PolyMutable NavigableMap<K, V> tailMap(@PolyMutable CheckedNavigableMap<K,V> this, K fromKey, boolean inclusive) {
+        public @ReceiverDependentMutable NavigableMap<K, V> tailMap(@ReceiverDependentMutable CheckedNavigableMap<K,V> this, K fromKey, boolean inclusive) {
             return checkedNavigableMap(nm.tailMap(fromKey, inclusive), keyType, valueType);
         }
     }
@@ -4486,21 +4518,22 @@ public class Collections {
      */
     @SuppressWarnings("unchecked")
     @SideEffectFree
-    public static <T> Iterator<T> emptyIterator() {
-        return (Iterator<T>) EmptyIterator.EMPTY_ITERATOR;
+    public static <T> @PolyMutable Iterator<T> emptyIterator() {
+        return (@PolyMutable Iterator<T>) EmptyIterator.EMPTY_ITERATOR;
     }
 
+    @Immutable
     private static class EmptyIterator<E> implements Iterator<E> {
-        static final EmptyIterator<Object> EMPTY_ITERATOR
-            = new EmptyIterator<>();
+        static final @Immutable EmptyIterator<Object> EMPTY_ITERATOR
+            = new @Immutable EmptyIterator<>();
 
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
-        public boolean hasNext() { return false; }
-        public E next(@NonEmpty EmptyIterator<E> this) { throw new NoSuchElementException(); }
-        public void remove(@NonEmpty EmptyIterator<E> this) { throw new IllegalStateException(); }
+        public boolean hasNext(@Readonly EmptyIterator<E> this) { return false; }
+        public E next(@NonEmpty @Readonly EmptyIterator<E> this) { throw new NoSuchElementException(); }
+        public void remove(@NonEmpty @Readonly EmptyIterator<E> this) { throw new IllegalStateException(); }
         @Override
-        public void forEachRemaining(Consumer<? super E> action) {
+        public void forEachRemaining(@Readonly EmptyIterator<E> this, Consumer<? super E> action) {
             Objects.requireNonNull(action);
         }
     }
@@ -4533,23 +4566,24 @@ public class Collections {
      */
     @SuppressWarnings("unchecked")
     @SideEffectFree
-    public static <T> ListIterator<T> emptyListIterator() {
-        return (ListIterator<T>) EmptyListIterator.EMPTY_ITERATOR;
+    public static <T> @PolyMutable ListIterator<T> emptyListIterator() {
+        return (@PolyMutable ListIterator<T>) EmptyListIterator.EMPTY_ITERATOR;
     }
 
+    @Immutable
     private static class EmptyListIterator<E>
         extends EmptyIterator<E>
         implements ListIterator<E>
     {
-        static final EmptyListIterator<Object> EMPTY_ITERATOR
-            = new EmptyListIterator<>();
+        static final @Immutable EmptyListIterator<Object> EMPTY_ITERATOR
+            = new @Immutable EmptyListIterator<>();
 
-        public boolean hasPrevious() { return false; }
-        public E previous() { throw new NoSuchElementException(); }
-        public int nextIndex()     { return 0; }
-        public int previousIndex() { return -1; }
-        public void set(E e) { throw new IllegalStateException(); }
-        public void add(E e) { throw new UnsupportedOperationException(); }
+        public boolean hasPrevious(@Readonly EmptyListIterator<E> this) { return false; }
+        public E previous(@Readonly EmptyListIterator<E> this) { throw new NoSuchElementException(); }
+        public int nextIndex(@Readonly EmptyListIterator<E> this)     { return 0; }
+        public int previousIndex(@Readonly EmptyListIterator<E> this) { return -1; }
+        public void set(@Readonly EmptyListIterator<E> this, E e) { throw new IllegalStateException(); }
+        public void add(@Readonly EmptyListIterator<E> this, E e) { throw new UnsupportedOperationException(); }
     }
 
     /**
@@ -4571,8 +4605,8 @@ public class Collections {
      */
     @SuppressWarnings("unchecked")
     @SideEffectFree
-    public static <T> Enumeration<T> emptyEnumeration() {
-        return (Enumeration<T>) EmptyEnumeration.EMPTY_ENUMERATION;
+    public static <T> @PolyMutable Enumeration<T> emptyEnumeration() {
+        return (@PolyMutable Enumeration<T>) EmptyEnumeration.EMPTY_ENUMERATION;
     }
 
     @Immutable private static class EmptyEnumeration<E> implements Enumeration<E> {
@@ -4629,7 +4663,7 @@ public class Collections {
         private static final long serialVersionUID = 1582296315990362920L;
 
         @SideEffectFree
-        public Iterator<E> iterator() { return emptyIterator(); }
+        public @Mutable Iterator<E> iterator() { return emptyIterator(); }
 
         @Pure
         public @NonNegative int size() {return 0;}
@@ -4640,12 +4674,12 @@ public class Collections {
 
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
-        public boolean contains(@UnknownSignedness Object obj) {return false;}
+        public boolean contains(@UnknownSignedness @Readonly Object obj) {return false;}
         @Pure
-        public boolean containsAll(Collection<? extends @UnknownSignedness Object> c) { return c.isEmpty(); }
+        public boolean containsAll(@Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) { return c.isEmpty(); }
 
         @SideEffectFree
-        public @PolyNull @PolySigned Object[] toArray(Collections.EmptySet<@PolyNull @PolySigned E> this) { return new Object[0]; }
+        public @PolyNull @PolySigned @PolyMutable Object[] toArray(Collections.EmptySet<@PolyNull @PolySigned @PolyMutable E> this) { return new @PolyMutable Object[0]; }
 
         @SideEffectFree
         public <T> @Nullable T[] toArray(@PolyNull T[] a) {
@@ -4660,7 +4694,7 @@ public class Collections {
             Objects.requireNonNull(action);
         }
         @Override
-        public boolean removeIf(Predicate<? super E> filter) {
+        public boolean removeIf(@Readonly Predicate<? super E> filter) {
             Objects.requireNonNull(filter);
             return false;
         }
@@ -4768,10 +4802,10 @@ public class Collections {
         private static final long serialVersionUID = 8842843931221139166L;
 
         @SideEffectFree
-        public Iterator<E> iterator() {
+        public @Mutable Iterator<E> iterator() {
             return emptyIterator();
         }
-        public ListIterator<E> listIterator() {
+        public @Mutable ListIterator<E> listIterator() {
             return emptyListIterator();
         }
 
@@ -4786,10 +4820,10 @@ public class Collections {
         @EnsuresNonEmptyIf(result = true, expression = "this")
         public boolean contains(@UnknownSignedness @Readonly Object obj) {return false;}
         @Pure
-        public boolean containsAll(Collection<? extends @UnknownSignedness Object> c) { return c.isEmpty(); }
+        public boolean containsAll(@Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) { return c.isEmpty(); }
 
         @SideEffectFree
-        public @PolyNull @PolySigned Object[] toArray(Collections.EmptyList<@PolyNull @PolySigned E> this) { return new Object[0]; }
+        public @PolyNull @PolySigned @PolyMutable Object[] toArray(Collections.EmptyList<@PolyNull @PolySigned @PolyMutable E> this) { return new @PolyMutable Object[0]; }
 
         @SideEffectFree
         public <T> @Nullable T[] toArray(@PolyNull T[] a) {
@@ -4809,7 +4843,7 @@ public class Collections {
         public int hashCode() { return 1; }
 
         @Override
-        public boolean removeIf(Predicate<? super E> filter) {
+        public boolean removeIf(@Readonly Predicate<? super E> filter) {
             Objects.requireNonNull(filter);
             return false;
         }
@@ -4918,7 +4952,7 @@ public class Collections {
     /**
      * @serial include
      */
-    @Immutable private static class EmptyMap<K extends @Immutable Object,V>
+    @Immutable private static class EmptyMap<K extends @Readonly Object,V>
         extends AbstractMap<K,V>
         implements Serializable
     {
@@ -4933,10 +4967,10 @@ public class Collections {
         public void clear()                        {}
         @Pure
         @EnsuresKeyForIf(expression={"#1"}, result=true, map={"this"})
-        public boolean containsKey(@UnknownSignedness Object key)     {return false;}
+        public boolean containsKey(@UnknownSignedness @Readonly Object key)     {return false;}
         @Pure
-        public boolean containsValue(@UnknownSignedness Object value) {return false;}
-        public V get(Object key)                   {return null;}
+        public boolean containsValue(@UnknownSignedness @Readonly Object value) {return false;}
+        public V get(@Readonly Object key)                   {return null;}
         public @Immutable Set<K> keySet()                     {return emptySet();}
         public @Immutable Collection<V> values()              {return emptySet();}
         @SideEffectFree
@@ -4952,7 +4986,7 @@ public class Collections {
         @Override
         @SuppressWarnings("unchecked")
         @Pure
-        public V getOrDefault(Object k, V defaultValue) {
+        public V getOrDefault(@Readonly Object k, V defaultValue) {
             return defaultValue;
         }
 
@@ -4973,7 +5007,7 @@ public class Collections {
         }
 
         @Override
-        public boolean remove(@UnknownSignedness Object key, @UnknownSignedness Object value) {
+        public boolean remove(@UnknownSignedness @Readonly Object key, @UnknownSignedness @Readonly Object value) {
             throw new UnsupportedOperationException();
         }
 
@@ -5032,9 +5066,8 @@ public class Collections {
         return new SingletonSet<>(o);
     }
 
-    @SuppressWarnings("mutability") // receiver in anonymous class not denotable, see typetool#2433
-    static <E> @Immutable Iterator<E> singletonIterator(final E e) {
-        return new @Immutable Iterator<E>() {
+    static <E> @Mutable Iterator<E> singletonIterator(final E e) {
+        return new @Mutable Iterator<E>() {
             private boolean hasNext = true;
             @Pure
             @EnsuresNonEmptyIf(result = true, expression = "this")
@@ -5069,7 +5102,7 @@ public class Collections {
      * @return A singleton {@code Spliterator}
      */
     static <T> Spliterator<T> singletonSpliterator(final T element) {
-        return new Spliterator<T>() {
+        return new @Mutable Spliterator<T>() {
             long est = 1;
 
             @Override
@@ -5124,7 +5157,7 @@ public class Collections {
         SingletonSet(E e) {element = e;}
 
         @SideEffectFree
-        public @Immutable Iterator<E> iterator() {
+        public @Mutable Iterator<E> iterator() {
             return singletonIterator(element);
         }
 
@@ -5133,7 +5166,7 @@ public class Collections {
 
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
-        public boolean contains(@UnknownSignedness Object o) {return eq(o, element);}
+        public boolean contains(@UnknownSignedness @Readonly Object o) {return eq(o, element);}
 
         // Override default methods for Collection
         @Override
@@ -5146,7 +5179,7 @@ public class Collections {
             return singletonSpliterator(element);
         }
         @Override
-        public boolean removeIf(Predicate<? super E> filter) {
+        public boolean removeIf(@Readonly Predicate<? super E> filter) {
             throw new UnsupportedOperationException();
         }
         @Override
@@ -5186,7 +5219,7 @@ public class Collections {
         SingletonList(E obj)                {element = obj;}
 
         @SideEffectFree
-        public @Immutable Iterator<E> iterator() {
+        public @Mutable Iterator<E> iterator() {
             return singletonIterator(element);
         }
 
@@ -5195,7 +5228,7 @@ public class Collections {
 
         @Pure
         @EnsuresNonEmptyIf(result = true, expression = "this")
-        public boolean contains(@UnknownSignedness Object obj) {return eq(obj, element);}
+        public boolean contains(@UnknownSignedness @Readonly Object obj) {return eq(obj, element);}
 
         public E get(int index) {
             if (index != 0)
@@ -5209,7 +5242,7 @@ public class Collections {
             action.accept(element);
         }
         @Override
-        public boolean removeIf(Predicate<? super E> filter) {
+        public boolean removeIf(@Readonly Predicate<? super E> filter) {
             throw new UnsupportedOperationException();
         }
         @Override
@@ -5304,7 +5337,7 @@ public class Collections {
         // Override default methods in Map
         @Override
         @Pure
-        public V getOrDefault(Object key, V defaultValue) {
+        public V getOrDefault(@Readonly Object key, V defaultValue) {
             return eq(key, k) ? v : defaultValue;
         }
 
@@ -5325,7 +5358,7 @@ public class Collections {
         }
 
         @Override
-        public boolean remove(@UnknownSignedness Object key, @UnknownSignedness Object value) {
+        public boolean remove(@UnknownSignedness @Readonly Object key, @UnknownSignedness @Readonly Object value) {
             throw new UnsupportedOperationException();
         }
 
@@ -5567,13 +5600,14 @@ public class Collections {
      * @see Comparable
      */
     @SuppressWarnings("unchecked")
-    public static <T> Comparator<T> reverseOrder() {
-        return (Comparator<T>) ReverseComparator.REVERSE_ORDER;
+    public static <T> @Immutable Comparator<T> reverseOrder() {
+        return (@Immutable Comparator<T>) ReverseComparator.REVERSE_ORDER;
     }
 
     /**
      * @serial include
      */
+    @Immutable // a stateless shared singleton
     private static class ReverseComparator
         implements Comparator<Comparable<Object>>, Serializable {
 
@@ -5588,7 +5622,7 @@ public class Collections {
         }
 
         @java.io.Serial
-        private Object readResolve() { return Collections.reverseOrder(); }
+        private @Immutable Object readResolve() { return Collections.reverseOrder(); }
 
         @Override
         public @Immutable Comparator<Comparable<Object>> reversed() {
@@ -5656,7 +5690,7 @@ public class Collections {
             return cmp.compare(t2, t1);
         }
 
-        public boolean equals(Object o) {
+        public boolean equals(@Readonly Object o) {
             return (o == this) ||
                 (o instanceof ReverseComparator2 &&
                  cmp.equals(((ReverseComparator2)o).cmp));
@@ -5687,9 +5721,9 @@ public class Collections {
      * @return an enumeration over the specified collection.
      * @see Enumeration
      */
-    public static <T> Enumeration<T> enumeration(final Collection<T> c) {
-        return new Enumeration<T>() {
-            private final Iterator<T> i = c.iterator();
+    public static <T> @Mutable Enumeration<T> enumeration(final @Readonly Collection<T> c) {
+        return new @Mutable Enumeration<T>() {
+            private final @Mutable Iterator<T> i = c.iterator();
 
             @EnsuresNonEmptyIf(result = true, expression = "this")
             public boolean hasMoreElements() {
@@ -5917,14 +5951,14 @@ public class Collections {
      * @since 1.6
      */
     @SideEffectFree
-    public static <E extends @Immutable Object> Set<E> newSetFromMap(Map<E, Boolean> map) {
+    public static <E extends @Readonly Object> Set<E> newSetFromMap(Map<E, Boolean> map) {
         return new SetFromMap<>(map);
     }
 
     /**
      * @serial include
      */
-    @ReceiverDependentMutable private static class SetFromMap<E extends @Immutable Object> extends AbstractSet<E>
+    @ReceiverDependentMutable private static class SetFromMap<E extends @Readonly Object> extends AbstractSet<E>
         implements Set<E>, Serializable
     {
         @SuppressWarnings("serial") // Conditionally serializable
@@ -5951,33 +5985,34 @@ public class Collections {
         @EnsuresNonEmpty("this")
         public boolean add(@Mutable SetFromMap<E> this, E e) { return m.put(e, Boolean.TRUE) == null; }
         @SideEffectFree
-        public Iterator<E> iterator(@Readonly SetFromMap<E> this)     { return s.iterator(); }
+        public @Mutable Iterator<E> iterator(@ReceiverDependentMutable SetFromMap<E> this)     { return s.iterator(); }
         @SideEffectFree
-        public @PolyNull @PolySigned @Immutable Object[] toArray(Collections.SetFromMap<@PolyNull @PolySigned E> this)         { return s.toArray(); }
+        @SuppressWarnings("mutability:override.return.invalid") // the elements are only @Readonly-bounded, so the precise return is @Readonly Object[], which an override of a @PolyMutable return cannot state
+        public @PolyNull @PolySigned @Readonly Object[] toArray(Collections.SetFromMap<@PolyNull @PolySigned E> this)         { return s.toArray(); }
         @SideEffectFree
         public <T> @Nullable T[] toArray(@PolyNull T[] a)     { return s.toArray(a); }
         public String toString(@Readonly SetFromMap<E> this)          { return s.toString(); }
         public int hashCode(@Readonly SetFromMap<E> this)             { return s.hashCode(); }
         public boolean equals(@Readonly SetFromMap<E> this, @Readonly Object o)   { return o == this || s.equals(o); }
         @Pure
-        public boolean containsAll(@Readonly SetFromMap<E> this, @Readonly Collection<? extends @UnknownSignedness Object> c) {return s.containsAll(c);}
-        public boolean removeAll(@Mutable SetFromMap<E> this, @Readonly Collection<? extends @UnknownSignedness Object> c)   {return s.removeAll(c);}
-        public boolean retainAll(@Mutable SetFromMap<E> this, Collection<? extends @UnknownSignedness Object> c)   {return s.retainAll(c);}
+        public boolean containsAll(@Readonly SetFromMap<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) {return s.containsAll(c);}
+        public boolean removeAll(@Mutable SetFromMap<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c)   {return s.removeAll(c);}
+        public boolean retainAll(@Mutable SetFromMap<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c)   {return s.retainAll(c);}
         // addAll is the only inherited implementation
 
         // Override default methods in Collection
         @Override
-        public void forEach(@Mutable SetFromMap<E> this, Consumer<? super E> action) {
+        public void forEach(@Readonly SetFromMap<E> this, Consumer<? super E> action) {
             s.forEach(action);
         }
         @Override
-        public boolean removeIf(@Mutable SetFromMap<E> this, Predicate<? super E> filter) {
+        public boolean removeIf(@Mutable SetFromMap<E> this, @Readonly Predicate<? super E> filter) {
             return s.removeIf(filter);
         }
 
         @SideEffectFree
         @Override
-        public Spliterator<E> spliterator(@Readonly SetFromMap<E> this) {return s.spliterator();}
+        public Spliterator<E> spliterator(@ReceiverDependentMutable SetFromMap<E> this) {return s.spliterator();}
         @Override
         public Stream<E> stream(@Readonly SetFromMap<E> this)           {return s.stream();}
         @Override
@@ -6013,8 +6048,9 @@ public class Collections {
      * @return the queue
      * @since  1.6
      */
-    public static <T> @Readonly @PolyGrowShrink @PolyNonEmpty Queue<T> asLifoQueue(@PolyGrowShrink @PolyNonEmpty Deque<T> deque) {
-        return new AsLIFOQueue<>(Objects.requireNonNull(deque));
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:mutability.lost.parameter", "mutability:type.arguments.not.inferred"}) // one poly: the argument and the created object are the same instantiation
+    public static <T> @PolyMutable @PolyGrowShrink @PolyNonEmpty Queue<T> asLifoQueue(@PolyMutable @PolyGrowShrink @PolyNonEmpty Deque<T> deque) {
+        return new @PolyMutable AsLIFOQueue<>(Objects.requireNonNull(deque));
     }
 
     /**
@@ -6046,9 +6082,9 @@ public class Collections {
         public boolean contains(@Readonly AsLIFOQueue<E> this, @UnknownSignedness @Readonly Object o)           { return q.contains(o); }
         public boolean remove(@Mutable AsLIFOQueue<E> this, @UnknownSignedness @Readonly Object o)             { return q.remove(o); }
         @SideEffectFree
-        public Iterator<E> iterator(@Readonly AsLIFOQueue<E> this)               { return q.iterator(); }
+        public @Mutable Iterator<E> iterator(@ReceiverDependentMutable AsLIFOQueue<E> this)               { return q.iterator(); }
         @SideEffectFree
-        @SuppressWarnings("mutability") // poly does not work on field's type argument
+        @SuppressWarnings("mutability:return.type.incompatible") // poly does not work on field's type argument
         public @PolyNull @PolySigned @PolyMutable Object[] toArray(Collections.AsLIFOQueue<@PolyNull @PolySigned @PolyMutable E> this)                   { return q.toArray(); }
         @SideEffectFree
         public <T> @Nullable T[] toArray(@PolyNull T[] a)               { return q.toArray(a); }
@@ -6062,9 +6098,9 @@ public class Collections {
 
         // Override default methods in Collection
         @Override
-        public void forEach(@Mutable AsLIFOQueue<E> this, Consumer<? super E> action) {q.forEach(action);}
+        public void forEach(@Readonly AsLIFOQueue<E> this, Consumer<? super E> action) {q.forEach(action);}
         @Override
-        public boolean removeIf(@Mutable AsLIFOQueue<E> this, Predicate<? super E> filter) {
+        public boolean removeIf(@Mutable AsLIFOQueue<E> this, @Readonly Predicate<? super E> filter) {
             return q.removeIf(filter);
         }
         @SideEffectFree

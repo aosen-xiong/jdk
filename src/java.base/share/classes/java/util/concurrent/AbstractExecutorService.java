@@ -35,6 +35,7 @@
 
 package java.util.concurrent;
 
+import org.checkerframework.checker.mutability.qual.Readonly;
 import org.checkerframework.checker.interning.qual.UsesObjectEquals;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
@@ -153,7 +154,7 @@ public abstract @UsesObjectEquals class AbstractExecutorService implements Execu
     /**
      * the main mechanics of invokeAny.
      */
-    private <T> T doInvokeAny(Collection<? extends Callable<T>> tasks,
+    private <T> T doInvokeAny(@Readonly Collection<? extends Callable<T>> tasks,
                               boolean timed, long nanos)
         throws InterruptedException, ExecutionException, TimeoutException {
         if (tasks == null)
@@ -223,7 +224,7 @@ public abstract @UsesObjectEquals class AbstractExecutorService implements Execu
         }
     }
 
-    public <T> T invokeAny(Collection<? extends Callable<T>> tasks)
+    public <T> T invokeAny(@Readonly Collection<? extends Callable<T>> tasks)
         throws InterruptedException, ExecutionException {
         try {
             return doInvokeAny(tasks, false, 0);
@@ -233,13 +234,13 @@ public abstract @UsesObjectEquals class AbstractExecutorService implements Execu
         }
     }
 
-    public <T> T invokeAny(Collection<? extends Callable<T>> tasks,
+    public <T> T invokeAny(@Readonly Collection<? extends Callable<T>> tasks,
                            long timeout, TimeUnit unit)
         throws InterruptedException, ExecutionException, TimeoutException {
         return doInvokeAny(tasks, true, unit.toNanos(timeout));
     }
 
-    public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks)
+    public <T> List<Future<T>> invokeAll(@Readonly Collection<? extends Callable<T>> tasks)
         throws InterruptedException {
         if (tasks == null)
             throw new NullPointerException();
@@ -264,7 +265,7 @@ public abstract @UsesObjectEquals class AbstractExecutorService implements Execu
         }
     }
 
-    public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks,
+    public <T> List<Future<T>> invokeAll(@Readonly Collection<? extends Callable<T>> tasks,
                                          long timeout, TimeUnit unit)
         throws InterruptedException {
         if (tasks == null)

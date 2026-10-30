@@ -28,6 +28,8 @@ package java.util;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nonempty.qual.EnsuresNonEmptyIf;
 import org.checkerframework.checker.nonempty.qual.NonEmpty;
+import org.checkerframework.checker.mutability.qual.Readonly;
+import org.checkerframework.checker.mutability.qual.Mutable;
 import org.checkerframework.checker.mutability.qual.ReceiverDependentMutable;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.framework.qual.AnnotatedFor;
@@ -80,7 +82,7 @@ public interface Enumeration<E> {
      */
     @Pure
     @EnsuresNonEmptyIf(result = true, expression = "this")
-    boolean hasMoreElements();
+    boolean hasMoreElements(@Readonly Enumeration<E> this);
 
     /**
      * Returns the next element of this enumeration if this enumeration
@@ -89,7 +91,7 @@ public interface Enumeration<E> {
      * @return     the next element of this enumeration.
      * @throws     NoSuchElementException  if no more elements exist.
      */
-    E nextElement(@GuardSatisfied @NonEmpty Enumeration<E> this);
+    E nextElement(@GuardSatisfied @NonEmpty @Mutable Enumeration<E> this);
 
     /**
      * Returns an {@link Iterator} that traverses the remaining elements
@@ -125,8 +127,8 @@ public interface Enumeration<E> {
      *
      * @since 9
      */
-    default Iterator<E> asIterator() {
-        return new Iterator<>() {
+    default Iterator<E> asIterator(@Mutable Enumeration<E> this) {
+        return new @Mutable Iterator<>() {
             @Pure
             @EnsuresNonEmptyIf(result = true, expression = "this")
             @Override public boolean hasNext() {

@@ -137,10 +137,10 @@ class ImmutableCollections {
     static class Access {
         static {
             SharedSecrets.setJavaUtilCollectionAccess(new JavaUtilCollectionAccess() {
-                public <E> @Immutable List<E> listFromTrustedArray(Object @Immutable [] array) {
+                public <E> @Immutable List<E> listFromTrustedArray(@Readonly Object @Readonly [] array) {
                     return ImmutableCollections.listFromTrustedArray(array);
                 }
-                public <E> @Immutable List<E> listFromTrustedArrayNullsAllowed(Object[] array) {
+                public <E> @Immutable List<E> listFromTrustedArrayNullsAllowed(@Readonly Object @Readonly [] array) {
                     return ImmutableCollections.listFromTrustedArrayNullsAllowed(array);
                 }
             });
@@ -165,12 +165,12 @@ class ImmutableCollections {
         @Override
         @EnsuresNonEmpty("this")
         public boolean add(E e) { throw uoe(); }
-        @Override public boolean addAll(Collection<? extends E> c) { throw uoe(); }
+        @Override public boolean addAll(@Readonly Collection<? extends E> c) { throw uoe(); }
         @Override public void    clear() { throw uoe(); }
         @Override public boolean remove(@UnknownSignedness @Readonly Object o) { throw uoe(); }
-        @Override public boolean removeAll(Collection<? extends @UnknownSignedness @Readonly Object> c) { throw uoe(); }
-        @Override public boolean removeIf(Predicate<? super E> filter) { throw uoe(); }
-        @Override public boolean retainAll(Collection<? extends @UnknownSignedness @Readonly Object> c) { throw uoe(); }
+        @Override public boolean removeAll(@Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) { throw uoe(); }
+        @Override public boolean removeIf(@Readonly Predicate<? super E> filter) { throw uoe(); }
+        @Override public boolean retainAll(@Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) { throw uoe(); }
     }
 
     // ---------- List Static Factory Methods ----------
@@ -258,7 +258,7 @@ class ImmutableCollections {
      * @return the new list
      */
     @SuppressWarnings("unchecked")
-    static <E> @Immutable List<E> listFromTrustedArrayNullsAllowed(Object... input) {
+    static <E> @Immutable List<E> listFromTrustedArrayNullsAllowed(@Readonly Object @Readonly... input) {
         assert input.getClass() == Object[].class;
         if (input.length == 0) {
             return (@Immutable List<E>) EMPTY_LIST_NULLS;
@@ -276,7 +276,7 @@ class ImmutableCollections {
 
         // all mutating methods throw UnsupportedOperationException
         @Override public void    add(int index, E element) { throw uoe(); }
-        @Override public boolean addAll(int index, Collection<? extends E> c) { throw uoe(); }
+        @Override public boolean addAll(int index, @Readonly Collection<? extends E> c) { throw uoe(); }
         @Override public E       remove(int index) { throw uoe(); }
         @Override public void    replaceAll(UnaryOperator<E> operator) { throw uoe(); }
         @Override public E       set(int index, E element) { throw uoe(); }
@@ -300,17 +300,17 @@ class ImmutableCollections {
         }
 
         @Override
-        public Iterator<E> iterator() {
-            return new ListItr<E>(this, size());
+        public @Mutable Iterator<E> iterator() {
+            return new @Mutable ListItr<E>(this, size());
         }
 
         @Override
-        public ListIterator<E> listIterator() {
+        public @Mutable ListIterator<E> listIterator() {
             return listIterator(0);
         }
 
         @Override
-        public ListIterator<E> listIterator(final int index) {
+        public @Mutable ListIterator<E> listIterator(final int index) {
             int size = size();
             if (index < 0 || index > size) {
                 throw outOfBounds(index);
@@ -358,7 +358,7 @@ class ImmutableCollections {
         }
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     static final class ListItr<E> implements ListIterator<E> {
 
         @Stable
@@ -495,13 +495,13 @@ class ImmutableCollections {
             return size;
         }
 
-        public Iterator<E> iterator() {
-            return new ListItr<>(this, size());
+        public @Mutable Iterator<E> iterator() {
+            return new @Mutable ListItr<>(this, size());
         }
 
-        public ListIterator<E> listIterator(int index) {
+        public @Mutable ListIterator<E> listIterator(int index) {
             rangeCheck(index);
-            return new ListItr<>(this, size(), index);
+            return new @Mutable ListItr<>(this, size(), index);
         }
 
         public @Immutable List<E> subList(int fromIndex, int toIndex) {
@@ -657,11 +657,12 @@ class ImmutableCollections {
         }
 
         @Override
-        public @Readonly Object[] toArray() {
+        @SuppressWarnings("mutability:array.initializer.type.incompatible") // e0 and e1 are this list's elements, of the receiver's @PolyMutable E, but a field read is typed by the declared E (e1 is declared Object to hold the EMPTY sentinel)
+        public @PolyMutable Object[] toArray(@Readonly List12<@PolyMutable E> this) {
             if (e1 == EMPTY) {
-                return new @Readonly Object[] { e0 };
+                return new @PolyMutable Object[] { e0 };
             } else {
-                return new @Readonly Object[] { e0, e1 };
+                return new @PolyMutable Object[] { e0, e1 };
             }
         }
 
@@ -728,12 +729,13 @@ class ImmutableCollections {
         }
 
         @Override
-        public @Readonly Object[] toArray() {
+        @SuppressWarnings({"mutability:type.arguments.not.inferred", "mutability:return.type.incompatible"}) // elements holds this list's elements, of the receiver's @PolyMutable E, but a field read is typed by the declared E
+        public @PolyMutable Object[] toArray(@Readonly ListN<@PolyMutable E> this) {
             return Arrays.copyOf(elements, elements.length);
         }
 
         @Override
-        @SuppressWarnings({"unchecked", "mutability:argument.type.incompatible"}) // getClass error
+        @SuppressWarnings("unchecked")
         public <T> @Nullable T[] toArray(@PolyNull T[] a) {
             int size = elements.length;
             if (a.length < size) {
@@ -859,8 +861,8 @@ class ImmutableCollections {
         }
 
         @Override
-        public Iterator<E> iterator() {
-            return new Iterator<E>() {
+        public @Mutable Iterator<E> iterator() {
+            return new @Mutable Iterator<E>() {
                 private int idx = (e1 == EMPTY) ? 1 : 2;
 
                 @Override
@@ -901,13 +903,14 @@ class ImmutableCollections {
         }
 
         @Override
-        public @Readonly Object[] toArray() {
+        @SuppressWarnings("mutability:array.initializer.type.incompatible") // e0 and e1 are this set's elements, of the receiver's @PolyMutable E, but a field read is typed by the declared E (e1 is declared Object to hold the EMPTY sentinel)
+        public @PolyMutable Object[] toArray(@Readonly Set12<@PolyMutable E> this) {
             if (e1 == EMPTY) {
-                return new @Readonly Object[] { e0 };
+                return new @PolyMutable Object[] { e0 };
             } else if (REVERSE) {
-                return new @Readonly Object[] { e1, e0 };
+                return new @PolyMutable Object[] { e1, e0 };
             } else {
-                return new @Readonly Object[] { e0, e1 };
+                return new @PolyMutable Object[] { e0, e1 };
             }
         }
 
@@ -952,7 +955,7 @@ class ImmutableCollections {
         final int size;
 
         @SafeVarargs
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({"unchecked", "mutability:illegal.array.write"}) // mutability: elements is filled only while this constructor builds the set, before it escapes
         SetN(E @Readonly... input) {
             size = input.length; // implicit nullcheck of input
 
@@ -1004,12 +1007,12 @@ class ImmutableCollections {
             @Override
             @Pure
             @EnsuresNonEmptyIf(result = true, expression = "this")
-            public boolean hasNext() {
+            public boolean hasNext(@Readonly SetNIterator this) {
                 return remaining > 0;
             }
 
             @Override
-            public E next(@NonEmpty SetNIterator this) {
+            public E next(@Readonly SetN<E>.@NonEmpty @Mutable SetNIterator this) {
                 if (remaining > 0) {
                     E element;
                     int idx = this.idx;
@@ -1036,8 +1039,8 @@ class ImmutableCollections {
         }
 
         @Override
-        public Iterator<E> iterator() {
-            return new SetNIterator();
+        public @Mutable Iterator<E> iterator(@Readonly SetN<E> this) {
+            return new @Mutable SetNIterator();
         }
 
         @Override
@@ -1087,9 +1090,9 @@ class ImmutableCollections {
         }
 
         @Override
-        public @Readonly Object[] toArray() {
-            @Readonly Object[] array = new Object[size];
-            Iterator<E> it = iterator();
+        public @PolyMutable Object[] toArray(@Readonly SetN<@PolyMutable E> this) {
+            @PolyMutable Object[] array = new @PolyMutable Object[size];
+            Iterator<@PolyMutable E> it = iterator();
             for (int i = 0; i < size; i++) {
                 array[i] = it.next();
             }
@@ -1123,10 +1126,10 @@ class ImmutableCollections {
         @Override public @PolyNull V computeIfPresent(K key, BiFunction<? super K,? super V,? extends @PolyNull V> rf) { throw uoe(); }
         @Override public @PolyNull V merge(K key, @NonNull V value, BiFunction<? super @NonNull V,? super @NonNull V,? extends @PolyNull V> rf) { throw uoe(); }
         @Override public V put(AbstractImmutableMap<K,V> this, K key, V value) { throw uoe(); }
-        @Override public void putAll(AbstractImmutableMap<K,V> this, Map<? extends K,? extends V> m) { throw uoe(); }
+        @Override public void putAll(AbstractImmutableMap<K,V> this, @Readonly Map<? extends K,? extends V> m) { throw uoe(); }
         @Override public V putIfAbsent(K key, V value) { throw uoe(); }
-        @Override public V remove(Object key) { throw uoe(); }
-        @Override public boolean remove(@UnknownSignedness Object key, @UnknownSignedness Object value) { throw uoe(); }
+        @Override public V remove(@Readonly Object key) { throw uoe(); }
+        @Override public boolean remove(@UnknownSignedness @Readonly Object key, @UnknownSignedness @Readonly Object value) { throw uoe(); }
         @Override public V replace(K key, V value) { throw uoe(); }
         @Override public boolean replace(K key, V oldValue, V newValue) { throw uoe(); }
         @Override public void replaceAll(BiFunction<? super K,? super V,? extends V> f) { throw uoe(); }
@@ -1138,7 +1141,7 @@ class ImmutableCollections {
          * value should be returned.
          */
         @Override
-        public V getOrDefault(Object key, V defaultValue) {
+        public V getOrDefault(@Readonly Object key, V defaultValue) {
             V v;
             return ((v = get(key)) != null)
                     ? v
@@ -1228,6 +1231,7 @@ class ImmutableCollections {
         @Stable
         final int size; // number of pairs
 
+        @SuppressWarnings("mutability:illegal.array.write") // table is filled only while this constructor builds the map, before it escapes
         MapN(@Readonly Object @Readonly... input) {
             if ((input.length & 1) != 0) { // implicit nullcheck of input
                 throw new InternalError("length is odd");
@@ -1288,7 +1292,7 @@ class ImmutableCollections {
 
         @Override
         @SuppressWarnings("unchecked")
-        public V get(Object o) {
+        public V get(@Readonly Object o) {
             if (size == 0) {
                 Objects.requireNonNull(o);
                 return null;
@@ -1329,11 +1333,11 @@ class ImmutableCollections {
             @Override
             @Pure
             @EnsuresNonEmptyIf(result = true, expression = "this")
-            public boolean hasNext() {
+            public boolean hasNext(@Readonly MapNIterator this) {
                 return remaining > 0;
             }
 
-            private int nextIndex() {
+            private int nextIndex(@Mutable MapNIterator this) {
                 int idx = this.idx;
                 if (REVERSE) {
                     if ((idx += 2) >= table.length) {
@@ -1348,7 +1352,7 @@ class ImmutableCollections {
             }
 
             @Override
-            public Map.@Immutable Entry<K,V> next(@NonEmpty MapNIterator this) {
+            public Map.@Immutable Entry<K,V> next(@Readonly MapN<K,V>.@NonEmpty @Mutable MapNIterator this) {
                 if (remaining > 0) {
                     int idx;
                     while (table[idx = nextIndex()] == null) {}
@@ -1365,8 +1369,9 @@ class ImmutableCollections {
 
         @Override
         @SideEffectFree
-        public Set<Map.@Immutable Entry<K,V>> entrySet() {
-            return new AbstractSet<>() {
+        @SuppressWarnings("mutability:return.type.incompatible") // the diamond infers Map.Entry with the default qualifier, not the target's @Immutable (https://github.com/eisop/checker-framework/issues/2271): KeyValueHolder entries are @Immutable
+        public @Immutable Set<Map.@Immutable Entry<K,V>> entrySet() {
+            return new @Immutable AbstractSet<>() {
                 @Override
                 @Pure
                 public int size() {
@@ -1374,8 +1379,9 @@ class ImmutableCollections {
                 }
 
                 @Override
-                public Iterator<Map.@Immutable Entry<K,V>> iterator() {
-                    return new MapNIterator();
+                @SuppressWarnings("mutability:override.return.invalid") // the diamond infers Map.Entry with the default qualifier, not the target's @Immutable (https://github.com/eisop/checker-framework/issues/2271): KeyValueHolder entries are @Immutable
+                public @Mutable Iterator<Map.@Immutable Entry<K,V>> iterator() {
+                    return new @Mutable MapNIterator();
                 }
             };
         }
@@ -1552,7 +1558,7 @@ final class CollSer implements Serializable {
      * @since 9
      */
     @java.io.Serial
-    @SuppressWarnings("mutability:argument.type.incompatible") // array component type
+    @SuppressWarnings({"mutability:argument.type.incompatible", "mutability:type.arguments.not.inferred"}) // array component type: the deserialized array holds @Readonly Objects, from which the @Immutable element and key bounds of Set.of and the maps cannot be recovered
     private @Immutable Object readResolve() throws ObjectStreamException {
         try {
             if (array == null) {

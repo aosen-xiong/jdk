@@ -100,9 +100,9 @@ public abstract class EnumSet<E extends Enum<E>> extends AbstractSet<E>
     /**
      * All of the values comprising E.  (Cached for performance.)
      */
-    final transient Enum<?>[] universe;
+    final transient Enum<?> @Readonly [] universe; // the enum class's shared constants array, never written
 
-    EnumSet(Class<E>elementType, Enum<?> @ReceiverDependentMutable [] universe) {
+    EnumSet(Class<E>elementType, Enum<?> @Readonly [] universe) {
         this.elementType = elementType;
         this.universe    = universe;
     }
@@ -397,7 +397,7 @@ public abstract class EnumSet<E extends Enum<E>> extends AbstractSet<E>
     /**
      * Complements the contents of this enum set.
      */
-    abstract void complement();
+    abstract void complement(@Mutable EnumSet<E> this);
 
     /**
      * Throws an exception if e is not of the correct type for this enum set.
@@ -412,7 +412,7 @@ public abstract class EnumSet<E extends Enum<E>> extends AbstractSet<E>
      * Returns all of the values comprising E.
      * The result is uncloned, cached, and shared by all callers.
      */
-    private static <E extends Enum<E>> E[] getUniverse(Class<E> elementType) {
+    private static <E extends Enum<E>> E @Readonly [] getUniverse(Class<E> elementType) {
         return SharedSecrets.getJavaLangAccess()
                                         .getEnumConstantsShared(elementType);
     }
@@ -446,7 +446,7 @@ public abstract class EnumSet<E extends Enum<E>> extends AbstractSet<E>
          */
         private final @Nullable Enum<?>[] elements;
 
-        SerializationProxy(EnumSet<E> set) {
+        SerializationProxy(@Readonly EnumSet<E> set) {
             elementType = set.elementType;
             elements = set.toArray(ZERO_LENGTH_ENUM_ARRAY);
         }
@@ -484,7 +484,7 @@ public abstract class EnumSet<E extends Enum<E>> extends AbstractSet<E>
      * representing the state of this instance
      */
     @java.io.Serial
-    Object writeReplace(@Mutable EnumSet<E> this) {
+    Object writeReplace(@Readonly EnumSet<E> this) {
         return new SerializationProxy<>(this);
     }
 

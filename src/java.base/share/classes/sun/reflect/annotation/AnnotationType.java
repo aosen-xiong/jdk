@@ -196,7 +196,7 @@ public class AnnotationType {
      * Returns member types for this annotation type
      * (member name {@literal ->} type mapping).
      */
-    public Map<String, Class<?>> memberTypes() {
+    public @Immutable Map<String, Class<?>> memberTypes() {
         return memberTypes;
     }
 
@@ -204,7 +204,7 @@ public class AnnotationType {
      * Returns members of this annotation type
      * (member name {@literal ->} associated Method object mapping).
      */
-    public Map<String, Method> members() {
+    public @Immutable Map<String, Method> members() {
         return members;
     }
 
@@ -212,7 +212,7 @@ public class AnnotationType {
      * Returns the default values for this annotation type
      * (Member name {@literal ->} default value mapping).
      */
-    public Map<String, Object> memberDefaults() {
+    public @Immutable Map<String, @Readonly Object> memberDefaults() {
         return memberDefaults;
     }
 

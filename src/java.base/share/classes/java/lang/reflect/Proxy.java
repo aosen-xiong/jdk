@@ -27,6 +27,7 @@ package java.lang.reflect;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.framework.qual.AnnotatedFor;
+import org.checkerframework.checker.mutability.qual.Readonly;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -1130,7 +1131,7 @@ public class Proxy implements java.io.Serializable {
      */
     @SuppressWarnings("removal")
     @CallerSensitive
-    public static InvocationHandler getInvocationHandler(Object proxy)
+    public static InvocationHandler getInvocationHandler(@Readonly Object proxy)
         throws IllegalArgumentException
     {
         /*

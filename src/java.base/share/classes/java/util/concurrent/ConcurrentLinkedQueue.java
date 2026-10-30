@@ -35,6 +35,7 @@
 
 package java.util.concurrent;
 
+import org.checkerframework.checker.mutability.qual.Readonly;
 import org.checkerframework.checker.index.qual.PolyGrowShrink;
 import org.checkerframework.checker.index.qual.CanShrink;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
@@ -272,7 +273,7 @@ public class ConcurrentLinkedQueue<E extends @NonNull Object> extends AbstractQu
      * @throws NullPointerException if the specified collection or any
      *         of its elements are null
      */
-    public ConcurrentLinkedQueue(Collection<? extends E> c) {
+    public ConcurrentLinkedQueue(@Readonly Collection<? extends E> c) {
         Node<E> h = null, t = null;
         for (E e : c) {
             Node<E> newNode = new Node<E>(Objects.requireNonNull(e));
@@ -990,7 +991,7 @@ public class ConcurrentLinkedQueue<E extends @NonNull Object> extends AbstractQu
     /**
      * @throws NullPointerException {@inheritDoc}
      */
-    public boolean removeIf(@CanShrink ConcurrentLinkedQueue<E> this, Predicate<? super E> filter) {
+    public boolean removeIf(@CanShrink ConcurrentLinkedQueue<E> this, @Readonly Predicate<? super E> filter) {
         Objects.requireNonNull(filter);
         return bulkRemove(filter);
     }
@@ -1022,7 +1023,7 @@ public class ConcurrentLinkedQueue<E extends @NonNull Object> extends AbstractQu
     private static final int MAX_HOPS = 8;
 
     /** Implementation of bulk remove methods. */
-    private boolean bulkRemove(Predicate<? super E> filter) {
+    private boolean bulkRemove(@Readonly Predicate<? super E> filter) {
         boolean removed = false;
         restartFromHead: for (;;) {
             int hops = MAX_HOPS;

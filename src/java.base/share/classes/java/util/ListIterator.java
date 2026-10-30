@@ -122,7 +122,7 @@ public interface ListIterator<E> extends Iterator<E> {
      * @throws NoSuchElementException if the iteration has no previous
      *         element
      */
-    E previous(@GuardSatisfied @Readonly ListIterator<E> this);
+    E previous(@GuardSatisfied @Mutable ListIterator<E> this);
 
     /**
      * Returns the index of the element that would be returned by a

@@ -25,6 +25,7 @@
 
 package java.util;
 
+import org.checkerframework.checker.mutability.qual.Readonly;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.checkerframework.checker.index.qual.PolyGrowShrink;
 import org.checkerframework.checker.index.qual.Positive;
@@ -37,7 +38,9 @@ import org.checkerframework.checker.nonempty.qual.PolyNonEmpty;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
+import org.checkerframework.checker.mutability.qual.ReceiverDependentMutable;
 import org.checkerframework.checker.mutability.qual.Mutable;
+import org.checkerframework.checker.mutability.qual.Immutable;
 import org.checkerframework.checker.signedness.qual.PolySigned;
 import org.checkerframework.checker.signedness.qual.UnknownSignedness;
 import org.checkerframework.dataflow.qual.Pure;
@@ -106,7 +109,7 @@ import jdk.internal.util.ArraysSupport;
 @CFComment({"lock/nullness: This class doesn't permits null elements"})
 @AnnotatedFor({"lock", "nullness", "index"})
 @SuppressWarnings({"unchecked", "mutability"}) // Not interesting class, fix later
-public class PriorityQueue<E extends @NonNull Object> extends AbstractQueue<E>
+public class PriorityQueue<E extends @NonNull @Immutable Object> extends AbstractQueue<E>
     implements java.io.Serializable {
 
     @java.io.Serial
@@ -214,7 +217,7 @@ public class PriorityQueue<E extends @NonNull Object> extends AbstractQueue<E>
      * @throws NullPointerException if the specified collection or any
      *         of its elements are null
      */
-    public @PolyNonEmpty PriorityQueue(@PolyNonEmpty Collection<? extends E> c) {
+    public @PolyNonEmpty PriorityQueue(@PolyNonEmpty @Readonly Collection<? extends E> c) {
         if (c instanceof SortedSet<?>) {
             SortedSet<? extends E> ss = (SortedSet<? extends E>) c;
             this.comparator = (Comparator<? super E>) ss.comparator();
@@ -245,7 +248,7 @@ public class PriorityQueue<E extends @NonNull Object> extends AbstractQueue<E>
      * @throws NullPointerException if the specified priority queue or any
      *         of its elements are null
      */
-    public PriorityQueue(PriorityQueue<? extends E> c) {
+    public PriorityQueue(@Readonly PriorityQueue<? extends E> c) {
         this.comparator = (Comparator<? super E>) c.comparator();
         initFromPriorityQueue(c);
     }
@@ -263,7 +266,7 @@ public class PriorityQueue<E extends @NonNull Object> extends AbstractQueue<E>
      * @throws NullPointerException if the specified sorted set or any
      *         of its elements are null
      */
-    public PriorityQueue(SortedSet<? extends E> c) {
+    public PriorityQueue(@Readonly SortedSet<? extends E> c) {
         this.comparator = (Comparator<? super E>) c.comparator();
         initElementsFromCollection(c);
     }
@@ -493,7 +496,7 @@ public class PriorityQueue<E extends @NonNull Object> extends AbstractQueue<E>
      * @return an iterator over the elements in this queue
      */
     @SideEffectFree
-    public @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@PolyGrowShrink @PolyNonEmpty PriorityQueue<E> this) {
+    public @Mutable @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty PriorityQueue<E> this) {
         return new Itr();
     }
 
@@ -923,7 +926,7 @@ public class PriorityQueue<E extends @NonNull Object> extends AbstractQueue<E>
     /**
      * @throws NullPointerException {@inheritDoc}
      */
-    public boolean removeIf(@GuardSatisfied @CanShrink PriorityQueue<E> this, Predicate<? super E> filter) {
+    public boolean removeIf(@GuardSatisfied @CanShrink PriorityQueue<E> this, @Readonly Predicate<? super E> filter) {
         Objects.requireNonNull(filter);
         return bulkRemove(filter);
     }
@@ -957,7 +960,7 @@ public class PriorityQueue<E extends @NonNull Object> extends AbstractQueue<E>
     }
 
     /** Implementation of bulk remove methods. */
-    private boolean bulkRemove(Predicate<? super E> filter) {
+    private boolean bulkRemove(@Readonly Predicate<? super E> filter) {
         final int expectedModCount = ++modCount;
         final Object[] es = queue;
         final int end = size;

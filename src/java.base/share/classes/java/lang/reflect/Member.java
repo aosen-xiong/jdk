@@ -25,6 +25,10 @@
 
 package java.lang.reflect;
 
+import org.checkerframework.checker.mutability.qual.Readonly;
+import org.checkerframework.checker.mutability.qual.ReceiverDependentMutable;
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 /**
  * Member is an interface that reflects identifying information about
  * a single member (a field or a method) or a constructor.
@@ -37,6 +41,8 @@ package java.lang.reflect;
  * @author Nakul Saraiya
  * @since 1.1
  */
+@AnnotatedFor("mutability")
+@ReceiverDependentMutable
 public interface Member {
 
     /**
@@ -58,7 +64,7 @@ public interface Member {
      * @return an object representing the declaring class of the
      * underlying member
      */
-    public Class<?> getDeclaringClass();
+    public Class<?> getDeclaringClass(@Readonly Member this);
 
     /**
      * Returns the simple name of the underlying member or constructor
@@ -66,7 +72,7 @@ public interface Member {
      *
      * @return the simple name of the underlying member
      */
-    public String getName();
+    public String getName(@Readonly Member this);
 
     /**
      * Returns the Java language modifiers for the member or
@@ -77,7 +83,7 @@ public interface Member {
      * @return the Java language modifiers for the underlying member
      * @see Modifier
      */
-    public int getModifiers();
+    public int getModifiers(@Readonly Member this);
 
     /**
      * Returns {@code true} if this member was introduced by
@@ -88,5 +94,5 @@ public interface Member {
      * @jls 13.1 The Form of a Binary
      * @since 1.5
      */
-    public boolean isSynthetic();
+    public boolean isSynthetic(@Readonly Member this);
 }

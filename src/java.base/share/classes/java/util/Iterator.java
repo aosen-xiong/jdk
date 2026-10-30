@@ -118,6 +118,13 @@ public interface Iterator<E> {
      *         been called after the last call to the {@code next}
      *         method
      */
+    // Mutability: an iterator is a @Mutable cursor whose position is its own abstract state, so
+    // next() needs a @Mutable iterator. remove() also writes the collection the iterator came from.
+    // An implementation states that in its enclosing type, as in
+    // remove(@Mutable ArrayList<E>.@Mutable Itr this), but Iterator<E> cannot name the collection,
+    // and qualifiers on enclosing types are not yet checked
+    // (https://github.com/eisop/checker-framework/issues/2322). So remove() through an iterator
+    // over a non-mutable collection is not rejected here.
     default void remove(@Mutable @GuardSatisfied @CanShrink Iterator<E> this) {
         throw new UnsupportedOperationException("remove");
     }

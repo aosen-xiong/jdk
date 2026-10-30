@@ -69,7 +69,7 @@ public @UsesObjectEquals class AtomicInteger extends Number implements java.io.S
     private static final long VALUE
         = U.objectFieldOffset(AtomicInteger.class, "value");
 
-    private volatile @Assignable int value;
+    private volatile int value;
 
     /**
      * Creates a new AtomicInteger with the given initial value.

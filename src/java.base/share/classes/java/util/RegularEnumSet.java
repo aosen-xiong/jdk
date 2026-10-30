@@ -35,6 +35,7 @@ import org.checkerframework.checker.nonempty.qual.PolyNonEmpty;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.mutability.qual.Assignable;
 import org.checkerframework.checker.mutability.qual.Mutable;
 import org.checkerframework.checker.mutability.qual.Readonly;
 import org.checkerframework.checker.mutability.qual.ReceiverDependentMutable;
@@ -62,7 +63,7 @@ class RegularEnumSet<E extends Enum<E>> extends EnumSet<E> {
      */
     private long elements = 0L;
 
-    RegularEnumSet(Class<E>elementType, Enum<?> @ReceiverDependentMutable [] universe) {
+    RegularEnumSet(Class<E>elementType, Enum<?> @Readonly [] universe) {
         super(elementType, universe);
     }
 
@@ -92,11 +93,11 @@ class RegularEnumSet<E extends Enum<E>> extends EnumSet<E> {
      *
      * @return an iterator over the elements contained in this set
      */
-    public @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@Readonly @PolyGrowShrink @PolyNonEmpty RegularEnumSet<E> this) {
-        return new EnumSetIterator<>();
+    public @Mutable @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@ReceiverDependentMutable @PolyGrowShrink @PolyNonEmpty RegularEnumSet<E> this) {
+        return new @Mutable EnumSetIterator<>();
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     private class EnumSetIterator<E extends Enum<E>> implements Iterator<E> {
         /**
          * A bit vector representing the elements in the set not yet
@@ -225,7 +226,7 @@ class RegularEnumSet<E extends Enum<E>> extends EnumSet<E> {
      * @throws NullPointerException if the specified collection is null
      */
     @Pure
-    public boolean containsAll(@Readonly RegularEnumSet<E> this, Collection<? extends @UnknownSignedness @Readonly Object> c) {
+    public boolean containsAll(@Readonly RegularEnumSet<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) {
         if (!(c instanceof RegularEnumSet<?> es))
             return super.containsAll(c);
 
@@ -268,7 +269,7 @@ class RegularEnumSet<E extends Enum<E>> extends EnumSet<E> {
      * @return {@code true} if this set changed as a result of the call
      * @throws NullPointerException if the specified collection is null
      */
-    public boolean removeAll(@Mutable RegularEnumSet<E> this, Collection<? extends @UnknownSignedness @Readonly Object> c) {
+    public boolean removeAll(@Mutable RegularEnumSet<E> this, @Readonly Collection<? extends @UnknownSignedness @Readonly Object> c) {
         if (!(c instanceof RegularEnumSet<?> es))
             return super.removeAll(c);
 

@@ -1680,7 +1680,8 @@ public
         // Get a snapshot of the list of all threads
         Thread[] threads = getThreads();
         StackTraceElement[][] traces = dumpThreads(threads);
-        Map<@Immutable Thread, StackTraceElement[]> m = new HashMap<>(threads.length);
+        @SuppressWarnings({"mutability:type.argument.type.incompatible", "mutability:type.arguments.not.inferred"}) // key type uses identity equals/hashCode
+        Map<Thread, StackTraceElement[]> m = new HashMap<>(threads.length);
         for (int i = 0; i < threads.length; i++) {
             StackTraceElement[] stackTrace = traces[i];
             if (stackTrace != null) {

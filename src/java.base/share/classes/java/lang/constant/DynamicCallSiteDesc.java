@@ -30,6 +30,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Stream;
+import org.checkerframework.checker.mutability.qual.Readonly;
 
 import static java.lang.constant.ConstantDescs.CD_String;
 import static java.lang.constant.ConstantUtils.EMPTY_CONSTANTDESC;
@@ -256,7 +257,7 @@ public class DynamicCallSiteDesc {
      *      is equal to this {@code DynamicCallSiteDesc}.
      */
     @Override
-    public final boolean equals(Object o) {
+    public final boolean equals(@Readonly Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DynamicCallSiteDesc specifier = (DynamicCallSiteDesc) o;

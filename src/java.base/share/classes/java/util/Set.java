@@ -186,7 +186,7 @@ public interface Set<E> extends Collection<E> {
      * @return an iterator over the elements in this set
      */
     @SideEffectFree
-    @PolyGrowShrink @PolyNonEmpty Iterator<E> iterator(@PolyGrowShrink @PolyNonEmpty @Readonly Set<E> this);
+    @PolyNonEmpty @Mutable @PolyGrowShrink Iterator<E> iterator(@PolyNonEmpty @ReceiverDependentMutable @PolyGrowShrink Set<E> this);
 
     /**
      * Returns an array containing all of the elements in this set.
@@ -475,7 +475,7 @@ public interface Set<E> extends Collection<E> {
      * @since 1.8
      */
     @Override
-    default Spliterator<E> spliterator(@Readonly Set<E> this) {
+    default Spliterator<E> spliterator(@ReceiverDependentMutable Set<E> this) {
         return Spliterators.spliterator(this, Spliterator.DISTINCT);
     }
 
@@ -504,7 +504,7 @@ public interface Set<E> extends Collection<E> {
      *
      * @since 9
      */
-    static <E extends @Readonly Object> @NonEmpty @Immutable Set<E> of(E e1) {
+    static <E extends @Immutable Object> @NonEmpty @Immutable Set<E> of(E e1) {
         return new ImmutableCollections.Set12<>(e1);
     }
 
@@ -521,7 +521,7 @@ public interface Set<E> extends Collection<E> {
      *
      * @since 9
      */
-    static <E extends @Readonly Object> @NonEmpty @Immutable Set<E> of(E e1, E e2) {
+    static <E extends @Immutable Object> @NonEmpty @Immutable Set<E> of(E e1, E e2) {
         return new ImmutableCollections.Set12<>(e1, e2);
     }
 
@@ -539,7 +539,7 @@ public interface Set<E> extends Collection<E> {
      *
      * @since 9
      */
-    static <E extends @Readonly Object> @NonEmpty @Immutable Set<E> of(E e1, E e2, E e3) {
+    static <E extends @Immutable Object> @NonEmpty @Immutable Set<E> of(E e1, E e2, E e3) {
         return new ImmutableCollections.SetN<>(e1, e2, e3);
     }
 
@@ -558,7 +558,7 @@ public interface Set<E> extends Collection<E> {
      *
      * @since 9
      */
-    static <E extends @Readonly Object> @NonEmpty @Immutable Set<E> of(E e1, E e2, E e3, E e4) {
+    static <E extends @Immutable Object> @NonEmpty @Immutable Set<E> of(E e1, E e2, E e3, E e4) {
         return new ImmutableCollections.SetN<>(e1, e2, e3, e4);
     }
 
@@ -578,7 +578,7 @@ public interface Set<E> extends Collection<E> {
      *
      * @since 9
      */
-    static <E extends @Readonly Object> @NonEmpty @Immutable Set<E> of(E e1, E e2, E e3, E e4, E e5) {
+    static <E extends @Immutable Object> @NonEmpty @Immutable Set<E> of(E e1, E e2, E e3, E e4, E e5) {
         return new ImmutableCollections.SetN<>(e1, e2, e3, e4, e5);
     }
 
@@ -599,7 +599,7 @@ public interface Set<E> extends Collection<E> {
      *
      * @since 9
      */
-    static <E extends @Readonly Object> @NonEmpty @Immutable Set<E> of(E e1, E e2, E e3, E e4, E e5, E e6) {
+    static <E extends @Immutable Object> @NonEmpty @Immutable Set<E> of(E e1, E e2, E e3, E e4, E e5, E e6) {
         return new ImmutableCollections.SetN<>(e1, e2, e3, e4, e5,
                                                e6);
     }
@@ -622,7 +622,7 @@ public interface Set<E> extends Collection<E> {
      *
      * @since 9
      */
-    static <E extends @Readonly Object> @NonEmpty @Immutable Set<E> of(E e1, E e2, E e3, E e4, E e5, E e6, E e7) {
+    static <E extends @Immutable Object> @NonEmpty @Immutable Set<E> of(E e1, E e2, E e3, E e4, E e5, E e6, E e7) {
         return new ImmutableCollections.SetN<>(e1, e2, e3, e4, e5,
                                                e6, e7);
     }
@@ -646,7 +646,7 @@ public interface Set<E> extends Collection<E> {
      *
      * @since 9
      */
-    static <E extends @Readonly Object> @NonEmpty @Immutable Set<E> of(E e1, E e2, E e3, E e4, E e5, E e6, E e7, E e8) {
+    static <E extends @Immutable Object> @NonEmpty @Immutable Set<E> of(E e1, E e2, E e3, E e4, E e5, E e6, E e7, E e8) {
         return new ImmutableCollections.SetN<>(e1, e2, e3, e4, e5,
                                                e6, e7, e8);
     }
@@ -671,7 +671,7 @@ public interface Set<E> extends Collection<E> {
      *
      * @since 9
      */
-    static <E extends @Readonly Object> @NonEmpty @Immutable Set<E> of(E e1, E e2, E e3, E e4, E e5, E e6, E e7, E e8, E e9) {
+    static <E extends @Immutable Object> @NonEmpty @Immutable Set<E> of(E e1, E e2, E e3, E e4, E e5, E e6, E e7, E e8, E e9) {
         return new ImmutableCollections.SetN<>(e1, e2, e3, e4, e5,
                                                e6, e7, e8, e9);
     }
@@ -697,7 +697,7 @@ public interface Set<E> extends Collection<E> {
      *
      * @since 9
      */
-    static <E extends @Readonly Object> @NonEmpty @Immutable Set<E> of(E e1, E e2, E e3, E e4, E e5, E e6, E e7, E e8, E e9, E e10) {
+    static <E extends @Immutable Object> @NonEmpty @Immutable Set<E> of(E e1, E e2, E e3, E e4, E e5, E e6, E e7, E e8, E e9, E e10) {
         return new ImmutableCollections.SetN<>(e1, e2, e3, e4, e5,
                                                e6, e7, e8, e9, e10);
     }
@@ -730,7 +730,7 @@ public interface Set<E> extends Collection<E> {
      */
     @SafeVarargs
     @SuppressWarnings("varargs")
-    static <E extends @Readonly Object> @Immutable Set<E> of(E @Readonly... elements) {
+    static <E extends @Immutable Object> @Immutable Set<E> of(E @Readonly... elements) {
         switch (elements.length) { // implicit null check of elements
             case 0:
                 @SuppressWarnings("unchecked")

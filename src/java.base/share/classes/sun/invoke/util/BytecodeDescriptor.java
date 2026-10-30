@@ -28,6 +28,7 @@ package sun.invoke.util;
 import java.lang.invoke.MethodType;
 import java.util.ArrayList;
 import java.util.List;
+import org.checkerframework.checker.mutability.qual.Readonly;
 
 /**
  * Utility routines for dealing with bytecode-level signatures.
@@ -135,7 +136,7 @@ public class BytecodeDescriptor {
         return sb.toString();
     }
 
-    public static String unparseMethod(Class<?> rtype, Class<?>[] ptypes) {
+    public static String unparseMethod(Class<?> rtype, Class<?> @Readonly [] ptypes) {
         StringBuilder sb = new StringBuilder();
         sb.append('(');
         for (Class<?> pt : ptypes)

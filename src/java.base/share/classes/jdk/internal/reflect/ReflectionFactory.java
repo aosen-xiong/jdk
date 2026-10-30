@@ -339,7 +339,7 @@ public class ReflectionFactory {
         return langReflectAccess.getExecutableTypeAnnotationBytes(ex);
     }
 
-    public Class<?>[] getExecutableSharedParameterTypes(@Readonly Executable ex) {
+    public Class<?> @Readonly [] getExecutableSharedParameterTypes(@Readonly Executable ex) {
         return langReflectAccess.getExecutableSharedParameterTypes(ex);
     }
 

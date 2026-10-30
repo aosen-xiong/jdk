@@ -30,6 +30,7 @@ import org.checkerframework.framework.qual.AnnotatedFor;
 
 import jdk.internal.reflect.MethodAccessor;
 import jdk.internal.reflect.ConstructorAccessor;
+import org.checkerframework.checker.mutability.qual.Readonly;
 
 /** Package-private class implementing the
     jdk.internal.access.JavaLangReflectAccess interface, allowing the java.lang
@@ -94,7 +95,7 @@ import jdk.internal.reflect.ConstructorAccessor;
         return ex.getTypeAnnotationBytes();
     }
 
-    public Class<?>[] getExecutableSharedParameterTypes(Executable ex) {
+    public Class<?> @Readonly [] getExecutableSharedParameterTypes(Executable ex) {
         return ex.getSharedParameterTypes();
     }
 

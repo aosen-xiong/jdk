@@ -27,6 +27,7 @@ package java.lang.constant;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import org.checkerframework.checker.mutability.qual.Immutable;
 
 import static java.lang.constant.ConstantDescs.BSM_INVOKE;
 import static java.lang.constant.ConstantDescs.CD_MethodHandle;
@@ -37,6 +38,7 @@ import static java.util.Objects.requireNonNull;
  * {@link MethodHandle} constant that performs a {@link MethodHandle#asType(MethodType)}
  * adaptation on another {@link MethodHandle}.
  */
+@Immutable
 final class AsTypeMethodHandleDesc extends DynamicConstantDesc<MethodHandle>
         implements MethodHandleDesc {
 

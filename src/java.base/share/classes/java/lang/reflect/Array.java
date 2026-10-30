@@ -35,6 +35,7 @@ import org.checkerframework.framework.qual.CFComment;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.framework.qual.AnnotatedFor;
+import org.checkerframework.checker.mutability.qual.Readonly;
 
 import jdk.internal.vm.annotation.IntrinsicCandidate;
 
@@ -139,7 +140,7 @@ public final
     @Pure
     @IntrinsicCandidate
     @StaticallyExecutable
-    public static native @LengthOf({"#1"}) int getLength(Object array)
+    public static native @LengthOf({"#1"}) int getLength(@Readonly Object array)
         throws IllegalArgumentException;
 
     /**

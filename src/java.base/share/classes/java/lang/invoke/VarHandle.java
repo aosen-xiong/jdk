@@ -47,6 +47,7 @@ import jdk.internal.vm.annotation.DontInline;
 import jdk.internal.vm.annotation.ForceInline;
 import jdk.internal.vm.annotation.IntrinsicCandidate;
 import jdk.internal.vm.annotation.Stable;
+import org.checkerframework.checker.mutability.qual.Immutable;
 
 import static java.lang.invoke.MethodHandleStatics.UNSAFE;
 
@@ -2269,6 +2270,7 @@ public abstract class VarHandle implements Constable {
      *
      * @since 12
      */
+    @Immutable
     public static final class VarHandleDesc extends DynamicConstantDesc<VarHandle> {
 
         /**

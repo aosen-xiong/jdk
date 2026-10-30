@@ -277,7 +277,7 @@ public class WeakHashMap<K extends @Immutable Object,V>
      * @since   1.3
      */
     @SuppressWarnings("mutability") // PICO constructor fix
-    public @PolyNonEmpty WeakHashMap(@PolyNonEmpty Map<? extends K, ? extends V> m) {
+    public @PolyNonEmpty WeakHashMap(@PolyNonEmpty @Readonly Map<? extends K, ? extends V> m) {
         this(Math.max((int) ((float)m.size() / DEFAULT_LOAD_FACTOR + 1.0F),
                 DEFAULT_INITIAL_CAPACITY),
              DEFAULT_LOAD_FACTOR);
@@ -796,7 +796,7 @@ public class WeakHashMap<K extends @Immutable Object,V>
         }
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     private abstract class HashIterator<T> implements Iterator<T> {
         private int index;
         private Entry<K,V> entry;
@@ -870,23 +870,24 @@ public class WeakHashMap<K extends @Immutable Object,V>
 
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     private class ValueIterator extends HashIterator<V> {
         public V next(@NonEmpty @Mutable ValueIterator this) {
             return nextEntry().value;
         }
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     private class KeyIterator extends HashIterator<K> {
         public K next(@NonEmpty @Mutable KeyIterator this) {
             return nextEntry().getKey();
         }
     }
 
-    @ReceiverDependentMutable
-    private class EntryIterator extends HashIterator<Map.Entry<K,V>> {
-        public Map.Entry<K,V> next(@NonEmpty @Mutable EntryIterator this) {
+    @Mutable
+    private class EntryIterator extends HashIterator<Map.@ReceiverDependentMutable Entry<K,V>> {
+        @SuppressWarnings({"mutability:return.type.incompatible", "mutability:override.return.invalid"}) // the entries have the enclosing map's mutability, but the cursor reads them through the @Readonly enclosing map, and in the iterator's supertype a receiver-dependent qualifier is relative to the iterator, a fresh @Mutable cursor. There is no qualifier relative to the enclosing instance: https://github.com/eisop/checker-framework/issues/2322
+        public Map.@ReceiverDependentMutable Entry<K,V> next(@NonEmpty @Mutable EntryIterator this) {
             return nextEntry();
         }
     }
@@ -909,10 +910,10 @@ public class WeakHashMap<K extends @Immutable Object,V>
      * operations.
      */
     @SideEffectFree
-    public @PolyMutable Set<@KeyFor({"this"}) K> keySet(@GuardSatisfied @PolyMutable WeakHashMap<K, V> this) {
+    public @ReceiverDependentMutable Set<@KeyFor({"this"}) K> keySet(@GuardSatisfied @ReceiverDependentMutable WeakHashMap<K, V> this) {
         Set<K> ks = keySet;
         if (ks == null) {
-            ks = new @PolyMutable KeySet();
+            ks = new @ReceiverDependentMutable KeySet();
             keySet = ks;
         }
         return ks;
@@ -921,7 +922,7 @@ public class WeakHashMap<K extends @Immutable Object,V>
     @ReceiverDependentMutable
     private class KeySet extends AbstractSet<K> {
         @SideEffectFree
-        public Iterator<K> iterator(@Readonly KeySet this) {
+        public @Mutable Iterator<K> iterator(@ReceiverDependentMutable KeySet this) {
             return new KeyIterator();
         }
 
@@ -950,7 +951,7 @@ public class WeakHashMap<K extends @Immutable Object,V>
         }
 
         @SideEffectFree
-        public Spliterator<K> spliterator(@Readonly KeySet this) {
+        public Spliterator<K> spliterator(@ReceiverDependentMutable KeySet this) {
             return new KeySpliterator<>(WeakHashMap.this, 0, -1, 0, 0);
         }
     }
@@ -969,10 +970,10 @@ public class WeakHashMap<K extends @Immutable Object,V>
      * support the {@code add} or {@code addAll} operations.
      */
     @SideEffectFree
-    public @PolyMutable Collection<V> values(@GuardSatisfied @PolyMutable WeakHashMap<K, V> this) {
+    public @ReceiverDependentMutable Collection<V> values(@GuardSatisfied @ReceiverDependentMutable WeakHashMap<K, V> this) {
         Collection<V> vs = values;
         if (vs == null) {
-            vs = new Values();
+            vs = new @ReceiverDependentMutable Values();
             values = vs;
         }
         return vs;
@@ -981,7 +982,7 @@ public class WeakHashMap<K extends @Immutable Object,V>
     @ReceiverDependentMutable
     private class Values extends AbstractCollection<V> {
         @SideEffectFree
-        public Iterator<V> iterator(@Readonly Values this) {
+        public @Mutable Iterator<V> iterator(@ReceiverDependentMutable Values this) {
             return new ValueIterator();
         }
 
@@ -1021,15 +1022,16 @@ public class WeakHashMap<K extends @Immutable Object,V>
      * {@code add} or {@code addAll} operations.
      */
     @SideEffectFree
-    public @PolyMutable Set<Map.@PolyMutable Entry<@KeyFor({"this"}) K,V>> entrySet(@GuardSatisfied @PolyMutable WeakHashMap<K, V> this) {
+    public @ReceiverDependentMutable Set<Map.@ReceiverDependentMutable Entry<@KeyFor({"this"}) K,V>> entrySet(@GuardSatisfied @ReceiverDependentMutable WeakHashMap<K, V> this) {
         Set<Map.Entry<K,V>> es = entrySet;
-        return es != null ? es : (entrySet = new EntrySet());
+        return es != null ? es : (entrySet = new @ReceiverDependentMutable EntrySet());
     }
 
     @ReceiverDependentMutable
-    private class EntrySet extends AbstractSet<Map.@Readonly Entry<K,V>> {
+    private class EntrySet extends AbstractSet<Map.@ReceiverDependentMutable Entry<K,V>> {
         @SideEffectFree
-        public Iterator<Map.@Readonly Entry<K,V>> iterator(@Readonly EntrySet this) {
+        @SuppressWarnings("mutability:return.type.incompatible") // the entries have the enclosing map's mutability, but in the iterator class's supertype a receiver-dependent qualifier is relative to the iterator, which is a fresh @Mutable cursor. There is no qualifier relative to the enclosing instance: https://github.com/eisop/checker-framework/issues/2322
+        public @Mutable Iterator<Map.@ReceiverDependentMutable Entry<K,V>> iterator(@ReceiverDependentMutable EntrySet this) {
             return new EntryIterator();
         }
 
@@ -1125,7 +1127,7 @@ public class WeakHashMap<K extends @Immutable Object,V>
      * Similar form as other hash Spliterators, but skips dead
      * elements.
      */
-    @ReceiverDependentMutable
+    @Mutable
     static class WeakHashMapSpliterator<K extends @Immutable Object,V> {
         final @Readonly WeakHashMap<K,V> map;
         WeakHashMap.Entry<K,V> current; // current node
@@ -1161,7 +1163,7 @@ public class WeakHashMap<K extends @Immutable Object,V>
         }
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     static final class KeySpliterator<K extends @Immutable Object,V>
         extends WeakHashMapSpliterator<K,V>
         implements Spliterator<K> {
@@ -1242,7 +1244,7 @@ public class WeakHashMap<K extends @Immutable Object,V>
         }
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     static final class ValueSpliterator<K extends @Immutable Object,V>
         extends WeakHashMapSpliterator<K,V>
         implements Spliterator<V> {
@@ -1320,7 +1322,7 @@ public class WeakHashMap<K extends @Immutable Object,V>
         }
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     static final class EntrySpliterator<K extends @Immutable Object,V>
         extends WeakHashMapSpliterator<K,V>
         implements Spliterator<Map.Entry<K,V>> {

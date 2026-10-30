@@ -1076,7 +1076,7 @@ final class StringUTF16 {
         return (right != length) ? newString(value, 0, right) : null;
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     private static final class LinesSpliterator implements Spliterator<String> {
         private byte @Readonly [] value;
         private int index;        // current index, modified on advance/split
@@ -1196,7 +1196,7 @@ final class StringUTF16 {
         Arrays.fill(val, index << 1, end << 1, (byte)0);
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     static class CharsSpliterator implements Spliterator.OfInt {
         private final byte @Readonly [] array;
         private int index;        // current index, modified on advance/split
@@ -1258,7 +1258,7 @@ final class StringUTF16 {
         }
     }
 
-    @ReceiverDependentMutable
+    @Mutable
     static class CodePointsSpliterator implements Spliterator.OfInt {
         private final byte @Readonly [] array;
         private int index;        // current index, modified on advance/split
