@@ -25,6 +25,8 @@
 
 package java.nio.file;
 
+import org.checkerframework.checker.mutability.qual.ReceiverDependentMutable;
+
 import java.io.IOException;
 
 /**
@@ -42,6 +44,7 @@ import java.io.IOException;
  * @see Path#register
  */
 
+@ReceiverDependentMutable // a supertype of Path, which is @Immutable
 public interface Watchable {
 
     /**

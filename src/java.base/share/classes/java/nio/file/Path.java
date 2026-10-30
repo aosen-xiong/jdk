@@ -27,6 +27,7 @@ package java.nio.file;
 
 import org.checkerframework.checker.nonempty.qual.EnsuresNonEmptyIf;
 import org.checkerframework.checker.nonempty.qual.NonEmpty;
+import org.checkerframework.checker.mutability.qual.Immutable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
@@ -104,6 +105,7 @@ import java.util.NoSuchElementException;
  */
 
 @AnnotatedFor({"nullness"})
+@Immutable // "Implementations of this interface are immutable" (interface Javadoc)
 public interface Path
     extends Comparable<Path>, Iterable<Path>, Watchable
 {
