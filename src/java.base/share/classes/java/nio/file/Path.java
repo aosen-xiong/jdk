@@ -25,6 +25,8 @@
 
 package java.nio.file;
 
+import org.checkerframework.checker.mutability.qual.Readonly;
+
 import org.checkerframework.checker.nonempty.qual.EnsuresNonEmptyIf;
 import org.checkerframework.checker.nonempty.qual.NonEmpty;
 import org.checkerframework.checker.mutability.qual.Immutable;
@@ -1021,7 +1023,7 @@ public interface Path
      *          that is identical to this {@code Path}
      */
     @Pure
-    boolean equals(@Nullable Object other);
+    boolean equals(@Nullable @Readonly Object other); // equality only reads other
 
     /**
      * Computes a hash code for this path.

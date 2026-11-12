@@ -37,6 +37,8 @@
 
 package java.text;
 
+import org.checkerframework.checker.mutability.qual.Readonly;
+
 import org.checkerframework.checker.interning.qual.UsesObjectEquals;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
@@ -159,7 +161,7 @@ public final @UsesObjectEquals class Normalizer {
      * @throws NullPointerException If {@code src} or {@code form}
      * is null.
      */
-    public static String normalize(CharSequence src, Form form) {
+    public static String normalize(@Readonly CharSequence src, Form form) { // normalizing only reads src
         return NormalizerBase.normalize(src.toString(), form);
     }
 

@@ -25,6 +25,8 @@
 
 package java.nio.file;
 
+import org.checkerframework.checker.mutability.qual.Readonly;
+
 import java.util.List;
 
 /**
@@ -146,5 +148,5 @@ public interface WatchKey {
      *
      * @return the object for which this watch key was created
      */
-    Watchable watchable();
+    @Readonly Watchable watchable(); // the registered object, which the key does not own
 }

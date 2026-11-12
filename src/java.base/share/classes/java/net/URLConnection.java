@@ -25,6 +25,8 @@
 
 package java.net;
 
+import org.checkerframework.checker.mutability.qual.Readonly;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -592,7 +594,7 @@ public abstract class URLConnection {
      * @return a Map of header fields
      * @since 1.4
      */
-    public Map<String,List<String>> getHeaderFields() {
+    public @Readonly Map<String,List<String>> getHeaderFields() { // "Returns an unmodifiable Map of the header fields"
         return Collections.emptyMap();
     }
 

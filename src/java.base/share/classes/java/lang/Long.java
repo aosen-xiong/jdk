@@ -1542,7 +1542,7 @@ public final class Long extends Number
      */
     @Pure
     @StaticallyExecutable
-    public boolean equals(@Nullable Object obj) {
+    public boolean equals(@Nullable @Readonly Object obj) { // equality only reads obj
         if (obj instanceof Long) {
             return value == ((Long)obj).longValue();
         }

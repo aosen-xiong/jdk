@@ -25,6 +25,8 @@
 
 package java.nio.file.attribute;
 
+import org.checkerframework.checker.mutability.qual.Readonly;
+
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.checkerframework.framework.qual.AnnotatedFor;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -156,5 +158,5 @@ public interface BasicFileAttributes {
      *
      * @see java.nio.file.Files#walkFileTree
      */
-    @Nullable Object fileKey();
+    @Nullable @Readonly Object fileKey(); // a key that identifies the file, not a handle to change it
 }

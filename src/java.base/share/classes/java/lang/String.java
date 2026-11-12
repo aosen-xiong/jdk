@@ -3485,8 +3485,8 @@ public final class String
      */
     @SideEffectFree
     @StaticallyExecutable
-    public static String join(CharSequence delimiter,
-            Iterable<? extends @Nullable CharSequence> elements) {
+    public static String join(@Readonly CharSequence delimiter, // joining only reads its arguments, as in the varargs overload
+            @Readonly Iterable<? extends @Nullable @Readonly CharSequence> elements) {
         Objects.requireNonNull(delimiter);
         Objects.requireNonNull(elements);
         var delim = delimiter.toString();

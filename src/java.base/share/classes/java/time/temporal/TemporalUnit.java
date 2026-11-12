@@ -61,6 +61,8 @@
  */
 package java.time.temporal;
 
+import org.checkerframework.checker.mutability.qual.Immutable;
+
 import java.time.DateTimeException;
 import java.time.Duration;
 import java.time.LocalTime;
@@ -94,6 +96,7 @@ import java.time.chrono.ChronoZonedDateTime;
  *
  * @since 1.8
  */
+@Immutable // "All implementations that can be instantiated must be final, immutable and thread-safe"
 public interface TemporalUnit {
 
     /**
