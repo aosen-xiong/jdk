@@ -25,6 +25,8 @@
 
 package java.nio.file;
 
+import org.checkerframework.checker.mutability.qual.Readonly;
+
 import org.checkerframework.checker.interning.qual.UsesObjectEquals;
 import org.checkerframework.checker.mustcall.qual.InheritableMustCall;
 import org.checkerframework.framework.qual.AnnotatedFor;
@@ -196,7 +198,7 @@ public abstract @UsesObjectEquals class FileSystem
      *
      * @return  An object to iterate over the root directories
      */
-    public abstract Iterable<Path> getRootDirectories();
+    public abstract @Readonly Iterable<Path> getRootDirectories(); // the caller may only iterate over the roots
 
     /**
      * Returns an object to iterate over the underlying file stores.
@@ -230,7 +232,7 @@ public abstract @UsesObjectEquals class FileSystem
      *
      * @return  An object to iterate over the backing file stores
      */
-    public abstract Iterable<FileStore> getFileStores();
+    public abstract @Readonly Iterable<FileStore> getFileStores(); // the caller may only iterate over the stores
 
     /**
      * Returns the set of the {@link FileAttributeView#name names} of the file
@@ -247,7 +249,7 @@ public abstract @UsesObjectEquals class FileSystem
      * @return  An unmodifiable set of the names of the supported file attribute
      *          views
      */
-    public abstract Set<String> supportedFileAttributeViews();
+    public abstract @Readonly Set<String> supportedFileAttributeViews(); // a description of the file system, not a mutable view of it
 
     /**
      * Converts a path string, or a sequence of strings that when joined form

@@ -38,6 +38,8 @@
 
 package java.text;
 
+import org.checkerframework.checker.mutability.qual.Readonly;
+
 import org.checkerframework.checker.i18nformatter.qual.I18nFormatFor;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -865,7 +867,7 @@ public class MessageFormat extends Format {
      *            that use it.
      * @throws    NullPointerException if {@code pattern} is {@code null}
      */
-    public static String format(@I18nFormatFor("#2") String pattern, @Nullable Object ... arguments) {
+    public static String format(@I18nFormatFor("#2") String pattern, @Nullable @Readonly Object ... arguments) { // formatting only reads the arguments
         MessageFormat temp = new MessageFormat(pattern);
         return temp.format(arguments);
     }

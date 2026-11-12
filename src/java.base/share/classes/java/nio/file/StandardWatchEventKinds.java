@@ -25,6 +25,8 @@
 
 package java.nio.file;
 
+import org.checkerframework.checker.mutability.qual.Immutable;
+
 import org.checkerframework.checker.interning.qual.UsesObjectEquals;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
@@ -85,6 +87,7 @@ public final @UsesObjectEquals class StandardWatchEventKinds {
     public static final StdWatchEventKind<Path> ENTRY_MODIFY =
         new StdWatchEventKind<Path>("ENTRY_MODIFY", Path.class);
 
+    @Immutable // implements the @Immutable WatchEvent.Kind; its name and type fields are final
     private static class StdWatchEventKind<T> implements WatchEvent.Kind<T> {
         private final String name;
         private final Class<T> type;

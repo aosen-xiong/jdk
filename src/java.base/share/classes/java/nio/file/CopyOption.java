@@ -25,6 +25,8 @@
 
 package java.nio.file;
 
+import org.checkerframework.checker.mutability.qual.Immutable;
+
 /**
  * An object that configures how to copy or move a file.
  *
@@ -41,5 +43,6 @@ package java.nio.file;
  * @since 1.7
  */
 
+@Immutable // only constant configuration; every JDK implementation is an enum (StandardCopyOption, LinkOption, ExtendedCopyOption)
 public interface CopyOption {
 }

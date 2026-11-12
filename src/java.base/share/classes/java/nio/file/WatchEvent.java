@@ -25,6 +25,8 @@
 
 package java.nio.file;
 
+import org.checkerframework.checker.mutability.qual.Immutable;
+
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
@@ -56,6 +58,7 @@ public interface WatchEvent<T extends @Nullable Object> {
      * @since 1.7
      * @see StandardWatchEventKinds
      */
+    @Immutable // "An event kind, for the purposes of identification": a name and a context type, both fixed
     public static interface Kind<T extends @Nullable Object> {
         /**
          * Returns the name of the event kind.
