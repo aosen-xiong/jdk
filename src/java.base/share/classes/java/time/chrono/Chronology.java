@@ -61,6 +61,7 @@
  */
 package java.time.chrono;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import static java.time.temporal.ChronoField.HOUR_OF_DAY;
 import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
 import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
@@ -294,7 +295,7 @@ public interface Chronology extends Comparable<Chronology> {
      * @return the calendar system type, null if the calendar is not defined by CLDR/LDML
      * @see #getId()
      */
-    String getCalendarType();
+    @Nullable String getCalendarType();
 
     //-----------------------------------------------------------------------
     /**
@@ -645,7 +646,7 @@ public interface Chronology extends Comparable<Chronology> {
     default String getDisplayName(TextStyle style, Locale locale) {
         TemporalAccessor temporal = new TemporalAccessor() {
             @Override
-            public boolean isSupported(TemporalField field) {
+            public boolean isSupported(@Nullable TemporalField field) {
                 return false;
             }
             @Override
@@ -654,7 +655,7 @@ public interface Chronology extends Comparable<Chronology> {
             }
             @SuppressWarnings("unchecked")
             @Override
-            public <R> R query(TemporalQuery<R> query) {
+            public <R extends @Nullable Object> R query(TemporalQuery<R> query) {
                 if (query == TemporalQueries.chronology()) {
                     return (R) Chronology.this;
                 }
@@ -683,7 +684,7 @@ public interface Chronology extends Comparable<Chronology> {
      * @throws DateTimeException if the date cannot be resolved, typically
      *  because of a conflict in the input data
      */
-    ChronoLocalDate resolveDate(Map<TemporalField, Long> fieldValues, ResolverStyle resolverStyle);
+    @Nullable ChronoLocalDate resolveDate(Map<TemporalField, Long> fieldValues, ResolverStyle resolverStyle);
 
     //-----------------------------------------------------------------------
     /**
@@ -793,7 +794,7 @@ public interface Chronology extends Comparable<Chronology> {
      * @return true if this is equal to the other chronology
      */
     @Override
-    boolean equals(Object obj);
+    boolean equals(@Nullable Object obj);
 
     /**
      * A hash code for this chronology.

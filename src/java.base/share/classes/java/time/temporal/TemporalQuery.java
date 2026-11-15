@@ -61,6 +61,7 @@
  */
 package java.time.temporal;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import java.time.DateTimeException;
 
 /**
@@ -100,7 +101,7 @@ import java.time.DateTimeException;
  * @since 1.8
  */
 @FunctionalInterface
-public interface TemporalQuery<R> {
+public interface TemporalQuery<R extends @Nullable Object> {
 
     /**
      * Queries the specified temporal object.

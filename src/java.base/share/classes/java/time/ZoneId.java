@@ -528,7 +528,7 @@ public abstract class ZoneId implements Serializable {
     private TemporalAccessor toTemporal() {
         return new TemporalAccessor() {
             @Override
-            public boolean isSupported(TemporalField field) {
+            public boolean isSupported(@Nullable TemporalField field) {
                 return false;
             }
             @Override
@@ -537,7 +537,7 @@ public abstract class ZoneId implements Serializable {
             }
             @SuppressWarnings("unchecked")
             @Override
-            public <R> R query(TemporalQuery<R> query) {
+            public <R extends @Nullable Object> R query(TemporalQuery<R> query) {
                 if (query == TemporalQueries.zoneId()) {
                     return (R) ZoneId.this;
                 }

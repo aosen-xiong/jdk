@@ -56,6 +56,7 @@
  */
 package java.time.temporal;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static java.time.temporal.ChronoUnit.ERAS;
 import static java.time.temporal.ChronoUnit.FOREVER;
@@ -607,7 +608,7 @@ public enum ChronoField implements TemporalField {
     private final TemporalUnit baseUnit;
     private final TemporalUnit rangeUnit;
     private final ValueRange range;
-    private final String displayNameKey;
+    private final @Nullable String displayNameKey;
 
     private ChronoField(String name, TemporalUnit baseUnit, TemporalUnit rangeUnit, ValueRange range) {
         this.name = name;

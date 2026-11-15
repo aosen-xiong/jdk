@@ -61,6 +61,7 @@
  */
 package java.time;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import static java.time.temporal.ChronoField.MONTH_OF_YEAR;
 import static java.time.temporal.ChronoUnit.MONTHS;
 
@@ -275,7 +276,7 @@ public enum Month implements TemporalAccessor, TemporalAdjuster {
      * @return true if the field is supported on this month-of-year, false if not
      */
     @Override
-    public boolean isSupported(TemporalField field) {
+    public boolean isSupported(@Nullable TemporalField field) {
         if (field instanceof ChronoField) {
             return field == MONTH_OF_YEAR;
         }
@@ -560,7 +561,7 @@ public enum Month implements TemporalAccessor, TemporalAdjuster {
      */
     @SuppressWarnings("unchecked")
     @Override
-    public <R> R query(TemporalQuery<R> query) {
+    public <R extends @Nullable Object> R query(TemporalQuery<R> query) {
         if (query == TemporalQueries.chronology()) {
             return (R) IsoChronology.INSTANCE;
         } else if (query == TemporalQueries.precision()) {

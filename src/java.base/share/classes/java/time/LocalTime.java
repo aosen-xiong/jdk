@@ -61,6 +61,7 @@
  */
 package java.time;
 
+import org.checkerframework.framework.qual.CFComment;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -544,7 +545,7 @@ public final class LocalTime
      * @return true if the field is supported on this time, false if not
      */
     @Override
-    public boolean isSupported(TemporalField field) {
+    public boolean isSupported(@Nullable TemporalField field) {
         if (field instanceof ChronoField) {
             return field.isTimeBased();
         }
@@ -580,7 +581,7 @@ public final class LocalTime
      * @return true if the unit can be added/subtracted, false if not
      */
     @Override  // override for Javadoc
-    public boolean isSupported(TemporalUnit unit) {
+    public boolean isSupported(@Nullable TemporalUnit unit) {
         if (unit instanceof ChronoUnit) {
             return unit.isTimeBased();
         }
@@ -1315,9 +1316,10 @@ public final class LocalTime
      * @throws DateTimeException if unable to query (defined by the query)
      * @throws ArithmeticException if numeric overflow occurs (defined by the query)
      */
-    @SuppressWarnings("unchecked")
+    @CFComment("nullness: returns null only for queries whose result type is nullable, such as TemporalQueries.zoneId()")
+    @SuppressWarnings({"unchecked", "nullness:return"})
     @Override
-    public <R> R query(TemporalQuery<R> query) {
+    public <R extends @Nullable Object> R query(TemporalQuery<R> query) {
         if (query == TemporalQueries.chronology() || query == TemporalQueries.zoneId() ||
                 query == TemporalQueries.zone() || query == TemporalQueries.offset()) {
             return null;

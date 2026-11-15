@@ -61,6 +61,7 @@
  */
 package java.time.chrono;
 
+import org.checkerframework.framework.qual.CFComment;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -243,7 +244,7 @@ final class ChronoLocalDateTimeImpl<D extends ChronoLocalDate>
 
     //-----------------------------------------------------------------------
     @Override
-    public boolean isSupported(TemporalField field) {
+    public boolean isSupported(@Nullable TemporalField field) {
         if (field instanceof ChronoField chronoField) {
             return chronoField.isDateBased() || chronoField.isTimeBased();
         }
@@ -431,6 +432,8 @@ final class ChronoLocalDateTimeImpl<D extends ChronoLocalDate>
         out.writeObject(time);
     }
 
+    @CFComment("nullness: writeExternal wrote these objects, and none of them is null")
+    @SuppressWarnings({"nullness:dereference", "nullness:argument"})
     static ChronoLocalDateTime<?> readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         ChronoLocalDate date = (ChronoLocalDate) in.readObject();
         LocalTime time = (LocalTime) in.readObject();

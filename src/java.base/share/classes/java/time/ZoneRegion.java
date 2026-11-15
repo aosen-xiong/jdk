@@ -56,6 +56,7 @@
  */
 package java.time;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
@@ -101,7 +102,7 @@ final class ZoneRegion extends ZoneId implements Serializable {
     /**
      * The time-zone rules, null if zone ID was loaded leniently.
      */
-    private final transient ZoneRules rules;
+    private final transient @Nullable ZoneRules rules;
 
     /**
      * Obtains an instance of {@code ZoneId} from an identifier.
@@ -160,7 +161,7 @@ final class ZoneRegion extends ZoneId implements Serializable {
      * @param id  the time-zone ID, not null
      * @param rules  the rules, null for lazy lookup
      */
-    ZoneRegion(String id, ZoneRules rules) {
+    ZoneRegion(String id, @Nullable ZoneRules rules) {
         this.id = id;
         this.rules = rules;
     }

@@ -56,6 +56,7 @@
  */
 package java.time.temporal;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import static java.time.DayOfWeek.THURSDAY;
 import static java.time.DayOfWeek.WEDNESDAY;
 import static java.time.temporal.ChronoField.DAY_OF_WEEK;
@@ -346,7 +347,7 @@ public final class IsoFields {
                 return (R) temporal.with(DAY_OF_YEAR, temporal.getLong(DAY_OF_YEAR) + (newValue - curValue));
             }
             @Override
-            public ChronoLocalDate resolve(
+            public @Nullable ChronoLocalDate resolve(
                     Map<TemporalField, Long> fieldValues, TemporalAccessor partialTemporal, ResolverStyle resolverStyle) {
                 Long yearLong = fieldValues.get(YEAR);
                 Long qoyLong = fieldValues.get(QUARTER_OF_YEAR);
@@ -476,7 +477,7 @@ public final class IsoFields {
                 return (R) temporal.plus(Math.subtractExact(newValue, getFrom(temporal)), WEEKS);
             }
             @Override
-            public ChronoLocalDate resolve(
+            public @Nullable ChronoLocalDate resolve(
                     Map<TemporalField, Long> fieldValues, TemporalAccessor partialTemporal, ResolverStyle resolverStyle) {
                 Long wbyLong = fieldValues.get(WEEK_BASED_YEAR);
                 Long dowLong = fieldValues.get(DAY_OF_WEEK);

@@ -61,6 +61,7 @@
  */
 package java.time.chrono;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import static java.time.temporal.ChronoField.ERA;
 import static java.time.temporal.ChronoUnit.ERAS;
 
@@ -142,7 +143,7 @@ public interface Era extends TemporalAccessor, TemporalAdjuster {
      * @return true if the field is supported on this era, false if not
      */
     @Override
-    default boolean isSupported(TemporalField field) {
+    default boolean isSupported(@Nullable TemporalField field) {
         if (field instanceof ChronoField) {
             return field == ERA;
         }
@@ -265,7 +266,7 @@ public interface Era extends TemporalAccessor, TemporalAdjuster {
      */
     @SuppressWarnings("unchecked")
     @Override
-    default <R> R query(TemporalQuery<R> query) {
+    default <R extends @Nullable Object> R query(TemporalQuery<R> query) {
         if (query == TemporalQueries.precision()) {
             return (R) ERAS;
         }

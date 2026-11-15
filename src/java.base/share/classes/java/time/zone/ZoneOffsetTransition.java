@@ -61,6 +61,7 @@
  */
 package java.time.zone;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
@@ -374,7 +375,7 @@ public final class ZoneOffsetTransition
      * @param offset  the offset to check, null returns false
      * @return true if the offset is valid during the transition
      */
-    public boolean isValidOffset(ZoneOffset offset) {
+    public boolean isValidOffset(@Nullable ZoneOffset offset) {
         return isGap() ? false : (getOffsetBefore().equals(offset) || getOffsetAfter().equals(offset));
     }
 
@@ -417,7 +418,7 @@ public final class ZoneOffsetTransition
      * @return true if equal
      */
     @Override
-    public boolean equals(Object other) {
+    public boolean equals(@Nullable Object other) {
         if (other == this) {
             return true;
         }

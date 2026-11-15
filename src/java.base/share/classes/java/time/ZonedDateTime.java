@@ -61,6 +61,7 @@
  */
 package java.time;
 
+import org.checkerframework.framework.qual.CFComment;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -371,7 +372,9 @@ public final class ZonedDateTime
      * @param preferredOffset  the zone offset, null if no preference
      * @return the zoned date-time, not null
      */
-    public static ZonedDateTime ofLocal(LocalDateTime localDateTime, ZoneId zone, ZoneOffset preferredOffset) {
+    @CFComment("nullness: no valid offsets means localDateTime is in a gap, for which getTransition returns the transition")
+    @SuppressWarnings("nullness:dereference")
+    public static ZonedDateTime ofLocal(LocalDateTime localDateTime, ZoneId zone, @Nullable ZoneOffset preferredOffset) {
         Objects.requireNonNull(localDateTime, "localDateTime");
         Objects.requireNonNull(zone, "zone");
         if (zone instanceof ZoneOffset) {
@@ -709,7 +712,7 @@ public final class ZonedDateTime
      * @return true if the field is supported on this date-time, false if not
      */
     @Override
-    public boolean isSupported(TemporalField field) {
+    public boolean isSupported(@Nullable TemporalField field) {
         return field instanceof ChronoField || (field != null && field.isSupportedBy(this));
     }
 
@@ -750,7 +753,7 @@ public final class ZonedDateTime
      * @return true if the unit can be added/subtracted, false if not
      */
     @Override  // override for Javadoc
-    public boolean isSupported(TemporalUnit unit) {
+    public boolean isSupported(@Nullable TemporalUnit unit) {
         return ChronoZonedDateTime.super.isSupported(unit);
     }
 
@@ -2055,7 +2058,7 @@ public final class ZonedDateTime
      */
     @SuppressWarnings("unchecked")
     @Override  // override for Javadoc
-    public <R> R query(TemporalQuery<R> query) {
+    public <R extends @Nullable Object> R query(TemporalQuery<R> query) {
         if (query == TemporalQueries.localDate()) {
             return (R) toLocalDate();
         }

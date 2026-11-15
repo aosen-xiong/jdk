@@ -56,6 +56,7 @@
  */
 package java.time.chrono;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import java.io.InvalidObjectException;
 import static java.time.temporal.ChronoField.PROLEPTIC_MONTH;
 import static java.time.temporal.ChronoField.YEAR;
@@ -331,7 +332,7 @@ public final class MinguoChronology extends AbstractChronology implements Serial
 
     //-----------------------------------------------------------------------
     @Override  // override for return type
-    public MinguoDate resolveDate(Map<TemporalField, Long> fieldValues, ResolverStyle resolverStyle) {
+    public @Nullable MinguoDate resolveDate(Map<TemporalField, Long> fieldValues, ResolverStyle resolverStyle) {
         return (MinguoDate) super.resolveDate(fieldValues, resolverStyle);
     }
 

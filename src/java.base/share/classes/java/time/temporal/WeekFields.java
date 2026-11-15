@@ -936,7 +936,7 @@ public final class WeekFields implements Serializable {
         }
 
         @Override
-        public ChronoLocalDate resolve(
+        public @Nullable ChronoLocalDate resolve(
                 Map<TemporalField, Long> fieldValues, TemporalAccessor partialTemporal, ResolverStyle resolverStyle) {
             final long value = fieldValues.get(this);
             final int newValue = Math.toIntExact(value);  // broad limit makes overflow checking lighter

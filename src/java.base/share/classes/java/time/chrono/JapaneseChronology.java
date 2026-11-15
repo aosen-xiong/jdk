@@ -56,6 +56,8 @@
  */
 package java.time.chrono;
 
+import org.checkerframework.framework.qual.CFComment;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import static java.time.temporal.ChronoField.DAY_OF_MONTH;
 import static java.time.temporal.ChronoField.DAY_OF_YEAR;
 import static java.time.temporal.ChronoField.ERA;
@@ -420,12 +422,12 @@ public final class JapaneseChronology extends AbstractChronology implements Seri
 
     //-----------------------------------------------------------------------
     @Override  // override for return type
-    public JapaneseDate resolveDate(Map <TemporalField, Long> fieldValues, ResolverStyle resolverStyle) {
+    public @Nullable JapaneseDate resolveDate(Map <TemporalField, Long> fieldValues, ResolverStyle resolverStyle) {
         return (JapaneseDate) super.resolveDate(fieldValues, resolverStyle);
     }
 
     @Override  // override for special Japanese behavior
-    ChronoLocalDate resolveYearOfEra(Map<TemporalField, Long> fieldValues, ResolverStyle resolverStyle) {
+    @Nullable ChronoLocalDate resolveYearOfEra(Map<TemporalField, Long> fieldValues, ResolverStyle resolverStyle) {
         // validate era and year-of-era
         Long eraLong = fieldValues.get(ERA);
         JapaneseEra era = null;
@@ -459,6 +461,8 @@ public final class JapaneseChronology extends AbstractChronology implements Seri
         return era.getPrivateEra().getSinceDate().getYear() + yearOfEra - 1;
     }
 
+    @CFComment("nullness: callers call this only after checking fieldValues.containsKey for every field removed here")
+    @SuppressWarnings("nullness:unboxing")
     private ChronoLocalDate resolveYMD(JapaneseEra era, int yoe, Map<TemporalField,Long> fieldValues, ResolverStyle resolverStyle) {
         fieldValues.remove(ERA);
         fieldValues.remove(YEAR_OF_ERA);
@@ -492,6 +496,8 @@ public final class JapaneseChronology extends AbstractChronology implements Seri
         return date(era, yoe, moy, dom);
     }
 
+    @CFComment("nullness: callers call this only after checking fieldValues.containsKey for every field removed here")
+    @SuppressWarnings("nullness:unboxing")
     private ChronoLocalDate resolveYD(JapaneseEra era, int yoe, Map <TemporalField,Long> fieldValues, ResolverStyle resolverStyle) {
         fieldValues.remove(ERA);
         fieldValues.remove(YEAR_OF_ERA);

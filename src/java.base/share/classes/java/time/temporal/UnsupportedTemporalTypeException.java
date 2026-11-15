@@ -61,6 +61,7 @@
  */
 package java.time.temporal;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import java.time.DateTimeException;
 
 /**
@@ -85,7 +86,7 @@ public class UnsupportedTemporalTypeException extends DateTimeException {
      *
      * @param message  the message to use for this exception, may be null
      */
-    public UnsupportedTemporalTypeException(String message) {
+    public UnsupportedTemporalTypeException(@Nullable String message) {
         super(message);
     }
 
@@ -95,7 +96,7 @@ public class UnsupportedTemporalTypeException extends DateTimeException {
      * @param message  the message to use for this exception, may be null
      * @param cause  the cause of the exception, may be null
      */
-    public UnsupportedTemporalTypeException(String message, Throwable cause) {
+    public UnsupportedTemporalTypeException(@Nullable String message, @Nullable Throwable cause) {
         super(message, cause);
     }
 

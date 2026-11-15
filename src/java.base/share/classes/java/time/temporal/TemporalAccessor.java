@@ -61,6 +61,8 @@
  */
 package java.time.temporal;
 
+import org.checkerframework.framework.qual.CFComment;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import java.time.DateTimeException;
 import java.util.Objects;
 
@@ -123,7 +125,7 @@ public interface TemporalAccessor {
      * @param field  the field to check, null returns false
      * @return true if this date-time can be queried for the field, false if not
      */
-    boolean isSupported(TemporalField field);
+    boolean isSupported(@Nullable TemporalField field);
 
     /**
      * Gets the range of valid values for the specified field.
@@ -305,7 +307,9 @@ public interface TemporalAccessor {
      * @throws DateTimeException if unable to query
      * @throws ArithmeticException if numeric overflow occurs
      */
-    default <R> R query(TemporalQuery<R> query) {
+    @CFComment("nullness: returns null only for queries whose result type is nullable, such as TemporalQueries.zoneId()")
+    @SuppressWarnings("nullness:return")
+    default <R extends @Nullable Object> R query(TemporalQuery<R> query) {
         if (query == TemporalQueries.zoneId()
                 || query == TemporalQueries.chronology()
                 || query == TemporalQueries.precision()) {

@@ -61,6 +61,7 @@
  */
 package java.time.chrono;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import static java.time.chrono.JapaneseDate.MEIJI_6_ISODATE;
 import static java.time.temporal.ChronoField.ERA;
 
@@ -314,7 +315,7 @@ public final class JapaneseEra
      * @param date  the date, not null
      * @return the Era singleton, never null
      */
-    static JapaneseEra from(LocalDate date) {
+    static @Nullable JapaneseEra from(LocalDate date) {
         if (date.isBefore(MEIJI_6_ISODATE)) {
             throw new DateTimeException("JapaneseDate before Meiji 6 are not supported");
         }
@@ -327,7 +328,7 @@ public final class JapaneseEra
         return null;
     }
 
-    static JapaneseEra toJapaneseEra(sun.util.calendar.Era privateEra) {
+    static @Nullable JapaneseEra toJapaneseEra(sun.util.calendar.Era privateEra) {
         for (int i = ERA_CONFIG.length - 1; i >= 0; i--) {
             if (ERA_CONFIG[i].equals(privateEra)) {
                 return KNOWN_ERAS[i];
@@ -336,7 +337,7 @@ public final class JapaneseEra
         return null;
     }
 
-    static sun.util.calendar.Era privateEraFrom(LocalDate isoDate) {
+    static sun.util.calendar.@Nullable Era privateEraFrom(LocalDate isoDate) {
         for (int i = KNOWN_ERAS.length - 1; i > 0; i--) {
             JapaneseEra era = KNOWN_ERAS[i];
             if (isoDate.compareTo(era.since) >= 0) {

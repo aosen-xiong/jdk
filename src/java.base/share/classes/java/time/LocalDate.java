@@ -544,7 +544,7 @@ public final class LocalDate
      * @return true if the field is supported on this date, false if not
      */
     @Override  // override for Javadoc
-    public boolean isSupported(TemporalField field) {
+    public boolean isSupported(@Nullable TemporalField field) {
         return ChronoLocalDate.super.isSupported(field);
     }
 
@@ -578,7 +578,7 @@ public final class LocalDate
      * @return true if the unit can be added/subtracted, false if not
      */
     @Override  // override for Javadoc
-    public boolean isSupported(TemporalUnit unit) {
+    public boolean isSupported(@Nullable TemporalUnit unit) {
         return ChronoLocalDate.super.isSupported(unit);
     }
 
@@ -1559,7 +1559,7 @@ public final class LocalDate
      */
     @SuppressWarnings("unchecked")
     @Override
-    public <R> R query(TemporalQuery<R> query) {
+    public <R extends @Nullable Object> R query(TemporalQuery<R> query) {
         if (query == TemporalQueries.localDate()) {
             return (R) this;
         }
