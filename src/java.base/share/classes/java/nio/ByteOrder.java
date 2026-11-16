@@ -26,6 +26,7 @@
 package java.nio;
 
 import org.checkerframework.checker.interning.qual.UsesObjectEquals;
+import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
 import jdk.internal.misc.Unsafe;
@@ -79,6 +80,7 @@ public final @UsesObjectEquals class ByteOrder {
      * @return  The native byte order of the hardware upon which this Java
      *          virtual machine is running
      */
+    @Pure
     public static ByteOrder nativeOrder() {
         return NATIVE_ORDER;
     }
@@ -92,6 +94,7 @@ public final @UsesObjectEquals class ByteOrder {
      *
      * @return  The specified string
      */
+    @Pure
     public String toString() {
         return name;
     }
