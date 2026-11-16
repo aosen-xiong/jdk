@@ -179,8 +179,8 @@ jobs:
       - name: Check out Checker Framework
         uses: actions/checkout@v4
         with:
-          repository: eisop/checker-framework
-          ref: c12ce38daa5a3978ac3fce693c8f870ebecbd09b
+          repository: aosen-xiong/checker-framework
+          ref: 85e349bee56c19456a94af84e1fff1a89e48e52c # codex/nullness-study-ci
           path: checker-framework
           persist-credentials: false
       - name: Check out the checker's bundled JDK contracts
@@ -198,25 +198,27 @@ jobs:
       - name: Build Checker Framework
         working-directory: checker-framework
         run: |
-          mkdir -p "$GITHUB_WORKSPACE/jdk/build/typecheck"
+          mkdir -p "$GITHUB_WORKSPACE/checker-framework/checker/build/jdk-typecheck"
           ./gradlew :checker:assembleForJavac --no-daemon --max-workers=2 \
             -x :framework:cloneAnnotatedJdk \
             -PannotatedJdkHome="$GITHUB_WORKSPACE/bundled-jdk" --console=plain \
-            2>&1 | tee "$GITHUB_WORKSPACE/jdk/build/typecheck/checker-build.log"
+            2>&1 | tee "$GITHUB_WORKSPACE/checker-framework/checker/build/jdk-typecheck/checker-build.log"
           sha256sum checker/dist/checker.jar checker/dist/checker-qual.jar \
-            > "$GITHUB_WORKSPACE/jdk/build/typecheck/checker.sha256"
+            > "$GITHUB_WORKSPACE/checker-framework/checker/build/jdk-typecheck/checker.sha256"
       - name: Set up JDK 17 for source checking
         uses: actions/setup-java@v6.0.0
         with:
           distribution: temurin
           java-version: '17.0.14+7'
       - name: Type-check javax.xml.namespace
-        working-directory: jdk
-        run: ./typecheck.sh nullness java.xml javax.xml.namespace
+        working-directory: checker-framework
+        env:
+          JDK_SRC: ${{ github.workspace }}/jdk
+        run: checker/bin-devel/typecheck-jdk.sh nullness java.xml javax.xml.namespace
       - name: Upload type-checking logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: namespace-nullness-${{ github.run_id }}
-          path: jdk/build/typecheck/
+          path: checker-framework/checker/build/jdk-typecheck/
           if-no-files-found: warn
