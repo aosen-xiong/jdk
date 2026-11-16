@@ -70,6 +70,36 @@ This fork's annotations are pulled into those repositories, in order to build an
 annotated JDK.  We do not write annotations in (say) typetools:jdk20u, because
 it would be painful to get them into typetools:jdk21u due to subsequent commits.
 
+## Type checking
+
+Checker Framework maintains the checking script in `checker/bin-devel/` and
+annotation contract tests in `checker/tests/nullness/`. Use matching branches of
+the JDK and Checker Framework repositories when changing annotations and tests.
+
+After building Checker Framework with JDK 21, run from its checkout with a
+compiler compatible with these JDK sources (JDK 17):
+
+```sh
+export JAVA_HOME=/path/to/jdk17
+JDK_SRC=/path/to/jdk checker/bin-devel/typecheck-jdk.sh nullness java.base \
+  java/lang/StackTraceElement.java java/lang/Throwable.java \
+  java/lang/Exception.java java/lang/RuntimeException.java java/lang/Error.java
+```
+
+The script accepts module-relative `.java` paths or package names and checks
+each selected file with `--patch-module`. The current exceptions batch contains
+`StackTraceElement`, `Throwable`, `Exception`, `RuntimeException`, and `Error`.
+The remaining `java.lang` files are not yet validated.
+Logs go under CF's `checker/build/jdk-typecheck/`. Nullness checking uses
+JSpecify mode, which assumes purity, initialized state, map-key correctness and
+enabled assertions, with permissive defaults for unchecked dependencies.
+The existing CF JUnit CI jobs run the contract tests. The separate **Build the
+JDK** job checks the native build.
+
+For `java.base`, the script uses `-XDignore.symbol.file=true` to avoid javac
+internal-API warnings preventing annotation processing; other warning checks
+remain enabled. CI pins the checker revision and its bundled JDK contracts.
+
 ## Pull request merge conflicts
 
 If a pull request is failing with a merge conflict in `jdk17u`, first

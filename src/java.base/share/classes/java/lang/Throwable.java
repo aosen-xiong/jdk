@@ -128,7 +128,7 @@ public @UsesObjectEquals class Throwable implements Serializable {
     /**
      * The JVM saves some indication of the stack backtrace in this slot.
      */
-    private transient Object backtrace;
+    private transient @Nullable Object backtrace;
 
     /**
      * Specific details about the Throwable.  For example, for
@@ -137,7 +137,7 @@ public @UsesObjectEquals class Throwable implements Serializable {
      *
      * @serial
      */
-    private String detailMessage;
+    private @Nullable String detailMessage;
 
 
     /**
@@ -204,7 +204,7 @@ public @UsesObjectEquals class Throwable implements Serializable {
      * @serial
      * @since 1.4
      */
-    private Throwable cause = this;
+    private @Nullable Throwable cause = this;
 
     /**
      * The stack trace, as returned by {@link #getStackTrace()}.
@@ -217,7 +217,7 @@ public @UsesObjectEquals class Throwable implements Serializable {
      * @serial
      * @since 1.4
      */
-    private StackTraceElement[] stackTrace = UNASSIGNED_STACK;
+    private StackTraceElement @Nullable [] stackTrace = UNASSIGNED_STACK;
 
     /**
      * The JVM code sets the depth of the backtrace for later retrieval
@@ -239,7 +239,7 @@ public @UsesObjectEquals class Throwable implements Serializable {
      * @since 1.7
      */
     @SuppressWarnings("serial") // Not statically typed as Serializable
-    private List<Throwable> suppressedExceptions = SUPPRESSED_SENTINEL;
+    private @Nullable List<Throwable> suppressedExceptions = SUPPRESSED_SENTINEL;
 
     /** Message for trying to suppress a null exception. */
     private static final String NULL_CAUSE_MESSAGE = "Cannot suppress a null exception.";

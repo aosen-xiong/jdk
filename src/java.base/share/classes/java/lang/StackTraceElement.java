@@ -26,7 +26,9 @@
 package java.lang;
 
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
+import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.nullness.qual.RequiresNonNull;
 import org.checkerframework.checker.signature.qual.FullyQualifiedName;
 import org.checkerframework.checker.signature.qual.Identifier;
 import org.checkerframework.dataflow.qual.Pure;
@@ -66,21 +68,21 @@ public final class StackTraceElement implements java.io.Serializable {
     // construct the 'format' bitmap, and then is cleared.
     //
     // For STEs constructed using the public constructors, this field is not used.
-    private transient Class<?> declaringClassObject;
+    private transient @Nullable Class<?> declaringClassObject;
 
     // Normally initialized by VM
     /**
      * The name of the class loader.
      */
-    private String classLoaderName;
+    private @Nullable String classLoaderName;
     /**
      * The module name.
      */
-    private String moduleName;
+    private @Nullable String moduleName;
     /**
      * The module version.
      */
-    private String moduleVersion;
+    private @Nullable String moduleVersion;
     /**
      * The declaring class.
      */
@@ -92,7 +94,7 @@ public final class StackTraceElement implements java.io.Serializable {
     /**
      * The source file name.
      */
-    private String fileName;
+    private @Nullable String fileName;
     /**
      * The source line number.
      */
@@ -161,10 +163,10 @@ public final class StackTraceElement implements java.io.Serializable {
      *
      * @since 9
      */
-    public StackTraceElement(String classLoaderName,
-                             String moduleName, String moduleVersion,
+    public StackTraceElement(@Nullable String classLoaderName,
+                             @Nullable String moduleName, @Nullable String moduleVersion,
                              String declaringClass, @Identifier String methodName,
-                             String fileName, int lineNumber) {
+                             @Nullable String fileName, int lineNumber) {
         this.classLoaderName = classLoaderName;
         this.moduleName      = moduleName;
         this.moduleVersion   = moduleVersion;
@@ -221,7 +223,7 @@ public final class StackTraceElement implements java.io.Serializable {
      * @since 9
      * @see Module#getName()
      */
-    public String getModuleName() {
+    public @Nullable String getModuleName() {
         return moduleName;
     }
 
@@ -235,7 +237,7 @@ public final class StackTraceElement implements java.io.Serializable {
      * @since 9
      * @see java.lang.module.ModuleDescriptor.Version
      */
-    public String getModuleVersion() {
+    public @Nullable String getModuleVersion() {
         return moduleVersion;
     }
 
@@ -250,7 +252,7 @@ public final class StackTraceElement implements java.io.Serializable {
      * @since 9
      * @see java.lang.ClassLoader#getName()
      */
-    public String getClassLoaderName() {
+    public @Nullable String getClassLoaderName() {
         return classLoaderName;
     }
 
@@ -454,6 +456,7 @@ public final class StackTraceElement implements java.io.Serializable {
      * If the loader is one of the built-in loaders (`boot`, `platform`, or `app`)
      * then set BUILTIN_CLASS_LOADER to omit the first element (`<loader>/`).
      */
+    @RequiresNonNull("declaringClassObject")
     private synchronized void computeFormat() {
         try {
             Class<?> cls = (Class<?>) declaringClassObject;
@@ -545,6 +548,9 @@ public final class StackTraceElement implements java.io.Serializable {
      * Returns an array of StackTraceElements of the given depth
      * filled from the backtrace of a given Throwable.
      */
+    // The VM initializes declaringClassObject for every array element; this
+    // quantified native postcondition cannot be expressed with @EnsuresNonNull.
+    @SuppressWarnings("nullness:contracts.precondition.not.satisfied")
     static StackTraceElement[] of(Throwable x, int depth) {
         StackTraceElement[] stackTrace = new StackTraceElement[depth];
         for (int i = 0; i < depth; i++) {
@@ -581,6 +587,7 @@ public final class StackTraceElement implements java.io.Serializable {
     /*
      * Sets the given stack trace element with the given StackFrameInfo
      */
+    @EnsuresNonNull("#1.declaringClassObject")
     private static native void initStackTraceElement(StackTraceElement element,
                                                      StackFrameInfo sfi);
 
