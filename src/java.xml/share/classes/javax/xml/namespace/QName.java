@@ -25,6 +25,9 @@
 
 package javax.xml.namespace;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 import java.io.Serializable;
 import javax.xml.XMLConstants;
 import jdk.xml.internal.SecuritySupport;
@@ -65,6 +68,7 @@ import jdk.xml.internal.SecuritySupport;
  * @since 1.5
  */
 
+@AnnotatedFor("nullness")
 public class QName implements Serializable {
     // tests show that the ID is the same from JDK 1.5 through JDK 9
     private static final long serialVersionUID = -9120448754896609940L;
@@ -125,7 +129,7 @@ public class QName implements Serializable {
      * prefix) QName(String namespaceURI, String localPart, String
      * prefix)
      */
-    public QName(final String namespaceURI, final String localPart) {
+    public QName(final @Nullable String namespaceURI, final String localPart) {
         this(namespaceURI, localPart, XMLConstants.DEFAULT_NS_PREFIX);
     }
 
@@ -169,7 +173,7 @@ public class QName implements Serializable {
      * @throws IllegalArgumentException When <code>localPart</code>
      *   or <code>prefix</code> is <code>null</code>
      */
-    public QName(String namespaceURI, String localPart, String prefix) {
+    public QName(@Nullable String namespaceURI, String localPart, String prefix) {
 
         // map null Namespace URI to default
         // to preserve compatibility with QName 1.0
@@ -296,7 +300,7 @@ public class QName implements Serializable {
      * @return <code>true</code> if the given <code>Object</code> is
      * equal to this <code>QName</code> else <code>false</code>
      */
-    public final boolean equals(Object objectToTest) {
+    public final boolean equals(@Nullable Object objectToTest) {
         if (objectToTest == this) {
             return true;
         }
