@@ -206,8 +206,8 @@ public interface NamespaceContext {
      * @throws IllegalArgumentException When {@code namespaceURI} is
      *   {@code null}
      */
-    @Nullable @Pure
-    String getPrefix(String namespaceURI);
+    @Pure
+    @Nullable String getPrefix(String namespaceURI);
 
     /**
      * Get all prefixes bound to a Namespace URI in the current
