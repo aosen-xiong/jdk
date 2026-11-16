@@ -70,6 +70,45 @@ This fork's annotations are pulled into those repositories, in order to build an
 annotated JDK.  We do not write annotations in (say) typetools:jdk20u, because
 it would be painful to get them into typetools:jdk21u due to subsequent commits.
 
+## Type checking
+
+Use the same entry point locally and in CI:
+
+```sh
+export CHECKERFRAMEWORK=/path/to/checker-framework
+export JAVA_HOME=/path/to/jdk17
+./typecheck.sh nullness java.xml javax.xml.namespace
+```
+
+Build Checker Framework first, using JDK 21 for its Gradle build. The script
+defaults to the sibling `../checker-framework` checkout. Its interface is
+`./typecheck.sh CHECKER MODULE PACKAGE...`; each package's Java files are checked
+individually with the complete module source root supplied through
+`--patch-module`. It saves commands, compiler output and exit statuses under
+`build/typecheck/`. A full native JDK build is not required for this source check.
+
+For nullness, the script selects `-Amode=jspecify`, checks for an explicit
+`@AnnotatedFor("nullness")` opt-in, audits suppressions and treats warnings as
+errors. Review the complete file's checking scope when adding annotations.
+This mode assumes purity, initialized state, map-key correctness and enabled
+assertions, and uses permissive defaults for unchecked dependencies.
+
+Contract tests go under `test/typecheck/CHECKER/MODULE/` in the Java package
+directory. They use the Checker Framework test suite's
+`// :: error: (diagnostic.key)` syntax, one expected error per line. The script
+checks both successful fixtures and the exact diagnostic-key counts for negative
+fixtures; compiler failures and crashes cannot satisfy an expected-error test.
+
+The initial CI job covers only `javax.xml.namespace`. QName's Javadoc explicitly
+permits null namespace URIs in both multi-argument constructors and null in
+`equals`; local names, prefixes and `valueOf` inputs remain non-null. Existing
+NamespaceContext contracts are retained. The fixtures exercise nullable inputs,
+nullable prefix results, non-null iterator elements and implementation overrides.
+The workflow pins the checker and its bundled JDK contracts, then uses this
+script to check the current PR source. The separate **Build the JDK** job tests
+the native build; this type-checking job does not run the JAXP runtime test suite.
+
+
 ## Pull request merge conflicts
 
 If a pull request is failing with a merge conflict in `jdk17u`, first
