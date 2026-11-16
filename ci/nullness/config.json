@@ -1,0 +1,37 @@
+{
+  "checker_source_commit": "c12ce38daa5a3978ac3fce693c8f870ebecbd09b",
+  "bundled_jdk_source_commit": "0af1a5ad1f994431fc6e08540000c4ae1ab13153",
+  "timeout_seconds": 120,
+  "checker_options": [
+    "-processor",
+    "org.checkerframework.checker.nullness.NullnessChecker",
+    "-Amode=jspecify",
+    "-AprintVerboseGenerics",
+    "-Afilenames",
+    "-proc:only",
+    "-implicit:none",
+    "-Xmaxerrs",
+    "5000",
+    "-Xmaxwarns",
+    "5000"
+  ],
+  "assertions": "enabled",
+  "purity": "assumed-pure",
+  "unchecked_code_defaults": "permissive source and bytecode",
+  "mode_expansion": [
+    "-AonlyAnnotatedFor",
+    "-AassumeInitialized",
+    "-AassumeKeyFor",
+    "-AjspecifyUnrecognizedLocations",
+    "-AassumePure",
+    "-AstoreInBytecode=false",
+    "-AassumeAssertions=enabled",
+    "-AusePermissiveDefaultsForUncheckedCode=source,bytecode"
+  ],
+  "mode_source": "checker/src/main/java/org/checkerframework/checker/nullness/NullnessNoInitSubchecker.java:addOptionsForMode",
+  "name": "jspecify-jdk17-namespace-ci-v1",
+  "build_java_version": "21.0.7+6",
+  "check_java_version": "17.0.14+7",
+  "source_base_commit": "0724cfccbf42248f19351f4d6569d3a729eff1a0",
+  "scope": "Explicit javax.xml.namespace files; full current java.xml source patch; frozen bundled contracts for binary dependencies."
+}

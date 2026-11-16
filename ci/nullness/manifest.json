@@ -1,0 +1,22 @@
+{
+  "package": "javax.xml.namespace",
+  "module": "java.xml",
+  "verified_files": [
+    "NamespaceContext",
+    "QName"
+  ],
+  "candidates": [
+    {
+      "id": "QName",
+      "module": "java.xml",
+      "path": "src/java.xml/share/classes/javax/xml/namespace/QName.java",
+      "reason": "constructors and equality"
+    },
+    {
+      "id": "NamespaceContext",
+      "module": "java.xml",
+      "path": "src/java.xml/share/classes/javax/xml/namespace/NamespaceContext.java",
+      "reason": "Complete namespace package: audit existing interface contracts"
+    }
+  ]
+}

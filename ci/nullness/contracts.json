@@ -1,0 +1,99 @@
+{
+  "review_timing": "Recorded before annotation edits and before target-file diagnostics.",
+  "recorded_at": "2026-11-15T23:48:08.969393+00:00",
+  "source_revision": "0af1a5ad1f994431fc6e08540000c4ae1ab13153",
+  "package_policy": "package-info.java describes XML namespace standards but adds no general Java null policy. Module Javadoc describes JAXP services; per-symbol Java contracts determine these decisions.",
+  "QName": [
+    {
+      "symbol": "QName(String,String) and QName(String,String,String): namespaceURI parameter roots",
+      "classification": "documented",
+      "reference": "QName.java constructor Javadoc: If the Namespace URI is null",
+      "clause": "Both constructors normalize a null namespace URI to XMLConstants.NULL_NS_URI (the empty string).",
+      "annotation": "@Nullable String namespaceURI in both overloads"
+    },
+    {
+      "symbol": "All QName constructors: localPart; three-argument constructor: prefix",
+      "classification": "documented",
+      "reference": "QName.java constructor Javadoc and @throws IllegalArgumentException",
+      "clause": "Null localPart and null prefix are rejected; empty strings are valid.",
+      "annotation": "Retain non-null defaults"
+    },
+    {
+      "symbol": "QName.equals(Object): objectToTest parameter root",
+      "classification": "documented",
+      "reference": "QName.java equals Javadoc; inherited java.lang.Object.equals contract",
+      "clause": "A null argument returns false.",
+      "annotation": "@Nullable Object objectToTest"
+    },
+    {
+      "symbol": "QName.valueOf(String): qNameAsString parameter root and result",
+      "classification": "documented",
+      "reference": "QName.java valueOf Javadoc and @throws IllegalArgumentException",
+      "clause": "Null or malformed input is rejected. A normal return produces the QName represented by the string.",
+      "annotation": "Retain non-null parameter and return defaults"
+    },
+    {
+      "symbol": "QName.getNamespaceURI/getLocalPart/getPrefix: result roots",
+      "classification": "documented",
+      "reference": "QName.java class and constructor invariants plus getter Javadoc",
+      "clause": "Namespace URI is normalized to empty when absent; localPart and prefix cannot be null after successful construction. Getters return those components.",
+      "annotation": "Retain non-null return defaults"
+    },
+    {
+      "symbol": "QName.toString: result root",
+      "classification": "documented",
+      "reference": "QName.java toString Javadoc",
+      "clause": "Returns the local part or the specified concatenation of non-null namespace URI and local part.",
+      "annotation": "Retain non-null return default"
+    },
+    {
+      "symbol": "QName.namespaceURI/localPart/prefix: private field roots",
+      "classification": "implementation-derived",
+      "reference": "QName.java field Javadoc and constructor assignments",
+      "clause": "Constructors normalize or reject null before assigning final fields. No setters or custom deserialization methods exist in this file. Initialization checking remains excluded by the study profile.",
+      "annotation": "Retain non-null field defaults"
+    }
+  ],
+  "NamespaceContext": [
+    {
+      "symbol": "NamespaceContext.getNamespaceURI: prefix parameter and result roots",
+      "classification": "documented",
+      "reference": "NamespaceContext.java getNamespaceURI return-value table and @throws",
+      "clause": "Null prefix is rejected; unbound prefixes produce the empty string, not null.",
+      "annotation": "Retain non-null defaults"
+    },
+    {
+      "symbol": "NamespaceContext.getPrefix: namespaceURI parameter and result roots",
+      "classification": "documented",
+      "reference": "NamespaceContext.java getPrefix return-value table and @throws",
+      "clause": "Null namespaceURI is rejected; an unbound URI produces null.",
+      "annotation": "Retain non-null input and existing @Nullable result"
+    },
+    {
+      "symbol": "NamespaceContext.getPrefixes: namespaceURI input, iterator result, and element type",
+      "classification": "documented",
+      "reference": "NamespaceContext.java getPrefixes return-value table and Iterator-over-String description",
+      "clause": "Null namespaceURI is rejected. Returns an iterator over prefix strings, empty when no prefix is bound; the absent-result representation is an empty iterator.",
+      "annotation": "Retain non-null input, iterator, and String-element defaults"
+    }
+  ],
+  "controls_planned": [
+    "Both QName constructors accept null namespaceURI; component getters remain dereferenceable.",
+    "QName.equals accepts null, including through an Object receiver.",
+    "Each invalid QName localPart/prefix/valueOf null argument is rejected independently.",
+    "NamespaceContext.getPrefix needs a null guard; getNamespaceURI and getPrefixes are non-null.",
+    "All three NamespaceContext methods reject null input independently.",
+    "A conforming NamespaceContext implementation and QName subclass/consumer pass; an implementation returning null URI or null iterator/element is rejected.",
+    "Controlled pre-annotation QName source rejects the documented valid null namespaceURI constructor calls after opting in."
+  ],
+  "baseline_source_sha256": {
+    "QName.java": "3cc3949e4bb3c5d0b404e392c2c81d9f91ae2bb77992b07f63e89fc530c7604f",
+    "NamespaceContext.java": "634a2c43582d9b43391e183ccc83e0b4bfc88a24ab5702645d6a3ca8cb207c42",
+    "package-info.java": "97c3f5d65af142cdbf715336d153f4756b5faf7bc00ca3b9ca01be58ab9262f5"
+  },
+  "limitations": [
+    "Serializable does not make constructor checks a validation of arbitrary crafted serialized data.",
+    "Existing @Pure annotations in NamespaceContext are preserved; this study assumes purity and does not establish it.",
+    "No remote CI or package-wide upstream readiness is claimed by a local run."
+  ]
+}
