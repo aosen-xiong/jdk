@@ -1162,6 +1162,7 @@ public final class URI
      * @return  The scheme component of this URI,
      *          or {@code null} if the scheme is undefined
      */
+    @Pure
     public @Nullable String getScheme() {
         return scheme;
     }
@@ -1173,6 +1174,7 @@ public final class URI
      *
      * @return  {@code true} if, and only if, this URI is absolute
      */
+    @Pure
     public boolean isAbsolute() {
         return scheme != null;
     }
@@ -1187,6 +1189,7 @@ public final class URI
      *
      * @return  {@code true} if, and only if, this URI is opaque
      */
+    @Pure
     public boolean isOpaque() {
         return path == null;
     }
@@ -1264,6 +1267,7 @@ public final class URI
      * @return  The raw authority component of this URI,
      *          or {@code null} if the authority is undefined
      */
+    @Pure
     public @Nullable String getRawAuthority() {
         return authority;
     }
@@ -1296,6 +1300,7 @@ public final class URI
      * @return  The raw user-information component of this URI,
      *          or {@code null} if the user information is undefined
      */
+    @Pure
     public @Nullable String getRawUserInfo() {
         return userInfo;
     }
@@ -1354,6 +1359,7 @@ public final class URI
      * @return  The host component of this URI,
      *          or {@code null} if the host is undefined
      */
+    @Pure
     public @Nullable String getHost() {
         return host;
     }
@@ -1367,6 +1373,7 @@ public final class URI
      * @return  The port component of this URI,
      *          or {@code -1} if the port is undefined
      */
+    @Pure
     public int getPort() {
         return port;
     }
@@ -1382,6 +1389,7 @@ public final class URI
      * @return  The path component of this URI,
      *          or {@code null} if the path is undefined
      */
+    @Pure
     public @Nullable String getRawPath() {
         return path;
     }
@@ -1413,6 +1421,7 @@ public final class URI
      * @return  The raw query component of this URI,
      *          or {@code null} if the query is undefined
      */
+    @Pure
     public @Nullable String getRawQuery() {
         return query;
     }
@@ -1444,6 +1453,7 @@ public final class URI
      * @return  The raw fragment component of this URI,
      *          or {@code null} if the fragment is undefined
      */
+    @Pure
     public @Nullable String getRawFragment() {
         return fragment;
     }
