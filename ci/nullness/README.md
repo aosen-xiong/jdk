@@ -13,8 +13,8 @@ contracts; only the placement of its existing `@Nullable` changes.
 
 ## What runs
 
-The **Namespace nullness (JSpecify)** job runs on pull requests, pushes to master
-and manual dispatch. It checks the exact PR head, without workflow-level path
+The **Namespace nullness (JSpecify)** job runs on pull requests, pushes to master or
+`codex/nullness-*` study branches, and manual dispatch. It checks the exact PR head, without workflow-level path
 filters or `continue-on-error`.
 
 1. Build CF revision `c12ce38daa5a3978ac3fce693c8f870ebecbd09b` with Temurin

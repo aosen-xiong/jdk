@@ -3,7 +3,7 @@ name: Namespace nullness
 on:
   pull_request:
   push:
-    branches: [master]
+    branches: [master, "codex/nullness-*"]
   workflow_dispatch:
 
 permissions:
