@@ -14,7 +14,7 @@ concurrency:
 jobs:
   build_jdk:
     name: Build the JDK
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04 # This JDK build requires the gcc-10/g++-10 packages.
     permissions:
       contents: read
     env:
@@ -163,3 +163,62 @@ jobs:
       - name: Run test script checker/bin-devel/check-jdk-consistency.sh
         run: ./checker/bin-devel/check-jdk-consistency.sh
         working-directory: ../checker-framework
+
+  nullness:
+    name: Nullness (javax.xml.namespace)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          path: jdk
+          persist-credentials: false
+      - name: Check out Checker Framework
+        uses: actions/checkout@v4
+        with:
+          repository: aosen-xiong/checker-framework
+          ref: 85e349bee56c19456a94af84e1fff1a89e48e52c # codex/nullness-study-ci
+          path: checker-framework
+          persist-credentials: false
+      - name: Check out the checker's bundled JDK contracts
+        uses: actions/checkout@v4
+        with:
+          repository: eisop/jdk
+          ref: 0af1a5ad1f994431fc6e08540000c4ae1ab13153
+          path: bundled-jdk
+          persist-credentials: false
+      - name: Set up JDK 21 for the checker build
+        uses: actions/setup-java@v6.0.0
+        with:
+          distribution: temurin
+          java-version: '21.0.7'
+      - name: Build Checker Framework
+        working-directory: checker-framework
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/checker-framework/checker/build/jdk-typecheck"
+          ./gradlew :checker:assembleForJavac --no-daemon --max-workers=2 \
+            -x :framework:cloneAnnotatedJdk \
+            -PannotatedJdkHome="$GITHUB_WORKSPACE/bundled-jdk" --console=plain \
+            2>&1 | tee "$GITHUB_WORKSPACE/checker-framework/checker/build/jdk-typecheck/checker-build.log"
+          sha256sum checker/dist/checker.jar checker/dist/checker-qual.jar \
+            > "$GITHUB_WORKSPACE/checker-framework/checker/build/jdk-typecheck/checker.sha256"
+      - name: Set up JDK 17 for source checking
+        uses: actions/setup-java@v6.0.0
+        with:
+          distribution: temurin
+          java-version: '17.0.14+7'
+      - name: Type-check javax.xml.namespace
+        working-directory: checker-framework
+        env:
+          JDK_SRC: ${{ github.workspace }}/jdk
+        run: checker/bin-devel/typecheck-jdk.sh nullness java.xml javax.xml.namespace
+      - name: Upload type-checking logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: namespace-nullness-${{ github.run_id }}
+          path: checker-framework/checker/build/jdk-typecheck/
+          if-no-files-found: warn
