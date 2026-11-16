@@ -907,6 +907,7 @@ public final @UsesObjectEquals class Math {
      * @since 1.8
      */
     @IntrinsicCandidate
+    @Pure
     public static int addExact(int x, int y) {
         int r = x + y;
         // HD 2-12 Overflow iff both arguments have the opposite sign of the result
@@ -927,6 +928,7 @@ public final @UsesObjectEquals class Math {
      * @since 1.8
      */
     @IntrinsicCandidate
+    @Pure
     public static long addExact(long x, long y) {
         long r = x + y;
         // HD 2-12 Overflow iff both arguments have the opposite sign of the result
@@ -947,6 +949,7 @@ public final @UsesObjectEquals class Math {
      * @since 1.8
      */
     @IntrinsicCandidate
+    @Pure
     public static int subtractExact(int x, int y) {
         int r = x - y;
         // HD 2-12 Overflow iff the arguments have different signs and
@@ -968,6 +971,7 @@ public final @UsesObjectEquals class Math {
      * @since 1.8
      */
     @IntrinsicCandidate
+    @Pure
     public static long subtractExact(long x, long y) {
         long r = x - y;
         // HD 2-12 Overflow iff the arguments have different signs and
@@ -989,6 +993,7 @@ public final @UsesObjectEquals class Math {
      * @since 1.8
      */
     @IntrinsicCandidate
+    @Pure
     public static int multiplyExact(int x, int y) {
         long r = (long)x * (long)y;
         if ((int)r != r) {
@@ -1007,6 +1012,7 @@ public final @UsesObjectEquals class Math {
      * @throws ArithmeticException if the result overflows a long
      * @since 9
      */
+    @Pure
     public static long multiplyExact(long x, int y) {
         return multiplyExact(x, (long)y);
     }
@@ -1022,6 +1028,7 @@ public final @UsesObjectEquals class Math {
      * @since 1.8
      */
     @IntrinsicCandidate
+    @Pure
     public static long multiplyExact(long x, long y) {
         long r = x * y;
         long ax = Math.abs(x);
@@ -1049,6 +1056,7 @@ public final @UsesObjectEquals class Math {
      * @since 1.8
      */
     @IntrinsicCandidate
+    @Pure
     public static int incrementExact(int a) {
         if (a == Integer.MAX_VALUE) {
             throw new ArithmeticException("integer overflow");
@@ -1068,6 +1076,7 @@ public final @UsesObjectEquals class Math {
      * @since 1.8
      */
     @IntrinsicCandidate
+    @Pure
     public static long incrementExact(long a) {
         if (a == Long.MAX_VALUE) {
             throw new ArithmeticException("long overflow");
@@ -1087,6 +1096,7 @@ public final @UsesObjectEquals class Math {
      * @since 1.8
      */
     @IntrinsicCandidate
+    @Pure
     public static int decrementExact(int a) {
         if (a == Integer.MIN_VALUE) {
             throw new ArithmeticException("integer overflow");
@@ -1106,6 +1116,7 @@ public final @UsesObjectEquals class Math {
      * @since 1.8
      */
     @IntrinsicCandidate
+    @Pure
     public static long decrementExact(long a) {
         if (a == Long.MIN_VALUE) {
             throw new ArithmeticException("long overflow");
@@ -1125,6 +1136,7 @@ public final @UsesObjectEquals class Math {
      * @since 1.8
      */
     @IntrinsicCandidate
+    @Pure
     public static int negateExact(int a) {
         if (a == Integer.MIN_VALUE) {
             throw new ArithmeticException("integer overflow");
@@ -1144,6 +1156,7 @@ public final @UsesObjectEquals class Math {
      * @since 1.8
      */
     @IntrinsicCandidate
+    @Pure
     public static long negateExact(long a) {
         if (a == Long.MIN_VALUE) {
             throw new ArithmeticException("long overflow");
@@ -1161,6 +1174,7 @@ public final @UsesObjectEquals class Math {
      * @throws ArithmeticException if the {@code argument} overflows an int
      * @since 1.8
      */
+    @Pure
     public static int toIntExact(long value) {
         if ((int)value != value) {
             throw new ArithmeticException("integer overflow");
@@ -1176,6 +1190,7 @@ public final @UsesObjectEquals class Math {
      * @return the result
      * @since 9
      */
+    @Pure
     public static long multiplyFull(int x, int y) {
         return (long)x * (long)y;
     }
@@ -1190,6 +1205,7 @@ public final @UsesObjectEquals class Math {
      * @since 9
      */
     @IntrinsicCandidate
+    @Pure
     public static long multiplyHigh(long x, long y) {
         if (x < 0 || y < 0) {
             // Use technique from section 8-2 of Henry S. Warren, Jr.,
@@ -1252,6 +1268,7 @@ public final @UsesObjectEquals class Math {
      * @see #floor(double)
      * @since 1.8
      */
+    @Pure
     public static int floorDiv(int x, int y) {
         int r = x / y;
         // if the signs are different and modulo not zero, round down
@@ -1286,6 +1303,7 @@ public final @UsesObjectEquals class Math {
      * @see #floor(double)
      * @since 9
      */
+    @Pure
     public static long floorDiv(long x, int y) {
         return floorDiv(x, (long)y);
     }
@@ -1315,6 +1333,7 @@ public final @UsesObjectEquals class Math {
      * @see #floor(double)
      * @since 1.8
      */
+    @Pure
     public static long floorDiv(long x, long y) {
         long r = x / y;
         // if the signs are different and modulo not zero, round down
@@ -1369,6 +1388,7 @@ public final @UsesObjectEquals class Math {
      * @see #floorDiv(int, int)
      * @since 1.8
      */
+    @Pure
     public static int floorMod(int x, int y) {
         int mod = x % y;
         // if the signs are different and modulo not zero, adjust result
@@ -1400,6 +1420,7 @@ public final @UsesObjectEquals class Math {
      * @see #floorDiv(long, int)
      * @since 9
      */
+    @Pure
     public static int floorMod(long x, int y) {
         // Result cannot overflow the range of int.
         return (int)floorMod(x, (long)y);
@@ -1427,6 +1448,7 @@ public final @UsesObjectEquals class Math {
      * @see #floorDiv(long, long)
      * @since 1.8
      */
+    @Pure
     public static long floorMod(long x, long y) {
         long mod = x % y;
         // if the signs are different and modulo not zero, adjust result

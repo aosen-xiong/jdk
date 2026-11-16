@@ -228,6 +228,7 @@ public final @UsesObjectEquals class Objects {
      */
     @CFComment({"lock: TODO: treat like other nullness assertion methods in the Checker Framework."})
     @EnsuresNonNull("#1")
+    @Pure
     public static <T> @NonNull T requireNonNull(@NonNull T obj) {
         if (obj == null)
             throw new NullPointerException();
@@ -254,7 +255,7 @@ public final @UsesObjectEquals class Objects {
      * @throws NullPointerException if {@code obj} is {@code null}
      */
     @EnsuresNonNull("#1")
-    @SideEffectFree
+    @Pure
     public static <T> @NonNull T requireNonNull(@GuardSatisfied @NonNull @UnknownSignedness T obj, @Nullable String message) {
         if (obj == null)
             throw new NullPointerException(message);
@@ -315,6 +316,7 @@ public final @UsesObjectEquals class Objects {
      *        {@code defaultObj} is {@code null}
      * @since 9
      */
+    @Pure
     public static <T> @NonNull T requireNonNullElse(@Nullable T obj, @NonNull T defaultObj) {
         return (obj != null) ? obj : requireNonNull(defaultObj, "defaultObj");
     }

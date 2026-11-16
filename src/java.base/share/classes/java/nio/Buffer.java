@@ -28,6 +28,7 @@ package java.nio;
 import org.checkerframework.checker.index.qual.GTENegativeOne;
 import org.checkerframework.checker.index.qual.LessThan;
 import org.checkerframework.checker.index.qual.NonNegative;
+import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
 import jdk.internal.access.JavaNioAccess;
@@ -291,6 +292,7 @@ public abstract class Buffer {
      *
      * @return  The capacity of this buffer
      */
+    @Pure
     public final @NonNegative int capacity() {
         return capacity;
     }
@@ -300,6 +302,7 @@ public abstract class Buffer {
      *
      * @return  The position of this buffer
      */
+    @Pure
     public final @NonNegative int position() {
         return position;
     }
@@ -352,6 +355,7 @@ public abstract class Buffer {
      *
      * @return  The limit of this buffer
      */
+    @Pure
     public final @NonNegative int limit() {
         return limit;
     }
@@ -509,6 +513,7 @@ public abstract class Buffer {
      *
      * @return  The number of elements remaining in this buffer
      */
+    @Pure
     public final @NonNegative int remaining() {
         int rem = limit - position;
         return rem > 0 ? rem : 0;
@@ -521,6 +526,7 @@ public abstract class Buffer {
      * @return  {@code true} if, and only if, there is at least one element
      *          remaining in this buffer
      */
+    @Pure
     public final boolean hasRemaining() {
         return position < limit;
     }
