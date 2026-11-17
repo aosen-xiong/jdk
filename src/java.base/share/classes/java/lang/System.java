@@ -2315,13 +2315,13 @@ public final @UsesObjectEquals class System {
             E @Nullable [] getEnumConstantsShared(Class<E> klass) {
                 return klass.getEnumConstantsShared();
             }
-            public void blockedOn(Interruptible b) {
+            public void blockedOn(@Nullable Interruptible b) {
                 Thread.blockedOn(b);
             }
             public void registerShutdownHook(int slot, boolean registerShutdownInProgress, Runnable hook) {
                 Shutdown.add(slot, registerShutdownInProgress, hook);
             }
-            public Thread newThreadWithAcc(Runnable target, @SuppressWarnings("removal") AccessControlContext acc) {
+            public Thread newThreadWithAcc(@Nullable Runnable target, @SuppressWarnings("removal") @Nullable AccessControlContext acc) {
                 return new Thread(target, acc);
             }
             @SuppressWarnings("deprecation")

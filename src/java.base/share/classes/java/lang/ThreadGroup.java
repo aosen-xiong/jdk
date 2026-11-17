@@ -64,18 +64,18 @@ import java.util.Arrays;
  */
 @AnnotatedFor({"index", "interning", "lock", "nullness"})
 public @UsesObjectEquals class ThreadGroup implements Thread.UncaughtExceptionHandler {
-    private final ThreadGroup parent;
-    String name;
+    private final @Nullable ThreadGroup parent;
+    @Nullable String name;
     int maxPriority;
     boolean destroyed;
     boolean daemon;
 
     int nUnstartedThreads = 0;
     @LTEqLengthOf({"threads"}) @NonNegative int nthreads;
-    Thread threads[];
+    @Nullable Thread threads @Nullable [];
 
     @LTEqLengthOf({"groups"}) @NonNegative int ngroups;
-    ThreadGroup groups[];
+    @Nullable ThreadGroup groups @Nullable [];
 
     /**
      * Creates an empty Thread group that is not in any Thread group.
@@ -100,6 +100,8 @@ public @UsesObjectEquals class ThreadGroup implements Thread.UncaughtExceptionHa
      * @see     java.lang.ThreadGroup#checkAccess()
      * @since   1.0
      */
+    // VM lifecycle: the currently executing thread retains its parent group.
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public ThreadGroup(@Nullable String name) {
         this(Thread.currentThread().getThreadGroup(), name);
     }
@@ -125,7 +127,7 @@ public @UsesObjectEquals class ThreadGroup implements Thread.UncaughtExceptionHa
         this(checkParentAccess(parent), parent, name);
     }
 
-    private ThreadGroup(Void unused, ThreadGroup parent, String name) {
+    private ThreadGroup(@Nullable Void unused, ThreadGroup parent, @Nullable String name) {
         this.name = name;
         this.maxPriority = parent.maxPriority;
         this.daemon = parent.daemon;
@@ -138,7 +140,7 @@ public @UsesObjectEquals class ThreadGroup implements Thread.UncaughtExceptionHa
      * @throws  SecurityException     if the current thread cannot create a
      *                                thread in the specified thread group.
      */
-    private static Void checkParentAccess(ThreadGroup parent) {
+    private static @Nullable Void checkParentAccess(ThreadGroup parent) {
         parent.checkAccess();
         return null;
     }
@@ -284,10 +286,11 @@ public @UsesObjectEquals class ThreadGroup implements Thread.UncaughtExceptionHa
      */
     @CFComment({"index: groupSnapshot.length = ngroupsSnapshot by #0.1",
                 "for the else case, ngroupsSnapshot will be null and it will never enter the group as nGroups will be 0"})
-    @SuppressWarnings("index:array.access.unsafe.high")
+    @SuppressWarnings({"index:array.access.unsafe.high", "nullness:accessing.nullable", "nullness:dereference.of.nullable"})
+    // Array/count invariant: loops and copies use only the populated non-null prefix.
     public final void setMaxPriority(int pri) {
         int ngroupsSnapshot;
-        ThreadGroup[] groupsSnapshot;
+        @Nullable ThreadGroup[] groupsSnapshot;
         synchronized (this) {
             checkAccess();
             if (pri < Thread.MIN_PRIORITY || pri > Thread.MAX_PRIORITY) {
@@ -316,7 +319,7 @@ public @UsesObjectEquals class ThreadGroup implements Thread.UncaughtExceptionHa
      *          {@code false} otherwise.
      * @since   1.0
      */
-    public final boolean parentOf(ThreadGroup g) {
+    public final boolean parentOf(@Nullable ThreadGroup g) {
         for (; g != null ; g = g.parent) {
             if (g == this) {
                 return true;
@@ -372,13 +375,14 @@ public @UsesObjectEquals class ThreadGroup implements Thread.UncaughtExceptionHa
      */
     @CFComment({"index: groupSnapshot.length = ngroupsSnapshot by #0.1",
                 "for the else case, ngroupsSnapshot will be null and it will never enter the group as nGroups will be 0"})
-    @SuppressWarnings("index:array.access.unsafe.high")
+    @SuppressWarnings({"index:array.access.unsafe.high", "nullness:accessing.nullable", "nullness:dereference.of.nullable"})
+    // Array/count invariant: loops and copies use only the populated non-null prefix.
     public @NonNegative int activeCount() {
         int result;
         // Snapshot sub-group data so we don't hold this lock
         // while our children are computing.
         int ngroupsSnapshot;
-        ThreadGroup[] groupsSnapshot;
+        @Nullable ThreadGroup[] groupsSnapshot;
         synchronized (this) {
             if (destroyed) {
                 return 0;
@@ -466,10 +470,11 @@ public @UsesObjectEquals class ThreadGroup implements Thread.UncaughtExceptionHa
     "#1: To enter this loop, nt has to be positive, i.c, list.length - n is @Positive, and n is @NonNegative, hence if this loop is entered, n is @LTLengthOf(\"list\")",
     "#2: groupSnapshot.length = ngroupsSnapshot by #0.1, for the else case, ngroupsSnapshot will be null and it will never enter the group as nGroups will be 0"
     })
-    @SuppressWarnings({"index:array.access.unsafe.high","index:array.access.unsafe.high.range"})
-    private @NonNegative int enumerate(Thread list[], @NonNegative int n, boolean recurse) {
+    @SuppressWarnings({"index:array.access.unsafe.high", "index:array.access.unsafe.high.range", "nullness:accessing.nullable", "nullness:dereference.of.nullable"})
+    // Array/count invariant: loops and copies use only the populated non-null prefix.
+    private @NonNegative int enumerate(@PolyNull Thread list[], @NonNegative int n, boolean recurse) {
         int ngroupsSnapshot = 0;
-        ThreadGroup[] groupsSnapshot = null;
+        @Nullable ThreadGroup[] groupsSnapshot = null;
         synchronized (this) {
             if (destroyed) {
                 return n;
@@ -517,10 +522,11 @@ public @UsesObjectEquals class ThreadGroup implements Thread.UncaughtExceptionHa
      */
     @CFComment({"index: groupSnapshot.length = ngroupsSnapshot by #0.1", 
                 "for the else case, ngroupsSnapshot will be null and it will never enter the group as nGroups will be 0"})
-    @SuppressWarnings("index:array.access.unsafe.high")
+    @SuppressWarnings({"index:array.access.unsafe.high", "nullness:accessing.nullable", "nullness:dereference.of.nullable"})
+    // Array/count invariant: loops and copies use only the populated non-null prefix.
     public @NonNegative int activeGroupCount() {
         int ngroupsSnapshot;
-        ThreadGroup[] groupsSnapshot;
+        @Nullable ThreadGroup[] groupsSnapshot;
         synchronized (this) {
             if (destroyed) {
                 return 0;
@@ -606,10 +612,11 @@ public @UsesObjectEquals class ThreadGroup implements Thread.UncaughtExceptionHa
 
     @CFComment({"index: groupSnapshot.length = ngroupsSnapshot by #0.1",
                 "for the else case ngroupsSnapshot will be null and it will never enter the group as nGroups will be 0"})
-    @SuppressWarnings("index:array.access.unsafe.high")
-    private @NonNegative int enumerate(ThreadGroup list[], @NonNegative int n, boolean recurse) {
+    @SuppressWarnings({"index:array.access.unsafe.high", "nullness:accessing.nullable", "nullness:dereference.of.nullable", "nullness:argument.type.incompatible"})
+    // Array/count invariant: loops and copies use only the populated non-null prefix.
+    private @NonNegative int enumerate(@PolyNull ThreadGroup list[], @NonNegative int n, boolean recurse) {
         int ngroupsSnapshot = 0;
-        ThreadGroup[] groupsSnapshot = null;
+        @Nullable ThreadGroup[] groupsSnapshot = null;
         synchronized (this) {
             if (destroyed) {
                 return n;
@@ -683,10 +690,11 @@ public @UsesObjectEquals class ThreadGroup implements Thread.UncaughtExceptionHa
      */
     @CFComment({" groupSnapshot.length = ngroupsSnapshot by #0.1",
                 "for the else case, ngroupsSnapshot will be null and it will never enter the group as nGroups will be 0"})
-    @SuppressWarnings("index:array.access.unsafe.high")
+    @SuppressWarnings({"index:array.access.unsafe.high", "nullness:accessing.nullable", "nullness:dereference.of.nullable"})
+    // Array/count invariant: loops and copies use only the populated non-null prefix.
     public final void interrupt() {
         int ngroupsSnapshot;
-        ThreadGroup[] groupsSnapshot;
+        @Nullable ThreadGroup[] groupsSnapshot;
         synchronized (this) {
             checkAccess();
             for (int i = 0 ; i < nthreads ; i++) {
@@ -739,12 +747,13 @@ public @UsesObjectEquals class ThreadGroup implements Thread.UncaughtExceptionHa
      */
     @CFComment({"index: groupSnapshot.length = ngroupsSnapshot by #0.1",
                 "for the else case, ngroupsSnapshot will be null and it will never enter the group as nGroups will be 0"})
-    @SuppressWarnings({"deprecation", "removal", "index:array.access.unsafe.high"})
+    @SuppressWarnings({"deprecation", "removal", "index:array.access.unsafe.high", "nullness:accessing.nullable", "nullness:dereference.of.nullable"})
+    // Array/count invariant: loops and copies use only the populated non-null prefix.
     private boolean stopOrSuspend(boolean suspend) {
         boolean suicide = false;
         Thread us = Thread.currentThread();
         int ngroupsSnapshot;
-        ThreadGroup[] groupsSnapshot = null;
+        @Nullable ThreadGroup[] groupsSnapshot = null;
         synchronized (this) {
             checkAccess();
             for (int i = 0 ; i < nthreads ; i++) {
@@ -791,10 +800,11 @@ public @UsesObjectEquals class ThreadGroup implements Thread.UncaughtExceptionHa
     @CFComment({"index:  // groupSnapshot.length = ngroupsSnapshot by #0.1",
                 "for the else case, ngroupsSnapshot will be null and it will never enter the group as nGroups will be 0"})
     @Deprecated(since="1.2", forRemoval=true)
-    @SuppressWarnings({"removal", "index:array.access.unsafe.high"})
+    @SuppressWarnings({"removal", "index:array.access.unsafe.high", "nullness:accessing.nullable", "nullness:dereference.of.nullable"})
+    // Array/count invariant: loops and copies use only the populated non-null prefix.
     public final void resume() {
         int ngroupsSnapshot;
-        ThreadGroup[] groupsSnapshot;
+        @Nullable ThreadGroup[] groupsSnapshot;
         synchronized (this) {
             checkAccess();
             for (int i = 0 ; i < nthreads ; i++) {
@@ -833,11 +843,12 @@ public @UsesObjectEquals class ThreadGroup implements Thread.UncaughtExceptionHa
      */
     @CFComment({"index: groupSnapshot.length = ngroupsSnapshot by #0.1",
                 "for the else case, ngroupsSnapshot will be null and it will never enter the group as nGroups will be 0"})
-    @SuppressWarnings("index:array.access.unsafe.high")
+    @SuppressWarnings({"index:array.access.unsafe.high", "nullness:accessing.nullable", "nullness:dereference.of.nullable"})
     @Deprecated(since="16", forRemoval=true)
+    // Array/count invariant: loops and copies use only the populated non-null prefix.
     public final void destroy() {
         int ngroupsSnapshot;
-        ThreadGroup[] groupsSnapshot;
+        @Nullable ThreadGroup[] groupsSnapshot;
         synchronized (this) {
             checkAccess();
             if (destroyed || (nthreads > 0)) {
@@ -896,7 +907,8 @@ public @UsesObjectEquals class ThreadGroup implements Thread.UncaughtExceptionHa
      * @return if this Thread has already been destroyed.
      */
     @CFComment({"index: #1: ngroups - i <= groups.length - i"})
-    @SuppressWarnings("index:argument")
+    @SuppressWarnings({"index:argument", "nullness:accessing.nullable"})
+    // Array/count invariant: loops and copies use only the populated non-null prefix.
     private void remove(ThreadGroup g) {
         synchronized (this) {
             if (destroyed) {
@@ -1032,7 +1044,8 @@ public @UsesObjectEquals class ThreadGroup implements Thread.UncaughtExceptionHa
      *         the Thread to be removed
      */
     @CFComment({"index: #1: --nthreads - i < threads.length - i, also, --nthreads - i is @NonNegative as --nthreads >= i"})
-    @SuppressWarnings("index:argument")
+    @SuppressWarnings({"index:argument", "nullness:accessing.nullable"})
+    // Array/count invariant: loops and copies use only the populated non-null prefix.
     private void remove(Thread t) {
         synchronized (this) {
             if (destroyed) {
@@ -1062,9 +1075,11 @@ public @UsesObjectEquals class ThreadGroup implements Thread.UncaughtExceptionHa
     public void list() {
         list(System.out, 0);
     }
+    // Array/count invariant: loops and copies use only the populated non-null prefix.
+    @SuppressWarnings({"nullness:accessing.nullable", "nullness:dereference.of.nullable"})
     void list(PrintStream out, int indent) {
         int ngroupsSnapshot;
-        ThreadGroup[] groupsSnapshot;
+        @Nullable ThreadGroup[] groupsSnapshot;
         synchronized (this) {
             for (int j = 0 ; j < indent ; j++) {
                 out.print(" ");

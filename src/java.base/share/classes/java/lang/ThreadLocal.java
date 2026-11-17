@@ -25,9 +25,12 @@
 
 package java.lang;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.framework.qual.AnnotatedFor;
 import org.checkerframework.framework.qual.CFComment;
+import org.checkerframework.framework.qual.DefaultQualifier;
+import org.checkerframework.framework.qual.TypeUseLocation;
 
 import jdk.internal.misc.TerminatingThreadLocal;
 
@@ -88,7 +91,9 @@ import java.util.function.Supplier;
             "@SuppressWarnings(\"nullness:type.argument\") // initialValue returns non-null"
         })
 @AnnotatedFor({"interning", "nullness"})
-public @UsesObjectEquals class ThreadLocal<@Nullable T> {
+// Preserve the nullable lower bound required by the null initial value.
+@DefaultQualifier(value = Nullable.class, locations = TypeUseLocation.IMPLICIT_LOWER_BOUND)
+public @UsesObjectEquals class ThreadLocal<T extends @Nullable Object> {
     /**
      * ThreadLocals rely on per-thread linear-probe hash maps attached
      * to each thread (Thread.threadLocals and
@@ -154,7 +159,10 @@ public @UsesObjectEquals class ThreadLocal<@Nullable T> {
      * @throws NullPointerException if the specified supplier is null
      * @since 1.8
      */
-    public static <S> ThreadLocal<S> withInitial(Supplier<? extends S> supplier) {
+    @DefaultQualifier(value = NonNull.class, locations = TypeUseLocation.IMPLICIT_LOWER_BOUND)
+    // Generic model limitation: SuppliedThreadLocal initializes each value from its supplier.
+    @SuppressWarnings("nullness:type.argument.type.incompatible")
+    public static <S extends @Nullable Object> ThreadLocal<S> withInitial(Supplier<? extends S> supplier) {
         return new SuppliedThreadLocal<>(supplier);
     }
 
@@ -206,6 +214,8 @@ public @UsesObjectEquals class ThreadLocal<@Nullable T> {
      *
      * @return the initial value
      */
+    // Suspected bundled-JDK/source merge bug: createMap changes the receiver T upper bound.
+    @SuppressWarnings("nullness:argument.type.incompatible")
     private T setInitialValue() {
         T value = initialValue();
         Thread t = Thread.currentThread();
@@ -230,6 +240,8 @@ public @UsesObjectEquals class ThreadLocal<@Nullable T> {
      * @param value the value to be stored in the current thread's copy of
      *        this thread-local.
      */
+    // Suspected bundled-JDK/source merge bug: createMap changes the receiver T upper bound.
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public void set(T value) {
         Thread t = Thread.currentThread();
         ThreadLocalMap map = getMap(t);
@@ -265,7 +277,7 @@ public @UsesObjectEquals class ThreadLocal<@Nullable T> {
      * @param  t the current thread
      * @return the map
      */
-    ThreadLocalMap getMap(Thread t) {
+    @Nullable ThreadLocalMap getMap(Thread t) {
         return t.threadLocals;
     }
 
@@ -307,7 +319,10 @@ public @UsesObjectEquals class ThreadLocal<@Nullable T> {
      * An extension of ThreadLocal that obtains its initial value from
      * the specified {@code Supplier}.
      */
-    static final class SuppliedThreadLocal<T> extends ThreadLocal<T> {
+    @DefaultQualifier(value = NonNull.class, locations = TypeUseLocation.IMPLICIT_LOWER_BOUND)
+    // Generic model limitation: initialValue is overridden to return the supplier's T.
+    @SuppressWarnings("nullness:type.argument.type.incompatible")
+    static final class SuppliedThreadLocal<T extends @Nullable Object> extends ThreadLocal<T> {
 
         private final Supplier<? extends T> supplier;
 
@@ -331,6 +346,7 @@ public @UsesObjectEquals class ThreadLocal<@Nullable T> {
      * used, stale entries are guaranteed to be removed only when
      * the table starts running out of space.
      */
+    @DefaultQualifier(value = NonNull.class, locations = TypeUseLocation.IMPLICIT_LOWER_BOUND)
     static class ThreadLocalMap {
 
         /**
@@ -343,9 +359,9 @@ public @UsesObjectEquals class ThreadLocal<@Nullable T> {
          */
         static class Entry extends WeakReference<ThreadLocal<?>> {
             /** The value associated with this ThreadLocal. */
-            Object value;
+            @Nullable Object value;
 
-            Entry(ThreadLocal<?> k, Object v) {
+            Entry(ThreadLocal<?> k, @Nullable Object v) {
                 super(k);
                 value = v;
             }
@@ -360,7 +376,7 @@ public @UsesObjectEquals class ThreadLocal<@Nullable T> {
          * The table, resized as necessary.
          * table.length MUST always be a power of two.
          */
-        private Entry[] table;
+        private @Nullable Entry[] table;
 
         /**
          * The number of entries in the table.
@@ -398,7 +414,7 @@ public @UsesObjectEquals class ThreadLocal<@Nullable T> {
          * ThreadLocalMaps are constructed lazily, so we only create
          * one when we have at least one entry to put in it.
          */
-        ThreadLocalMap(ThreadLocal<?> firstKey, Object firstValue) {
+        ThreadLocalMap(ThreadLocal<?> firstKey, @Nullable Object firstValue) {
             table = new Entry[INITIAL_CAPACITY];
             int i = firstKey.threadLocalHashCode & (INITIAL_CAPACITY - 1);
             table[i] = new Entry(firstKey, firstValue);
@@ -413,7 +429,7 @@ public @UsesObjectEquals class ThreadLocal<@Nullable T> {
          * @param parentMap the map associated with parent thread.
          */
         private ThreadLocalMap(ThreadLocalMap parentMap) {
-            Entry[] parentTable = parentMap.table;
+            @Nullable Entry[] parentTable = parentMap.table;
             int len = parentTable.length;
             setThreshold(len);
             table = new Entry[len];
@@ -421,7 +437,7 @@ public @UsesObjectEquals class ThreadLocal<@Nullable T> {
             for (Entry e : parentTable) {
                 if (e != null) {
                     @SuppressWarnings("unchecked")
-                    ThreadLocal<Object> key = (ThreadLocal<Object>) e.get();
+                    ThreadLocal<@Nullable Object> key = (ThreadLocal<@Nullable Object>) e.get();
                     if (key != null) {
                         Object value = key.childValue(e.value);
                         Entry c = new Entry(key, value);
@@ -445,7 +461,7 @@ public @UsesObjectEquals class ThreadLocal<@Nullable T> {
          * @param  key the thread local object
          * @return the entry associated with key, or null if no such
          */
-        private Entry getEntry(ThreadLocal<?> key) {
+        private @Nullable Entry getEntry(ThreadLocal<?> key) {
             int i = key.threadLocalHashCode & (table.length - 1);
             Entry e = table[i];
             if (e != null && e.refersTo(key))
@@ -463,8 +479,10 @@ public @UsesObjectEquals class ThreadLocal<@Nullable T> {
          * @param  e the entry at table[i]
          * @return the entry associated with key, or null if no such
          */
-        private Entry getEntryAfterMiss(ThreadLocal<?> key, int i, Entry e) {
-            Entry[] tab = table;
+        // JDK annotation gap: Reference.refersTo explicitly accepts null to test clearing.
+        @SuppressWarnings("nullness:argument.type.incompatible")
+        private @Nullable Entry getEntryAfterMiss(ThreadLocal<?> key, int i, @Nullable Entry e) {
+            @Nullable Entry[] tab = table;
             int len = tab.length;
 
             while (e != null) {
@@ -485,14 +503,16 @@ public @UsesObjectEquals class ThreadLocal<@Nullable T> {
          * @param key the thread local object
          * @param value the value to be set
          */
-        private void set(ThreadLocal<?> key, Object value) {
+        // JDK annotation gap: Reference.refersTo explicitly accepts null to test clearing.
+        @SuppressWarnings("nullness:argument.type.incompatible")
+        private void set(ThreadLocal<?> key, @Nullable Object value) {
 
             // We don't use a fast path as with get() because it is at
             // least as common to use set() to create new entries as
             // it is to replace existing ones, in which case, a fast
             // path would fail more often than not.
 
-            Entry[] tab = table;
+            @Nullable Entry[] tab = table;
             int len = tab.length;
             int i = key.threadLocalHashCode & (len-1);
 
@@ -520,7 +540,7 @@ public @UsesObjectEquals class ThreadLocal<@Nullable T> {
          * Remove the entry for key.
          */
         private void remove(ThreadLocal<?> key) {
-            Entry[] tab = table;
+            @Nullable Entry[] tab = table;
             int len = tab.length;
             int i = key.threadLocalHashCode & (len-1);
             for (Entry e = tab[i];
@@ -549,9 +569,11 @@ public @UsesObjectEquals class ThreadLocal<@Nullable T> {
          * @param  staleSlot index of the first stale entry encountered while
          *         searching for key.
          */
-        private void replaceStaleEntry(ThreadLocal<?> key, Object value,
+        // refersTo accepts null; the caller-established stale slot contains an Entry.
+        @SuppressWarnings({"nullness:argument.type.incompatible", "nullness:dereference.of.nullable"})
+        private void replaceStaleEntry(ThreadLocal<?> key, @Nullable Object value,
                                        int staleSlot) {
-            Entry[] tab = table;
+            @Nullable Entry[] tab = table;
             int len = tab.length;
             Entry e;
 
@@ -616,8 +638,10 @@ public @UsesObjectEquals class ThreadLocal<@Nullable T> {
          * (all between staleSlot and this slot will have been checked
          * for expunging).
          */
+        // Index precondition: the caller-established stale slot contains an Entry.
+        @SuppressWarnings("nullness:dereference.of.nullable")
         private int expungeStaleEntry(int staleSlot) {
-            Entry[] tab = table;
+            @Nullable Entry[] tab = table;
             int len = tab.length;
 
             // expunge entry at staleSlot
@@ -676,9 +700,11 @@ public @UsesObjectEquals class ThreadLocal<@Nullable T> {
          *
          * @return true if any stale entries have been removed.
          */
+        // JDK annotation gap: Reference.refersTo explicitly accepts null to test clearing.
+        @SuppressWarnings("nullness:argument.type.incompatible")
         private boolean cleanSomeSlots(int i, int n) {
             boolean removed = false;
-            Entry[] tab = table;
+            @Nullable Entry[] tab = table;
             int len = tab.length;
             do {
                 i = nextIndex(i, len);
@@ -709,10 +735,10 @@ public @UsesObjectEquals class ThreadLocal<@Nullable T> {
          * Double the capacity of the table.
          */
         private void resize() {
-            Entry[] oldTab = table;
+            @Nullable Entry[] oldTab = table;
             int oldLen = oldTab.length;
             int newLen = oldLen * 2;
-            Entry[] newTab = new Entry[newLen];
+            @Nullable Entry[] newTab = new Entry[newLen];
             int count = 0;
 
             for (Entry e : oldTab) {
@@ -738,8 +764,10 @@ public @UsesObjectEquals class ThreadLocal<@Nullable T> {
         /**
          * Expunge all stale entries in the table.
          */
+        // JDK annotation gap: Reference.refersTo explicitly accepts null to test clearing.
+        @SuppressWarnings("nullness:argument.type.incompatible")
         private void expungeStaleEntries() {
-            Entry[] tab = table;
+            @Nullable Entry[] tab = table;
             int len = tab.length;
             for (int j = 0; j < len; j++) {
                 Entry e = tab[j];

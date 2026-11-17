@@ -28,6 +28,8 @@ package java.lang;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.framework.qual.AnnotatedFor;
 import org.checkerframework.framework.qual.CFComment;
+import org.checkerframework.framework.qual.DefaultQualifier;
+import org.checkerframework.framework.qual.TypeUseLocation;
 
 import java.lang.ref.*;
 
@@ -57,7 +59,9 @@ import java.lang.ref.*;
 
 @CFComment({"nullness: See comment in ThreadLocal class about type parameter annotation."})
 @AnnotatedFor({"nullness"})
-public class InheritableThreadLocal<@Nullable T> extends ThreadLocal<T> {
+// Preserve the nullable lower bound required by the null initial value.
+@DefaultQualifier(value = Nullable.class, locations = TypeUseLocation.IMPLICIT_LOWER_BOUND)
+public class InheritableThreadLocal<T extends @Nullable Object> extends ThreadLocal<T> {
     /**
      * Creates an inheritable thread local variable.
      */
@@ -75,6 +79,8 @@ public class InheritableThreadLocal<@Nullable T> extends ThreadLocal<T> {
      * @param parentValue the parent thread's value
      * @return the child thread's initial value
      */
+    // Suspected bundled-JDK/source merge bug: implicit receiver changes T upper bound.
+    @SuppressWarnings("nullness:override.receiver.invalid")
     protected T childValue(T parentValue) {
         return parentValue;
     }
@@ -84,7 +90,9 @@ public class InheritableThreadLocal<@Nullable T> extends ThreadLocal<T> {
      *
      * @param t the current thread
      */
-    ThreadLocalMap getMap(Thread t) {
+    // Suspected bundled-JDK/source merge bug: implicit receiver changes T upper bound.
+    @SuppressWarnings("nullness:override.receiver.invalid")
+    @Nullable ThreadLocalMap getMap(Thread t) {
        return t.inheritableThreadLocals;
     }
 
@@ -94,6 +102,8 @@ public class InheritableThreadLocal<@Nullable T> extends ThreadLocal<T> {
      * @param t the current thread
      * @param firstValue value for the initial entry of the table.
      */
+    // Suspected bundled-JDK/source merge bug: implicit receiver changes T upper bound.
+    @SuppressWarnings("nullness:override.receiver.invalid")
     void createMap(Thread t, T firstValue) {
         t.inheritableThreadLocals = new ThreadLocalMap(this, firstValue);
     }
