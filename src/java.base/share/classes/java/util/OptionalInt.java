@@ -68,6 +68,8 @@ import java.util.stream.IntStream;
  * @since 1.8
  */
 @AnnotatedFor({"lock", "nullness", "optional"})
+// Preserve the existing CF nonnull class policy; this declaration site is outside JSpecify.
+@SuppressWarnings("nullness:jspecify.unrecognized.location.class")
 @jdk.internal.ValueBased
 public final @NonNull class OptionalInt {
     /**
