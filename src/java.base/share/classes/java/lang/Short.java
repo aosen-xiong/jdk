@@ -264,7 +264,7 @@ public final class Short extends Number implements Comparable<Short>, Constable 
         private ShortCache() {}
 
         static final Short[] cache;
-        static Short[] archivedCache;
+        static Short @Nullable [] archivedCache;
 
         static {
             int size = -(-128) + 127 + 1;
