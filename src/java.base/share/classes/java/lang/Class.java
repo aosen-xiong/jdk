@@ -31,6 +31,7 @@ import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
+import org.checkerframework.checker.nullness.qual.RequiresNonNull;
 import org.checkerframework.checker.nullness.qual.UnknownKeyFor;
 import org.checkerframework.checker.signature.qual.CanonicalName;
 import org.checkerframework.checker.signature.qual.ClassGetName;
@@ -244,7 +245,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * This constructor is not used and prevents the default constructor being
      * generated.
      */
-    private Class(ClassLoader loader, Class<?> arrayComponentType) {
+    private Class(@Nullable ClassLoader loader, @Nullable Class<?> arrayComponentType) {
         // Initialize final field for classLoader.  The initialization value of non-null
         // prevents future JIT optimizations from assuming this final field is null.
         classLoader = loader;
@@ -302,6 +303,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      *
      * @since 1.8
      */
+    @SuppressWarnings("nullness:dereference.of.nullable") // Array-loop invariant: each step starts from an array class.
     public String toGenericString() {
         if (isPrimitive()) {
             return toString();
@@ -403,7 +405,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      */
     @ForName
     @CallerSensitive
-    public static Class<? extends Object> forName(@ClassGetName String className)
+    public static Class<? extends @Nullable Object> forName(@ClassGetName String className)
                 throws ClassNotFoundException {
         Class<?> caller = Reflection.getCallerClass();
         return forName0(className, true, ClassLoader.getClassLoader(caller), caller);
@@ -479,7 +481,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * @since     1.2
      */
     @CallerSensitive
-    public static Class<? extends Object> forName(@ClassGetName String name, boolean initialize,
+    public static Class<? extends @Nullable Object> forName(@ClassGetName String name, boolean initialize,
                                    @Nullable ClassLoader loader)
         throws ClassNotFoundException
     {
@@ -503,8 +505,8 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
 
     /** Called after security check for system loader access checks have been made. */
     private static native Class<?> forName0(String name, boolean initialize,
-                                            ClassLoader loader,
-                                            Class<?> caller)
+                                            @Nullable ClassLoader loader,
+                                            @Nullable Class<?> caller)
         throws ClassNotFoundException;
 
 
@@ -556,7 +558,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      */
     @SuppressWarnings("removal")
     @CallerSensitive
-    public static Class<? extends Object> forName(Module module, String name) {
+    public static @Nullable Class<? extends @Nullable Object> forName(Module module, String name) {
         Objects.requireNonNull(module);
         Objects.requireNonNull(name);
 
@@ -569,7 +571,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
                 // java.base has all permissions
                 sm.checkPermission(SecurityConstants.GET_CLASSLOADER_PERMISSION);
             }
-            PrivilegedAction<ClassLoader> pa = module::getClassLoader;
+            PrivilegedAction<@Nullable ClassLoader> pa = module::getClassLoader;
             cl = AccessController.doPrivileged(pa);
         } else {
             cl = module.getClassLoader();
@@ -635,7 +637,8 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      *          s.checkPackageAccess()} denies access to the package
      *          of this class.
      */
-    @SuppressWarnings("removal")
+    // Allocation returns nonnull; Unsafe.throwException never returns normally.
+    @SuppressWarnings({"removal", "nullness:return.type.incompatible", "nullness:type.arguments.not.inferred"})
     @CallerSensitive
     @Deprecated(since="9")
     public @NonNull T newInstance()
@@ -684,7 +687,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
         }
     }
 
-    private transient volatile Constructor<T> cachedConstructor;
+    private transient volatile @Nullable Constructor<T> cachedConstructor;
 
     /**
      * Determines if the specified {@code Object} is assignment-compatible
@@ -771,7 +774,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      *          {@code false} otherwise.
      * @since   1.1
      */
-    @EnsuresNonNullIf(expression={"getComponentType()"}, result=true)
+    @EnsuresNonNullIf(expression = {"getComponentType()", "componentType", "elementType()"}, result=true)
     @Pure
     @IntrinsicCandidate
     public native boolean isArray(@GuardSatisfied Class<T> this);
@@ -911,7 +914,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
 
     // Cache the name to reduce the number of calls into the VM.
     // This field would be set by VM itself during initClassName call.
-    private transient @ClassGetName String name;
+    private transient @ClassGetName @Nullable String name;
     private native @ClassGetName String initClassName();
 
     /**
@@ -950,7 +953,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
     }
 
     // Package-private to allow ClassLoader access
-    ClassLoader getClassLoader0() { return classLoader; }
+    @Nullable ClassLoader getClassLoader0() { return classLoader; }
 
     /**
      * Returns the module that this class or interface is a member of.
@@ -978,13 +981,13 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
     // Initialized in JVM not by private constructor
     // This field is filtered from reflection access, i.e. getDeclaredField
     // will throw NoSuchFieldException
-    private final ClassLoader classLoader;
+    private final @Nullable ClassLoader classLoader;
 
     // Set by VM
-    private transient Object classData;
+    private transient @Nullable Object classData;
 
     // package-private
-    Object getClassData() {
+    @Nullable Object getClassData() {
         return classData;
     }
 
@@ -1137,7 +1140,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
     }
 
     // cached package name
-    private transient String packageName;
+    private transient @Nullable String packageName;
 
     /**
      * Returns the interfaces directly implemented by the class or interface
@@ -1184,7 +1187,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * @return an array of interfaces directly implemented by this class
      */
     @SideEffectFree
-    public Class<? extends Object>[] getInterfaces(@GuardSatisfied Class<T> this) {
+    public Class<? extends @Nullable Object>[] getInterfaces(@GuardSatisfied Class<T> this) {
         // defensively copy before handing over to user code
         return getInterfaces(true);
     }
@@ -1272,7 +1275,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * @since 1.1
      */
     @Pure
-    public @Nullable Class<? extends Object> getComponentType(@GuardSatisfied Class<T> this) {
+    public @Nullable Class<? extends @Nullable Object> getComponentType(@GuardSatisfied Class<T> this) {
         // Only return for array types. Storage may be reused for Class for instance types.
         if (isArray()) {
             return componentType;
@@ -1281,14 +1284,14 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
         }
     }
 
-    private final Class<?> componentType;
+    private final @Nullable Class<?> componentType;
 
     /*
      * Returns the {@code Class} representing the element type of an array class.
      * If this class does not represent an array class, then this method returns
      * {@code null}.
      */
-    private Class<?> elementType() {
+    private @Nullable Class<?> elementType() {
         if (!isArray()) return null;
 
         Class<?> c = this;
@@ -1442,10 +1445,10 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
         }
     }
 
-    private native Object[] getEnclosingMethod0();
+    private native @Nullable Object @Nullable [] getEnclosingMethod0();
 
-    private EnclosingMethodInfo getEnclosingMethodInfo() {
-        Object[] enclosingInfo = getEnclosingMethod0();
+    private @Nullable EnclosingMethodInfo getEnclosingMethodInfo() {
+        @Nullable Object[] enclosingInfo = getEnclosingMethod0();
         if (enclosingInfo == null)
             return null;
         else {
@@ -1455,10 +1458,10 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
 
     private static final class EnclosingMethodInfo {
         private final Class<?> enclosingClass;
-        private final String name;
-        private final String descriptor;
+        private final @Nullable String name;
+        private final @Nullable String descriptor;
 
-        static void validate(Object[] enclosingInfo) {
+        static void validate(@Nullable Object[] enclosingInfo) {
             if (enclosingInfo.length != 3)
                 throw new InternalError("Malformed enclosing method information");
             try {
@@ -1481,25 +1484,31 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
             }
         }
 
-        EnclosingMethodInfo(Object[] enclosingInfo) {
+        @SuppressWarnings("nullness:assignment.type.incompatible") // Native tuple slot 0 is the nonnull enclosing class.
+        EnclosingMethodInfo(@Nullable Object[] enclosingInfo) {
             validate(enclosingInfo);
             this.enclosingClass = (Class<?>)enclosingInfo[0];
             this.name = (String)enclosingInfo[1];
             this.descriptor = (String)enclosingInfo[2];
         }
 
+        @EnsuresNonNullIf(expression = {"name", "descriptor"}, result = false)
         boolean isPartial() {
             return enclosingClass == null || name == null || descriptor == null;
         }
 
+        @EnsuresNonNullIf(expression = {"name", "descriptor"}, result = true)
         boolean isConstructor() { return !isPartial() && "<init>".equals(name); }
 
+        @EnsuresNonNullIf(expression = {"name", "descriptor"}, result = true)
         boolean isMethod() { return !isPartial() && !isConstructor() && !"<clinit>".equals(name); }
 
         Class<?> getEnclosingClass() { return enclosingClass; }
 
+        @RequiresNonNull("name")
         String getName() { return name; }
 
+        @RequiresNonNull("descriptor")
         String getDescriptor() { return descriptor; }
 
     }
@@ -1547,7 +1556,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * @since 1.5
      */
     @CallerSensitive
-    public @Nullable Constructor<? extends Object> getEnclosingConstructor() throws SecurityException {
+    public @Nullable Constructor<? extends @Nullable Object> getEnclosingConstructor() throws SecurityException {
         EnclosingMethodInfo enclosingInfo = getEnclosingMethodInfo();
 
         if (enclosingInfo == null)
@@ -1613,7 +1622,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * @since 1.1
      */
     @CallerSensitive
-    public @Nullable Class<? extends Object> getDeclaringClass() throws SecurityException {
+    public @Nullable Class<? extends @Nullable Object> getDeclaringClass() throws SecurityException {
         final Class<?> candidate = getDeclaringClass0();
 
         if (candidate != null) {
@@ -1627,7 +1636,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
         return candidate;
     }
 
-    private native Class<?> getDeclaringClass0();
+    private native @Nullable Class<?> getDeclaringClass0();
 
 
     /**
@@ -1645,7 +1654,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      */
     @Pure
     @CallerSensitive
-    public @Nullable Class<? extends Object> getEnclosingClass() throws SecurityException {
+    public @Nullable Class<? extends @Nullable Object> getEnclosingClass() throws SecurityException {
         // There are five kinds of classes (or interfaces):
         // a) Top level classes
         // b) Nested classes (static member classes)
@@ -1725,6 +1734,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * @return an informative string for the name of this class or interface
      * @since 1.8
      */
+    @SuppressWarnings("nullness:dereference.of.nullable") // Array-loop invariant: each step starts from an array class.
     public String getTypeName() {
         if (isArray()) {
             try {
@@ -1842,7 +1852,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * Returns {@code null} if the underlying class is a top level
      * class.
      */
-    private String getSimpleBinaryName() {
+    private @Nullable String getSimpleBinaryName() {
         if (isTopLevelClass())
             return null;
         String name = getSimpleBinaryName0();
@@ -1851,7 +1861,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
         return name;
     }
 
-    private native String getSimpleBinaryName0();
+    private native @Nullable String getSimpleBinaryName0();
 
     /**
      * Returns {@code true} if this is a top level class.  Returns {@code false}
@@ -1873,7 +1883,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
     }
 
     private boolean hasEnclosingMethodInfo() {
-        Object[] enclosingInfo = getEnclosingMethod0();
+        @Nullable Object[] enclosingInfo = getEnclosingMethod0();
         if (enclosingInfo != null) {
             EnclosingMethodInfo.validate(enclosingInfo);
             return true;
@@ -1906,7 +1916,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      */
     @SuppressWarnings("removal")
     @CallerSensitive
-    public Class<? extends Object>[] getClasses() {
+    public Class<? extends @Nullable Object>[] getClasses() {
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
             checkMemberAccess(sm, Member.PUBLIC, Reflection.getCallerClass(), false);
@@ -2107,7 +2117,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * @since 1.1
      */
     @CallerSensitive
-    public Constructor<? extends Object>[] getConstructors() throws SecurityException {
+    public Constructor<? extends @Nullable Object>[] getConstructors() throws SecurityException {
         @SuppressWarnings("removal")
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
@@ -2369,7 +2379,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * @jls 8.5 Member Type Declarations
      */
     @CallerSensitive
-    public Class<? extends Object>[] getDeclaredClasses() throws SecurityException {
+    public Class<? extends @Nullable Object>[] getDeclaredClasses() throws SecurityException {
         @SuppressWarnings("removal")
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
@@ -2484,7 +2494,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * @since 16
      */
     @CallerSensitive
-    public RecordComponent[] getRecordComponents() {
+    public RecordComponent @Nullable [] getRecordComponents() {
         @SuppressWarnings("removal")
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
@@ -3007,7 +3017,8 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * the module. For other callers, then the package needs to be open to
      * the caller.
      */
-    private boolean isOpenToCaller(String name, Class<?> caller) {
+    @SuppressWarnings("nullness:argument.type.incompatible") // Pinned JDK source defect: null caller falls through for an open package.
+    private boolean isOpenToCaller(String name, @Nullable Class<?> caller) {
         // assert getModule().isNamed();
         Module thisModule = getModule();
         Module callerModule = (caller != null) ? caller.getModule() : null;
@@ -3029,7 +3040,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
 
 
     /** protection domain returned when the internal domain is null */
-    private static java.security.ProtectionDomain allPermDomain;
+    private static java.security.@Nullable ProtectionDomain allPermDomain;
 
     /**
      * Returns the {@code ProtectionDomain} of this class.  If there is a
@@ -3079,7 +3090,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
     /**
      * Returns the ProtectionDomain of this class.
      */
-    private native java.security.ProtectionDomain getProtectionDomain0();
+    private native java.security.@Nullable ProtectionDomain getProtectionDomain0();
 
     /*
      * Return the Virtual Machine's Class object for the named
@@ -3122,7 +3133,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      *
      * NOTE: this method should only be called if a SecurityManager is active
      */
-    private void checkPackageAccess(@SuppressWarnings("removal") SecurityManager sm, final ClassLoader ccl,
+    private void checkPackageAccess(@SuppressWarnings("removal") SecurityManager sm, final @Nullable ClassLoader ccl,
                                     boolean checkProxyInterfaces) {
         final ClassLoader cl = getClassLoader0();
 
@@ -3152,7 +3163,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * NOTE: this method does not support Proxy classes
      */
     private static void checkPackageAccessForPermittedSubclasses(@SuppressWarnings("removal") SecurityManager sm,
-                                    final ClassLoader ccl, Class<?>[] subClasses) {
+                                    final @Nullable ClassLoader ccl, Class<?>[] subClasses) {
         final ClassLoader cl = subClasses[0].getClassLoader0();
 
         if (ReflectUtil.needsPackageAccessCheck(ccl, cl)) {
@@ -3211,19 +3222,19 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
                 = unsafe.objectFieldOffset(Class.class, "annotationData");
 
         static <T> boolean casReflectionData(Class<?> clazz,
-                                             SoftReference<ReflectionData<T>> oldData,
+                                             @Nullable SoftReference<ReflectionData<T>> oldData,
                                              SoftReference<ReflectionData<T>> newData) {
             return unsafe.compareAndSetReference(clazz, reflectionDataOffset, oldData, newData);
         }
 
         static boolean casAnnotationType(Class<?> clazz,
-                                         AnnotationType oldType,
+                                         @Nullable AnnotationType oldType,
                                          AnnotationType newType) {
             return unsafe.compareAndSetReference(clazz, annotationTypeOffset, oldType, newType);
         }
 
         static boolean casAnnotationData(Class<?> clazz,
-                                         AnnotationData oldData,
+                                         @Nullable AnnotationData oldData,
                                          AnnotationData newData) {
             return unsafe.compareAndSetReference(clazz, annotationDataOffset, oldData, newData);
         }
@@ -3236,21 +3247,21 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
     // Reflection data caches various derived names and reflective members. Cached
     // values may be invalidated when JVM TI RedefineClasses() is called
     private static class ReflectionData<T> {
-        volatile Field[] declaredFields;
-        volatile Field[] publicFields;
-        volatile Method[] declaredMethods;
-        volatile Method[] publicMethods;
-        volatile Constructor<T>[] declaredConstructors;
-        volatile Constructor<T>[] publicConstructors;
+        volatile Field @Nullable [] declaredFields;
+        volatile Field @Nullable [] publicFields;
+        volatile Method @Nullable [] declaredMethods;
+        volatile Method @Nullable [] publicMethods;
+        volatile Constructor<T> @Nullable [] declaredConstructors;
+        volatile Constructor<T> @Nullable [] publicConstructors;
         // Intermediate results for getFields and getMethods
-        volatile Field[] declaredPublicFields;
-        volatile Method[] declaredPublicMethods;
-        volatile Class<?>[] interfaces;
+        volatile Field @Nullable [] declaredPublicFields;
+        volatile Method @Nullable [] declaredPublicMethods;
+        volatile Class<?> @Nullable [] interfaces;
 
         // Cached names
-        String simpleName;
+        @Nullable String simpleName;
         @CFComment("signature: is a @CanonicalName or ReflectionData.NULL_SENTINEL")
-        String canonicalName;
+        @Nullable String canonicalName;
         static final String NULL_SENTINEL = new String();
 
         // Value of classRedefinedCount when we created this ReflectionData instance
@@ -3261,7 +3272,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
         }
     }
 
-    private transient volatile SoftReference<ReflectionData<T>> reflectionData;
+    private transient volatile @Nullable SoftReference<ReflectionData<T>> reflectionData;
 
     // Incremented by the VM on each call to JVM TI RedefineClasses()
     // that redefines this class or a superclass.
@@ -3282,7 +3293,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
         return newReflectionData(reflectionData, classRedefinedCount);
     }
 
-    private ReflectionData<T> newReflectionData(SoftReference<ReflectionData<T>> oldReflectionData,
+    private ReflectionData<T> newReflectionData(@Nullable SoftReference<ReflectionData<T>> oldReflectionData,
                                                 int classRedefinedCount) {
         while (true) {
             ReflectionData<T> rd = new ReflectionData<>(classRedefinedCount);
@@ -3302,10 +3313,10 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
     }
 
     // Generic signature handling
-    private native String getGenericSignature0();
+    private native @Nullable String getGenericSignature0();
 
     // Generic info repository; lazily initialized
-    private transient volatile ClassRepository genericInfo;
+    private transient volatile @Nullable ClassRepository genericInfo;
 
     // accessor for factory
     private GenericsFactory getFactory() {
@@ -3315,7 +3326,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
 
     // accessor for generic info repository;
     // generic info is lazily initialized
-    private ClassRepository getGenericInfo() {
+    private @Nullable ClassRepository getGenericInfo() {
         ClassRepository genericInfo = this.genericInfo;
         if (genericInfo == null) {
             String signature = getGenericSignature0();
@@ -3330,14 +3341,14 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
     }
 
     // Annotations handling
-    native byte[] getRawAnnotations();
+    native byte @Nullable [] getRawAnnotations();
     // Since 1.8
-    native byte[] getRawTypeAnnotations();
-    static byte[] getExecutableTypeAnnotationBytes(Executable ex) {
+    native byte @Nullable [] getRawTypeAnnotations();
+    static byte @Nullable [] getExecutableTypeAnnotationBytes(Executable ex) {
         return getReflectionFactory().getExecutableTypeAnnotationBytes(ex);
     }
 
-    native ConstantPool getConstantPool();
+    native @Nullable ConstantPool getConstantPool();
 
     //
     //
@@ -3519,7 +3530,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
     //
 
     // This method does not copy the returned Field object!
-    private static Field searchFields(Field[] fields, String name) {
+    private static @Nullable Field searchFields(Field[] fields, String name) {
         for (Field field : fields) {
             if (field.getName().equals(name)) {
                 return field;
@@ -3531,7 +3542,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
     // Returns a "root" Field object. This Field object must NOT
     // be propagated to the outside world, but must instead be copied
     // via ReflectionFactory.copyField.
-    private Field getField0(String name) {
+    private @Nullable Field getField0(String name) {
         // Note: the intent is that the search algorithm this routine
         // uses be equivalent to the ordering imposed by
         // privateGetPublicFields(). It fetches only the declared
@@ -3564,7 +3575,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
     }
 
     // This method does not copy the returned Method object!
-    private static Method searchMethods(Method[] methods,
+    private static @Nullable Method searchMethods(Method[] methods,
                                         String name,
                                         Class<?>[] parameterTypes)
     {
@@ -3587,7 +3598,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
     // Returns a "root" Method object. This Method object must NOT
     // be propagated to the outside world, but must instead be copied
     // via ReflectionFactory.copyMethod.
-    private Method getMethod0(String name, Class<?>[] parameterTypes) {
+    private @Nullable Method getMethod0(String name, Class<?> @Nullable [] parameterTypes) {
         PublicMethods.MethodList res = getMethodsRecursive(
             name,
             parameterTypes == null ? EMPTY_CLASS_ARRAY : parameterTypes,
@@ -3598,7 +3609,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
     // Returns a list of "root" Method objects. These Method objects must NOT
     // be propagated to the outside world, but must instead be copied
     // via ReflectionFactory.copyMethod.
-    private PublicMethods.MethodList getMethodsRecursive(String name,
+    private PublicMethods.@Nullable MethodList getMethodsRecursive(String name,
                                                          Class<?>[] parameterTypes,
                                                          boolean includeStatic) {
         // 1st check declared public methods
@@ -3651,7 +3662,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
     // Other helpers and base implementation
     //
 
-    private static boolean arrayContentsEq(Object[] a1, Object[] a2) {
+    private static boolean arrayContentsEq(@Nullable Object @Nullable [] a1, @Nullable Object @Nullable [] a2) {
         if (a1 == null) {
             return a2 == null || a2.length == 0;
         }
@@ -3712,13 +3723,13 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * Note that this method returns non-null array on a class with
      * the Record attribute even if this class is not a record.
      */
-    private native RecordComponent[] getRecordComponents0();
+    private native RecordComponent @Nullable [] getRecordComponents0();
     private native boolean       isRecord0();
 
     /**
      * Helper method to get the method name from arguments.
      */
-    private String methodToString(String name, Class<?>[] argTypes) {
+    private String methodToString(String name, @Nullable Class<?> @Nullable [] argTypes) {
         return getName() + '.' + name +
                 ((argTypes == null || argTypes.length == 0) ?
                 "()" :
@@ -3778,6 +3789,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * @see    java.lang.ClassLoader#setDefaultAssertionStatus
      * @since  1.4
      */
+    @SuppressWarnings("nullness:contracts.precondition.not.satisfied") // Both loader assertion maps are initialized together under assertionLock.
     public boolean desiredAssertionStatus() {
         ClassLoader loader = getClassLoader0();
         // If the loader is null this is a system class, so ask the VM
@@ -3859,7 +3871,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
         }
         return reflectionFactory;
     }
-    private static ReflectionFactory reflectionFactory;
+    private static @Nullable ReflectionFactory reflectionFactory;
 
     /**
      * Returns the elements of this enum class or null if this
@@ -3873,7 +3885,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * @jls 8.9.1 Enum Constants
      */
     public @NonNull T @Nullable [] getEnumConstants() {
-        T[] values = getEnumConstantsShared();
+        @NonNull T[] values = getEnumConstantsShared();
         return (values != null) ? values.clone() : null;
     }
 
@@ -3884,8 +3896,8 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * uncloned, cached, and shared by all callers.
      */
     @SuppressWarnings("removal")
-    T[] getEnumConstantsShared() {
-        T[] constants = enumConstants;
+    @NonNull T @Nullable [] getEnumConstantsShared() {
+        @NonNull T[] constants = enumConstants;
         if (constants == null) {
             if (!isEnum()) return null;
             try {
@@ -3897,8 +3909,8 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
                                 return null;
                             }
                         });
-                @SuppressWarnings("unchecked")
-                T[] temporaryConstants = (T[])values.invoke(null);
+                @SuppressWarnings({"unchecked", "nullness:argument.type.incompatible"}) // Method.invoke permits a null receiver for static values().
+                @NonNull T[] temporaryConstants = (@NonNull T[])values.invoke(null);
                 enumConstants = constants = temporaryConstants;
             }
             // These can happen when users concoct enum-like classes
@@ -3908,7 +3920,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
         }
         return constants;
     }
-    private transient volatile T[] enumConstants;
+    private transient volatile @NonNull T @Nullable [] enumConstants;
 
     /**
      * Returns a map from simple name to enum constant.  This package-private
@@ -3918,9 +3930,9 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * created lazily on first use.  Typically it won't ever get created.
      */
     Map<String, @NonNull T> enumConstantDirectory() {
-        Map<String, T> directory = enumConstantDirectory;
+        Map<String, @NonNull T> directory = enumConstantDirectory;
         if (directory == null) {
-            T[] universe = getEnumConstantsShared();
+            @NonNull T[] universe = getEnumConstantsShared();
             if (universe == null)
                 throw new IllegalArgumentException(
                     getName() + " is not an enum class");
@@ -3932,7 +3944,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
         }
         return directory;
     }
-    private transient volatile Map<String, T> enumConstantDirectory;
+    private transient volatile @Nullable Map<String, @NonNull T> enumConstantDirectory;
 
     /**
      * Casts an object to the class or interface represented
@@ -4091,14 +4103,14 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
 
     // annotation data that might get invalidated when JVM TI RedefineClasses() is called
     private static class AnnotationData {
-        final Map<Class<? extends Annotation>, Annotation> annotations;
-        final Map<Class<? extends Annotation>, Annotation> declaredAnnotations;
+        final Map<Class<? extends @Nullable Annotation>, Annotation> annotations;
+        final Map<Class<? extends @Nullable Annotation>, Annotation> declaredAnnotations;
 
         // Value of classRedefinedCount when we created this AnnotationData instance
         final int redefinedCount;
 
-        AnnotationData(Map<Class<? extends Annotation>, Annotation> annotations,
-                       Map<Class<? extends Annotation>, Annotation> declaredAnnotations,
+        AnnotationData(Map<Class<? extends @Nullable Annotation>, Annotation> annotations,
+                       Map<Class<? extends @Nullable Annotation>, Annotation> declaredAnnotations,
                        int redefinedCount) {
             this.annotations = annotations;
             this.declaredAnnotations = declaredAnnotations;
@@ -4108,7 +4120,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
 
     // Annotations cache
     @SuppressWarnings("UnusedDeclaration")
-    private transient volatile AnnotationData annotationData;
+    private transient volatile @Nullable AnnotationData annotationData;
 
     private AnnotationData annotationData() {
         while (true) { // retry loop
@@ -4129,15 +4141,15 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
     }
 
     private AnnotationData createAnnotationData(int classRedefinedCount) {
-        Map<Class<? extends Annotation>, Annotation> declaredAnnotations =
+        Map<Class<? extends @Nullable Annotation>, Annotation> declaredAnnotations =
             AnnotationParser.parseAnnotations(getRawAnnotations(), getConstantPool(), this);
         Class<?> superClass = getSuperclass();
-        Map<Class<? extends Annotation>, Annotation> annotations = null;
+        Map<Class<? extends @Nullable Annotation>, Annotation> annotations = null;
         if (superClass != null) {
-            Map<Class<? extends Annotation>, Annotation> superAnnotations =
+            Map<Class<? extends @Nullable Annotation>, Annotation> superAnnotations =
                 superClass.annotationData().annotations;
-            for (Map.Entry<Class<? extends Annotation>, Annotation> e : superAnnotations.entrySet()) {
-                Class<? extends Annotation> annotationClass = e.getKey();
+            for (Map.Entry<Class<? extends @Nullable Annotation>, Annotation> e : superAnnotations.entrySet()) {
+                Class<? extends @Nullable Annotation> annotationClass = e.getKey();
                 if (AnnotationType.getInstance(annotationClass).isInherited()) {
                     if (annotations == null) { // lazy construction
                         annotations = new LinkedHashMap<>((Math.max(
@@ -4163,24 +4175,24 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
     // Annotation interfaces cache their internal (AnnotationType) form
 
     @SuppressWarnings("UnusedDeclaration")
-    private transient volatile AnnotationType annotationType;
+    private transient volatile @Nullable AnnotationType annotationType;
 
-    boolean casAnnotationType(AnnotationType oldType, AnnotationType newType) {
+    boolean casAnnotationType(@Nullable AnnotationType oldType, AnnotationType newType) {
         return Atomic.casAnnotationType(this, oldType, newType);
     }
 
-    AnnotationType getAnnotationType() {
+    @Nullable AnnotationType getAnnotationType() {
         return annotationType;
     }
 
-    Map<Class<? extends Annotation>, Annotation> getDeclaredAnnotationMap() {
+    Map<Class<? extends @Nullable Annotation>, Annotation> getDeclaredAnnotationMap() {
         return annotationData().declaredAnnotations;
     }
 
     /* Backing store of user-defined values pertaining to this class.
      * Maintained by the ClassValue class.
      */
-    transient ClassValue.ClassValueMap classValueMap;
+    transient ClassValue.@Nullable ClassValueMap classValueMap;
 
     /**
      * Returns an {@code AnnotatedType} object that represents the use of a
@@ -4201,7 +4213,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * @return an object representing the superclass
      * @since 1.8
      */
-    public AnnotatedType getAnnotatedSuperclass() {
+    public @Nullable AnnotatedType getAnnotatedSuperclass() {
         if (this == Object.class ||
                 isInterface() ||
                 isArray() ||
@@ -4285,7 +4297,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * @jvms 5.4.4 Access Control
      */
     @CallerSensitive
-    public Class<? extends Object> getNestHost() {
+    public Class<? extends @Nullable Object> getNestHost() {
         if (isPrimitive() || isArray()) {
             return this;
         }
@@ -4377,7 +4389,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * @jvms 4.7.29 The {@code NestMembers} Attribute
      */
     @CallerSensitive
-    public Class<? extends Object>[] getNestMembers() {
+    public Class<? extends @Nullable Object>[] getNestMembers() {
         if (isPrimitive() || isArray()) {
             return new Class<?>[] { this };
         }
@@ -4494,7 +4506,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      */
     @Override
     @Pure
-    public @Nullable Class<? extends Object> componentType() {
+    public @Nullable Class<? extends @Nullable Object> componentType() {
         return isArray() ? componentType : null;
     }
 
@@ -4507,7 +4519,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      */
     @Override
     @Pure
-    public Class<? extends Object> arrayType() {
+    public Class<? extends @Nullable Object> arrayType() {
         return Array.newInstance(this, 0).getClass();
     }
 
@@ -4575,7 +4587,7 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * @since 17
      */
     @CallerSensitive
-    public Class<? extends Object>[] getPermittedSubclasses() {
+    public Class<? extends @Nullable Object> @Nullable [] getPermittedSubclasses() {
         Class<?>[] subClasses;
         if (isArray() || isPrimitive() || (subClasses = getPermittedSubclasses0()) == null) {
             return null;
@@ -4636,5 +4648,5 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
         return getPermittedSubclasses() != null;
     }
 
-    private native Class<?>[] getPermittedSubclasses0();
+    private native Class<?> @Nullable [] getPermittedSubclasses0();
 }
