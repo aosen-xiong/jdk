@@ -36,7 +36,6 @@ import org.checkerframework.checker.signature.qual.BinaryName;
 import org.checkerframework.checker.signature.qual.FullyQualifiedName;
 import org.checkerframework.common.reflection.qual.ForName;
 import org.checkerframework.framework.qual.AnnotatedFor;
-import org.checkerframework.framework.qual.CFComment;
 
 import java.io.InputStream;
 import java.io.IOException;
@@ -254,7 +253,7 @@ public abstract @UsesObjectEquals class ClassLoader {
     private final @Nullable ClassLoader parent;
 
     // class loader name
-    private final String name;
+    private final @Nullable String name;
 
     // the unnamed module for this ClassLoader
     private final Module unnamedModule;
@@ -280,6 +279,7 @@ public abstract @UsesObjectEquals class ClassLoader {
          * Returns {@code true} is successfully registered; {@code false} if
          * loader's super class is not registered.
          */
+        @SuppressWarnings("nullness:argument.type.incompatible") // Language invariant: every ClassLoader type has a superclass.
         static boolean register(Class<? extends ClassLoader> c) {
             synchronized (loaderTypes) {
                 if (loaderTypes.contains(c.getSuperclass())) {
@@ -325,6 +325,7 @@ public abstract @UsesObjectEquals class ClassLoader {
 
     // The "default" domain. Set as the default ProtectionDomain on newly
     // created classes.
+    @SuppressWarnings("nullness:argument.type.incompatible") // Dependency gap: ProtectionDomain treats null principals as an empty array.
     private final ProtectionDomain defaultDomain =
         new ProtectionDomain(new CodeSource(null, (Certificate[]) null),
                              null, this, null);
@@ -373,7 +374,7 @@ public abstract @UsesObjectEquals class ClassLoader {
         return checkCreateClassLoader(null);
     }
 
-    private static Void checkCreateClassLoader(String name) {
+    private static @Nullable Void checkCreateClassLoader(@Nullable String name) {
         if (name != null && name.isEmpty()) {
             throw new IllegalArgumentException("name must be non-empty or null");
         }
@@ -386,7 +387,7 @@ public abstract @UsesObjectEquals class ClassLoader {
         return null;
     }
 
-    private ClassLoader(Void unused, String name, ClassLoader parent) {
+    private ClassLoader(@Nullable Void unused, @Nullable String name, @Nullable ClassLoader parent) {
         this.name = name;
         this.parent = parent;
         this.unnamedModule = new Module(this);
@@ -507,7 +508,7 @@ public abstract @UsesObjectEquals class ClassLoader {
 
     // package-private used by StackTraceElement to avoid
     // calling the overrideable getName method
-    final String name() {
+    final @Nullable String name() {
         return name;
     }
 
@@ -640,7 +641,7 @@ public abstract @UsesObjectEquals class ClassLoader {
      *         this class loader, or {@code null} if the class could not be found.
      */
     @ForName
-    final Class<?> loadClass(Module module, @BinaryName String name) {
+    final @Nullable Class<?> loadClass(Module module, @BinaryName String name) {
         synchronized (getClassLoadingLock(name)) {
             // First, check if the class has already been loaded
             Class<?> c = findLoadedClass(name);
@@ -702,7 +703,7 @@ public abstract @UsesObjectEquals class ClassLoader {
             final String packageName = cls.getPackageName();
             if (!packageName.isEmpty()) {
                 AccessController.doPrivileged(new PrivilegedAction<>() {
-                    public Void run() {
+                    public @Nullable Void run() {
                         sm.checkPackageAccess(packageName);
                         return null;
                     }
@@ -759,7 +760,7 @@ public abstract @UsesObjectEquals class ClassLoader {
      *
      * @since 9
      */
-    protected Class<?> findClass(String moduleName, String name) {
+    protected @Nullable Class<?> findClass(@Nullable String moduleName, String name) {
         if (moduleName == null) {
             try {
                 return findClass(name);
@@ -1122,12 +1123,12 @@ public abstract @UsesObjectEquals class ClassLoader {
         return c;
     }
 
-    static native Class<?> defineClass1(ClassLoader loader, @BinaryName String name, byte[] b, int off, int len,
-                                        ProtectionDomain pd, String source);
+    static native Class<?> defineClass1(@Nullable ClassLoader loader, @Nullable @BinaryName String name, byte[] b, int off, int len,
+                                        @Nullable ProtectionDomain pd, @Nullable String source);
 
-    static native Class<?> defineClass2(ClassLoader loader, @BinaryName String name, java.nio.ByteBuffer b,
-                                        int off, int len, ProtectionDomain pd,
-                                        String source);
+    static native Class<?> defineClass2(@Nullable ClassLoader loader, @Nullable @BinaryName String name, java.nio.ByteBuffer b,
+                                        int off, int len, @Nullable ProtectionDomain pd,
+                                        @Nullable String source);
 
     /**
      * Defines a class of the given flags via Lookup.defineClass.
@@ -1143,14 +1144,14 @@ public abstract @UsesObjectEquals class ClassLoader {
      * @param flags flags
      * @param classData class data
      */
-    static native Class<?> defineClass0(ClassLoader loader,
+    static native Class<?> defineClass0(@Nullable ClassLoader loader,
                                         Class<?> lookup,
-                                        String name,
+                                        @Nullable String name,
                                         byte[] b, int off, int len,
-                                        ProtectionDomain pd,
+                                        @Nullable ProtectionDomain pd,
                                         boolean initialize,
                                         int flags,
-                                        Object classData);
+                                        @Nullable Object classData);
 
     // true if the name is null or has the potential to be a valid binary name
     private static boolean checkName(@Nullable String name) {
@@ -1182,7 +1183,7 @@ public abstract @UsesObjectEquals class ClassLoader {
      * check to make sure the certs for the new class (certs) are the same as
      * the certs for the first class inserted in the package (pcerts)
      */
-    private boolean compareCerts(Certificate[] pcerts, Certificate @Nullable [] certs) {
+    private boolean compareCerts(Certificate[] pcerts, Certificate[] certs) {
         // empty array fast-path
         if (certs.length == 0)
             return pcerts.length == 0;
@@ -1302,7 +1303,7 @@ public abstract @UsesObjectEquals class ClassLoader {
         return findLoadedClass0(name);
     }
 
-    private final native Class<?> findLoadedClass0(String name);
+    private final native @Nullable Class<?> findLoadedClass0(String name);
 
     /**
      * Sets the signers of a class.  This should be invoked after defining a
@@ -1357,7 +1358,7 @@ public abstract @UsesObjectEquals class ClassLoader {
      * @see java.lang.module.ModuleReader#find(String)
      * @since 9
      */
-    protected URL findResource(String moduleName, String name) throws IOException {
+    protected @Nullable URL findResource(@Nullable String moduleName, String name) throws IOException {
         if (moduleName == null) {
             return findResource(name);
         } else {
@@ -1977,6 +1978,7 @@ public abstract @UsesObjectEquals class ClassLoader {
      *
      * @see java.lang.System#initPhase3
      */
+    @SuppressWarnings("nullness:dereference.of.nullable") // Exceptional protocol: Constructor.newInstance wraps the actual thrown cause.
     static synchronized ClassLoader initSystemClassLoader() {
         if (VM.initLevel() != 3) {
             throw new InternalError("system class loader cannot be set at initLevel " +
@@ -2048,7 +2050,7 @@ public abstract @UsesObjectEquals class ClassLoader {
     }
 
     // Returns the class's class loader, or null if none.
-    static @Nullable ClassLoader getClassLoader(Class<?> caller) {
+    static @Nullable ClassLoader getClassLoader(@Nullable Class<?> caller) {
         // This can be null if the VM is requesting it
         if (caller == null) {
             return null;
@@ -2062,7 +2064,7 @@ public abstract @UsesObjectEquals class ClassLoader {
      * if caller's class loader is not null and caller's class loader
      * is not the same as or an ancestor of the given cl argument.
      */
-    static void checkClassLoaderPermission(ClassLoader cl, Class<?> caller) {
+    static void checkClassLoaderPermission(ClassLoader cl, @Nullable Class<?> caller) {
         @SuppressWarnings("removal")
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
@@ -2088,7 +2090,7 @@ public abstract @UsesObjectEquals class ClassLoader {
      *
      * This method does not throw IllegalArgumentException.
      */
-    Package definePackage(Class<?> c) {
+    @Nullable Package definePackage(Class<?> c) {
         if (c.isPrimitive() || c.isArray()) {
             return null;
         }
@@ -2120,7 +2122,7 @@ public abstract @UsesObjectEquals class ClassLoader {
     /*
      * Returns a Package object for the named package
      */
-    private Package toPackage(String name, NamedPackage p, Module m) {
+    private Package toPackage(String name, @Nullable NamedPackage p, Module m) {
         // define Package object if the named package is not yet defined
         if (p == null)
             return NamedPackage.toPackage(name, m);
@@ -2245,7 +2247,7 @@ public abstract @UsesObjectEquals class ClassLoader {
      *
      * @since  9
      */
-    public final Package getDefinedPackage(String name) {
+    public final @Nullable Package getDefinedPackage(String name) {
         Objects.requireNonNull(name, "name cannot be null");
 
         NamedPackage p = packages.get(name);
@@ -2351,9 +2353,6 @@ public abstract @UsesObjectEquals class ClassLoader {
      * @since  1.2
      * @revised 9
      */
-    @CFComment({"nullness: The size of array passed to toArray",
-     "method is of exact same size as of the map for which toArray method is invoked"})
-    @SuppressWarnings({"nullness:return"})
     protected Package[] getPackages() {
         Stream<Package> pkgs = packages();
         ClassLoader ld = parent;
@@ -2403,10 +2402,7 @@ public abstract @UsesObjectEquals class ClassLoader {
     private final NativeLibraries libraries = NativeLibraries.jniNativeLibraries(this);
 
     // Invoked in the java.lang.Runtime class to implement load and loadLibrary.
-    @CFComment({"nulness: usr_paths and sys_paths are initialized",
-                "by intializePath method if they are null"})
-    @SuppressWarnings({"nullness:dereference.of.nullable"})
-    static NativeLibrary loadLibrary(Class<?> fromClass, File file) {
+    static NativeLibrary loadLibrary(@Nullable Class<?> fromClass, File file) {
         ClassLoader loader = (fromClass == null) ? null : fromClass.getClassLoader();
         NativeLibraries libs = loader != null ? loader.libraries : BootLoader.getNativeLibraries();
         NativeLibrary nl = libs.loadLibrary(fromClass, file);
@@ -2415,7 +2411,7 @@ public abstract @UsesObjectEquals class ClassLoader {
         }
         throw new UnsatisfiedLinkError("Can't load library: " + file);
     }
-    static NativeLibrary loadLibrary(Class<?> fromClass, String name) {
+    static NativeLibrary loadLibrary(@Nullable Class<?> fromClass, String name) {
         ClassLoader loader = (fromClass == null) ? null : fromClass.getClassLoader();
         if (loader == null) {
             NativeLibrary nl = BootLoader.getNativeLibraries().loadLibrary(fromClass, name);
@@ -2631,6 +2627,7 @@ public abstract @UsesObjectEquals class ClassLoader {
      *
      * @since  1.4
      */
+    @SuppressWarnings("nullness:argument.type.incompatible") // Dependency gap: this map is always a HashMap supporting the unnamed-package null key.
     @RequiresNonNull({"classAssertionStatus", "packageAssertionStatus"})
     boolean desiredAssertionStatus(String className) {
         synchronized (assertionLock) {
@@ -2664,7 +2661,6 @@ public abstract @UsesObjectEquals class ClassLoader {
 
     // Set up the assertions with information provided by the VM.
     // Note: Should only be called inside a synchronized block
-    @SuppressWarnings({"contracts.postcondition.not.satisfied"})
     @EnsuresNonNull({"classAssertionStatus", "packageAssertionStatus"})
     private void initializeJavaAssertionMaps() {
         // assert Thread.holdsLock(assertionLock);
@@ -2694,6 +2690,7 @@ public abstract @UsesObjectEquals class ClassLoader {
      * Returns the ConcurrentHashMap used as a storage for ClassLoaderValue(s)
      * associated with this ClassLoader, creating it if it doesn't already exist.
      */
+    @SuppressWarnings("nullness:return.type.incompatible") // CAS protocol: this thread or the winning thread publishes a nonnull map.
     ConcurrentHashMap<?, ?> createOrGetClassLoaderValueMap() {
         ConcurrentHashMap<?, ?> map = classLoaderValueMap;
         if (map == null) {
@@ -2708,7 +2705,7 @@ public abstract @UsesObjectEquals class ClassLoader {
     }
 
     // the storage for ClassLoaderValue(s) associated with this ClassLoader
-    private volatile ConcurrentHashMap<?, ?> classLoaderValueMap;
+    private volatile @Nullable ConcurrentHashMap<?, ?> classLoaderValueMap;
 
     /**
      * Attempts to atomically set a volatile field in this object. Returns
@@ -2726,6 +2723,7 @@ public abstract @UsesObjectEquals class ClassLoader {
     /**
      * Called by the VM, during -Xshare:dump
      */
+    @RequiresNonNull("parallelLockMap") // Native CDS entry: only registered parallel loaders are archived.
     private void resetArchivedStates() {
         parallelLockMap.clear();
         packages.clear();
@@ -2738,6 +2736,7 @@ public abstract @UsesObjectEquals class ClassLoader {
 /*
  * A utility class that will enumerate over an array of enumerations.
  */
+@AnnotatedFor("nullness")
 final class CompoundEnumeration<E> implements Enumeration<E> {
     private final Enumeration<E>[] enums;
     private int index;
