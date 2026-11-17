@@ -24,6 +24,9 @@
  */
 package java.lang;
 
+import org.checkerframework.framework.qual.AnnotatedFor;
+
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
 
@@ -45,7 +48,8 @@ import java.util.function.BiFunction;
  * @param <V>  the type of value
  * @author Peter Levart
  */
-final class WeakPairMap<K1, K2, V> {
+@AnnotatedFor("nullness")
+final class WeakPairMap<K1 extends @NonNull Object, K2 extends @NonNull Object, V extends @NonNull Object> {
 
     private final ConcurrentHashMap<Pair<K1, K2>, V> map = new ConcurrentHashMap<>();
     private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
@@ -82,7 +86,7 @@ final class WeakPairMap<K1, K2, V> {
      * this map contains no mapping for the key pair
      * @throws NullPointerException if any of the specified keys is null
      */
-    public V get(K1 k1, K2 k2) {
+    public @Nullable V get(K1 k1, K2 k2) {
         expungeStaleAssociations();
         return map.get(Pair.lookup(k1, k2));
     }
@@ -102,7 +106,7 @@ final class WeakPairMap<K1, K2, V> {
      * there was no mapping for key pair
      * @throws NullPointerException if any of the specified keys or value is null
      */
-    public V put(K1 k1, K2 k2, V v) {
+    public @Nullable V put(K1 k1, K2 k2, V v) {
         expungeStaleAssociations();
         return map.put(Pair.weak(k1, k2, queue), v);
     }
@@ -121,7 +125,7 @@ final class WeakPairMap<K1, K2, V> {
      * there was no mapping for key pair
      * @throws NullPointerException if any of the specified keys or value is null
      */
-    public V putIfAbsent(K1 k1, K2 k2, V v) {
+    public @Nullable V putIfAbsent(K1 k1, K2 k2, V v) {
         expungeStaleAssociations();
         return map.putIfAbsent(Pair.weak(k1, k2, queue), v);
     }
@@ -151,6 +155,8 @@ final class WeakPairMap<K1, K2, V> {
      * @throws RuntimeException      or Error if the mappingFunction does so, in
      *                               which case the mapping is left unestablished
      */
+    // CF lambda inference loses PolyNull; reachabilityFence keeps both callback keys alive.
+    @SuppressWarnings({"nullness:return.type.incompatible", "nullness:argument.type.incompatible"})
     public @PolyNull V computeIfAbsent(K1 k1, K2 k2,
                              BiFunction<? super K1, ? super K2, ? extends @PolyNull V>
                                  mappingFunction) {
@@ -197,14 +203,14 @@ final class WeakPairMap<K1, K2, V> {
     /**
      * Common interface of both {@link Weak} and {@link Lookup} key pairs.
      */
-    private interface Pair<K1, K2> {
+    private interface Pair<K1 extends @NonNull Object, K2 extends @NonNull Object> {
 
-        static <K1, K2> Pair<K1, K2> weak(K1 k1, K2 k2,
+        static <K1 extends @NonNull Object, K2 extends @NonNull Object> Pair<K1, K2> weak(K1 k1, K2 k2,
                                           ReferenceQueue<Object> queue) {
             return new Weak<>(k1, k2, queue);
         }
 
-        static <K1, K2> Pair<K1, K2> lookup(K1 k1, K2 k2) {
+        static <K1 extends @NonNull Object, K2 extends @NonNull Object> Pair<K1, K2> lookup(K1 k1, K2 k2) {
             return new Lookup<>(k1, k2);
         }
 
@@ -212,13 +218,13 @@ final class WeakPairMap<K1, K2, V> {
          * @return The 1st of the pair of keys (may be null for {@link Weak}
          * when it gets cleared)
          */
-        K1 first();
+        @Nullable K1 first();
 
         /**
          * @return The 2nd of the pair of keys (may be null for {@link Weak}
          * when it gets cleared)
          */
-        K2 second();
+        @Nullable K2 second();
 
         static int hashCode(Object first, Object second) {
             // assert first != null && second != null;
@@ -226,7 +232,7 @@ final class WeakPairMap<K1, K2, V> {
                    System.identityHashCode(second);
         }
 
-        static boolean equals(Object first, Object second, Pair<?, ?> p) {
+        static boolean equals(@Nullable Object first, @Nullable Object second, Pair<?, ?> p) {
             return first != null && second != null &&
                    first == p.first() && second == p.second();
         }
@@ -254,7 +260,7 @@ final class WeakPairMap<K1, K2, V> {
          * becomes weakly-reachable, the corresponding entries can be
          * {@link #expungeStaleAssociations() expunged} from the map.
          */
-        final class Weak<K1, K2> extends WeakRefPeer<K1> implements Pair<K1, K2> {
+        final class Weak<K1 extends @NonNull Object, K2 extends @NonNull Object> extends WeakRefPeer<K1> implements Pair<K1, K2> {
 
             // saved hash so it can be retrieved after the reference is cleared
             private final int hash;
@@ -277,12 +283,12 @@ final class WeakPairMap<K1, K2, V> {
             }
 
             @Override
-            public K1 first() {
+            public @Nullable K1 first() {
                 return get();
             }
 
             @Override
-            public K2 second() {
+            public @Nullable K2 second() {
                 return peer.get();
             }
 
@@ -292,7 +298,7 @@ final class WeakPairMap<K1, K2, V> {
             }
 
             @Override
-            public boolean equals(Object obj) {
+            public boolean equals(@Nullable Object obj) {
                 return this == obj ||
                        (obj instanceof Pair &&
                         Pair.equals(first(), second(), (Pair<?, ?>) obj));
@@ -308,7 +314,7 @@ final class WeakPairMap<K1, K2, V> {
          * All its methods are purposely designed so that 'this' is never
          * passed to any other method or used as identity.
          */
-        final class Lookup<K1, K2> implements Pair<K1, K2> {
+        final class Lookup<K1 extends @NonNull Object, K2 extends @NonNull Object> implements Pair<K1, K2> {
             private final K1 k1;
             private final K2 k2;
 
@@ -333,7 +339,7 @@ final class WeakPairMap<K1, K2, V> {
             }
 
             @Override
-            public boolean equals(Object obj) {
+            public boolean equals(@Nullable Object obj) {
                 return obj instanceof Pair &&
                        Pair.equals(k1, k2, (Pair<?, ?>) obj);
             }
@@ -343,7 +349,7 @@ final class WeakPairMap<K1, K2, V> {
     /**
      * Common abstract supertype of a pair of WeakReference peers.
      */
-    private static abstract class WeakRefPeer<K> extends WeakReference<K> {
+    private static abstract class WeakRefPeer<K extends @NonNull Object> extends WeakReference<K> {
 
         WeakRefPeer(K k, ReferenceQueue<Object> queue) {
             super(Objects.requireNonNull(k), queue);
