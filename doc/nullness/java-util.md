@@ -30,8 +30,10 @@ A clean source check does not establish complete modeling of conditional contrac
 
 The first group uses paired branch `codex/nullness-java-util-core`, stacked on
 [java.lang VersionProps, PR #31](https://github.com/aosen-xiong/jdk/pull/31).
-Each subsequent group targets the preceding java.util branch. Hosted validation
-of this group is pending; local results below do not replace exact-head CI.
+The core layer is [PR #33](https://github.com/aosen-xiong/jdk/pull/33). The traversal
+layer uses paired branch `codex/nullness-java-util-traversal` and targets that core
+branch. Each subsequent group targets the preceding java.util branch. Hosted
+validation is pending; local results below do not replace exact-head CI.
 
 ## Exact inventory and proposed PR groups
 
@@ -78,7 +80,10 @@ exceptions, one comparator conditional-input boundary, and one reproduced CF
 polymorphic conditional issue. These are disclosed limitations, not silent opt-outs.
 The constructors, empty-instance cast and private presence predicates were reviewed
 against source documentation and implementation. No executable behavior changed.
-Groups 2–25: unattempted (115 files). package-info.java reviewed: existing
+Group 2: traversal source/caller checks, all eleven removal controls, and the
+cumulative 148-file Unix regression pass locally. Groups 3–25: unattempted
+(108 files). Exact-head hosted CI remains pending.
+package-info.java reviewed: existing
 KeyFor lower-bound default retained; no general package nullness policy inferred.
 Full JSpecify mode remains pinned to CF c12ce38daa implementation; initialization,
 KeyFor, purity and native execution are outside the proof scope. Checker defects
@@ -91,7 +96,7 @@ coverage or widen callbacks to Nullable without preserving rejection of unsafe c
 
 ## First PR configuration
 
-The matching CF branch is `codex/nullness-java-util-core`. The workflow pins
+The core PR uses CF branch `codex/nullness-java-util-core`. Its workflow pins
 [CF 502a563](https://github.com/aosen-xiong/checker-framework/commit/502a5630341673eb659cedf265fc7576478b3d36),
 which adds caller controls and the reduced supplier issue without changing the
 checker implementation. The new workflow step uses the same
@@ -132,7 +137,74 @@ while the source-aware checker rejects them under the retained nonnull callback
 preconditions. These calls remain a disclosed completeness gap. Checker success
 must not be reported as complete coverage of that documented conditional domain.
 
-Final local checkpoint: run `run.6SeaN1` verifies the inherited 136 java.lang
-sources plus 5 java.util files. This is 5/120 direct java.util sources locally checked,
-all with disclosed suppressions; 115 remain unattempted. Hosted java.util validation
-and the conservative callback-domain limitation remain open.
+Core local checkpoint: run `run.6SeaN1` verifies the inherited 136 java.lang
+sources plus 5 java.util files. Hosted java.util validation and the conservative
+callback-domain limitation remain open.
+
+## Traversal contract review (group 2)
+
+Seven files are in scope; four need source changes. Existing `Iterator`,
+`ListIterator`, and `Enumeration` contracts pass without edits, preserving nullable
+element substitutions and existing annotations for other checkers.
+
+| File | Oracle and decision |
+| --- | --- |
+| `Iterator` | `next` returns the element type, not an extra null sentinel; `forEachRemaining` explicitly rejects a null action. Preserve existing contracts. |
+| `ListIterator` | `next`/`previous` and `add`/`set` preserve the element type; the underlying list determines nullable-element eligibility. Preserve invariance and existing contracts. |
+| `Enumeration` | `nextElement` and the `asIterator` adapter preserve element nullness; emptiness throws rather than returning an extra null. Preserve existing contracts. |
+| `PrimitiveIterator` | Its generic `forEachRemaining` explicitly rejects a null action: add `@NonNull` to the `T_CONS` parameter use. Primitive boxing results remain nonnull. |
+| `Spliterator` | The generic primitive callback methods have the same nonnull action requirement. Existing nullable split and natural-order comparator results remain. |
+| `Spliterators` | Add missing nullable results to split/comparator overrides, nullable internal payload and lazy-source storage, and nonnull empty-spliterator callback parameters. Public array factories retain their existing polymorphic element contract. |
+| `Tripwire` | Opt in the whole helper file. Class-name dereferencing requires a nonnull class; the message default remains an assumption, as its Javadoc has no explicit null clause. |
+
+### Findings and narrow boundaries
+
+The generic primitive callback gap is an annotation defect, not a checker bug.
+With the published core sources, `PrimitiveIterator<Integer, @Nullable IntConsumer>`
+and the analogous `Spliterator.OfPrimitive` type allow three null-action calls
+contrary to their `@throws NullPointerException` clauses. Explicit `@NonNull`
+parameter uses reject all three while preserving valid calls and generic bounds.
+
+Eight diagnostic-specific method suppressions in `Spliterators` describe internal
+invariants that the current analysis cannot establish. They are not classified
+as confirmed checker defects:
+
+- Two adapter methods consume a `T` only when `valueReady` is true. Its storage
+  is null before filling and after clearing; `T` may itself be nullable, so an
+  unconditional `@EnsuresNonNull` promise would be wrong.
+- Two array traversal methods consume only the active range containing `T` values;
+  the existing `Object[]` representation and casts erase that relationship.
+- Four lazy iterator methods rely on constructors establishing that either the
+  iterator or collection is nonnull. The collection is present whenever the
+  lazy iterator is absent.
+
+The baseline `Spliterators` run reports 28 errors; the annotated file passes.
+The CF `TraversalNullness` fixture checks valid nullable/nonnullable elements,
+factory contracts, split/comparator results, all three primitive specializations,
+and callback rejection: 31 expected invalid-use diagnostics in each of JSpecify
+and ordinary nullness profiles. Tests remain exclusively in the paired CF branch.
+The traversal workflow pins [CF a4e96ed](https://github.com/aosen-xiong/checker-framework/commit/a4e96ede63249afe193cc461ec66935537a68b54);
+the [caller fixture](https://github.com/aosen-xiong/checker-framework/blob/a4e96ede63249afe193cc461ec66935537a68b54/checker/tests/nullness/TraversalNullness.java)
+includes the three generic-callback regression controls. This changes tests only;
+the checker implementation and study profile are unchanged.
+No checker implementation change, executable JDK change, blanket suppression,
+or new opt-out is included. The CI job budget grows to 90 minutes to accommodate
+the cumulative source checks and helper callers as the verified set expands.
+
+Final traversal checkpoint: runs `run.6roSeF`, `run.6lALRQ`, and `run.jYpCki`
+partition the same 148-file regression set without duplicates. All selected files
+were visited and completed with zero errors, warnings, crashes, or truncation;
+141 physical source hashes stayed unchanged. The three contexts generate fresh
+CharacterData sources and reuse a provenance-checked configured VersionProps
+artifact from the earlier java.lang CI. Exact-head native generation is left to
+hosted CI. This brings local direct java.util coverage to 12/120 files, with
+108 remaining. Six traversal files pass without nullness suppressions; only
+`Spliterators` needs the eight documented boundaries.
+
+Review queue for later groups: source inspection found that `SortedSet.spliterator`
+has an anonymous `getComparator` override with a nonnull default even though it
+forwards the documented nullable `SortedSet.comparator` result. Review this in
+group 4. `Comparators.NullComparator` stores an optional delegate and accepts null
+when all nonnull elements compare equal; its field/constructor annotations need
+review in group 3. These are observed annotation gaps, not reproduced checker
+bugs or completed coverage of those files.
