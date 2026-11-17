@@ -184,7 +184,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: aosen-xiong/checker-framework
-          ref: 23102fabf4a14703e7ec0f1e289a3615031c2c1f # codex/nullness-java-lang-annotations
+          ref: 3b0fff80ed46b18bba86a6b3e54942db60dda012 # codex/nullness-java-lang-reflection-foundations
           path: checker-framework
           persist-credentials: false
       - name: Check out the checker's bundled JDK contracts
@@ -315,13 +315,17 @@ jobs:
             java/lang/FunctionalInterface.java \
             java/lang/Override.java \
             java/lang/SafeVarargs.java \
-            java/lang/SuppressWarnings.java
+            java/lang/SuppressWarnings.java \
+            java/lang/Class.java \
+            java/lang/ClassValue.java \
+            java/lang/PublicMethods.java \
+            java/lang/WeakPairMap.java
       - name: Check package-private helper callers from CF
         working-directory: checker-framework
         env:
           JDK_SRC: ${{ github.workspace }}/jdk
           JDK_EXTRA_SOURCE_ROOTS: ${{ github.workspace }}/checker-framework/checker/tests/jdk-source/java.base
-        run: checker/bin-devel/typecheck-jdk.sh nullness java.base java/lang/TextHelperContracts.java java/lang/UnicodeHelperContracts.java
+        run: checker/bin-devel/typecheck-jdk.sh nullness java.base java/lang/TextHelperContracts.java java/lang/UnicodeHelperContracts.java java/lang/ReflectionHelperContracts.java
       - name: Upload type-checking logs
         if: always()
         uses: actions/upload-artifact@v4
