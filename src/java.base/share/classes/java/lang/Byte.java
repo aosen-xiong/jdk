@@ -131,7 +131,7 @@ public final class Byte extends Number implements Comparable<Byte>, Constable {
         private ByteCache() {}
 
         static final Byte[] cache;
-        static Byte[] archivedCache;
+        static Byte @Nullable [] archivedCache;
 
         static {
             final int size = -(-128) + 127 + 1;
