@@ -1077,7 +1077,7 @@ public final class Integer extends Number
         static final int low = -128;
         static final int high;
         static final Integer[] cache;
-        static Integer[] archivedCache;
+        static Integer @Nullable [] archivedCache;
 
         static {
             // high value may be configured by property
@@ -1445,6 +1445,8 @@ public final class Integer extends Number
      */
     @SideEffectFree
     @StaticallyExecutable
+    // A null name deliberately triggers the caught NPE, which selects the default value.
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public static @PolyNull Integer getInteger(@Nullable String nm, @PolyNull Integer val) {
         String v = null;
         try {
@@ -1997,7 +1999,7 @@ public final class Integer extends Number
      * @since 12
      */
     @Override
-    public Integer resolveConstantDesc(MethodHandles.Lookup lookup) {
+    public Integer resolveConstantDesc(MethodHandles.@Nullable Lookup lookup) {
         return this;
     }
 

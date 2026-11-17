@@ -1262,7 +1262,7 @@ public final class Double extends Number
      * @since 12
      */
     @Override
-    public Double resolveConstantDesc(MethodHandles.Lookup lookup) {
+    public Double resolveConstantDesc(MethodHandles.@Nullable Lookup lookup) {
         return this;
     }
 

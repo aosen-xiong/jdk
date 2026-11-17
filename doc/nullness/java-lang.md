@@ -62,22 +62,29 @@ than silently moving a blocked file out of the denominator.
    `codex/nullness-java-lang-interfaces` targets the exception-causes branch;
    all eight interfaces have passed local source/consumer checks, with no Java
    source changes needed. Hosted CI is pending.
-4. `codex/nullness-java-lang-values` targets the interfaces branch; five more
+4. [PR #11](https://github.com/aosen-xiong/jdk/pull/11):
+   `codex/nullness-java-lang-values` targets the interfaces branch; five more
    source files and their consumer contracts are reviewed. All 26 cumulative
    source checks pass locally. Hosted CI remains unverified.
 
-CI checkpoint (2026-11-17): GitHub reports Actions enabled and this workflow
-active, but has not queued a hosted run for #9 or #10 after PR creation and
-branch pushes. Workflow syntax validates locally; the trigger issue is
-unresolved. Neither new layer has a claimed hosted CI result, and M1 remains
-open pending those checks and review/merge.
+5. `codex/nullness-java-lang-wrappers` targets the values branch; seven
+   wrapper files pass individually, with cumulative validation recorded below.
 
-The current branch enrolls **26/126** shared implementation files; all 26
-passed the cumulative local source check under the frozen profile.
-StackTraceElement retains its native-array suppression, and Enum adds one
-language-invariant suppression. The other 24 source files have no nullness
-suppressions. A generated-record consumer has a separate
-known checker-bug suppression. The other 100 files remain future milestones.
+CI checkpoint (2026-11-17): the fork's Actions page explicitly says workflows
+are not running due to the scale of GitHub Actions usage and require maintainer
+re-enablement. REST reports Actions enabled and the workflow active, but manual
+dispatch returns HTTP 422, "Actions has been disabled for this repository."
+Re-enabling through the repository/workflow APIs did not clear the restriction.
+Hosted checks on #9, #10 and #11 have not started; the wrapper layer has no
+claimed hosted result either. The existing PR #7 result remains green. Re-enable
+workflows on the fork's Actions page, then run CI for each exact stack head.
+M1/M2 remain open pending hosted checks and review/merge.
+
+The current branch enrolls **33/126** shared implementation files. All 33 pass
+the cumulative local run under the frozen profile, with no errors or warnings. Five source files retain nullness suppressions: StackTraceElement,
+Enum, Boolean, Integer and Long. The other 28 have no nullness suppressions.
+The generated-record consumer has a separate known checker-bug suppression.
+The other 93 shared files remain future milestones.
 
 ## Exact shared-source inventory
 
@@ -226,6 +233,46 @@ fixture. Both JSpecify and ordinary nullness/purity profiles pass with it presen
 Recheck and remove the suppression after a checker fix; do not treat the
 suppressed caller as independently verified. No checker implementation fix is
 included in this stack layer.
+
+## Primitive wrappers (M2b)
+
+`codex/nullness-java-lang-wrappers` builds on the value foundations (#11).
+The seven complete files, including their nested cache classes, are reviewed and
+checked. Each changed source has a separate annotation commit. The profile and
+checker implementation remain frozen; no executable behavior changes.
+
+| Position | Documentation oracle and change |
+| --- | --- |
+| `Integer`, `Long`, `Float`, `Double`: `resolveConstantDesc` lookup parameter | Each override documents the parameter as ignored and the result as the instance itself. Add Nullable to the ignored argument; preserve the nonnull return. Previously four valid null callers were rejected; all four now pass. |
+| `Byte`, `Short`, `Integer`, `Long`: `Cache.archivedCache` | Internal comments and initialization show an optional CDS array before fallback allocation. Add Nullable to the array reference, preserving nonnull element types and the final nonnull cache. This is implementation-derived; native archive contents and loop-fill completeness remain trusted under the first-pass profile. |
+| `Boolean` parsing/valueOf and all equals methods | Existing Nullable inputs encode documented null-to-false behavior. Preserve Boolean's conditional nonnull contracts; caller refinements are exercised. |
+| `Integer.getInteger`, `Long.getLong` | Existing Nullable names/results and PolyNull boxed-default relations match the documented default behavior. Test nullable and nonnull defaults separately. |
+| Numeric parsing, constructors, valueOf and compareTo | Preserve nonnull preconditions: numeric null strings are rejected with NumberFormatException or NPE, and Comparable rejects null. Explicit rejection is not normal null acceptance. decode's nonnull input remains a disclosed default assumption where its Javadoc lacks an explicit null clause. |
+| Formatting, boxing, TYPE and describeConstable results | Preserve the documented nonnull String/wrapper/Class/Optional results. Primitive-only methods need no extra qualifier. |
+
+Three source methods need suppressions for intentional exception translation.
+Boolean.getBoolean, Integer.getInteger(String,Integer), and
+Long.getLong(String,Long) explicitly accept null names. They call
+System.getProperty, catch its documented NPE, and return false/the default.
+The Nullness Checker still enforces System.getProperty's nonnull argument.
+Suppress only `nullness:argument.type.incompatible` on those methods.
+Boolean also needs `nullness:contracts.conditional.postcondition.not.satisfied`:
+its true result implies a nonnull name, but the analysis does not recover that
+relation across the catch. Preserve the existing sound conditional contract.
+This is documented as an analysis limitation, not a demonstrated checker defect.
+
+The limitation was recorded before adding suppressions. Removing each of the
+four keys alone, holding the other source changes and profile fixed, restores
+exactly its corresponding diagnostic. All seven source files pass with unused
+suppression auditing. Annotation-normalized AST comparisons confirm unchanged
+executable syntax and preservation of the other checker annotations.
+
+The matching CF branch contains WrapperValueNullness (17 deliberate invalid
+caller diagnostics) and WrapperConstantNullness (four valid ignored-null lookup
+calls plus descriptor consumers). These fixtures exercise JSpecify and ordinary
+nullness/purity profiles. Tests and the runner remain entirely in CF.
+No initialization, purity, native implementation, or mathematical accuracy proof
+is claimed by these source checks.
 
 ## Package completion and upstream delivery
 
