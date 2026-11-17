@@ -27,6 +27,7 @@ package java.lang;
 
 import org.checkerframework.checker.interning.qual.UsesObjectEquals;
 import org.checkerframework.dataflow.qual.SideEffectFree;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.framework.qual.AnnotatedFor;
 import org.checkerframework.framework.qual.CFComment;
 import org.checkerframework.checker.mustcall.qual.NotOwning;
@@ -109,12 +110,12 @@ public abstract @UsesObjectEquals class Process {
 
     // Readers and Writers created for this process; so repeated calls return the same object
     // All updates must be done while synchronized on this Process.
-    private BufferedWriter outputWriter;
-    private Charset outputCharset;
-    private BufferedReader inputReader;
-    private Charset inputCharset;
-    private BufferedReader errorReader;
-    private Charset errorCharset;
+    private @Nullable BufferedWriter outputWriter;
+    private @Nullable Charset outputCharset;
+    private @Nullable BufferedReader inputReader;
+    private @Nullable Charset inputCharset;
+    private @Nullable BufferedReader errorReader;
+    private @Nullable Charset errorCharset;
 
     /**
      * Default constructor for Process.
@@ -273,6 +274,7 @@ public abstract @UsesObjectEquals class Process {
      * @throws IllegalStateException if called more than once with different charset arguments
      * @since 17
      */
+    @SuppressWarnings("nullness:dereference.of.nullable") // Paired cache: the charset is assigned before the reader/writer under this lock.
     public final BufferedReader inputReader(Charset charset) {
         Objects.requireNonNull(charset, "charset");
         synchronized (this) {
@@ -343,6 +345,7 @@ public abstract @UsesObjectEquals class Process {
      * @throws IllegalStateException if called more than once with different charset arguments
      * @since 17
      */
+    @SuppressWarnings("nullness:dereference.of.nullable") // Paired cache: the charset is assigned before the reader/writer under this lock.
     public final BufferedReader errorReader(Charset charset) {
         Objects.requireNonNull(charset, "charset");
         synchronized (this) {
@@ -414,6 +417,7 @@ public abstract @UsesObjectEquals class Process {
      * @throws IllegalStateException if called more than once with different charset arguments
      * @since 17
      */
+    @SuppressWarnings("nullness:dereference.of.nullable") // Paired cache: the charset is assigned before the reader/writer under this lock.
     public final BufferedWriter outputWriter(Charset charset) {
         Objects.requireNonNull(charset, "charset");
         synchronized (this) {
