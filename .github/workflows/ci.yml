@@ -184,7 +184,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: aosen-xiong/checker-framework
-          ref: 45410bbd1af81bc34241045242160fcff45fbf6d # codex/nullness-java-lang-processes
+          ref: 4c9c6b18c51938f425815dac416d04036431c225 # codex/nullness-java-lang-stack-walking
           path: checker-framework
           persist-credentials: false
       - name: Check out the checker's bundled JDK contracts
@@ -340,13 +340,18 @@ jobs:
             java/lang/ProcessHandle.java \
             java/lang/ProcessHandleImpl.java \
             java/lang/ApplicationShutdownHooks.java \
-            java/lang/Shutdown.java
+            java/lang/Shutdown.java \
+            java/lang/StackWalker.java \
+            java/lang/StackStreamFactory.java \
+            java/lang/StackFrameInfo.java \
+            java/lang/LiveStackFrame.java \
+            java/lang/LiveStackFrameInfo.java
       - name: Check package-private helper callers from CF
         working-directory: checker-framework
         env:
           JDK_SRC: ${{ github.workspace }}/jdk
           JDK_EXTRA_SOURCE_ROOTS: ${{ github.workspace }}/checker-framework/checker/tests/jdk-source/java.base
-        run: checker/bin-devel/typecheck-jdk.sh nullness java.base java/lang/TextHelperContracts.java java/lang/UnicodeHelperContracts.java java/lang/ReflectionHelperContracts.java java/lang/LoadingHelperContracts.java java/lang/SystemRuntimeHelperContracts.java java/lang/ThreadHelperContracts.java java/lang/ProcessHelperContracts.java
+        run: checker/bin-devel/typecheck-jdk.sh nullness java.base java/lang/TextHelperContracts.java java/lang/UnicodeHelperContracts.java java/lang/ReflectionHelperContracts.java java/lang/LoadingHelperContracts.java java/lang/SystemRuntimeHelperContracts.java java/lang/ThreadHelperContracts.java java/lang/ProcessHelperContracts.java java/lang/StackWalkingHelperContracts.java
       - name: Upload type-checking logs
         if: always()
         uses: actions/upload-artifact@v4

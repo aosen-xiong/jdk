@@ -120,32 +120,38 @@ than silently moving a blocked file out of the denominator.
     `codex/nullness-java-lang-threads` targets system/runtime; four thread sources
     and a System bridge follow-up pass the 115-file local gate.
 
-The current process layer, `codex/nullness-java-lang-processes`, targets #25.
-It adds six reviewed process/shutdown files and retires one Runtime suppression.
+19. [PR #26](https://github.com/aosen-xiong/jdk/pull/26):
+    `codex/nullness-java-lang-processes` targets threads; six process/shutdown
+    sources pass the 121-file local gate, with one Runtime suppression retired.
+
+The current stack-walking layer, `codex/nullness-java-lang-stack-walking`,
+targets #26 and completes the 126-file shared-source inventory locally.
 
 CI checkpoint (2026-11-17): the fork's Actions page explicitly says workflows
 are not running due to the scale of GitHub Actions usage and require maintainer
 re-enablement. REST reports Actions enabled and the workflow active, but manual
 dispatch returns HTTP 422, "Actions has been disabled for this repository."
 Re-enabling through the repository/workflow APIs did not clear the restriction.
-Hosted checks on #9 through #25 remain unverified; this process layer
+Hosted checks on #9 through #26 remain unverified; this stack-walking layer
 has no claimed hosted result either. The existing PR #7 result remains green. Re-enable
 workflows on the fork's Actions page, then run CI for each exact stack head.
 M1/M2/M3/M4/M5 remain open pending hosted checks and review/merge.
 
-The current branch enrolls **121/126** shared Java source files. All 121 pass
-in cumulative run.5jJkqj with no errors or warnings under the frozen profile;
-source hashes and checker visitation are verified. Thirty-one files have
+The current branch enrolls **126/126** shared Java source files. All 126 pass
+in cumulative run.NbeZAd with no errors or warnings under the frozen profile;
+source hashes and checker visitation are verified. Thirty-two files have
 nullness suppressions: StackTraceElement, Enum, Boolean, Integer, Long, String,
 StringBuilder, StringBuffer, AbstractStringBuilder, Character, CharacterName,
 StringLatin1, StringUTF16, Class, PublicMethods, ClassValue, WeakPairMap,
 ClassLoader, Module, ModuleLayer, System, Runtime, SecurityManager, Thread,
 ThreadGroup, ThreadLocal, InheritableThreadLocal, Process, ProcessBuilder,
-ProcessHandleImpl and ApplicationShutdownHooks. The other 90 do not.
+ProcessHandleImpl, ApplicationShutdownHooks and StackStreamFactory. The other
+94 do not.
 Caller reproducer expectations/suppressions are counted separately.
-Private callers do not inflate JDK coverage. The remaining five shared files
-are M6d; platform/generated coverage is separately in M7. The pinned
-Class/Module null-caller source defect remains unresolved for upstream readiness.
+Private callers do not inflate JDK coverage. No shared source file remains
+unattempted in this inventory. Platform/generated coverage and integration
+remain in M7; hosted checks are still required. The Class/Module null-caller and
+Redirect equality source defects remain unresolved for upstream readiness.
 
 ## Exact shared-source inventory
 
@@ -983,6 +989,72 @@ JDK build was run locally, and hosted CI remains unverified.
 Next is M6d: the final five shared stack-walking files, reaching 126/126.
 M7's platform/generated sources, integration, suppression review, unresolved
 source defects and hosted native/CF results still gate package readiness.
+
+
+## Stack walking (M6d)
+
+Layer `codex/nullness-java-lang-stack-walking` follows processes (#26) and
+finishes the five remaining shared files. Each receives an explicit whole-file
+nullness opt-in, including inherited nested scopes. Each source has its own
+annotation commit; the matching CF branch owns the caller controls. This
+completes the shared-source annotation pass locally, not package readiness.
+
+| File | Documentation oracle and annotation decisions |
+| --- | --- |
+| `StackWalker` | Class policy rejects null options/callbacks. StackFrame.getFileName explicitly admits missing source information. Optional internal extendedOption is nullable; factories and getCallerClass retain non-null normal results. walk preserves the callback's T, including nullable results. |
+| `StackFrameInfo` | Nullable file name matches the interface and StackTraceElement. The lazy stack-trace-element cache is nullable; double-checked construction still returns a non-null value. Member metadata supplied by VM remains a trusted boundary. |
+| `LiveStackFrame` | Local/operand arrays are non-null and may contain null reference values. Monitor components also admit observed empty slots; this is an implementation-derived contract and a documentation mismatch, not a promised non-null-element API weakened just to pass checking. |
+| `LiveStackFrameInfo` | Preserve non-null array references and primitive-slot results; represent nullable locals, operands and monitor entries in both fields and overrides. |
+| `StackStreamFactory` | Preserve nullable traversal exhaustion, nullable trySplit and callback result propagation. Partially filled/reserved array slots are nullable. MonotonicNonNull records the frame buffer's initialization phase; EnsuresNonNull on initFrameBuffer is verified through its overrides and used by a caller. |
+
+Fifteen diagnostic-specific source keys in fourteen methods record native
+callback order, populated buffer ranges, the hasNext/next-frame relation and
+caller discovery. Every key's individual removal restores exactly one error.
+The helper postcondition has its own removal control; no false postcondition is
+added to checkState, since NEW can succeed before initialization. No executable
+code, new runtime guard or cast is introduced. Native state, array bounds and
+concurrency are outside proof. Existing NonEmpty and purity annotations remain.
+
+The ordinary caller comparison exposed a KeyFor default incompatibility
+(NULL-0032), initially suspected to be a checker defect. java.lang's existing
+KeyForBottom LOWER_BOUND default reaches explicit callback wildcard bounds.
+A reduced example passes if the default is removed or restricted to implicit
+bounds. In the full source context, changing package-info alone still leaves
+bundled defaults in effect; the diagnostic-only combination with ignorejdkastub
+removes the extra failures. The frozen source gate does not use that override.
+Four method-scoped keyfor-only suppressions live solely in the CF caller fixture,
+with individual removal controls restoring the seven extra KeyFor diagnostics.
+Both caller profiles continue to reject all nine intended nullness errors.
+No package-wide default change or checker implementation fix is included.
+
+A host OpenJDK17.0.14 interpreter probe independently confirms one null monitor
+slot after exiting a synchronized block (NULL-0034). Only the test class is
+patched into the host module; it does not build or replace JDK implementations.
+The native source copies monitor owner slots without filtering empty entries.
+This observation explains the conservative nullable component contract and is
+retained for documentation review. Locals/operands have their own documented
+or JVM-value basis for nullable elements.
+
+The five files total 909 original non-comment source lines. They add 33 Nullable
+sites, one MonotonicNonNull, one EnsuresNonNull and five opt-ins. Four files pass
+without suppressions; StackStreamFactory has the fifteen keys. The syntax audit
+confirms only annotations/imports/comments changed. Four trial generic bounds
+were removed as redundant under this checker's existing implicit nullable upper
+bounds; valid nullable callback consumers verify the retained declarations.
+
+Validation: all 126 cumulative shared source files pass with unchanged input
+hashes, verified visitation, zero errors/warnings/crashes or truncation. All
+eight package-private helper fixtures pass; six private negative controls reject
+unsafe nullable payload/state uses. Public callers match nine deliberate errors
+in JSpecify and ordinary nullness modes with the scoped KeyFor workarounds.
+The checker implementation, artifacts and JDK17 compiler are unchanged.
+Hosted checks and native builds remain unverified.
+
+M7 is the remaining package work: Unix and Windows variants of ProcessEnvironment,
+ProcessImpl and Terminator; six CharacterData template/output pairs; matching
+platform/generated compilation contexts; cross-module/package integration;
+source/default/suppression review; and exact-head hosted CF/native results.
+The shared 126-file denominator does not include or conceal those items.
 
 ## Package completion and upstream delivery
 
