@@ -25,6 +25,9 @@
 
 package java.lang;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Objects;
@@ -41,6 +44,7 @@ import static java.lang.String.LATIN1;
 import static java.lang.String.UTF16;
 import static java.lang.String.checkOffset;
 
+@AnnotatedFor("nullness")
 final class StringLatin1 {
 
     public static char charAt(byte[] value, int index) {
@@ -299,7 +303,7 @@ final class StringLatin1 {
         return -1;
     }
 
-    public static String replace(byte[] value, char oldChar, char newChar) {
+    public static @Nullable String replace(byte[] value, char oldChar, char newChar) {
         if (canEncode(oldChar)) {
             int len = value.length;
             int i = -1;
@@ -336,7 +340,7 @@ final class StringLatin1 {
         return null; // for string to return this;
     }
 
-    public static String replace(byte[] value, int valLen, byte[] targ,
+    public static @Nullable String replace(byte[] value, int valLen, byte[] targ,
                                  int targLen, byte[] repl, int replLen)
     {
         assert targLen > 0;
@@ -584,7 +588,7 @@ final class StringLatin1 {
         return StringUTF16.newString(result, 0, resultOffset);
     }
 
-    public static String trim(byte[] value) {
+    public static @Nullable String trim(byte[] value) {
         int len = value.length;
         int st = 0;
         while ((st < len) && ((value[st] & 0xff) <= ' ')) {
@@ -623,7 +627,7 @@ final class StringLatin1 {
         return right;
     }
 
-    public static String strip(byte[] value) {
+    public static @Nullable String strip(byte[] value) {
         int left = indexOfNonWhitespace(value);
         if (left == value.length) {
             return "";
@@ -633,12 +637,12 @@ final class StringLatin1 {
         return ifChanged ? newString(value, left, right - left) : null;
     }
 
-    public static String stripLeading(byte[] value) {
+    public static @Nullable String stripLeading(byte[] value) {
         int left = indexOfNonWhitespace(value);
         return (left != 0) ? newString(value, left, value.length - left) : null;
     }
 
-    public static String stripTrailing(byte[] value) {
+    public static @Nullable String stripTrailing(byte[] value) {
         int right = lastIndexOfNonWhitespace(value);
         return (right != value.length) ? newString(value, 0, right) : null;
     }
@@ -707,7 +711,7 @@ final class StringLatin1 {
         }
 
         @Override
-        public Spliterator<String> trySplit() {
+        public @Nullable Spliterator<String> trySplit() {
             int half = (fence + index) >>> 1;
             int mid = skipLineSeparator(indexOfLineSeparator(half));
             if (mid < fence) {
@@ -746,7 +750,7 @@ final class StringLatin1 {
         return (char)(val[index] & 0xff);
     }
 
-    public static byte[] toBytes(int[] val, int off, int len) {
+    public static byte @Nullable [] toBytes(int[] val, int off, int len) {
         byte[] ret = new byte[len];
         for (int i = 0; i < len; i++) {
             int cp = val[off++];
@@ -807,7 +811,7 @@ final class StringLatin1 {
         }
 
         @Override
-        public OfInt trySplit() {
+        public @Nullable OfInt trySplit() {
             int lo = index, mid = (lo + fence) >>> 1;
             return (lo >= mid)
                    ? null

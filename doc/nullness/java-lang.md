@@ -73,25 +73,29 @@ than silently moving a blocked file out of the denominator.
 6. [PR #13](https://github.com/aosen-xiong/jdk/pull/13):
    `codex/nullness-java-lang-arithmetic` targets the wrappers branch; the
    final three M2 files pass in the cumulative 36-file run with no new suppressions.
-7. `codex/nullness-java-lang-text` targets the arithmetic branch; four public
+7. [PR #14](https://github.com/aosen-xiong/jdk/pull/14):
+   `codex/nullness-java-lang-text` targets the arithmetic branch; four public
    text files pass in the cumulative 40-file local check.
+8. `codex/nullness-java-lang-text-helpers` targets the text branch; four helpers
+   and a coordinated builder follow-up pass in the cumulative 44-file local check.
 
 CI checkpoint (2026-11-17): the fork's Actions page explicitly says workflows
 are not running due to the scale of GitHub Actions usage and require maintainer
 re-enablement. REST reports Actions enabled and the workflow active, but manual
 dispatch returns HTTP 422, "Actions has been disabled for this repository."
 Re-enabling through the repository/workflow APIs did not clear the restriction.
-Hosted checks on #9 through #13 remain unverified; the text layer has no
+Hosted checks on #9 through #14 remain unverified; the helper layer has no
 claimed hosted result either. The existing PR #7 result remains green. Re-enable
 workflows on the fork's Actions page, then run CI for each exact stack head.
 M1/M2 remain open pending hosted checks and review/merge.
 
-The current branch enrolls **40/126** shared implementation files. All 40 pass
-the cumulative local source check with no errors or warnings. Eight
-source files have nullness suppressions: StackTraceElement, Enum, Boolean,
-Integer, Long, String, StringBuilder and StringBuffer. The other 32 do not.
-The generated-record consumer has a separate known checker-bug suppression.
-The other 86 shared files remain future milestones.
+The current branch enrolls **44/126** shared implementation files. All 44 pass
+the cumulative local source check with no errors or warnings (run.ewYrSH).
+Nine sources have nullness suppressions: StackTraceElement, Enum, Boolean,
+Integer, Long, String, StringBuilder, StringBuffer and AbstractStringBuilder.
+The other 35 do not. The generated-record consumer has a separate known
+checker-bug suppression. The private-helper caller fixture is counted separately
+from JDK coverage. The other 82 shared files remain future milestones.
 
 ## Exact shared-source inventory
 
@@ -360,6 +364,50 @@ caller diagnostics in both JSpecify and ordinary nullness/purity modes. Valid
 nullable contents, generic results and ignored lookups are accepted. All 40 cumulative
 source invocations pass without warnings. M3 still has four
 text helpers and six Unicode shared files; generated Unicode outputs remain M7.
+
+## Text implementation helpers (M3b)
+
+`codex/nullness-java-lang-text-helpers` builds on the public text APIs (#14).
+It adds complete nullness opt-in to StringCoding, StringConcatHelper, StringLatin1
+and StringUTF16, preserving StringCoding's other checker names. Nested line,
+character and code-point spliterators are included. The four new files add
+31 Nullable positions, with no suppressions in those helpers themselves.
+
+| Position | Evidence and decision |
+| --- | --- |
+| StringConcatHelper object inputs (four) | The helper's string-conversion documentation and implementation accept null and produce a concrete String. Annotate simpleConcat's two arguments, newStringOf and stringOf. Preserve nonnull results, including defensive handling of a null toString result. |
+| StringConcatHelper prepend prefixes (seven) | StringConcatFactory initializes and resets its optional constant to null and passes it through the prepender pipeline. Annotate only prefix; converted String values, suffixes and byte buffers remain nonnull. This is internal caller evidence. |
+| Latin1/UTF16 replace, trim, strip, stripLeading and stripTrailing results | Null means reuse the original String. Internal comments/branches and guarded public String callers establish the sentinel contract; add Nullable to helper results without weakening public String results. |
+| Latin1.toBytes(int[],off,len), UTF16.compress(char[]/byte[]) | Failed Latin1 conversion returns null. Annotate the array reference only; primitive elements are unaffected. String and builder callers are checked against the corrected returns. |
+| Concrete trySplit overrides | The Spliterator contract permits null when no split is available. Annotate two Latin1 and three UTF16 implementations. Keep action parameters nonnull and ordinary streams/arrays nonnull. |
+| StringCoding and remaining primitives | Nonnull byte arrays are indexed/copied and primitive values returned. Full source checking needs opt-in but no new nullable position. |
+
+The corrected compression contract requires one coordinated follow-up in
+AbstractStringBuilder.initBytes. During deserialization it temporarily stores a
+nullable compression result in value, tests it, and either returns with a nonnull
+value or fills a nonnull UTF16 fallback. Preserve the normally nonnull field and
+suppress only `nullness:assignment.type.incompatible` on that helper, with an
+explanation of the temporary state. Removing only the key restores one error.
+Initialization and arbitrary reentrant/malformed deserialization remain outside
+this pass. No extra postcondition is added because callers already use the
+field's nonnull declaration. StringUTF16 and the builder follow-up form a
+dependency pair; the combined PR head is the regression target, while each
+source has its own review commit.
+
+A clean concatenation-helper body did not reveal its missing input contracts.
+The CF-owned `checker/tests/jdk-source/java.base/java/lang/TextHelperContracts.java`
+now checks package-private callers through the existing typecheck-jdk.sh. Its
+separate invocation adds that source root using JDK_EXTRA_SOURCE_ROOTS, after
+the ordinary shared-source root. No fixture is copied into JDK and the JDK
+source checks retain their original patch context. The valid caller passes;
+removing the eleven new concatenation-input qualifiers restores exactly eleven
+argument errors. Public TextHelperPublicNullness matches four invalid caller
+cases in both JSpecify and ordinary nullness/purity profiles.
+
+All five changed sources pass individually and their annotation-normalized AST
+audits preserve executable syntax and other checker annotations. The cumulative
+44-file source run passes with no errors or warnings. M3 has six shared
+Unicode files remaining; generated Unicode templates/outputs are still M7.
 
 ## Package completion and upstream delivery
 
