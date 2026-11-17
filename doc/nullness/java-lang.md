@@ -128,24 +128,29 @@ than silently moving a blocked file out of the denominator.
     `codex/nullness-java-lang-stack-walking` targets processes and completes
     the 126-file shared-source inventory locally.
 
-The current Unix layer, `codex/nullness-java-lang-unix`, targets #27.
-It adds the three Unix implementations and follows up on ProcessBuilder.
+21. [PR #28](https://github.com/aosen-xiong/jdk/pull/28):
+    `codex/nullness-java-lang-unix` targets stack walking; all 126 shared
+    plus three Unix sources pass in their explicit platform context.
+
+The current Windows layer, `codex/nullness-java-lang-windows`, targets #28
+and adds the three Windows implementations.
 
 CI checkpoint (2026-11-17): the fork's Actions page explicitly says workflows
 are not running due to the scale of GitHub Actions usage and require maintainer
 re-enablement. REST reports Actions enabled and the workflow active, but manual
 dispatch returns HTTP 422, "Actions has been disabled for this repository."
 Re-enabling through the repository/workflow APIs did not clear the restriction.
-Hosted checks on #9 through #27 remain unverified; this Unix layer
+Hosted checks on #9 through #28 remain unverified; this Windows layer
 has no claimed hosted result either. The existing PR #7 result remains green. Re-enable
 workflows on the fork's Actions page, then run CI for each exact stack head.
 M1/M2/M3/M4/M5 remain open pending hosted checks and review/merge.
 
-The current branch enrolls **126/126** shared Java source files plus **3/6**
-platform variants. All 129 selected sources pass in cumulative run.Z6LDcm
-with the full shared root followed by Unix classes; source hashes and checker
-visitation are verified, with no errors or warnings. The prior shared-only
-checkpoint was run.NbeZAd on #27. Thirty-two shared files have
+The current branch enrolls **126/126** shared Java source files plus **6/6**
+platform variants. Each platform context selects 129 files: Unix passed in
+run.Z6LDcm and Windows in run.GgZYyh. Unix inputs still match their
+verified hashes; Windows hashes and visitation are verified, with no errors
+or warnings. These are 132 distinct physical source files, not 258 unique files.
+The prior shared-only checkpoint was run.NbeZAd on #27. Thirty-two shared files have
 nullness suppressions: StackTraceElement, Enum, Boolean, Integer, Long, String,
 StringBuilder, StringBuffer, AbstractStringBuilder, Character, CharacterName,
 StringLatin1, StringUTF16, Class, PublicMethods, ClassValue, WeakPairMap,
@@ -1109,6 +1114,59 @@ M7b remains the three Windows variants, M7c the six CharacterData template/outpu
 pairs, and M7d integration/default/suppression review and exact-head hosted
 CF/native results. The shared inventory remains 126; variants and generated
 outputs have their own counts. Hosted/native results are still unverified.
+
+## Windows process and termination implementations (M7b)
+
+This layer follows Unix (#28). Each of the three Windows files has its own
+annotation commit, with a matching CF branch and package-private caller fixture.
+The entire 126-file shared inventory is checked again with only the Windows
+classes root appended. The Unix source hashes remain identical to their passing
+129-file run. The six platform variants are all covered locally; generated
+sources and integration remain distinct work.
+
+CI uses a two-entry platform matrix with the same 129-file manifest and existing
+CF script. Each job selects its platform source root and matching helper fixture;
+Unix and Windows roots are never combined. Distinct artifact names retain both
+logs, fail-fast is disabled, and each job has a 45-minute limit for its checker
+build and source/caller checks. Both source jobs run on Linux; native Windows
+behavior remains the responsibility of the existing native build jobs.
+
+| File | Annotation decisions and retained boundaries |
+| --- | --- |
+| Windows Terminator | Nullable initial signal handler; otherwise existing defaults suffice. No suppression. |
+| Windows ProcessEnvironment | Nullable missing/previous map values, getenv result and optional environment block; nullable equality input. Four query overrides retain the documented environment null rejection and have individual override.param.invalid suppressions for the conflicting HashMap superclass contract. |
+| Windows ProcessImpl | Nullable environment, working directory and redirect-array references, including constructor/native forwarding. One start-method argument key covers the same closed redirect-factory dispatch as Unix. Public stream/handle/future guarantees remain non-null. |
+
+The environment conflict is an existing JDK inheritance/documentation problem,
+not a Checker Framework bug: HashMap promises null-query support, while the
+returned environment deliberately throws. Four temporary override suppressions
+preserve the documented environment precondition but do not prove or repair the
+inherited HashMap promise. This remains open for upstream review. General
+HashMap annotations are unchanged, as are executable guards and behavior.
+
+No regex suppression is required: no-argument Matcher.group is already non-null.
+Void already defaults nullable in this checker, so its callback argument/result
+needs no additional qualifier. No postcondition is added to nonNullString when
+its callers do not need refinement of their original arguments.
+
+The three files total 703 original non-comment source lines and add 15 Nullable
+sites and three opt-ins. Five new keys in five scopes each have a removal
+control: one override error for each environment method, three redirect argument
+errors for ProcessImpl.start. Eleven invalid caller checks and three independent
+optional-input removal checks behave as expected. Nine helper fixtures pass;
+public process callers match 20 intended errors in both nullness profiles. The
+AST audit preserves executable syntax and other-checker qualifiers.
+
+All 129 Windows-context sources pass with hashes and complete visitation verified,
+zero errors/warnings/crashes/truncation. Each 129-file platform set has 34 files
+with nullness suppressions and 95 without; across 132 physical files the counts
+are 36 and 96. These are checks under the frozen assumptions and documented source
+conflicts, not a proof of native behavior, concurrency or inheritance soundness.
+No Windows subprocess or native JDK build was run locally.
+
+Remaining M7c: the six CharacterData template/output pairs and matching generated
+source context. M7d: integration/default/suppression review, unresolved source
+contracts and exact-head hosted CF/native results. Hosted results are unverified.
 
 ## Package completion and upstream delivery
 
