@@ -33,6 +33,7 @@ import java.util.function.DoubleConsumer;
 import java.util.function.IntConsumer;
 import java.util.function.LongConsumer;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.PolyNull;
 import org.checkerframework.framework.qual.AnnotatedFor;
@@ -680,7 +681,7 @@ public final class Spliterators {
         Objects.requireNonNull(spliterator);
         class Adapter implements Iterator<T>, Consumer<T> {
             boolean valueReady = false;
-            T nextElement;
+            @Nullable T nextElement;
 
             @Override
             public void accept(T t) {
@@ -698,6 +699,8 @@ public final class Spliterators {
             }
 
             @Override
+            // valueReady means the slot holds a T; T itself may be nullable.
+            @SuppressWarnings("nullness:return.type.incompatible")
             public T next(@NonEmpty Adapter this) {
                 if (!valueReady && !hasNext())
                     throw new NoSuchElementException();
@@ -710,6 +713,8 @@ public final class Spliterators {
             }
 
             @Override
+            // A ready slot holds a T even though the cleared slot is nullable.
+            @SuppressWarnings("nullness:argument.type.incompatible")
             public void forEachRemaining(Consumer<? super T> action) {
                 Objects.requireNonNull(action);
                 if (valueReady) {
@@ -902,16 +907,16 @@ public final class Spliterators {
 
         EmptySpliterator() { }
 
-        public S trySplit() {
+        public @Nullable S trySplit() {
             return null;
         }
 
-        public boolean tryAdvance(C consumer) {
+        public boolean tryAdvance(@NonNull C consumer) {
             Objects.requireNonNull(consumer);
             return false;
         }
 
-        public void forEachRemaining(C consumer) {
+        public void forEachRemaining(@NonNull C consumer) {
             Objects.requireNonNull(consumer);
         }
 
@@ -962,7 +967,7 @@ public final class Spliterators {
          * so long as no methods write into the array or serialize it,
          * which we ensure here by defining this class as final.
          */
-        private final Object[] array;
+        private final @Nullable Object[] array;
         private int index;        // current index, modified on advance/split
         private final int fence;  // one past last index
         private final int characteristics;
@@ -974,7 +979,7 @@ public final class Spliterators {
          * of this spliterator's source or elements beyond {@code SIZED} and
          * {@code SUBSIZED} which are always reported
          */
-        public ArraySpliterator(Object[] array, int additionalCharacteristics) {
+        public ArraySpliterator(@Nullable Object[] array, int additionalCharacteristics) {
             this(array, 0, array.length, additionalCharacteristics);
         }
 
@@ -987,7 +992,7 @@ public final class Spliterators {
          * of this spliterator's source or elements beyond {@code SIZED} and
          * {@code SUBSIZED} which are always reported
          */
-        public ArraySpliterator(Object[] array, int origin, int fence, int additionalCharacteristics) {
+        public ArraySpliterator(@Nullable Object[] array, int origin, int fence, int additionalCharacteristics) {
             this.array = array;
             this.index = origin;
             this.fence = fence;
@@ -995,17 +1000,18 @@ public final class Spliterators {
         }
 
         @Override
-        public Spliterator<T> trySplit() {
+        public @Nullable Spliterator<T> trySplit() {
             int lo = index, mid = (lo + fence) >>> 1;
             return (lo >= mid)
                    ? null
                    : new ArraySpliterator<>(array, lo, index = mid, characteristics);
         }
 
-        @SuppressWarnings("unchecked")
+        // The active array range contains T values; Object[] erases that invariant.
+        @SuppressWarnings({"unchecked", "nullness:argument.type.incompatible"})
         @Override
         public void forEachRemaining(Consumer<? super T> action) {
-            Object[] a; int i, hi; // hoist accesses and checks from loop
+            @Nullable Object[] a; int i, hi; // hoist accesses and checks from loop
             if (action == null)
                 throw new NullPointerException();
             if ((a = array).length >= (hi = fence) &&
@@ -1015,6 +1021,8 @@ public final class Spliterators {
         }
 
         @Override
+        // The active array range contains T values; Object[] erases that invariant.
+        @SuppressWarnings("nullness:argument.type.incompatible")
         public boolean tryAdvance(Consumer<? super T> action) {
             if (action == null)
                 throw new NullPointerException();
@@ -1035,7 +1043,7 @@ public final class Spliterators {
         }
 
         @Override
-        public Comparator<? super T> getComparator() {
+        public @Nullable Comparator<? super T> getComparator() {
             if (hasCharacteristics(Spliterator.SORTED))
                 return null;
             throw new IllegalStateException();
@@ -1080,7 +1088,7 @@ public final class Spliterators {
         }
 
         @Override
-        public OfInt trySplit() {
+        public @Nullable OfInt trySplit() {
             int lo = index, mid = (lo + fence) >>> 1;
             return (lo >= mid)
                    ? null
@@ -1118,7 +1126,7 @@ public final class Spliterators {
         }
 
         @Override
-        public Comparator<? super Integer> getComparator() {
+        public @Nullable Comparator<? super Integer> getComparator() {
             if (hasCharacteristics(Spliterator.SORTED))
                 return null;
             throw new IllegalStateException();
@@ -1163,7 +1171,7 @@ public final class Spliterators {
         }
 
         @Override
-        public OfLong trySplit() {
+        public @Nullable OfLong trySplit() {
             int lo = index, mid = (lo + fence) >>> 1;
             return (lo >= mid)
                    ? null
@@ -1201,7 +1209,7 @@ public final class Spliterators {
         }
 
         @Override
-        public Comparator<? super Long> getComparator() {
+        public @Nullable Comparator<? super Long> getComparator() {
             if (hasCharacteristics(Spliterator.SORTED))
                 return null;
             throw new IllegalStateException();
@@ -1246,7 +1254,7 @@ public final class Spliterators {
         }
 
         @Override
-        public OfDouble trySplit() {
+        public @Nullable OfDouble trySplit() {
             int lo = index, mid = (lo + fence) >>> 1;
             return (lo >= mid)
                    ? null
@@ -1284,7 +1292,7 @@ public final class Spliterators {
         }
 
         @Override
-        public Comparator<? super Double> getComparator() {
+        public @Nullable Comparator<? super Double> getComparator() {
             if (hasCharacteristics(Spliterator.SORTED))
                 return null;
             throw new IllegalStateException();
@@ -1343,7 +1351,7 @@ public final class Spliterators {
         }
 
         static final class HoldingConsumer<T> implements Consumer<T> {
-            Object value;
+            @Nullable Object value;
 
             @Override
             public void accept(T value) {
@@ -1379,7 +1387,7 @@ public final class Spliterators {
                     n = (int) s;
                 if (n > MAX_BATCH)
                     n = MAX_BATCH;
-                Object[] a = new Object[n];
+                @Nullable Object[] a = new Object[n];
                 int j = 0;
                 do { a[j] = holder.value; } while (++j < n && tryAdvance(holder));
                 batch = j;
@@ -1756,8 +1764,8 @@ public final class Spliterators {
     static class IteratorSpliterator<T> implements Spliterator<T> {
         static final int BATCH_UNIT = 1 << 10;  // batch array size increment
         static final int MAX_BATCH = 1 << 25;  // max batch array size;
-        private final Collection<? extends T> collection; // null OK
-        private Iterator<? extends T> it;
+        private final @Nullable Collection<? extends T> collection; // null OK
+        private @Nullable Iterator<? extends T> it;
         private final int characteristics;
         private long est;             // size estimate
         private int batch;            // batch size for splits
@@ -1816,7 +1824,9 @@ public final class Spliterators {
         }
 
         @Override
-        public Spliterator<T> trySplit() {
+        // Constructors ensure collection is nonnull whenever the lazy iterator is null.
+        @SuppressWarnings("nullness:dereference.of.nullable")
+        public @Nullable Spliterator<T> trySplit() {
             /*
              * Split into arrays of arithmetically increasing batch
              * sizes.  This will only improve parallel performance if
@@ -1844,7 +1854,7 @@ public final class Spliterators {
                     n = (int) s;
                 if (n > MAX_BATCH)
                     n = MAX_BATCH;
-                Object[] a = new Object[n];
+                @Nullable Object[] a = new Object[n];
                 int j = 0;
                 do { a[j] = i.next(); } while (++j < n && i.hasNext());
                 batch = j;
@@ -1856,6 +1866,8 @@ public final class Spliterators {
         }
 
         @Override
+        // Constructors ensure collection is nonnull whenever the lazy iterator is null.
+        @SuppressWarnings("nullness:dereference.of.nullable")
         public void forEachRemaining(Consumer<? super T> action) {
             if (action == null) throw new NullPointerException();
             Iterator<? extends T> i;
@@ -1867,6 +1879,8 @@ public final class Spliterators {
         }
 
         @Override
+        // Constructors ensure collection is nonnull whenever the lazy iterator is null.
+        @SuppressWarnings("nullness:dereference.of.nullable")
         public boolean tryAdvance(Consumer<? super T> action) {
             if (action == null) throw new NullPointerException();
             if (it == null) {
@@ -1881,6 +1895,8 @@ public final class Spliterators {
         }
 
         @Override
+        // Constructors ensure collection is nonnull whenever the lazy iterator is null.
+        @SuppressWarnings("nullness:dereference.of.nullable")
         public long estimateSize() {
             if (it == null) {
                 it = collection.iterator();
@@ -1893,7 +1909,7 @@ public final class Spliterators {
         public int characteristics() { return characteristics; }
 
         @Override
-        public Comparator<? super T> getComparator() {
+        public @Nullable Comparator<? super T> getComparator() {
             if (hasCharacteristics(Spliterator.SORTED))
                 return null;
             throw new IllegalStateException();
@@ -1947,7 +1963,7 @@ public final class Spliterators {
         }
 
         @Override
-        public OfInt trySplit() {
+        public @Nullable OfInt trySplit() {
             PrimitiveIterator.OfInt i = it;
             long s = est;
             if (s > 1 && i.hasNext()) {
@@ -1992,7 +2008,7 @@ public final class Spliterators {
         public int characteristics() { return characteristics; }
 
         @Override
-        public Comparator<? super Integer> getComparator() {
+        public @Nullable Comparator<? super Integer> getComparator() {
             if (hasCharacteristics(Spliterator.SORTED))
                 return null;
             throw new IllegalStateException();
@@ -2041,7 +2057,7 @@ public final class Spliterators {
         }
 
         @Override
-        public OfLong trySplit() {
+        public @Nullable OfLong trySplit() {
             PrimitiveIterator.OfLong i = it;
             long s = est;
             if (s > 1 && i.hasNext()) {
@@ -2086,7 +2102,7 @@ public final class Spliterators {
         public int characteristics() { return characteristics; }
 
         @Override
-        public Comparator<? super Long> getComparator() {
+        public @Nullable Comparator<? super Long> getComparator() {
             if (hasCharacteristics(Spliterator.SORTED))
                 return null;
             throw new IllegalStateException();
@@ -2135,7 +2151,7 @@ public final class Spliterators {
         }
 
         @Override
-        public OfDouble trySplit() {
+        public @Nullable OfDouble trySplit() {
             PrimitiveIterator.OfDouble i = it;
             long s = est;
             if (s > 1 && i.hasNext()) {
@@ -2180,7 +2196,7 @@ public final class Spliterators {
         public int characteristics() { return characteristics; }
 
         @Override
-        public Comparator<? super Double> getComparator() {
+        public @Nullable Comparator<? super Double> getComparator() {
             if (hasCharacteristics(Spliterator.SORTED))
                 return null;
             throw new IllegalStateException();
