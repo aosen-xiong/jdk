@@ -126,7 +126,7 @@ import jdk.internal.vm.annotation.IntrinsicCandidate;
      * A cache of the last value returned by toString. Cleared
      * whenever the StringBuffer is modified.
      */
-    private transient String toStringCache;
+    private transient @Nullable String toStringCache;
 
     /** use serialVersionUID from JDK 1.0.2 for interoperability */
     @java.io.Serial
@@ -357,7 +357,7 @@ import jdk.internal.vm.annotation.IntrinsicCandidate;
      * @since 1.8
      */
     @Override
-    synchronized StringBuffer append(@LeakedToResult StringBuffer this, @NonLeaked AbstractStringBuilder asb) {
+    synchronized StringBuffer append(@LeakedToResult StringBuffer this, @NonLeaked @Nullable AbstractStringBuilder asb) {
         toStringCache = null;
         super.append(asb);
         return this;
@@ -784,6 +784,8 @@ import jdk.internal.vm.annotation.IntrinsicCandidate;
      * @throws ClassNotFoundException if a serialized class cannot be loaded
      */
     @java.io.Serial
+    // The serialized form written by writeObject contains a nonnull backing char array.
+    @SuppressWarnings({"nullness:argument.type.incompatible", "nullness:dereference.of.nullable"})
     private void readObject(java.io.ObjectInputStream s)
         throws java.io.IOException, ClassNotFoundException {
         java.io.ObjectInputStream.GetField fields = s.readFields();
