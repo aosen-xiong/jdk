@@ -89,9 +89,9 @@ JDK_SRC=/path/to/jdk checker/bin-devel/typecheck-jdk.sh nullness java.base \
 The script accepts module-relative `.java` paths or package names and checks
 each selected file with `--patch-module`. The current exceptions batch contains
 `StackTraceElement`, `Throwable`, `Exception`, `RuntimeException`, and `Error`.
-The stack also checks eight related exception files and eight core interfaces
+The stack also checks eight related exception files and eight core interfaces,
 five object/value foundations, seven primitive wrappers, and three arithmetic
-files, plus four public text APIs (40 files in total). See the
+files, four public text APIs, and four text helpers (44 files in total). See the
 [file inventory, PR stack, and completion milestones](doc/nullness/java-lang.md)
 for the remaining work and the precise validation status.
 Logs go under CF's `checker/build/jdk-typecheck/`. Nullness checking uses
@@ -103,6 +103,13 @@ JDK** job checks the native build.
 For `java.base`, the script uses `-XDignore.symbol.file=true` to avoid javac
 internal-API warnings preventing annotation processing; other warning checks
 remain enabled. CI pins the checker revision and its bundled JDK contracts.
+
+To check CF-owned callers of package-private JDK APIs, the same script accepts
+additional module source roots via `JDK_EXTRA_SOURCE_ROOTS` (colon-separated,
+after the JDK shared-source root). CI uses a separate invocation for
+`java/lang/TextHelperContracts.java` from
+`checker/tests/jdk-source/java.base/` in CF. The 44 JDK source checks leave this
+variable unset. No caller fixture is placed in the JDK source checkout.
 
 ## Pull request merge conflicts
 
