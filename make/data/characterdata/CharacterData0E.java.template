@@ -25,9 +25,12 @@
 
 package java.lang;
 
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 /** The CharacterData class encapsulates the large tables found in
     Java.lang.Character. */
 
+@AnnotatedFor("nullness")
 class CharacterData0E extends CharacterData {
     /* The character properties are currently encoded into 32 bits in the following manner:
         1 bit   mirrored property
