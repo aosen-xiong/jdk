@@ -26,6 +26,7 @@
 package java.lang;
 
 import org.checkerframework.checker.interning.qual.UsesObjectEquals;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
 import java.text.BreakIterator;
@@ -47,7 +48,7 @@ import sun.text.Normalizer;
  * Note that the unconditional case mappings (including 1:M mappings)
  * are handled in {@code Character.toLower/UpperCase()}.
  */
-@AnnotatedFor({"interning"})
+@AnnotatedFor({"interning", "nullness"})
 final @UsesObjectEquals class ConditionalSpecialCasing {
 
     // context conditions.
@@ -137,7 +138,7 @@ final @UsesObjectEquals class ConditionalSpecialCasing {
         }
     }
 
-    static char[] toLowerCaseCharArray(String src, int index, Locale locale) {
+    static char @Nullable [] toLowerCaseCharArray(String src, int index, Locale locale) {
         return lookUpTable(src, index, locale, true);
     }
 
@@ -150,7 +151,7 @@ final @UsesObjectEquals class ConditionalSpecialCasing {
         }
     }
 
-    private static char[] lookUpTable(String src, int index, Locale locale, boolean bLowerCasing) {
+    private static char @Nullable [] lookUpTable(String src, int index, Locale locale, boolean bLowerCasing) {
         HashSet<Entry> set = entryTable.get(src.codePointAt(index));
         char[] ret = null;
 
@@ -430,10 +431,10 @@ final @UsesObjectEquals class ConditionalSpecialCasing {
         int ch;
         char [] lower;
         char [] upper;
-        String lang;
+        @Nullable String lang;
         int condition;
 
-        Entry(int ch, char[] lower, char[] upper, String lang, int condition) {
+        Entry(int ch, char[] lower, char[] upper, @Nullable String lang, int condition) {
             this.ch = ch;
             this.lower = lower;
             this.upper = upper;
@@ -453,7 +454,7 @@ final @UsesObjectEquals class ConditionalSpecialCasing {
             return upper;
         }
 
-        String getLanguage() {
+        @Nullable String getLanguage() {
             return lang;
         }
 
