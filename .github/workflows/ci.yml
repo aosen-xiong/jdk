@@ -24,6 +24,9 @@ jobs:
       JAVA_VERSION: 17
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
       - name: Set up JDK 17
         uses: actions/setup-java@v6.0.0
         with:
@@ -43,6 +46,25 @@ jobs:
         run: bash ./configure --with-jtreg=/tmp/jtreg --disable-warnings-as-errors
       - name: Build the JDK
         run: make jdk
+      - name: Preserve configured VersionProps source
+        run: |
+          generated=(build/*/support/gensrc/java.base/java/lang/VersionProps.java)
+          test "${#generated[@]}" -eq 1
+          test -f "${generated[0]}"
+          destination="$RUNNER_TEMP/java-lang-generated"
+          mkdir -p "$destination/java/lang"
+          cp "${generated[0]}" "$destination/java/lang/VersionProps.java"
+          git rev-parse HEAD > "$destination/source-revision.txt"
+          sha256sum src/java.base/share/classes/java/lang/VersionProps.java.template \
+            > "$destination/template.sha256"
+          (cd "$destination" && sha256sum java/lang/VersionProps.java > generated.sha256)
+      - name: Upload configured VersionProps source
+        uses: actions/upload-artifact@v4
+        with:
+          name: java-lang-configured-${{ github.run_id }}
+          path: ${{ runner.temp }}/java-lang-generated/
+          if-no-files-found: error
+          overwrite: true
 
   CF:
     name: ${{ matrix.script }} on JDK ${{ matrix.java_version }}
@@ -170,6 +192,7 @@ jobs:
   # Grow this explicit file list after each documentation review and passing source check.
   nullness:
     name: Nullness (java.lang, ${{ matrix.platform }})
+    needs: build_jdk
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     strategy:
@@ -188,11 +211,21 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           path: jdk
           persist-credentials: false
+      - name: Download configured VersionProps source
+        uses: actions/download-artifact@v4
+        with:
+          name: java-lang-configured-${{ github.run_id }}
+          path: jdk-configured-java.base
+      - name: Verify generated source provenance
+        run: |
+          test "$(cat jdk-configured-java.base/source-revision.txt)" = "$(git -C jdk rev-parse HEAD)"
+          (cd jdk && sha256sum -c ../jdk-configured-java.base/template.sha256)
+          (cd jdk-configured-java.base && sha256sum -c generated.sha256)
       - name: Check out Checker Framework
         uses: actions/checkout@v4
         with:
           repository: aosen-xiong/checker-framework
-          ref: 3c3b624177252e3bc951d6c3e342541a8278d8c6 # codex/nullness-java-lang-generated
+          ref: e8fa72969e13ab46fa42e252cb8a84e035dd4e93 # codex/nullness-java-lang-version-props
           path: checker-framework
           persist-credentials: false
       - name: Check out the checker's bundled JDK contracts
@@ -210,6 +243,7 @@ jobs:
       - name: Build Checker Framework
         working-directory: checker-framework
         run: |
+          set -o pipefail
           mkdir -p "$GITHUB_WORKSPACE/checker-framework/checker/build/jdk-typecheck"
           ./gradlew :checker:assembleForJavac --no-daemon --max-workers=2 \
             -x :framework:cloneAnnotatedJdk \
@@ -227,7 +261,7 @@ jobs:
         env:
           JDK_SRC: ${{ github.workspace }}/jdk
           JDK_GENERATE_CHARACTER_DATA: '1'
-          JDK_EXTRA_SOURCE_ROOTS: ${{ github.workspace }}/jdk/src/java.base/${{ matrix.platform }}/classes
+          JDK_EXTRA_SOURCE_ROOTS: ${{ github.workspace }}/jdk/src/java.base/${{ matrix.platform }}/classes:${{ github.workspace }}/jdk-configured-java.base
         run: |
           checker/bin-devel/typecheck-jdk.sh nullness java.base \
             java/lang/StackTraceElement.java \
@@ -364,14 +398,15 @@ jobs:
             java/lang/CharacterData01.java \
             java/lang/CharacterData02.java \
             java/lang/CharacterData03.java \
-            java/lang/CharacterData0E.java
+            java/lang/CharacterData0E.java \
+            java/lang/VersionProps.java
       - name: Check package-private helper callers from CF
         working-directory: checker-framework
         env:
           JDK_SRC: ${{ github.workspace }}/jdk
           JDK_GENERATE_CHARACTER_DATA: '1'
-          JDK_EXTRA_SOURCE_ROOTS: ${{ github.workspace }}/jdk/src/java.base/${{ matrix.platform }}/classes:${{ github.workspace }}/checker-framework/checker/tests/jdk-source/java.base
-        run: checker/bin-devel/typecheck-jdk.sh nullness java.base java/lang/TextHelperContracts.java java/lang/UnicodeHelperContracts.java java/lang/ReflectionHelperContracts.java java/lang/LoadingHelperContracts.java java/lang/SystemRuntimeHelperContracts.java java/lang/ThreadHelperContracts.java java/lang/ProcessHelperContracts.java java/lang/StackWalkingHelperContracts.java java/lang/${{ matrix.helper }}.java
+          JDK_EXTRA_SOURCE_ROOTS: ${{ github.workspace }}/jdk/src/java.base/${{ matrix.platform }}/classes:${{ github.workspace }}/jdk-configured-java.base:${{ github.workspace }}/checker-framework/checker/tests/jdk-source/java.base
+        run: checker/bin-devel/typecheck-jdk.sh nullness java.base java/lang/TextHelperContracts.java java/lang/UnicodeHelperContracts.java java/lang/ReflectionHelperContracts.java java/lang/LoadingHelperContracts.java java/lang/SystemRuntimeHelperContracts.java java/lang/ThreadHelperContracts.java java/lang/ProcessHelperContracts.java java/lang/StackWalkingHelperContracts.java java/lang/VersionPropsHelperContracts.java java/lang/${{ matrix.helper }}.java
       - name: Upload type-checking logs
         if: always()
         uses: actions/upload-artifact@v4
