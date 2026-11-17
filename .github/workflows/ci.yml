@@ -184,7 +184,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: aosen-xiong/checker-framework
-          ref: 838c47e78a4e0afbd423367b4509facfb6aae04b # codex/nullness-java-lang-runtime-exceptions
+          ref: b0f216b87caa17bc0a7e3d10acfd388fe22637a5 # codex/nullness-java-lang-checked-exceptions
           path: checker-framework
           persist-credentials: false
       - name: Check out the checker's bundled JDK contracts
@@ -285,7 +285,13 @@ jobs:
             java/lang/NumberFormatException.java \
             java/lang/IndexOutOfBoundsException.java \
             java/lang/ArrayIndexOutOfBoundsException.java \
-            java/lang/StringIndexOutOfBoundsException.java
+            java/lang/StringIndexOutOfBoundsException.java \
+            java/lang/CloneNotSupportedException.java \
+            java/lang/IllegalAccessException.java \
+            java/lang/InstantiationException.java \
+            java/lang/InterruptedException.java \
+            java/lang/NoSuchFieldException.java \
+            java/lang/NoSuchMethodException.java
       - name: Check package-private helper callers from CF
         working-directory: checker-framework
         env:
