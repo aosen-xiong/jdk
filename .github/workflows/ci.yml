@@ -181,7 +181,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: aosen-xiong/checker-framework
-          ref: 74a722487d041305f25d36662ec001fa311f638f # codex/nullness-java-lang
+          ref: 8b12fec075f673ee34a67e223154df141458f009 # codex/nullness-java-lang-exception-causes
           path: checker-framework
           persist-credentials: false
       - name: Check out the checker's bundled JDK contracts
@@ -211,7 +211,7 @@ jobs:
         with:
           distribution: temurin
           java-version: '17.0.14+7'
-      - name: Type-check the java.lang exceptions batch
+      - name: Type-check the cumulative java.lang regression set
         working-directory: checker-framework
         env:
           JDK_SRC: ${{ github.workspace }}/jdk
@@ -221,7 +221,15 @@ jobs:
             java/lang/Throwable.java \
             java/lang/Exception.java \
             java/lang/RuntimeException.java \
-            java/lang/Error.java
+            java/lang/Error.java \
+            java/lang/ClassNotFoundException.java \
+            java/lang/NullPointerException.java \
+            java/lang/ExceptionInInitializerError.java \
+            java/lang/ReflectiveOperationException.java \
+            java/lang/LinkageError.java \
+            java/lang/AssertionError.java \
+            java/lang/TypeNotPresentException.java \
+            java/lang/EnumConstantNotPresentException.java
       - name: Upload type-checking logs
         if: always()
         uses: actions/upload-artifact@v4

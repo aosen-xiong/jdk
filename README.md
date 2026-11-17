@@ -89,7 +89,9 @@ JDK_SRC=/path/to/jdk checker/bin-devel/typecheck-jdk.sh nullness java.base \
 The script accepts module-relative `.java` paths or package names and checks
 each selected file with `--patch-module`. The current exceptions batch contains
 `StackTraceElement`, `Throwable`, `Exception`, `RuntimeException`, and `Error`.
-The remaining `java.lang` files are not yet validated.
+The exception follow-up also checks eight related files. See the
+[file inventory, PR stack, and completion milestones](doc/nullness/java-lang.md)
+for the remaining work and the precise validation status.
 Logs go under CF's `checker/build/jdk-typecheck/`. Nullness checking uses
 JSpecify mode, which assumes purity, initialized state, map-key correctness and
 enabled assertions, with permissive defaults for unchecked dependencies.
