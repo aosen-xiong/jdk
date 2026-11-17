@@ -26,6 +26,9 @@
 package java.lang;
 
 import org.checkerframework.checker.interning.qual.UsesObjectEquals;
+import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.nullness.qual.PolyNull;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
 import java.util.WeakHashMap;
@@ -46,7 +49,7 @@ import static java.lang.ClassValue.ClassValueMap.probeBackupLocations;
  * @author John Rose, JSR 292 EG
  * @since 1.7
  */
-@AnnotatedFor({"interning"})
+@AnnotatedFor({"interning", "nullness"})
 public abstract @UsesObjectEquals class ClassValue<T> {
     /**
      * Sole constructor.  (For invocation by subclass constructors, typically
@@ -103,7 +106,7 @@ public abstract @UsesObjectEquals class ClassValue<T> {
      */
     public T get(Class<?> type) {
         // non-racing this.hashCodeForCache : final int
-        Entry<?>[] cache;
+        @Nullable Entry<?>[] cache;
         Entry<T> e = probeHomeLocation(cache = getCacheCarefully(type), this);
         // racing e : current value <=> stale value from current cache or from stale cache
         // invariant:  e is null or an Entry with readable Entry.version and Entry.value
@@ -189,17 +192,17 @@ public abstract @UsesObjectEquals class ClassValue<T> {
     /// --------
 
     /** Return the cache, if it exists, else a dummy empty cache. */
-    private static Entry<?>[] getCacheCarefully(Class<?> type) {
+    private static @Nullable Entry<?>[] getCacheCarefully(Class<?> type) {
         // racing type.classValueMap{.cacheArray} : null => new Entry[X] <=> new Entry[Y]
         ClassValueMap map = type.classValueMap;
         if (map == null)  return EMPTY_CACHE;
-        Entry<?>[] cache = map.getCache();
+        @Nullable Entry<?>[] cache = map.getCache();
         return cache;
         // invariant:  returned value is safe to dereference and check for an Entry
     }
 
     /** Initial, one-element, empty cache used by all Class instances.  Must never be filled. */
-    private static final Entry<?>[] EMPTY_CACHE = { null };
+    private static final @Nullable Entry<?>[] EMPTY_CACHE = { null };
 
     /**
      * Slow tail of ClassValue.get to retry at nearby locations in the cache,
@@ -207,7 +210,7 @@ public abstract @UsesObjectEquals class ClassValue<T> {
      * Called only if the first probe was empty or a collision.
      * This is a separate method, so compilers can process it independently.
      */
-    private T getFromBackup(Entry<?>[] cache, Class<?> type) {
+    private T getFromBackup(@Nullable Entry<?>[] cache, Class<?> type) {
         Entry<T> e = probeBackupLocations(cache, this);
         if (e != null)
             return e.value();
@@ -216,7 +219,7 @@ public abstract @UsesObjectEquals class ClassValue<T> {
 
     // Hack to suppress warnings on the (T) cast, which is a no-op.
     @SuppressWarnings("unchecked")
-    Entry<T> castEntry(Entry<?> e) { return (Entry<T>) e; }
+    @PolyNull Entry<T> castEntry(@PolyNull Entry<?> e) { return (Entry<T>) e; }
 
     /** Called when the fast path of get fails, and cache reprobe also fails.
      */
@@ -242,7 +245,8 @@ public abstract @UsesObjectEquals class ClassValue<T> {
     }
 
     /** Check that e is non-null, matches this ClassValue, and is live. */
-    boolean match(Entry<?> e) {
+    @EnsuresNonNullIf(expression = "#1", result = true)
+    boolean match(@Nullable Entry<?> e) {
         // racing e.version : null (blank) => unique Version token => null (GC-ed version)
         // non-racing this.version : v1 => v2 => ... (updates are read faithfully from volatile)
         return (e != null && e.get() == this.version);
@@ -326,8 +330,8 @@ public abstract @UsesObjectEquals class ClassValue<T> {
      *  into the dead state.
      */
     static class Entry<T> extends WeakReference<Version<T>> {
-        final Object value;  // usually of type T, but sometimes (Entry)this
-        Entry(Version<T> version, T value) {
+        final @Nullable Object value;  // usually of type T, but sometimes (Entry)this
+        Entry(@Nullable Version<T> version, T value) {
             super(version);
             this.value = value;  // for a regular entry, value is of type T
         }
@@ -338,11 +342,11 @@ public abstract @UsesObjectEquals class ClassValue<T> {
             this.value = this;  // for a promise, value is not of type T, but Entry!
         }
         /** Fetch the value.  This entry must not be a promise. */
-        @SuppressWarnings("unchecked")  // if !isPromise, type is T
+        @SuppressWarnings({"unchecked", "nullness:return.type.incompatible"}) // Non-promise storage holds exactly T.
         T value() { assertNotPromise(); return (T) value; }
         boolean isPromise() { return value == this; }
-        Version<T> version() { return get(); }
-        ClassValue<T> classValueOrNull() {
+        @Nullable Version<T> version() { return get(); }
+        @Nullable ClassValue<T> classValueOrNull() {
             Version<T> v = version();
             return (v == null) ? null : v.classValue();
         }
@@ -355,7 +359,7 @@ public abstract @UsesObjectEquals class ClassValue<T> {
         }
         Entry<T> refreshVersion(Version<T> v2) {
             assertNotPromise();
-            @SuppressWarnings("unchecked")  // if !isPromise, type is T
+            @SuppressWarnings({"unchecked", "nullness:type.arguments.not.inferred"}) // Refresh preserves the stored T, including its nullness.
             Entry<T> e2 = new Entry<>(v2, (T) value);
             clear();
             // value = null -- caller must drop
@@ -395,7 +399,7 @@ public abstract @UsesObjectEquals class ClassValue<T> {
         return map;
     }
 
-    static <T> Entry<T> makeEntry(Version<T> explicitVersion, T value) {
+    static <T> Entry<T> makeEntry(@Nullable Version<T> explicitVersion, T value) {
         // Note that explicitVersion might be different from this.version.
         return new Entry<>(explicitVersion, value);
 
@@ -418,7 +422,7 @@ public abstract @UsesObjectEquals class ClassValue<T> {
      *  Also manages an unserialized fast-path cache.
      */
     static class ClassValueMap extends WeakHashMap<ClassValue.Identity, Entry<?>> {
-        private Entry<?>[] cacheArray;
+        private @Nullable Entry<?>[] cacheArray;
         private int cacheLoad, cacheLoadLimit;
 
         /** Number of entries initially allocated to each type when first used with any ClassValue.
@@ -434,7 +438,7 @@ public abstract @UsesObjectEquals class ClassValue<T> {
             sizeCache(INITIAL_ENTRIES);
         }
 
-        Entry<?>[] getCache() { return cacheArray; }
+        @Nullable Entry<?>[] getCache() { return cacheArray; }
 
         /** Initiate a query.  Store a promise (placeholder) if there is no value yet. */
         synchronized
@@ -474,7 +478,7 @@ public abstract @UsesObjectEquals class ClassValue<T> {
 
         /** Finish a query.  Overwrite a matching placeholder.  Drop stale incoming values. */
         synchronized
-        <T> Entry<T> finishEntry(ClassValue<T> classValue, Entry<T> e) {
+        <T> @Nullable Entry<T> finishEntry(ClassValue<T> classValue, Entry<T> e) {
             @SuppressWarnings("unchecked")  // one map has entries for all value types <T>
             Entry<T> e0 = (Entry<T>) get(classValue.identity);
             if (e == e0) {
@@ -545,7 +549,7 @@ public abstract @UsesObjectEquals class ClassValue<T> {
         // Statics do not need synchronization.
 
         /** Load the cache entry at the given (hashed) location. */
-        static Entry<?> loadFromCache(Entry<?>[] cache, int i) {
+        static @Nullable Entry<?> loadFromCache(@Nullable Entry<?>[] cache, int i) {
             // non-racing cache.length : constant
             // racing cache[i & (mask)] : null <=> Entry
             return cache[i & (cache.length-1)];
@@ -553,12 +557,12 @@ public abstract @UsesObjectEquals class ClassValue<T> {
         }
 
         /** Look in the cache, at the home location for the given ClassValue. */
-        static <T> Entry<T> probeHomeLocation(Entry<?>[] cache, ClassValue<T> classValue) {
+        static <T> @Nullable Entry<T> probeHomeLocation(@Nullable Entry<?>[] cache, ClassValue<T> classValue) {
             return classValue.castEntry(loadFromCache(cache, classValue.hashCodeForCache));
         }
 
         /** Given that first probe was a collision, retry at nearby locations. */
-        static <T> Entry<T> probeBackupLocations(Entry<?>[] cache, ClassValue<T> classValue) {
+        static <T> @Nullable Entry<T> probeBackupLocations(@Nullable Entry<?>[] cache, ClassValue<T> classValue) {
             if (PROBE_LIMIT <= 0)  return null;
             // Probe the cache carefully, in a range of slots.
             int mask = (cache.length-1);
@@ -594,7 +598,7 @@ public abstract @UsesObjectEquals class ClassValue<T> {
         }
 
         /** How far out of place is e? */
-        private static int entryDislocation(Entry<?>[] cache, int pos, Entry<?> e) {
+        private static int entryDislocation(@Nullable Entry<?>[] cache, int pos, Entry<?> e) {
             ClassValue<?> cv = e.classValueOrNull();
             if (cv == null)  return 0;  // entry is not live!
             int mask = (cache.length-1);
@@ -609,7 +613,7 @@ public abstract @UsesObjectEquals class ClassValue<T> {
             assert((length & (length-1)) == 0);  // must be power of 2
             cacheLoad = 0;
             cacheLoadLimit = (int) ((double) length * CACHE_LOAD_LIMIT / 100);
-            cacheArray = new Entry<?>[length];
+            cacheArray = new @Nullable Entry<?>[length];
         }
 
         /** Make sure the cache load stays below its limit, if possible. */
@@ -622,7 +626,7 @@ public abstract @UsesObjectEquals class ClassValue<T> {
             removeStaleEntries();
             if (cacheLoad < cacheLoadLimit)
                 return;  // win
-            Entry<?>[] oldCache = getCache();
+            @Nullable Entry<?>[] oldCache = getCache();
             if (oldCache.length > HASH_MASK)
                 return;  // lose
             sizeCache(oldCache.length * 2);
@@ -636,7 +640,7 @@ public abstract @UsesObjectEquals class ClassValue<T> {
         /** Remove stale entries in the given range.
          *  Should be executed under a Map lock.
          */
-        private void removeStaleEntries(Entry<?>[] cache, int begin, int count) {
+        private void removeStaleEntries(@Nullable Entry<?>[] cache, int begin, int count) {
             if (PROBE_LIMIT <= 0)  return;
             int mask = (cache.length-1);
             int removed = 0;
@@ -660,7 +664,7 @@ public abstract @UsesObjectEquals class ClassValue<T> {
          *  to be found via reprobes.  Find an entry after cache[begin]
          *  to plug into the hole, or return null if none is needed.
          */
-        private Entry<?> findReplacement(Entry<?>[] cache, int home1) {
+        private @Nullable Entry<?> findReplacement(@Nullable Entry<?>[] cache, int home1) {
             Entry<?> replacement = null;
             int haveReplacement = -1, replacementPos = 0;
             int mask = (cache.length-1);
@@ -705,7 +709,7 @@ public abstract @UsesObjectEquals class ClassValue<T> {
 
         /** Remove all stale entries, everywhere. */
         private void removeStaleEntries() {
-            Entry<?>[] cache = getCache();
+            @Nullable Entry<?>[] cache = getCache();
             removeStaleEntries(cache, 0, cache.length + PROBE_LIMIT - 1);
         }
 
@@ -720,7 +724,7 @@ public abstract @UsesObjectEquals class ClassValue<T> {
         private <T> void addToCache(ClassValue<T> classValue, Entry<T> e) {
             if (PROBE_LIMIT <= 0)  return;  // do not fill cache
             // Add e to the cache.
-            Entry<?>[] cache = getCache();
+            @Nullable Entry<?>[] cache = getCache();
             int mask = (cache.length-1);
             int home = classValue.hashCodeForCache & mask;
             Entry<?> e2 = placeInCache(cache, home, e, false);
@@ -741,7 +745,7 @@ public abstract @UsesObjectEquals class ClassValue<T> {
         /** Store the given entry.  Update cacheLoad, and return any live victim.
          *  'Gently' means return self rather than dislocating a live victim.
          */
-        private Entry<?> placeInCache(Entry<?>[] cache, int pos, Entry<?> e, boolean gently) {
+        private @Nullable Entry<?> placeInCache(@Nullable Entry<?>[] cache, int pos, Entry<?> e, boolean gently) {
             Entry<?> e2 = overwrittenEntry(cache[pos]);
             if (gently && e2 != null) {
                 // do not overwrite a live entry
@@ -758,7 +762,7 @@ public abstract @UsesObjectEquals class ClassValue<T> {
          *  because the caller is going to store something
          *  in its place.
          */
-        private <T> Entry<T> overwrittenEntry(Entry<T> e2) {
+        private <T> @Nullable Entry<T> overwrittenEntry(@Nullable Entry<T> e2) {
             if (e2 == null)  cacheLoad += 1;
             else if (e2.isLive())  return e2;
             return null;
