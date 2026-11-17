@@ -25,6 +25,8 @@
 
 package java.lang;
 
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 import java.lang.annotation.*;
 
 /**
@@ -90,4 +92,5 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.CONSTRUCTOR, ElementType.METHOD})
+@AnnotatedFor("nullness")
 public @interface SafeVarargs {}
