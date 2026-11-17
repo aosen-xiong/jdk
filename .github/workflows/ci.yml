@@ -169,9 +169,17 @@ jobs:
 
   # Grow this explicit file list after each documentation review and passing source check.
   nullness:
-    name: Nullness (java.lang)
+    name: Nullness (java.lang, ${{ matrix.platform }})
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: unix
+            helper: UnixProcessHelperContracts
+          - platform: windows
+            helper: WindowsProcessHelperContracts
     permissions:
       contents: read
     steps:
@@ -184,7 +192,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: aosen-xiong/checker-framework
-          ref: 02d6ce066ea7be0623599063b1ff5bff85e76220 # codex/nullness-java-lang-unix
+          ref: 9787346e67dcf46fd02de1706ae65b4f625a16e2 # codex/nullness-java-lang-windows
           path: checker-framework
           persist-credentials: false
       - name: Check out the checker's bundled JDK contracts
@@ -214,11 +222,11 @@ jobs:
         with:
           distribution: temurin
           java-version: '17.0.14+7'
-      - name: Type-check the cumulative java.lang set with Unix sources
+      - name: Type-check the cumulative java.lang set with platform sources
         working-directory: checker-framework
         env:
           JDK_SRC: ${{ github.workspace }}/jdk
-          JDK_EXTRA_SOURCE_ROOTS: ${{ github.workspace }}/jdk/src/java.base/unix/classes
+          JDK_EXTRA_SOURCE_ROOTS: ${{ github.workspace }}/jdk/src/java.base/${{ matrix.platform }}/classes
         run: |
           checker/bin-devel/typecheck-jdk.sh nullness java.base \
             java/lang/StackTraceElement.java \
@@ -354,12 +362,12 @@ jobs:
         working-directory: checker-framework
         env:
           JDK_SRC: ${{ github.workspace }}/jdk
-          JDK_EXTRA_SOURCE_ROOTS: ${{ github.workspace }}/jdk/src/java.base/unix/classes:${{ github.workspace }}/checker-framework/checker/tests/jdk-source/java.base
-        run: checker/bin-devel/typecheck-jdk.sh nullness java.base java/lang/TextHelperContracts.java java/lang/UnicodeHelperContracts.java java/lang/ReflectionHelperContracts.java java/lang/LoadingHelperContracts.java java/lang/SystemRuntimeHelperContracts.java java/lang/ThreadHelperContracts.java java/lang/ProcessHelperContracts.java java/lang/StackWalkingHelperContracts.java java/lang/UnixProcessHelperContracts.java
+          JDK_EXTRA_SOURCE_ROOTS: ${{ github.workspace }}/jdk/src/java.base/${{ matrix.platform }}/classes:${{ github.workspace }}/checker-framework/checker/tests/jdk-source/java.base
+        run: checker/bin-devel/typecheck-jdk.sh nullness java.base java/lang/TextHelperContracts.java java/lang/UnicodeHelperContracts.java java/lang/ReflectionHelperContracts.java java/lang/LoadingHelperContracts.java java/lang/SystemRuntimeHelperContracts.java java/lang/ThreadHelperContracts.java java/lang/ProcessHelperContracts.java java/lang/StackWalkingHelperContracts.java java/lang/${{ matrix.helper }}.java
       - name: Upload type-checking logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: java-lang-nullness-${{ github.run_id }}
+          name: java-lang-nullness-${{ matrix.platform }}-${{ github.run_id }}
           path: checker-framework/checker/build/jdk-typecheck/
           if-no-files-found: warn

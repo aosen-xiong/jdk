@@ -63,11 +63,15 @@
 
 package java.lang;
 
+import org.checkerframework.framework.qual.AnnotatedFor;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import org.checkerframework.dataflow.qual.Pure;
 
 import java.io.*;
 import java.util.*;
 
+@AnnotatedFor("nullness")
 final class ProcessEnvironment extends HashMap<String,String>
 {
 
@@ -95,25 +99,29 @@ final class ProcessEnvironment extends HashMap<String,String>
         return (String) o;
     }
 
-    public String put(String key, String value) {
+    public @Nullable String put(String key, String value) {
         return super.put(validateName(key), validateValue(value));
     }
 
-    public String get(Object key) {
+    @SuppressWarnings("nullness:override.param.invalid") // JDK contract conflict: environment queries reject null although HashMap accepts it.
+    public @Nullable String get(Object key) {
         return super.get(nonNullString(key));
     }
 
     @Pure
+    @SuppressWarnings("nullness:override.param.invalid") // JDK contract conflict: environment queries reject null although HashMap accepts it.
     public boolean containsKey(Object key) {
         return super.containsKey(nonNullString(key));
     }
 
     @Pure
+    @SuppressWarnings("nullness:override.param.invalid") // JDK contract conflict: environment queries reject null although HashMap accepts it.
     public boolean containsValue(Object value) {
         return super.containsValue(nonNullString(value));
     }
 
-    public String remove(Object key) {
+    @SuppressWarnings("nullness:override.param.invalid") // JDK contract conflict: environment queries reject null although HashMap accepts it.
+    public @Nullable String remove(Object key) {
         return super.remove(nonNullString(key));
     }
 
@@ -128,7 +136,7 @@ final class ProcessEnvironment extends HashMap<String,String>
             return e.setValue(validateValue(value));
         }
         public String toString() { return getKey() + "=" + getValue();}
-        public boolean equals(Object o) {return e.equals(o);}
+        public boolean equals(@Nullable Object o) {return e.equals(o);}
         public int hashCode()    {return e.hashCode();}
     }
 
@@ -275,7 +283,7 @@ final class ProcessEnvironment extends HashMap<String,String>
     }
 
     // Only for use by System.getenv(String)
-    static String getenv(String name) {
+    static @Nullable String getenv(String name) {
         // The original implementation used a native call to _wgetenv,
         // but it turns out that _wgetenv is only consistent with
         // GetEnvironmentStringsW (for non-ASCII) if `wmain' is used
@@ -352,7 +360,7 @@ final class ProcessEnvironment extends HashMap<String,String>
         sb.append(name).append('=').append(val).append('\u0000');
     }
 
-    static String toEnvironmentBlock(Map<String,String> map) {
+    static @Nullable String toEnvironmentBlock(@Nullable Map<String,String> map) {
         return map == null ? null :
             ((ProcessEnvironment)map).toEnvironmentBlock();
     }

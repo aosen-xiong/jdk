@@ -25,6 +25,9 @@
 
 package java.lang;
 
+import org.checkerframework.framework.qual.AnnotatedFor;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import jdk.internal.misc.Signal;
 
 
@@ -36,9 +39,10 @@ import jdk.internal.misc.Signal;
  * @since    1.3
  */
 
+@AnnotatedFor("nullness")
 class Terminator {
 
-    private static Signal.Handler handler = null;
+    private static Signal.@Nullable Handler handler = null;
 
     /* Invocations of setup and teardown are already synchronized
      * on the shutdown lock, so no further synchronization is needed here
