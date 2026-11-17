@@ -184,7 +184,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: aosen-xiong/checker-framework
-          ref: b0f216b87caa17bc0a7e3d10acfd388fe22637a5 # codex/nullness-java-lang-checked-exceptions
+          ref: 6ab298d8ef7bf6567b96f421aed0089f7c876db5 # codex/nullness-java-lang-linkage-errors
           path: checker-framework
           persist-credentials: false
       - name: Check out the checker's bundled JDK contracts
@@ -291,7 +291,20 @@ jobs:
             java/lang/InstantiationException.java \
             java/lang/InterruptedException.java \
             java/lang/NoSuchFieldException.java \
-            java/lang/NoSuchMethodException.java
+            java/lang/NoSuchMethodException.java \
+            java/lang/AbstractMethodError.java \
+            java/lang/BootstrapMethodError.java \
+            java/lang/ClassCircularityError.java \
+            java/lang/ClassFormatError.java \
+            java/lang/IllegalAccessError.java \
+            java/lang/IncompatibleClassChangeError.java \
+            java/lang/InstantiationError.java \
+            java/lang/NoClassDefFoundError.java \
+            java/lang/NoSuchFieldError.java \
+            java/lang/NoSuchMethodError.java \
+            java/lang/UnsatisfiedLinkError.java \
+            java/lang/UnsupportedClassVersionError.java \
+            java/lang/VerifyError.java
       - name: Check package-private helper callers from CF
         working-directory: checker-framework
         env:
