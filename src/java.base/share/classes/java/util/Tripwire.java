@@ -24,6 +24,8 @@
  */
 package java.util;
 
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 import sun.util.logging.PlatformLogger;
 
 import java.security.AccessController;
@@ -45,6 +47,7 @@ import java.security.PrivilegedAction;
  *
  * @since 1.8
  */
+@AnnotatedFor("nullness")
 final class Tripwire {
     private static final String TRIPWIRE_PROPERTY = "org.openjdk.java.util.stream.tripwire";
 

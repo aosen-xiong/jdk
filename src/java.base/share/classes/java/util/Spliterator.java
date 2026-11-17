@@ -27,6 +27,7 @@ package java.util;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.signedness.qual.SignedPositive;
 import org.checkerframework.dataflow.qual.Pure;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
 import java.util.function.Consumer;
@@ -636,7 +637,7 @@ public interface Spliterator<T> {
          * @throws NullPointerException if the specified action is null
          */
         @SuppressWarnings("overloads")
-        boolean tryAdvance(T_CONS action);
+        boolean tryAdvance(@NonNull T_CONS action);
 
         /**
          * Performs the given action for each remaining element, sequentially in
@@ -657,7 +658,7 @@ public interface Spliterator<T> {
          * @throws NullPointerException if the specified action is null
          */
         @SuppressWarnings("overloads")
-        default void forEachRemaining(T_CONS action) {
+        default void forEachRemaining(@NonNull T_CONS action) {
             do { } while (tryAdvance(action));
         }
     }
