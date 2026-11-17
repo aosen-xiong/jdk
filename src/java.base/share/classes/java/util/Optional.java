@@ -87,6 +87,8 @@ import java.util.stream.Stream;
 })
 @AnnotatedFor({"lock", "nullness", "optional"})
 @Covariant(0)
+// Preserve the existing CF nonnull class policy; this declaration site is outside JSpecify.
+@SuppressWarnings("nullness:jspecify.unrecognized.location.class")
 @jdk.internal.ValueBased
 public final @NonNull class Optional<T> {
     /**
@@ -127,7 +129,7 @@ public final @NonNull class Optional<T> {
      *        ensure the value is non-{@code null} unless creating the singleton
      *        instance returned by {@code empty()}.
      */
-    private Optional(@NonNull T value) {
+    private Optional(@Nullable T value) {
         this.value = value;
     }
 
@@ -159,7 +161,7 @@ public final @NonNull class Optional<T> {
     @SideEffectFree
     @SuppressWarnings("unchecked")
     public static <T> Optional<@NonNull T> ofNullable(@Nullable T value) {
-        return value == null ? (Optional<T>) EMPTY
+        return value == null ? (Optional<@NonNull T>) EMPTY
                              : new Optional<>(value);
     }
 
@@ -190,6 +192,7 @@ public final @NonNull class Optional<T> {
     @OptionalEliminator
     @Pure
     @EnsuresPresentIf(result = true, expression = "this")
+    @EnsuresNonNullIf(expression="value", result=true)
     public boolean isPresent() {
         return value != null;
     }
@@ -203,6 +206,7 @@ public final @NonNull class Optional<T> {
      */
     @Pure
     @EnsuresPresentIf(result = false, expression = "this")
+    @EnsuresNonNullIf(expression="value", result=false)
     public boolean isEmpty() {
         return value == null;
     }
@@ -414,6 +418,8 @@ public final @NonNull class Optional<T> {
      *         function is {@code null}
      */
     @OptionalEliminator
+    // CF limitation: the equivalent separate returns preserve the wildcard supplier qualifier.
+    @SuppressWarnings("nullness:conditional.type.incompatible")
     public @PolyNull T orElseGet(Supplier<? extends @PolyNull T> supplier) {
         return value != null ? value : supplier.get();
     }
