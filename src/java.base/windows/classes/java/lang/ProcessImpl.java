@@ -25,6 +25,9 @@
 
 package java.lang;
 
+import org.checkerframework.framework.qual.AnnotatedFor;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -57,6 +60,7 @@ import sun.security.action.GetPropertyAction;
  * @since   1.5
  */
 
+@AnnotatedFor("nullness")
 final class ProcessImpl extends Process {
     private static final JavaIOFileDescriptorAccess fdAccess
         = SharedSecrets.getJavaIOFileDescriptorAccess();
@@ -96,10 +100,11 @@ final class ProcessImpl extends Process {
     }
 
     // System-dependent portion of ProcessBuilder.start()
+    @SuppressWarnings("nullness:argument.type.incompatible") // Redirect invariant: remaining factory instances have a non-null file.
     static Process start(String cmdarray[],
-                         java.util.Map<String,String> environment,
-                         String dir,
-                         ProcessBuilder.Redirect[] redirects,
+                         java.util.@Nullable Map<String,String> environment,
+                         @Nullable String dir,
+                         ProcessBuilder.Redirect @Nullable [] redirects,
                          boolean redirectErrorStream)
         throws IOException
     {
@@ -420,8 +425,8 @@ final class ProcessImpl extends Process {
 
     @SuppressWarnings("removal")
     private ProcessImpl(String cmd[],
-                        final String envblock,
-                        final String path,
+                        final @Nullable String envblock,
+                        final @Nullable String path,
                         final long[] stdHandles,
                         boolean forceNullOutputStream,
                         final boolean redirectErrorStream)
@@ -681,8 +686,8 @@ final class ProcessImpl extends Process {
      * @return the native subprocess HANDLE returned by CreateProcess
      */
     private static synchronized native long create(String cmdstr,
-                                      String envblock,
-                                      String dir,
+                                      @Nullable String envblock,
+                                      @Nullable String dir,
                                       long[] stdHandles,
                                       boolean redirectErrorStream)
         throws IOException;
