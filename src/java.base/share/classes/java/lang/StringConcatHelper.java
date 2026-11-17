@@ -25,6 +25,9 @@
 
 package java.lang;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 import jdk.internal.misc.Unsafe;
 import jdk.internal.vm.annotation.ForceInline;
 
@@ -37,6 +40,7 @@ import java.lang.invoke.MethodType;
  * from {@link java.lang.invoke.StringConcatFactory}, and used in {@link java.lang.invoke.MethodHandle}
  * combinators there.
  */
+@AnnotatedFor("nullness")
 final class StringConcatHelper {
 
     private StringConcatHelper() {
@@ -192,7 +196,7 @@ final class StringConcatHelper {
      * @param prefix     a constant to prepend before value
      * @return           updated index (coder value retained)
      */
-    static long prepend(long indexCoder, byte[] buf, boolean value, String prefix) {
+    static long prepend(long indexCoder, byte[] buf, boolean value, @Nullable String prefix) {
         indexCoder = prepend(indexCoder, buf, value);
         if (prefix != null) indexCoder = prepend(indexCoder, buf, prefix);
         return indexCoder;
@@ -209,7 +213,7 @@ final class StringConcatHelper {
      * @param prefix     a constant to prepend before value
      * @return           updated index (coder value retained)
      */
-    static long prepend(long indexCoder, byte[] buf, byte value, String prefix) {
+    static long prepend(long indexCoder, byte[] buf, byte value, @Nullable String prefix) {
         indexCoder = prepend(indexCoder, buf, (int)value);
         if (prefix != null) indexCoder = prepend(indexCoder, buf, prefix);
         return indexCoder;
@@ -245,7 +249,7 @@ final class StringConcatHelper {
      * @param prefix     a constant to prepend before value
      * @return           updated index (coder value retained)
      */
-    static long prepend(long indexCoder, byte[] buf, char value, String prefix) {
+    static long prepend(long indexCoder, byte[] buf, char value, @Nullable String prefix) {
         indexCoder = prepend(indexCoder, buf, value);
         if (prefix != null) indexCoder = prepend(indexCoder, buf, prefix);
         return indexCoder;
@@ -262,7 +266,7 @@ final class StringConcatHelper {
      * @param prefix     a constant to prepend before value
      * @return           updated index (coder value retained)
      */
-    static long prepend(long indexCoder, byte[] buf, short value, String prefix) {
+    static long prepend(long indexCoder, byte[] buf, short value, @Nullable String prefix) {
         indexCoder = prepend(indexCoder, buf, (int)value);
         if (prefix != null) indexCoder = prepend(indexCoder, buf, prefix);
         return indexCoder;
@@ -297,7 +301,7 @@ final class StringConcatHelper {
      * @param prefix     a constant to prepend before value
      * @return           updated index (coder value retained)
      */
-    static long prepend(long indexCoder, byte[] buf, int value, String prefix) {
+    static long prepend(long indexCoder, byte[] buf, int value, @Nullable String prefix) {
         indexCoder = prepend(indexCoder, buf, value);
         if (prefix != null) indexCoder = prepend(indexCoder, buf, prefix);
         return indexCoder;
@@ -332,7 +336,7 @@ final class StringConcatHelper {
      * @param prefix     a constant to prepend before value
      * @return           updated index (coder value retained)
      */
-    static long prepend(long indexCoder, byte[] buf, long value, String prefix) {
+    static long prepend(long indexCoder, byte[] buf, long value, @Nullable String prefix) {
         indexCoder = prepend(indexCoder, buf, value);
         if (prefix != null) indexCoder = prepend(indexCoder, buf, prefix);
         return indexCoder;
@@ -369,7 +373,7 @@ final class StringConcatHelper {
      * @param prefix     a constant to prepend before value
      * @return           updated index (coder value retained)
      */
-    static long prepend(long indexCoder, byte[] buf, String value, String prefix) {
+    static long prepend(long indexCoder, byte[] buf, String value, @Nullable String prefix) {
         indexCoder = prepend(indexCoder, buf, value);
         if (prefix != null) indexCoder = prepend(indexCoder, buf, prefix);
         return indexCoder;
@@ -403,7 +407,7 @@ final class StringConcatHelper {
      * @return String       resulting string
      */
     @ForceInline
-    static String simpleConcat(Object first, Object second) {
+    static String simpleConcat(@Nullable Object first, @Nullable Object second) {
         String s1 = stringOf(first);
         String s2 = stringOf(second);
         if (s1.isEmpty()) {
@@ -438,7 +442,7 @@ final class StringConcatHelper {
      * @return String       resulting string
      */
     @ForceInline
-    static String newStringOf(Object arg) {
+    static String newStringOf(@Nullable Object arg) {
         return new String(stringOf(arg));
     }
 
@@ -448,7 +452,7 @@ final class StringConcatHelper {
      * in Java state we need to produce "null" String in this case, so we
      * provide a customized version that deals with this problematic corner case.
      */
-    static String stringOf(Object value) {
+    static String stringOf(@Nullable Object value) {
         String s;
         return (value == null || (s = value.toString()) == null) ? "null" : s;
     }
