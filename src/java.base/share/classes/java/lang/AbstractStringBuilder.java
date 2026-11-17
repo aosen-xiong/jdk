@@ -1676,6 +1676,9 @@ abstract @UsesObjectEquals class AbstractStringBuilder implements Appendable, Ch
     }
 
     /* for readObject() */
+    // During deserialization, a failed compression may temporarily clear this.value;
+    // each normal return restores its nonnull representation before publication.
+    @SuppressWarnings("nullness:assignment.type.incompatible")
     void initBytes(char[] value, int off, int len) {
         if (String.COMPACT_STRINGS) {
             this.value = StringUTF16.compress(value, off, len);
