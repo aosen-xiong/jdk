@@ -1087,7 +1087,7 @@ public final class Float extends Number
      * @since 12
      */
     @Override
-    public Float resolveConstantDesc(MethodHandles.Lookup lookup) {
+    public Float resolveConstantDesc(MethodHandles.@Nullable Lookup lookup) {
         return this;
     }
 
