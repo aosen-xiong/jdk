@@ -519,6 +519,7 @@ public final class StackTraceElement implements java.io.Serializable {
     private static class HashedModules {
         static Set<String> HASHED_MODULES = hashedModules();
 
+        @SuppressWarnings("nullness:dereference.of.nullable") // Startup protocol: this holder is reached only after the boot layer is initialized.
         static Set<String> hashedModules() {
 
             Optional<ResolvedModule> resolvedModule = ModuleLayer.boot()
@@ -538,6 +539,7 @@ public final class StackTraceElement implements java.io.Serializable {
         }
 
         @Pure
+        @SuppressWarnings("nullness:argument.type.incompatible") // Layer invariant: the caller established membership in the initialized boot layer.
         static boolean contains(Module m) {
             return HASHED_MODULES.contains(m.getName());
         }
