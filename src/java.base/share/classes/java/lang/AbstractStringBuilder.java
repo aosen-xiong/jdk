@@ -612,7 +612,7 @@ abstract @UsesObjectEquals class AbstractStringBuilder implements Appendable, Ch
     /**
      * @since 1.8
      */
-    AbstractStringBuilder append(AbstractStringBuilder asb) {
+    AbstractStringBuilder append(@Nullable AbstractStringBuilder asb) {
         if (asb == null) {
             return appendNull();
         }
