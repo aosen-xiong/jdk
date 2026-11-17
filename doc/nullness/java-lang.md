@@ -88,29 +88,31 @@ than silently moving a blocked file out of the denominator.
     `codex/nullness-java-lang-runtime-exceptions` targets Unicode; sixteen more
     runtime/bounds exception files pass without source edits or suppressions.
 
-11. `codex/nullness-java-lang-checked-exceptions` targets the runtime branch; six
+11. [PR #18](https://github.com/aosen-xiong/jdk/pull/18):
+    `codex/nullness-java-lang-checked-exceptions` targets the runtime branch; six
     checked/reflection source bodies pass with their existing annotations.
+
+12. `codex/nullness-java-lang-linkage-errors` targets checked exceptions; thirteen
+    linkage errors pass individually, with cumulative checking pending.
 
 CI checkpoint (2026-11-17): the fork's Actions page explicitly says workflows
 are not running due to the scale of GitHub Actions usage and require maintainer
 re-enablement. REST reports Actions enabled and the workflow active, but manual
 dispatch returns HTTP 422, "Actions has been disabled for this repository."
 Re-enabling through the repository/workflow APIs did not clear the restriction.
-Hosted checks on #9 through #17 remain unverified; the checked-exception layer has no
+Hosted checks on #9 through #18 remain unverified; the linkage layer has no
 claimed hosted result either. The existing PR #7 result remains green. Re-enable
 workflows on the fork's Actions page, then run CI for each exact stack head.
 M1/M2/M3 remain open pending hosted checks and review/merge.
 
-The current branch enrolls **72/126** shared implementation files. The 50-file
-parent check (run.pDu1Dc) and new 16-file check (run.uOpoTi) both pass with no
-errors or warnings. Source content and checker artifacts are unchanged between
-these runs. Six additional checked/reflection source files pass in run.KaDV3n;
-consumer controls pass in both profiles. The CI manifest checks all 72. Thirteen source files have nullness suppressions: StackTraceElement,
-Enum, Boolean, Integer, Long, String, StringBuilder, StringBuffer,
-AbstractStringBuilder, Character, CharacterName, StringLatin1 and StringUTF16.
-The other 59 do not. The generated-record consumer has a separate known
-checker-bug suppression. Private caller fixtures are counted separately from JDK
-coverage. The other 54 shared files remain future milestones.
+The current branch enrolls **85/126** shared implementation files. The prior
+72-file coverage and thirteen new individual source checks pass. The cumulative
+85-file run is pending. Thirteen source files have nullness suppressions:
+StackTraceElement, Enum, Boolean, Integer, Long, String, StringBuilder,
+StringBuffer, AbstractStringBuilder, Character, CharacterName, StringLatin1 and
+StringUTF16. The other 72 do not. The generated-record consumer has a separate
+known checker-bug suppression. Private callers are counted separately from JDK
+coverage. The other 41 shared files remain future milestones.
 
 ## Exact shared-source inventory
 
@@ -538,6 +540,34 @@ and six invalid accessor dereferences. Both JSpecify and ordinary nullness/purit
 profiles match exactly those six diagnostics.
 M4 has thirteen linkage errors, six VM/thread-death errors and five annotation
 declarations remaining (24 files).
+
+## Linkage errors (M4a.3)
+
+`codex/nullness-java-lang-linkage-errors` builds on the checked exceptions (#18).
+The thirteen-file group is AbstractMethodError, BootstrapMethodError,
+ClassCircularityError, ClassFormatError, IllegalAccessError,
+IncompatibleClassChangeError, InstantiationError, NoClassDefFoundError,
+NoSuchFieldError, NoSuchMethodError, UnsatisfiedLinkError,
+UnsupportedClassVersionError and VerifyError.
+
+Twelve already have correct nullness opt-in and nullable message constructors;
+all pass unchanged. BootstrapMethodError receives one whole-file opt-in and
+four Nullable input positions: messages in the one/two-argument constructors
+and causes in the one/two-argument constructors. Its cause Javadoc explicitly
+allows null. The locally unspecified message policy follows the superclass's
+optional-message convention and direct delegation as implementation evidence.
+There is no new suppression or executable change; the AST audit passes.
+
+BootstrapMethodError's opted-in body passed even without these input qualifiers,
+but the caller rejected four valid arguments. After annotation, the caller
+accepts all thirteen nullable-message constructions and both cause-overload
+calls while still producing exactly four intentional invalid-call diagnostics.
+JSpecify and ordinary nullness/purity runs agree. This is another missing-contract
+case, not a checker defect. Tests remain in the matching CF branch.
+
+All thirteen files pass individually; the complete 85-file regression is
+pending. M4 then has six VM/thread-death errors and five annotation declarations
+remaining. Hosted CI and native build results remain unverified for this layer.
 
 ## Package completion and upstream delivery
 
