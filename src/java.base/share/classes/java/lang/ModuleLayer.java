@@ -25,6 +25,9 @@
 
 package java.lang;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 import java.lang.module.Configuration;
 import java.lang.module.ModuleDescriptor;
 import java.lang.module.ResolvedModule;
@@ -147,6 +150,7 @@ import sun.security.util.SecurityConstants;
  * @see Module#getLayer()
  */
 
+@AnnotatedFor("nullness")
 public final class ModuleLayer {
 
     // the empty layer (may be initialized from the CDS archive)
@@ -171,9 +175,10 @@ public final class ModuleLayer {
     /**
      * Creates a new module layer from the modules in the given configuration.
      */
+    @SuppressWarnings("nullness:argument.type.incompatible") // Constructor protocol: only the empty-parent layer has a null callback.
     private ModuleLayer(Configuration cf,
                         List<ModuleLayer> parents,
-                        Function<String, ClassLoader> clf)
+                        @Nullable Function<String, @Nullable ClassLoader> clf)
     {
         this.cf = cf;
         this.parents = parents; // no need to do defensive copy
@@ -341,7 +346,7 @@ public final class ModuleLayer {
      * @see #findLoader
      */
     public ModuleLayer defineModulesWithOneLoader(Configuration cf,
-                                                  ClassLoader parentLoader) {
+                                                  @Nullable ClassLoader parentLoader) {
         return defineModulesWithOneLoader(cf, List.of(this), parentLoader).layer();
     }
 
@@ -383,7 +388,7 @@ public final class ModuleLayer {
      * @see #findLoader
      */
     public ModuleLayer defineModulesWithManyLoaders(Configuration cf,
-                                                    ClassLoader parentLoader) {
+                                                    @Nullable ClassLoader parentLoader) {
         return defineModulesWithManyLoaders(cf, List.of(this), parentLoader).layer();
     }
 
@@ -419,7 +424,7 @@ public final class ModuleLayer {
      *         the security manager
      */
     public ModuleLayer defineModules(Configuration cf,
-                                     Function<String, ClassLoader> clf) {
+                                     Function<String, @Nullable ClassLoader> clf) {
         return defineModules(cf, List.of(this), clf).layer();
     }
 
@@ -493,7 +498,7 @@ public final class ModuleLayer {
      */
     public static Controller defineModulesWithOneLoader(Configuration cf,
                                                         List<ModuleLayer> parentLayers,
-                                                        ClassLoader parentLoader)
+                                                        @Nullable ClassLoader parentLoader)
     {
         List<ModuleLayer> parents = List.copyOf(parentLayers);
         checkConfiguration(cf, parents);
@@ -569,7 +574,7 @@ public final class ModuleLayer {
      */
     public static Controller defineModulesWithManyLoaders(Configuration cf,
                                                           List<ModuleLayer> parentLayers,
-                                                          ClassLoader parentLoader)
+                                                          @Nullable ClassLoader parentLoader)
     {
         List<ModuleLayer> parents = List.copyOf(parentLayers);
         checkConfiguration(cf, parents);
@@ -653,7 +658,7 @@ public final class ModuleLayer {
      */
     public static Controller defineModules(Configuration cf,
                                            List<ModuleLayer> parentLayers,
-                                           Function<String, ClassLoader> clf)
+                                           Function<String, @Nullable ClassLoader> clf)
     {
         List<ModuleLayer> parents = List.copyOf(parentLayers);
         checkConfiguration(cf, parents);
@@ -720,10 +725,10 @@ public final class ModuleLayer {
      * @throws LayerInstantiationException
      */
     private static void checkForDuplicatePkgs(Configuration cf,
-                                              Function<String, ClassLoader> clf)
+                                              Function<String, @Nullable ClassLoader> clf)
     {
         // HashMap allows null keys
-        Map<ClassLoader, Set<String>> loaderToPackages = new HashMap<>();
+        Map<@Nullable ClassLoader, Set<String>> loaderToPackages = new HashMap<>();
         for (ResolvedModule resolvedModule : cf.modules()) {
             ModuleDescriptor descriptor = resolvedModule.reference().descriptor();
             ClassLoader loader = clf.apply(descriptor.name());
@@ -807,7 +812,7 @@ public final class ModuleLayer {
         return allLayers.stream();
     }
 
-    private volatile List<ModuleLayer> allLayers;
+    private volatile @Nullable List<ModuleLayer> allLayers;
 
     /**
      * Returns an unmodifiable set of the modules in this layer.
@@ -822,7 +827,7 @@ public final class ModuleLayer {
         return modules;
     }
 
-    private volatile Set<Module> modules;
+    private volatile @Nullable Set<Module> modules;
 
 
     /**
@@ -880,7 +885,7 @@ public final class ModuleLayer {
      *
      * @throws SecurityException if denied by the security manager
      */
-    public ClassLoader findLoader(String name) {
+    public @Nullable ClassLoader findLoader(String name) {
         Optional<Module> om = findModule(name);
 
         // can't use map(Module::getClassLoader) as class loader can be null
@@ -924,7 +929,7 @@ public final class ModuleLayer {
      *
      * @return The boot layer
      */
-    public static ModuleLayer boot() {
+    public static @Nullable ModuleLayer boot() {
         return System.bootLayer;
     }
 
@@ -951,7 +956,7 @@ public final class ModuleLayer {
         return servicesCatalog;
     }
 
-    private volatile ServicesCatalog servicesCatalog;
+    private volatile @Nullable ServicesCatalog servicesCatalog;
 
 
     /**
