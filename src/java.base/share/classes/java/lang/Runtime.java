@@ -595,7 +595,6 @@ public @UsesObjectEquals class Runtime {
      * @see     ProcessBuilder
      * @since 1.3
      */
-    @SuppressWarnings("nullness:argument.type.incompatible") // JDK annotation gap: ProcessBuilder.environment accepts null to inherit the environment.
     public Process exec(@Untainted String[] cmdarray, @Untainted String @Nullable [] envp, @Nullable File dir)
         throws IOException {
         return new ProcessBuilder(cmdarray)

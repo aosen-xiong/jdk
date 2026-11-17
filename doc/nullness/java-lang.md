@@ -116,30 +116,35 @@ than silently moving a blocked file out of the denominator.
     `codex/nullness-java-lang-system-runtime` targets loading/modules; five
     runtime/security files pass the 111-file local gate.
 
-The current thread layer, `codex/nullness-java-lang-threads`, targets #24.
-It adds four reviewed thread sources and a coordinated System bridge follow-up.
+18. [PR #25](https://github.com/aosen-xiong/jdk/pull/25):
+    `codex/nullness-java-lang-threads` targets system/runtime; four thread sources
+    and a System bridge follow-up pass the 115-file local gate.
+
+The current process layer, `codex/nullness-java-lang-processes`, targets #25.
+It adds six reviewed process/shutdown files and retires one Runtime suppression.
 
 CI checkpoint (2026-11-17): the fork's Actions page explicitly says workflows
 are not running due to the scale of GitHub Actions usage and require maintainer
 re-enablement. REST reports Actions enabled and the workflow active, but manual
 dispatch returns HTTP 422, "Actions has been disabled for this repository."
 Re-enabling through the repository/workflow APIs did not clear the restriction.
-Hosted checks on #9 through #24 remain unverified; this thread layer
+Hosted checks on #9 through #25 remain unverified; this process layer
 has no claimed hosted result either. The existing PR #7 result remains green. Re-enable
 workflows on the fork's Actions page, then run CI for each exact stack head.
 M1/M2/M3/M4/M5 remain open pending hosted checks and review/merge.
 
-The current branch enrolls **115/126** shared Java source files. All 115 pass
-in cumulative run.eZ9GkI with no errors or warnings under the frozen profile;
-source hashes and checker visitation are verified. Twenty-seven files have
+The current branch enrolls **121/126** shared Java source files. All 121 pass
+in cumulative run.5jJkqj with no errors or warnings under the frozen profile;
+source hashes and checker visitation are verified. Thirty-one files have
 nullness suppressions: StackTraceElement, Enum, Boolean, Integer, Long, String,
 StringBuilder, StringBuffer, AbstractStringBuilder, Character, CharacterName,
 StringLatin1, StringUTF16, Class, PublicMethods, ClassValue, WeakPairMap,
 ClassLoader, Module, ModuleLayer, System, Runtime, SecurityManager, Thread,
-ThreadGroup, ThreadLocal and InheritableThreadLocal. The other
-88 do not. Caller reproducer expectations/suppressions are counted separately.
-Private callers do not inflate JDK coverage. The remaining eleven shared files
-are M6c/M6d; platform/generated coverage is separately in M7. The pinned
+ThreadGroup, ThreadLocal, InheritableThreadLocal, Process, ProcessBuilder,
+ProcessHandleImpl and ApplicationShutdownHooks. The other 90 do not.
+Caller reproducer expectations/suppressions are counted separately.
+Private callers do not inflate JDK coverage. The remaining five shared files
+are M6d; platform/generated coverage is separately in M7. The pinned
 Class/Module null-caller source defect remains unresolved for upstream readiness.
 
 ## Exact shared-source inventory
@@ -912,6 +917,72 @@ six Unicode generation inputs/outputs, cross-module/package integration, a
 suppression audit and hosted native build results. The Class/Module null-caller
 source defect is still unresolved for upstream readiness. No automatic merge
 or upstream submission is part of this layer.
+
+## Processes and shutdown (M6c)
+
+Layer `codex/nullness-java-lang-processes` follows threads (#25). All six new
+shared source files are checked in full. ProcessHandle and ProcessHandleImpl
+receive explicit whole-file nullness opt-ins; ApplicationShutdownHooks extends
+its existing opt-in. Shutdown already has sufficient annotations and needs no
+source edit. Runtime receives a coordinated suppression removal, not an extra
+coverage count. Each edited Java source has its own commit; tests remain in CF.
+
+| File | Documentation oracle and annotation decisions |
+| --- | --- |
+| `Process` | “Null streams” are non-null stream objects with special behavior. Keep all stream/reader/writer results non-null and Charset inputs non-null. Mark six lazily populated cache fields nullable; three paired-cache dereference suppressions record lock-protected initialization order. |
+| `ProcessBuilder` | Class policy rejects null inputs except documented directory reset. Optional directory/environment/redirect-array references are nullable; redirect elements remain non-null. The Runtime-only environment helper accepts a nullable array with non-null strings. Redirect.file explicitly returns null for no file; equals accepts null. |
+| `ProcessHandle` | equals explicitly accepts null, compareTo rejects it. Optional wrappers, process streams and completion futures remain non-null; present payloads are non-null. Native argument array elements retain a reviewed non-null assumption. |
+| `ProcessHandleImpl` | Nullable Info fields represent unavailable native data; accessors return non-null Optional wrappers, despite stale local comments describing null. Two optional native output-array parameters are documented nullable. Companion-array and live-thread-group relations remain scoped assumptions. |
+| `ApplicationShutdownHooks` | Nullable hooks map represents failed registration or consumed shutdown state. Callback dispatch relies on successful registration, completed initialization and one-shot shutdown ordering. Hook inputs retain Runtime's documented non-null precondition. |
+| `Shutdown` | Existing non-null array of nullable Runnable slots and guarded dispatch are sufficient; passes unchanged. Internal hook inputs retain the actual non-null caller precondition. |
+
+Command arrays/lists model valid commands with non-null elements. Constructors
+can store an invalid list containing null and defer rejection until start; the
+annotations deliberately retain the conservative valid-command model, not a
+claim that constructors immediately validate every element. Native process
+metadata and unchecked event/platform dependencies are not proven by this pass.
+
+Findings precede all nine new diagnostic-specific keys: three paired-cache
+checks, a local declaration covering three missing ProcessImpl.start contracts,
+a pipeline predecessor-output relation, one current-thread/group invariant,
+two companion-array loop relations and the one-shot shutdown map. These are
+dependency, relational and lifecycle boundaries, not newly established CF bugs.
+Each independent removal restores only its intended key. Completing the
+ProcessBuilder environment contract removes Runtime's temporary argument key;
+removing that new qualifier alone restores exactly the former Runtime error.
+The platform dependency key should be revisited in M7.
+
+A separate source defect remains open (NULL-0030): Redirect.equals promises
+false for distinct redirects with no associated file, but internal pipe redirects
+reach an invalid non-null assertion and dereference. A test-only class patched into
+host OpenJDK17.0.14 reproduces NPE by default and AssertionError
+with system assertions enabled, without starting subprocesses. Reviewed source
+matches that path. The frozen JSpecify assumption that assertions are enabled
+lets the annotation check pass; this does not validate the assertion premise.
+No source behavior fix or JDK test is included. A second source-level observation
+is that Info.info does not clear commandLine on a start-time mismatch despite
+its empty-info comment; it is retained separately without a runtime claim.
+
+The six new files contain 1,118 original non-comment source lines. Across six
+edited sources: 21 additional Nullable sites, two added and one extended opt-in,
+no new postconditions, nine new suppression keys in nine declaration scopes
+(eight new annotations and one extended removal annotation), and one retired
+Runtime key. Syntax comparison confirms executable code and unrelated checker
+annotations are unchanged. Four of the six new files have suppressions.
+
+Validation: all 121 cumulative source checks pass with matching hashes and
+verified visitation, zero errors/warnings/crashes or truncation. Public process
+controls match 20 deliberate errors in each profile; the earlier Runtime/security
+fixture still matches ten in each. All seven package-private helper controls
+pass. One helper command used an incorrect filename after three completed
+fixtures; the remaining four were then checked with their actual names. That
+setup failure is retained and is not counted as a successful batch. Frozen CF
+implementation c12ce38daa and source compiler JDK17.0.14 are unchanged. No native
+JDK build was run locally, and hosted CI remains unverified.
+
+Next is M6d: the final five shared stack-walking files, reaching 126/126.
+M7's platform/generated sources, integration, suppression review, unresolved
+source defects and hosted native/CF results still gate package readiness.
 
 ## Package completion and upstream delivery
 

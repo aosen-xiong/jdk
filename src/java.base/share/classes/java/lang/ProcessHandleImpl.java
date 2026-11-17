@@ -27,6 +27,7 @@ package java.lang;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.framework.qual.AnnotatedFor;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
 
@@ -54,6 +55,7 @@ import java.util.stream.Stream;
  * @since 9
  */
 @jdk.internal.ValueBased
+@AnnotatedFor("nullness")
 final class ProcessHandleImpl implements ProcessHandle {
     /**
      * Default size of stack for reaper processes.
@@ -88,7 +90,7 @@ final class ProcessHandleImpl implements ProcessHandle {
     /**
      * The thread pool of "process reaper" daemon threads.
      */
-    @SuppressWarnings("removal")
+    @SuppressWarnings({"removal", "nullness:dereference.of.nullable"}) // VM lifecycle: the running thread still belongs to its group.
     private static final Executor processReaperExecutor =
             AccessController.doPrivileged((PrivilegedAction<Executor>) () -> {
                 // Initialize ThreadLocalRandom now to avoid using the smaller stack
@@ -341,7 +343,7 @@ final class ProcessHandleImpl implements ProcessHandle {
      *      if greater than the length of the arrays, the arrays are too small
      */
     private static native int getProcessPids0(long pid, long[] pids,
-                                              long[] ppids, long[] starttimes);
+                                              long @Nullable [] ppids, long @Nullable [] starttimes);
 
     /**
      * Destroy the process for this ProcessHandle.
@@ -427,6 +429,7 @@ final class ProcessHandleImpl implements ProcessHandle {
      *            0 for all processes
      * @return a stream of ProcessHandles
      */
+    @SuppressWarnings("nullness:accessing.nullable") // Loop invariant: the first iteration initializes both pid and start-time arrays.
     static Stream<ProcessHandle> children(long pid) {
         @SuppressWarnings("removal")
         SecurityManager sm = System.getSecurityManager();
@@ -448,6 +451,7 @@ final class ProcessHandleImpl implements ProcessHandle {
     }
 
     @Override
+    @SuppressWarnings("nullness:accessing.nullable") // Loop invariant: the first iteration initializes all three arrays together.
     public Stream<ProcessHandle> descendants() {
         @SuppressWarnings("removal")
         SecurityManager sm = System.getSecurityManager();
@@ -563,12 +567,12 @@ final class ProcessHandleImpl implements ProcessHandle {
          */
         private native void info0(long pid);
 
-        String command;
-        String commandLine;
-        String[] arguments;
+        @Nullable String command;
+        @Nullable String commandLine;
+        String @Nullable [] arguments;
         long startTime;
         long totalTime;
-        String user;
+        @Nullable String user;
 
         Info() {
             command = null;

@@ -198,10 +198,10 @@ import sun.security.action.GetPropertyAction;
 public final class ProcessBuilder
 {
     private List<String> command;
-    private File directory;
-    private Map<String,String> environment;
+    private @Nullable File directory;
+    private @Nullable Map<String,String> environment;
     private boolean redirectErrorStream;
-    private Redirect[] redirects;
+    private Redirect @Nullable [] redirects;
 
     /**
      * Constructs a process builder with the specified operating
@@ -368,7 +368,7 @@ public final class ProcessBuilder
     }
 
     // Only for use by Runtime.exec(...envp...)
-    ProcessBuilder environment(String[] envp) {
+    ProcessBuilder environment(String @Nullable [] envp) {
         assert environment == null;
         if (envp != null) {
             environment = ProcessEnvironment.emptyEnvironment(envp.length);
@@ -581,7 +581,7 @@ public final class ProcessBuilder
          * @return the file associated with this redirect,
          *         or {@code null} if there is no such file
          */
-        public File file() { return null; }
+        public @Nullable File file() { return null; }
 
         /**
          * When redirected to a destination file, indicates if the output
@@ -679,7 +679,7 @@ public final class ProcessBuilder
          * instances of the same type associated with non-null equal
          * {@code File} instances.
          */
-        public boolean equals(Object obj) {
+        public boolean equals(@Nullable Object obj) {
             if (obj == this)
                 return true;
             if (! (obj instanceof Redirect r))
@@ -1089,7 +1089,7 @@ public final class ProcessBuilder
      * @return the new Process
      * @throws IOException if an I/O error occurs
      */
-    private Process start(Redirect[] redirects) throws IOException {
+    private Process start(Redirect @Nullable [] redirects) throws IOException {
         // Must convert to array first -- a malicious user-supplied
         // list might try to circumvent the security check.
         String[] cmdarray = command.toArray(new String[command.size()]);
@@ -1115,6 +1115,7 @@ public final class ProcessBuilder
         }
 
         try {
+            @SuppressWarnings("nullness:argument.type.incompatible") // JDK annotation gap: null environment, directory, and redirects select defaults.
             Process process = ProcessImpl.start(cmdarray,
                                      environment,
                                      dir,
@@ -1276,6 +1277,7 @@ public final class ProcessBuilder
      * @throws IOException if an I/O error occurs
      * @since 9
      */
+    @SuppressWarnings("nullness:assignment.type.incompatible") // Loop invariant: index > 0 implies the preceding iteration set prevOutput.
     public static List<Process> startPipeline(List<ProcessBuilder> builders) throws IOException {
         // Accumulate and check the builders
         final int numBuilders = builders.size();
