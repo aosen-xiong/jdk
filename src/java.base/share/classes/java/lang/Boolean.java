@@ -313,6 +313,9 @@ public final class Boolean implements java.io.Serializable,
     @Pure
     @StaticallyExecutable
     @EnsuresNonNullIf(expression="#1", result=true)
+    // A null name deliberately triggers the caught NPE; only a nonnull name can yield true.
+    @SuppressWarnings({"nullness:argument.type.incompatible",
+                       "nullness:contracts.conditional.postcondition.not.satisfied"})
     public static boolean getBoolean(@Nullable String name) {
         boolean result = false;
         try {
