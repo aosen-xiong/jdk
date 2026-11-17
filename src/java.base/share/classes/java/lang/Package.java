@@ -440,7 +440,7 @@ public @UsesObjectEquals class Package extends NamedPackage implements java.lang
             // find package-info.class defined by loader
             String cn = packageName() + ".package-info";
             Module module = module();
-            PrivilegedAction<ClassLoader> pa = module::getClassLoader;
+            PrivilegedAction<@Nullable ClassLoader> pa = module::getClassLoader;
             @SuppressWarnings("removal")
             ClassLoader loader = AccessController.doPrivileged(pa);
             Class<?> c;
@@ -560,9 +560,9 @@ public @UsesObjectEquals class Package extends NamedPackage implements java.lang
      * @param loader defining class loader
      */
     Package(@DotSeparatedIdentifiers String name,
-            String spectitle, String specversion, String specvendor,
-            String impltitle, String implversion, String implvendor,
-            URL sealbase, ClassLoader loader)
+            @Nullable String spectitle, @Nullable String specversion, @Nullable String specvendor,
+            @Nullable String impltitle, @Nullable String implversion, @Nullable String implvendor,
+            @Nullable URL sealbase, @Nullable ClassLoader loader)
     {
         super(Objects.requireNonNull(name),
               loader != null ? loader.getUnnamedModule()
@@ -586,18 +586,18 @@ public @UsesObjectEquals class Package extends NamedPackage implements java.lang
         static final VersionInfo NULL_VERSION_INFO
             = new VersionInfo(null, null, null, null, null, null, null);
 
-        private final String specTitle;
-        private final String specVersion;
-        private final String specVendor;
-        private final String implTitle;
-        private final String implVersion;
-        private final String implVendor;
-        private final URL sealBase;
+        private final @Nullable String specTitle;
+        private final @Nullable String specVersion;
+        private final @Nullable String specVendor;
+        private final @Nullable String implTitle;
+        private final @Nullable String implVersion;
+        private final @Nullable String implVendor;
+        private final @Nullable URL sealBase;
 
-        static VersionInfo getInstance(String spectitle, String specversion,
-                                       String specvendor, String impltitle,
-                                       String implversion, String implvendor,
-                                       URL sealbase) {
+        static VersionInfo getInstance(@Nullable String spectitle, @Nullable String specversion,
+                                       @Nullable String specvendor, @Nullable String impltitle,
+                                       @Nullable String implversion, @Nullable String implvendor,
+                                       @Nullable URL sealbase) {
             if (spectitle == null && specversion == null &&
                     specvendor == null && impltitle == null &&
                     implversion == null && implvendor == null &&
@@ -609,10 +609,10 @@ public @UsesObjectEquals class Package extends NamedPackage implements java.lang
                     sealbase);
         }
 
-        private VersionInfo(String spectitle, String specversion,
-                            String specvendor, String impltitle,
-                            String implversion, String implvendor,
-                            URL sealbase)
+        private VersionInfo(@Nullable String spectitle, @Nullable String specversion,
+                            @Nullable String specvendor, @Nullable String impltitle,
+                            @Nullable String implversion, @Nullable String implvendor,
+                            @Nullable URL sealbase)
         {
             this.implTitle = impltitle;
             this.implVersion = implversion;
@@ -625,5 +625,5 @@ public @UsesObjectEquals class Package extends NamedPackage implements java.lang
     }
 
     private final VersionInfo versionInfo;
-    private Class<?> packageInfo;
+    private @Nullable Class<?> packageInfo;
 }
