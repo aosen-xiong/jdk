@@ -184,7 +184,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: aosen-xiong/checker-framework
-          ref: 3cf56232ad4b54ca96df50a689bf3c457ef9b7eb # codex/nullness-java-lang-loading-modules
+          ref: 88854cd20b4ea1fef028cf63a8c14eb8d28a8e87 # codex/nullness-java-lang-system-runtime
           path: checker-framework
           persist-credentials: false
       - name: Check out the checker's bundled JDK contracts
@@ -325,13 +325,18 @@ jobs:
             java/lang/Package.java \
             java/lang/NamedPackage.java \
             java/lang/Module.java \
-            java/lang/ModuleLayer.java
+            java/lang/ModuleLayer.java \
+            java/lang/System.java \
+            java/lang/Runtime.java \
+            java/lang/RuntimePermission.java \
+            java/lang/SecurityManager.java \
+            java/lang/Compiler.java
       - name: Check package-private helper callers from CF
         working-directory: checker-framework
         env:
           JDK_SRC: ${{ github.workspace }}/jdk
           JDK_EXTRA_SOURCE_ROOTS: ${{ github.workspace }}/checker-framework/checker/tests/jdk-source/java.base
-        run: checker/bin-devel/typecheck-jdk.sh nullness java.base java/lang/TextHelperContracts.java java/lang/UnicodeHelperContracts.java java/lang/ReflectionHelperContracts.java java/lang/LoadingHelperContracts.java
+        run: checker/bin-devel/typecheck-jdk.sh nullness java.base java/lang/TextHelperContracts.java java/lang/UnicodeHelperContracts.java java/lang/ReflectionHelperContracts.java java/lang/LoadingHelperContracts.java java/lang/SystemRuntimeHelperContracts.java
       - name: Upload type-checking logs
         if: always()
         uses: actions/upload-artifact@v4

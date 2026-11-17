@@ -108,26 +108,30 @@ than silently moving a blocked file out of the denominator.
     `codex/nullness-java-lang-reflection-foundations` targets annotations; four
     reflection/cache sources pass in the cumulative 100-file local regression.
 
+16. [PR #23](https://github.com/aosen-xiong/jdk/pull/23):
+    `codex/nullness-java-lang-loading-modules` targets reflection foundations;
+    six loading/module sources and coordinated follow-ups pass the 106-file local gate.
+
 CI checkpoint (2026-11-17): the fork's Actions page explicitly says workflows
 are not running due to the scale of GitHub Actions usage and require maintainer
 re-enablement. REST reports Actions enabled and the workflow active, but manual
 dispatch returns HTTP 422, "Actions has been disabled for this repository."
 Re-enabling through the repository/workflow APIs did not clear the restriction.
-Hosted checks on #9 through #22 remain unverified; this loading/module layer
+Hosted checks on #9 through #23 remain unverified; this system/runtime layer
 has no claimed hosted result either. The existing PR #7 result remains green. Re-enable
 workflows on the fork's Actions page, then run CI for each exact stack head.
 M1/M2/M3/M4/M5 remain open pending hosted checks and review/merge.
 
-The current branch enrolls **106/126** shared Java source files. All 106 pass
-in cumulative run.POwHfh with no errors or warnings under the frozen profile;
-source hashes and checker visitation are verified. Twenty files have nullness
-suppressions: StackTraceElement, Enum, Boolean, Integer, Long, String,
+The current branch enrolls **111/126** shared Java source files. All 111 pass
+in cumulative run.EFcrDp with no errors or warnings under the frozen profile;
+source hashes and checker visitation are verified. Twenty-three files have
+nullness suppressions: StackTraceElement, Enum, Boolean, Integer, Long, String,
 StringBuilder, StringBuffer, AbstractStringBuilder, Character, CharacterName,
 StringLatin1, StringUTF16, Class, PublicMethods, ClassValue, WeakPairMap,
-ClassLoader, Module and ModuleLayer. The other 86 do not. The generated-record
-and polymorphic-lambda caller fixtures have separate known/suspected checker-bug
-suppressions. Private callers do not inflate JDK coverage. The remaining twenty
-shared files are M6; platform/generated coverage is separately in M7. The pinned
+ClassLoader, Module, ModuleLayer, System, Runtime and SecurityManager. The other
+88 do not. Caller reproducer expectations/suppressions are counted separately.
+Private callers do not inflate JDK coverage. The remaining fifteen shared files
+are M6b/M6c/M6d; platform/generated coverage is separately in M7. The pinned
 Class/Module null-caller source defect remains unresolved for upstream readiness.
 
 ## Exact shared-source inventory
@@ -774,6 +778,67 @@ RuntimePermission, SecurityManager, Compiler), then M6b threads, M6c processes
 and shutdown, and M6d stack walking. Those twenty shared files remain, followed
 by the separate M7 platform/generated/integration work. M5 remains open for
 hosted checks and review; this is not package completion.
+
+## System and runtime (M6a)
+
+Branch `codex/nullness-java-lang-system-runtime` targets the loading/modules
+branch (#23). All five complete files already opt into nullness; their nested
+scopes have no opt-outs. RuntimePermission and Compiler need no source edits.
+The other three each have a separate annotation commit. Tests and the shared
+runner remain in CF, pinned to 88854cd20b4ea1fef028cf63a8c14eb8d28a8e87.
+
+| Source | Documentation oracle and decisions |
+| --- | --- |
+| `System` | Logger explicitly permits null messages, formats, exceptions and resource bundles; default implementations pass null parameter arrays. Supplier itself and log(Object)'s object remain non-null. Nullable supplier results and parameter elements follow message forwarding/MessageFormat behavior. LoggerFinder's localized bundle may be null, while System.getLogger(name,bundle) rejects null. Optional state and internal bridge returns/inputs match reviewed delegates. Preserve existing non-null system-stream model and its CFComment restriction excluding programs setting streams to null. |
+| `Runtime` | exec permits null environment array/directory but rejects null commands and array elements. Version equality accepts null, while parsing/comparison reject it. equalsIgnoreOptional's true result establishes its argument non-null. Lazy version and native bootstrap caller classes are nullable. |
+| `SecurityManager` | Context validators explicitly deny null with SecurityException; mark these validation inputs nullable without promising normal return. Other documented NPE preconditions remain non-null. Thread constructor docs permit an override to return a null thread-group preference. Property strings/caches are optional. |
+| `RuntimePermission` | Name rejects null; ignored actions should be null. Existing annotations agree. |
+| `Compiler` | command result may be null; documented inputs reject null. The compatibility stub does not enforce those NPEs, a recorded documentation/body discrepancy; retain documented preconditions without changing behavior. |
+
+The changes add 68 Nullable sites and one EnsuresNonNullIf, with no new opt-ins.
+Twelve new suppression annotations contain fourteen diagnostic-specific keys:
+
+| Location | Reason and boundary |
+| --- | --- |
+| Runtime.exec array overload | ProcessBuilder.environment accepts null in its body but lacks the annotation; retire this temporary argument suppression in M6c. |
+| Runtime.Version.parse split declaration | VNUM is a mandatory capture after a successful match; optional captures remain nullable. |
+| Runtime.Version.equals (two keys) | Known checker limitation: saving the guard result in a boolean loses the non-null fact, and an alias prevents refining the original argument. See CF Issue3622's ImmutableIntList10 and the new DelayedNullnessContract reproducer. |
+| SecurityManager.getRootGroup | The current thread is live and therefore has a group; the general Thread getter remains nullable. |
+| SecurityManager static boot call | Trusted VM phase ordering. This one argument key needs class scope because Java cannot annotate a static initializer; removing it restores only the intended error. |
+| SecurityManager descriptor stream | Layer members are named and have descriptors; the stream loses that graph relation. |
+| SecurityManager's two package checks | Matching locks and validity flags establish non-null cache snapshots. This does not verify concurrency generally. |
+| System's three stream fields | Null placeholders are filled through native setters during initPhase1; preserve the existing restricted stream model. |
+| System.initPhase1 (two keys) | Native properties supply line.separator, and the live main thread has a group. Native startup is outside this pass. |
+
+All fourteen key removals independently reproduce one intended diagnostic. A
+fifteenth control removes the new conditional postcondition and breaks its direct
+caller. The known boolean limitation is documented before suppression; no checker
+implementation fix or new crash is claimed. The minimal direct-guard control
+passes; delayed/aliased cases produce three expected diagnostics in each mode.
+
+CF's SystemLoggerNullness, RuntimeVersionNullness and LegacySecurityNullness
+match 32 intentional diagnostics per profile (31 nullness checks plus the existing
+clear.system.property policy). Valid nullable inputs, a nullable thread-group
+override, non-null/nullable supplier results and generic components pass.
+LegacySecurityNullness is restricted to JDK 17 for removed/disabled APIs.
+SystemRuntimeHelperContracts validates bootstrap null callers and the conditional
+postcondition. All 111 source invocations in run.EFcrDp exit zero with confirmed
+visitation, unchanged input hashes, no warnings/crashes/truncation, and unchanged
+checker JAR hashes. AST audits preserve executable syntax; three PrivilegedAction
+diamond expressions spell their inferred Object/String type arguments explicitly
+to carry qualifiers. Other-checker annotations are preserved.
+
+Detailed original/qualifier/final sources, exact commands and removal controls
+are retained in the CF study's system-runtime-study directory and personal cases
+NULL-0025/26/27. The JavaLangAccess interface remains unchecked; its Thread reset
+and constructor bridges require a coordinated M6b follow-up. No claim of complete
+annotation coverage for jdk.internal.access is made. Hosted CI/native builds
+remain unverified.
+
+Next milestones: M6b adds four thread/thread-local files (115/126), M6c adds six
+process/shutdown files (121/126), and M6d adds five stack-walking files (126/126).
+M7 then handles platform/generated sources and integration; these five source
+checks do not finish java.lang or close the hosted-CI/review gate.
 
 ## Package completion and upstream delivery
 
