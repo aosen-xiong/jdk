@@ -24,6 +24,9 @@
  */
 package java.lang;
 
+import org.checkerframework.framework.qual.AnnotatedFor;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import java.lang.StackWalker.StackFrame;
 import java.util.EnumSet;
 import java.util.Set;
@@ -41,6 +44,7 @@ import static java.lang.StackWalker.ExtendedOption.LOCALS_AND_OPERANDS;
  * @jvms 2.6 Frames
  */
 /* package-private */
+@AnnotatedFor("nullness")
 interface LiveStackFrame extends StackFrame {
     /**
      * Return the monitors held by this stack frame. This method returns
@@ -48,7 +52,7 @@ interface LiveStackFrame extends StackFrame {
      *
      * @return the monitors held by this stack frames
      */
-    public Object[] getMonitors();
+    public @Nullable Object[] getMonitors();
 
     /**
      * Gets the local variable array of this stack frame.
@@ -88,7 +92,7 @@ interface LiveStackFrame extends StackFrame {
      *
      * @return  the local variable array of this stack frame.
      */
-    public Object[] getLocals();
+    public @Nullable Object[] getLocals();
 
     /**
      * Gets the operand stack of this stack frame.
@@ -105,7 +109,7 @@ interface LiveStackFrame extends StackFrame {
      *
      * @return the operand stack of this stack frame.
      */
-    public Object[] getStack();
+    public @Nullable Object[] getStack();
 
     /**
      * <em>UNSUPPORTED</em> This interface is intended to be package-private

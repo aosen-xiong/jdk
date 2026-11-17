@@ -24,12 +24,16 @@
  */
 package java.lang;
 
+import org.checkerframework.framework.qual.AnnotatedFor;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import jdk.internal.access.JavaLangInvokeAccess;
 import jdk.internal.access.SharedSecrets;
 
 import java.lang.StackWalker.StackFrame;
 import java.lang.invoke.MethodType;
 
+@AnnotatedFor("nullness")
 class StackFrameInfo implements StackFrame {
     private static final JavaLangInvokeAccess JLIA =
         SharedSecrets.getJavaLangInvokeAccess();
@@ -37,7 +41,7 @@ class StackFrameInfo implements StackFrame {
     private final boolean retainClassRef;
     private final Object memberName;    // MemberName initialized by VM
     private int bci;                    // initialized by VM to >= 0
-    private volatile StackTraceElement ste;
+    private volatile @Nullable StackTraceElement ste;
 
     /*
      * Construct an empty StackFrameInfo object that will be filled by the VM
@@ -96,7 +100,7 @@ class StackFrameInfo implements StackFrame {
     }
 
     @Override
-    public String getFileName() {
+    public @Nullable String getFileName() {
         return toStackTraceElement().getFileName();
     }
 
