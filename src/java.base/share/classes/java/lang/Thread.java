@@ -173,17 +173,17 @@ public
     private long eetop;
 
     /* What will be run. */
-    private Runnable target;
+    private @Nullable Runnable target;
 
     /* The group of this thread */
-    private ThreadGroup group;
+    private @Nullable ThreadGroup group;
 
     /* The context ClassLoader for this thread */
-    private ClassLoader contextClassLoader;
+    private @Nullable ClassLoader contextClassLoader;
 
     /* The inherited AccessControlContext of this thread */
     @SuppressWarnings("removal")
-    private AccessControlContext inheritedAccessControlContext;
+    private @Nullable AccessControlContext inheritedAccessControlContext;
 
     /* For autonumbering anonymous threads. */
     private static int threadInitNumber;
@@ -193,13 +193,13 @@ public
 
     /* ThreadLocal values pertaining to this thread. This map is maintained
      * by the ThreadLocal class. */
-    ThreadLocal.ThreadLocalMap threadLocals = null;
+    ThreadLocal.@Nullable ThreadLocalMap threadLocals = null;
 
     /*
      * InheritableThreadLocal values pertaining to this thread. This map is
      * maintained by the InheritableThreadLocal class.
      */
-    ThreadLocal.ThreadLocalMap inheritableThreadLocals = null;
+    ThreadLocal.@Nullable ThreadLocalMap inheritableThreadLocals = null;
 
     /*
      * The requested stack size for this thread, or 0 if the creator did
@@ -231,19 +231,19 @@ public
      * Set by (private) java.util.concurrent.locks.LockSupport.setBlocker
      * Accessed using java.util.concurrent.locks.LockSupport.getBlocker
      */
-    volatile Object parkBlocker;
+    volatile @Nullable Object parkBlocker;
 
     /* The object in which this thread is blocked in an interruptible I/O
      * operation, if any.  The blocker's interrupt method should be invoked
      * after setting this thread's interrupt status.
      */
-    private volatile Interruptible blocker;
+    private volatile @Nullable Interruptible blocker;
     private final Object blockerLock = new Object();
 
     /* Set the blocker field; invoked via jdk.internal.access.SharedSecrets
      * from java.nio code
      */
-    static void blockedOn(Interruptible b) {
+    static void blockedOn(@Nullable Interruptible b) {
         Thread me = Thread.currentThread();
         synchronized (me.blockerLock) {
             me.blocker = b;
@@ -402,9 +402,10 @@ public
      * @param inheritThreadLocals if {@code true}, inherit initial values for
      *            inheritable thread-locals from the constructing thread
      */
-    @SuppressWarnings("removal")
-    private Thread(ThreadGroup g, Runnable target, String name,
-                   long stackSize, AccessControlContext acc,
+    @SuppressWarnings({"removal", "nullness:dereference.of.nullable"})
+    // VM lifecycle: the constructing thread retains its group.
+    private Thread(@Nullable ThreadGroup g, @Nullable Runnable target, String name,
+                   long stackSize, @Nullable AccessControlContext acc,
                    boolean inheritThreadLocals) {
         if (name == null) {
             throw new NullPointerException("name cannot be null");
@@ -511,7 +512,7 @@ public
      * but thread-local variables are not inherited.
      * This is not a public constructor.
      */
-    Thread(Runnable target, @SuppressWarnings("removal") AccessControlContext acc) {
+    Thread(@Nullable Runnable target, @SuppressWarnings("removal") @Nullable AccessControlContext acc) {
         this(null, target, "Thread-" + nextThreadNum(), 0, acc, false);
     }
 
@@ -772,7 +773,7 @@ public
      *
      * @since 9
      */
-    public Thread(ThreadGroup group, Runnable target, String name,
+    public Thread(@Nullable ThreadGroup group, @Nullable Runnable target, String name,
                   long stackSize, boolean inheritThreadLocals) {
         this(group, target, name, stackSize, null, inheritThreadLocals);
     }
@@ -794,6 +795,8 @@ public
      * @see        #run()
      * @see        #stop()
      */
+    // VM lifecycle: a NEW thread retains its group until exit.
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public synchronized void start() {
         /**
          * This method is not invoked for the main method thread or "system"
@@ -1232,6 +1235,8 @@ public
      *          thread's thread group and in any other thread group that
      *          has the current thread's thread group as an ancestor
      */
+    // VM lifecycle: the currently executing thread retains its group.
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public static int activeCount() {
         return currentThread().getThreadGroup().activeCount();
     }
@@ -1262,6 +1267,8 @@ public
      *          if {@link java.lang.ThreadGroup#checkAccess} determines that
      *          the current thread cannot access its thread group
      */
+    // VM lifecycle: the currently executing thread retains its group.
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public static int enumerate(@PolyNull Thread[] tarray) {
         return currentThread().getThreadGroup().enumerate(tarray);
     }
@@ -1617,7 +1624,7 @@ public
             if (!isAlive()) {
                 return EMPTY_STACK_TRACE;
             }
-            StackTraceElement[][] stackTraceArray = dumpThreads(new Thread[] {this});
+            StackTraceElement[] @Nullable [] stackTraceArray = dumpThreads(new Thread[] {this});
             StackTraceElement[] stackTrace = stackTraceArray[0];
             // a thread that was alive during the previous isAlive call may have
             // since terminated, therefore not having a stacktrace.
@@ -1678,7 +1685,7 @@ public
 
         // Get a snapshot of the list of all threads
         Thread[] threads = getThreads();
-        StackTraceElement[][] traces = dumpThreads(threads);
+        StackTraceElement[] @Nullable [] traces = dumpThreads(threads);
         Map<Thread, StackTraceElement[]> m = new HashMap<>(threads.length);
         for (int i = 0; i < threads.length; i++) {
             StackTraceElement[] stackTrace = traces[i];
@@ -1732,7 +1739,9 @@ public
     private static boolean auditSubclass(final Class<?> subcl) {
         @SuppressWarnings("removal")
         Boolean result = AccessController.doPrivileged(
-            new PrivilegedAction<>() {
+            new PrivilegedAction<Boolean>() {
+                // Class ancestry: subcl is a Thread subclass; the loop stops at Thread.class.
+                @SuppressWarnings("nullness:dereference.of.nullable")
                 public Boolean run() {
                     for (Class<?> cl = subcl;
                          cl != Thread.class;
@@ -1757,7 +1766,7 @@ public
         return result.booleanValue();
     }
 
-    private static native StackTraceElement[][] dumpThreads(Thread[] threads);
+    private static native StackTraceElement[] @Nullable [] dumpThreads(Thread[] threads);
     private static native Thread[] getThreads();
 
     /**
@@ -1923,10 +1932,10 @@ public
     }
 
     // null unless explicitly set
-    private volatile UncaughtExceptionHandler uncaughtExceptionHandler;
+    private volatile @Nullable UncaughtExceptionHandler uncaughtExceptionHandler;
 
     // null unless explicitly set
-    private static volatile UncaughtExceptionHandler defaultUncaughtExceptionHandler;
+    private static volatile @Nullable UncaughtExceptionHandler defaultUncaughtExceptionHandler;
 
     /**
      * Set the default handler invoked when a thread abruptly terminates
@@ -2023,6 +2032,8 @@ public
      * Dispatch an uncaught exception to the handler. This method is
      * intended to be called only by the JVM.
      */
+    // VM lifecycle: uncaught dispatch occurs before exit clears the group.
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private void dispatchUncaughtException(Throwable e) {
         getUncaughtExceptionHandler().uncaughtException(this, e);
     }
@@ -2075,7 +2086,7 @@ public
          * instance with the identical non-null referent as this one.
          */
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(@Nullable Object obj) {
             if (obj == this)
                 return true;
 
