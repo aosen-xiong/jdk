@@ -5,10 +5,13 @@ on:
     - cron: '0 7 * * *' # Runs daily at 2:00 AM EST
   pull_request:
   push:
-    branches: [ "master" ]
+    branches:
+      - master
+      - codex/nullness-java-lang-exception-causes
+      - codex/nullness-java-lang-interfaces
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: ${{ !contains(github.ref, 'heads/master') }}
 
 jobs:

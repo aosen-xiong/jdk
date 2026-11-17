@@ -27,18 +27,23 @@ child and review the resulting diff. Refresh the matching CF branch and pin
 when it changes, then rerun CI before considering that new head complete.
 No PR is automatically merged or sent upstream by this roadmap.
 
+CI also runs on pushes to the two new study branches. This provides a check for
+stack layers even when GitHub does not queue a pull-request event; the workflow
+uses the same branch concurrency group for push and pull-request runs. The
+checked-out JDK head and pinned CF revision are recorded in either case.
+
 ## Milestones, in priority order
 
 | Milestone | Shared files added | Cumulative target | Deliverable / exit focus |
 | --- | ---: | ---: | --- |
 | M0: exception foundations | 5 | 5/126 | PR #7; successful fork CI, pending review/merge. |
-| M1: exception follow-up and core interfaces | 16 | 21/126 | Two dependent PRs; nullable diagnostics, nullable append inputs, generic element propagation and override contracts. |
-| M2: everyday object/value and numeric APIs | 15 | 36/126 | Three PR groups below; nullable parsing/property inputs, equality, enum bounds, and wrapper consumers. |
-| M3: strings and Unicode | 14 | 50/126 | Three PR groups; distinguish nullable objects/sequences, nonnull arrays/elements, and internal caches. Establish generated Unicode context before its helper checks. |
-| M4: remaining exceptions and annotation types | 46 | 96/126 | Split the 41 exception/error files by ancestry (runtime, bounds, reflective/checked, linkage, VM); annotation declarations form their own PR. |
-| M5: class loading, reflection helpers and modules | 10 | 106/126 | Two PR groups; nullable lookups, lazy state, class-loader boundaries, and module consumers. |
-| M6: runtime, threads, processes and stack walking | 20 | 126/126 | Four PR groups; temporal state, callbacks, native effects, and platform dependencies. |
-| M7: platform/generated coverage and integration | separate denominator | package closure | Check the six platform variants and six Unicode templates/generated outputs in matching build contexts; package-wide and cross-module regression review. |
+| [M1: exception follow-up and core interfaces](https://github.com/aosen-xiong/jdk/milestone/1) | 16 | 21/126 | Two dependent PRs; nullable diagnostics, nullable append inputs, generic element propagation and override contracts. |
+| [M2: everyday object/value and numeric APIs](https://github.com/aosen-xiong/jdk/milestone/2) | 15 | 36/126 | Three PR groups below; nullable parsing/property inputs, equality, enum bounds, and wrapper consumers. |
+| [M3: strings and Unicode](https://github.com/aosen-xiong/jdk/milestone/3) | 14 | 50/126 | Three PR groups; distinguish nullable objects/sequences, nonnull arrays/elements, and internal caches. Establish generated Unicode context before its helper checks. |
+| [M4: remaining exceptions and annotation types](https://github.com/aosen-xiong/jdk/milestone/4) | 46 | 96/126 | Split the 41 exception/error files by ancestry (runtime, bounds, reflective/checked, linkage, VM); annotation declarations form their own PR. |
+| [M5: class loading, reflection helpers and modules](https://github.com/aosen-xiong/jdk/milestone/5) | 10 | 106/126 | Two PR groups; nullable lookups, lazy state, class-loader boundaries, and module consumers. |
+| [M6: runtime, threads, processes and stack walking](https://github.com/aosen-xiong/jdk/milestone/6) | 20 | 126/126 | Four PR groups; temporal state, callbacks, native effects, and platform dependencies. |
+| [M7: platform/generated coverage and integration](https://github.com/aosen-xiong/jdk/milestone/7) | separate denominator | package closure | Check the six platform variants and six Unicode templates/generated outputs in matching build contexts; package-wide and cross-module regression review. |
 
 These are scope targets, not completion claims or date estimates. M2 and M3
 prioritize widely used APIs before the remaining simple exception subclasses.
@@ -49,7 +54,8 @@ than silently moving a blocked file out of the denominator.
 
 1. [PR #7](https://github.com/aosen-xiong/jdk/pull/7): `codex/nullness-java-lang`
    targets `master`; five files verified, all 17 CI jobs passed.
-2. `codex/nullness-java-lang-exception-causes` targets `codex/nullness-java-lang`;
+2. [PR #9](https://github.com/aosen-xiong/jdk/pull/9):
+   `codex/nullness-java-lang-exception-causes` targets `codex/nullness-java-lang`;
    eight more files have passed local checks. Hosted CI is pending.
 3. Planned: `codex/nullness-java-lang-interfaces` targets the exception-causes
    branch; the eight interfaces below are candidates until reviewed and checked.
