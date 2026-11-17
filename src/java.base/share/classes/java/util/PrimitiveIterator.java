@@ -26,6 +26,7 @@ package java.util;
 
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.nonempty.qual.NonEmpty;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
 import java.util.function.Consumer;
@@ -90,7 +91,7 @@ public interface PrimitiveIterator<T, T_CONS> extends Iterator<T> {
      * @throws NullPointerException if the specified action is null
      */
     @SuppressWarnings("overloads")
-    void forEachRemaining(T_CONS action);
+    void forEachRemaining(@NonNull T_CONS action);
 
     /**
      * An Iterator specialized for {@code int} values.
