@@ -104,27 +104,31 @@ than silently moving a blocked file out of the denominator.
     `codex/nullness-java-lang-annotations` targets VM errors; all five annotation
     declarations pass, completing M4 source work locally.
 
+15. [PR #22](https://github.com/aosen-xiong/jdk/pull/22):
+    `codex/nullness-java-lang-reflection-foundations` targets annotations; four
+    reflection/cache sources pass in the cumulative 100-file local regression.
+
 CI checkpoint (2026-11-17): the fork's Actions page explicitly says workflows
 are not running due to the scale of GitHub Actions usage and require maintainer
 re-enablement. REST reports Actions enabled and the workflow active, but manual
 dispatch returns HTTP 422, "Actions has been disabled for this repository."
 Re-enabling through the repository/workflow APIs did not clear the restriction.
-Hosted checks on #9 through #21 remain unverified; the reflection layer has no
-claimed hosted result either. The existing PR #7 result remains green. Re-enable
+Hosted checks on #9 through #22 remain unverified; this loading/module layer
+has no claimed hosted result either. The existing PR #7 result remains green. Re-enable
 workflows on the fork's Actions page, then run CI for each exact stack head.
-M1/M2/M3/M4 remain open pending hosted checks and review/merge.
+M1/M2/M3/M4/M5 remain open pending hosted checks and review/merge.
 
-The current branch enrolls **100/126** shared Java source files. All 100 pass
-in cumulative run.QKgSf6 with no errors or warnings under the frozen profile;
-source hashes and checker visitation are verified. Seventeen files have nullness
+The current branch enrolls **106/126** shared Java source files. All 106 pass
+in cumulative run.POwHfh with no errors or warnings under the frozen profile;
+source hashes and checker visitation are verified. Twenty files have nullness
 suppressions: StackTraceElement, Enum, Boolean, Integer, Long, String,
 StringBuilder, StringBuffer, AbstractStringBuilder, Character, CharacterName,
-StringLatin1, StringUTF16, Class, PublicMethods, ClassValue and WeakPairMap.
-The other 83 do not. The generated-record and polymorphic-lambda caller fixtures
-have separate known/suspected checker-bug suppressions. Private callers do not
-inflate JDK coverage. The other 26 shared files remain in M5b/M6, with
-platform/generated coverage separately in M7. The pinned Class null-caller
-source defect is disclosed below and remains unresolved for upstream readiness.
+StringLatin1, StringUTF16, Class, PublicMethods, ClassValue, WeakPairMap,
+ClassLoader, Module and ModuleLayer. The other 86 do not. The generated-record
+and polymorphic-lambda caller fixtures have separate known/suspected checker-bug
+suppressions. Private callers do not inflate JDK coverage. The remaining twenty
+shared files are M6; platform/generated coverage is separately in M7. The pinned
+Class/Module null-caller source defect remains unresolved for upstream readiness.
 
 ## Exact shared-source inventory
 
@@ -695,6 +699,81 @@ matching CF checkout's checker/build/jdk-typecheck/reflection-foundations-study.
 Personal evidence cases NULL-0017 through NULL-0022 retain the reproduced issues
 and scoped controls; no general rule assumes arbitrary native or cache safety.
 The six loading/package/module files remain in M5b; M6/M7 are unchanged.
+
+## Class loading, package metadata and modules (M5b)
+
+`codex/nullness-java-lang-loading-modules` builds on the reflection foundation
+([PR #22](https://github.com/aosen-xiong/jdk/pull/22)). The six newly enrolled
+sources are ClassLoader, AssertionStatusDirectives, Package, NamedPackage,
+Module and ModuleLayer. AssertionStatusDirectives needs no Java edits: its
+existing nonnull array contracts agree with the matching native initializer.
+Class and StackTraceElement receive separately committed follow-ups for their
+uses of the newly precise module contracts. No executable JDK behavior changes.
+
+The pinned Javadoc is the primary oracle. Module names/descriptors for unnamed
+modules, absent layers/resources/annotations, bootstrap loaders, startup boot
+layer, class/resource/package lookups and optional package metadata retain their
+actual nullable positions. Nonnull container elements and successful loading
+results remain precise. Function results admit bootstrap-null mappings without
+making the function itself nullable; public layer creation documents its failure
+for such a mapping. The empty layer's private constructor is a separate protocol.
+
+ClassLoader's second top-level declaration, CompoundEnumeration, now opts into
+nullness too. Correct the private compareCerts input to nonnull after reviewing
+its sole caller's normalization. Remove three obsolete suppressions, retaining
+and checking the assertion initializer's existing EnsuresNonNull. Its two
+postcondition-removal controls restore caller errors. A new RequiresNonNull on
+the native CDS reset entry describes the parallel-loader precondition; source
+checking does not establish native caller correctness or concurrency safety.
+
+Module.isNamed supplies conditional facts about paired name/descriptor fields
+and their getters. The name-field fact is verified directly; the three related
+facts need a disclosed relational postcondition suppression. Each expression has
+its own removal control and useful caller. Do not infer that a named module has
+a layer. An attempted getter precondition for Class's local module alias failed
+at the callers and helper, was recorded, and was removed rather than retained
+with extra caller suppressions.
+
+Sixteen new diagnostic-key occurrences have sixteen independent removal
+controls. They cover the documented module/loader invariants, an exact-size array,
+three dependency/protocol gaps in ClassLoader, CAS publication, module-loader
+mapping and startup state. Three obsolete ClassLoader suppression keys are removed.
+The source adds 120 Nullable sites and removes one incorrect private Nullable;
+there are four new opt-ins, one EnsuresNonNullIf and one RequiresNonNull. Existing
+other-checker annotations remain intact except two obsolete explanatory CFComment
+annotations removed with their obsolete suppressions. Annotation-normalized AST
+checks preserve all executable syntax and declarations.
+
+**Pinned JDK source defect:** Module.getResourceAsStream has the same null-caller
+fallthrough as Class.isOpenToCaller: an unconditionally open package can lead to
+isOpen(package, null). Both suppressions are labeled as source defects. A copied
+branch reproduces the Module NPE; nonnull/open and null/closed controls pass.
+This is not a CF false positive, a JNI end-to-end test, or a rebuilt-JDK test.
+The defect remains unresolved for upstream readiness.
+
+CF owns ModuleLoadingNullness (12 intentional invalid uses), ClassLoaderNullness
+(5), and LoadingHelperContracts. Both public profiles match all 17 errors;
+valid private callers pass and six separate invalid private calls are rejected.
+Comparing with the parent annotations exposes eight missing nullable module-result
+diagnostics and three missing lookup-result diagnostics, while several documented
+null inputs were incorrectly rejected by the parent. Twenty-three independent
+removal controls cover sixteen suppression keys, four isNamed expressions, the
+new CDS precondition and the two existing assertion postconditions.
+
+Cumulative run.POwHfh checks all 106 files under the unchanged JSpecify profile,
+with final hashes, checker visitation and zero-status completion recorded. The
+first attempt stopped at two StackTraceElement dependency diagnostics; those
+were documented and controlled before the complete rerun. Detailed evidence is
+in the matching CF checkout's checker/build/jdk-typecheck/loading-modules-study
+and personal evidence cases NULL-0023/24, with occurrences added to NULL-0010/22.
+The matching CF revision is 3cf56232ad4b54ca96df50a689bf3c457ef9b7eb. No tests or new
+runner are added to JDK. Hosted CI/native builds remain unverified.
+
+M5 source work is complete locally. Next is M6a (System, Runtime,
+RuntimePermission, SecurityManager, Compiler), then M6b threads, M6c processes
+and shutdown, and M6d stack walking. Those twenty shared files remain, followed
+by the separate M7 platform/generated/integration work. M5 remains open for
+hosted checks and review; this is not package completion.
 
 ## Package completion and upstream delivery
 

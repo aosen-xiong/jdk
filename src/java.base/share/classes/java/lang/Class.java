@@ -3017,7 +3017,9 @@ public final @Interned class Class<@UnknownKeyFor T> implements java.io.Serializ
      * the module. For other callers, then the package needs to be open to
      * the caller.
      */
-    @SuppressWarnings("nullness:argument.type.incompatible") // Pinned JDK source defect: null caller falls through for an open package.
+    // Named-module invariant: both callers first check getModule().isNamed().
+    // Pinned JDK source defect: null caller falls through for an open package.
+    @SuppressWarnings({"nullness:dereference.of.nullable", "nullness:argument.type.incompatible"})
     private boolean isOpenToCaller(String name, @Nullable Class<?> caller) {
         // assert getModule().isNamed();
         Module thisModule = getModule();
