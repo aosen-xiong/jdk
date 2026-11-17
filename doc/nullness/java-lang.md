@@ -57,12 +57,13 @@ than silently moving a blocked file out of the denominator.
 2. [PR #9](https://github.com/aosen-xiong/jdk/pull/9):
    `codex/nullness-java-lang-exception-causes` targets `codex/nullness-java-lang`;
    eight more files have passed local checks. Hosted CI is pending.
-3. Planned: `codex/nullness-java-lang-interfaces` targets the exception-causes
-   branch; the eight interfaces below are candidates until reviewed and checked.
+3. `codex/nullness-java-lang-interfaces` targets the exception-causes branch;
+   all eight interfaces have passed local source/consumer checks, with no Java
+   source changes needed. Hosted CI is pending.
 
-The current branch enrolls **13/126** shared implementation files. Twelve have
+The current branch enrolls **21/126** shared implementation files. Twenty have
 no nullness suppressions; StackTraceElement retains the documented native-array
-postcondition suppression from PR #7. The other 113 are not yet verified here.
+postcondition suppression from PR #7. The other 105 are not yet verified here.
 
 ## Exact shared-source inventory
 
@@ -134,9 +135,31 @@ The untouched NullPointerException body passed despite its missing contracts.
 This is why documentation and caller tests are required in addition to body
 checks. CF's `ExceptionCauseNullness` tests valid nullable constructors, guarded
 results, a nullable override, and three invalid dereferences. The source job
-checks all 13 enrolled files separately using the shared
+checks the cumulative enrolled files separately using the shared
 `checker/bin-devel/typecheck-jdk.sh`; its explicit workflow list is the regression
 manifest. No new suppression or executable code change is introduced.
+
+## Core interface evidence
+
+All eight complete files, including CharSequence's local iterator classes,
+already have nullness opt-ins and suitable annotations. No Java source edit,
+new qualifier, or suppression is needed for this layer.
+
+| Interface | Reviewed contract and validation |
+| --- | --- |
+| `Appendable` | Both CharSequence inputs explicitly allow null, treated as "null". Existing Nullable inputs and nonnull fluent returns agree. Test nullable calls and reject an overriding method that narrows the input. |
+| `Readable` | read explicitly throws NPE for a null buffer. Preserve/test its nonnull parameter. |
+| `Comparable` | Class/method Javadoc reject compareTo(null). Preserve/test its nonnull bound and argument. |
+| `Iterable` | Nonnull iterator/spliterator and callback, with element nullness carried by T. Nullable T works through iterator, forEach, and spliterator under both checked profiles; no extra explicit bound is needed. |
+| `CharSequence` | Subsequence, string and stream results describe concrete results. Preserve/test nonnull results. compare's nonnull inputs are retained default assumptions backed by requireNonNull, not an explicit documented null clause. Local iterator callbacks inherit nonnull action contracts. |
+| `AutoCloseable`, `Runnable` | No reference parameter or return on close/run; existing signatures are sufficient. Receiver checking does not establish resource lifecycle or concurrency correctness. |
+| `Cloneable` | Marker interface has no declared methods; full-file scope review requires no qualifier edit. |
+
+All eight source checks finish with exit 0 and no warnings or nullness
+suppressions. CF's `CoreInterfaceNullness` fixture matches six expected errors
+in JSpecify and ordinary nullness/purity modes, alongside valid nullable append
+inputs and guarded nullable elements. The preceding 13 source files are
+unchanged from the validated parent; CI checks all 21 together.
 
 ## Package completion and upstream delivery
 
