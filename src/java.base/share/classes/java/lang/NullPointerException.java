@@ -80,7 +80,7 @@ public class NullPointerException extends RuntimeException {
     // 1: backtrace filled in, no message computed.
     // 2: message computed
     private transient int extendedMessageState;
-    private transient String extendedMessage;
+    private transient @Nullable String extendedMessage;
 
     /**
      * {@inheritDoc}
@@ -113,7 +113,7 @@ public class NullPointerException extends RuntimeException {
      *
      * @return the detail message string, which may be {@code null}.
      */
-    public String getMessage() {
+    public @Nullable String getMessage() {
         String message = super.getMessage();
         if (message == null) {
             synchronized(this) {
@@ -134,5 +134,5 @@ public class NullPointerException extends RuntimeException {
      * the location and cause of the exception. It returns null for
      * exceptions where this is not applicable.
      */
-    private native String getExtendedNPEMessage();
+    private native @Nullable String getExtendedNPEMessage();
 }
