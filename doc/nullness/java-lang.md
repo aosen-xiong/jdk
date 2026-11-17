@@ -84,28 +84,33 @@ than silently moving a blocked file out of the denominator.
    `codex/nullness-java-lang-unicode` targets the helper branch; six Unicode sources
    and two coordinated text-helper follow-ups pass in the cumulative 50-file local check.
 
-10. `codex/nullness-java-lang-runtime-exceptions` targets Unicode; sixteen more
+10. [PR #17](https://github.com/aosen-xiong/jdk/pull/17):
+    `codex/nullness-java-lang-runtime-exceptions` targets Unicode; sixteen more
     runtime/bounds exception files pass without source edits or suppressions.
+
+11. `codex/nullness-java-lang-checked-exceptions` targets the runtime branch; six
+    checked/reflection source bodies pass with their existing annotations.
 
 CI checkpoint (2026-11-17): the fork's Actions page explicitly says workflows
 are not running due to the scale of GitHub Actions usage and require maintainer
 re-enablement. REST reports Actions enabled and the workflow active, but manual
 dispatch returns HTTP 422, "Actions has been disabled for this repository."
 Re-enabling through the repository/workflow APIs did not clear the restriction.
-Hosted checks on #9 through #16 remain unverified; the runtime layer has no
+Hosted checks on #9 through #17 remain unverified; the checked-exception layer has no
 claimed hosted result either. The existing PR #7 result remains green. Re-enable
 workflows on the fork's Actions page, then run CI for each exact stack head.
 M1/M2/M3 remain open pending hosted checks and review/merge.
 
-The current branch enrolls **66/126** shared implementation files. The 50-file
+The current branch enrolls **72/126** shared implementation files. The 50-file
 parent check (run.pDu1Dc) and new 16-file check (run.uOpoTi) both pass with no
 errors or warnings. Source content and checker artifacts are unchanged between
-these runs; the CI manifest checks all 66. Thirteen source files have nullness suppressions: StackTraceElement,
+these runs. Six additional checked/reflection source files pass in run.KaDV3n;
+consumer controls pass in both profiles. The CI manifest checks all 72. Thirteen source files have nullness suppressions: StackTraceElement,
 Enum, Boolean, Integer, Long, String, StringBuilder, StringBuffer,
 AbstractStringBuilder, Character, CharacterName, StringLatin1 and StringUTF16.
-The other 53 do not. The generated-record consumer has a separate known
+The other 59 do not. The generated-record consumer has a separate known
 checker-bug suppression. Private caller fixtures are counted separately from JDK
-coverage. The other 60 shared files remain future milestones.
+coverage. The other 54 shared files remain future milestones.
 
 ## Exact shared-source inventory
 
@@ -513,6 +518,26 @@ The matching CF branch is pinned; no fixture or harness is added to JDK.
 
 M4 now has six checked/reflection exceptions, thirteen linkage errors, six
 VM/thread-death errors and five annotation declarations remaining (30 files).
+
+## Checked and reflection exceptions (M4a.2)
+
+`codex/nullness-java-lang-checked-exceptions` builds on the runtime group (#17).
+CloneNotSupportedException, IllegalAccessException, InstantiationException,
+InterruptedException, NoSuchFieldException and NoSuchMethodException all have
+existing complete nullness opt-in and nullable detail-message constructors.
+Their no-arg/message bodies delegate directly to Exception or
+ReflectiveOperationException. Preserve inherited optional getMessage/getCause
+results. Local message text is silent on null, so direct superclass delegation
+supports the preserved convention as implementation evidence. No annotation,
+executable source or suppression changes are needed in these six files.
+
+All six complete source checks pass. The preceding 66 source contents and
+checker binaries are unchanged; CI runs the cumulative 72-file set. The matching
+CF fixture checks six nullable-message constructors, guarded optional results
+and six invalid accessor dereferences. Both JSpecify and ordinary nullness/purity
+profiles match exactly those six diagnostics.
+M4 has thirteen linkage errors, six VM/thread-death errors and five annotation
+declarations remaining (24 files).
 
 ## Package completion and upstream delivery
 
