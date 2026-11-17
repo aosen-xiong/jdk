@@ -26,10 +26,11 @@
 package java.lang;
 
 import org.checkerframework.checker.interning.qual.UsesObjectEquals;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.common.value.qual.IntRange;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
-@AnnotatedFor({"index", "interning"})
+@AnnotatedFor({"index", "interning", "nullness"})
 abstract @UsesObjectEquals class CharacterData {
     abstract int getProperties(int ch);
     abstract int getType(int ch);
@@ -55,7 +56,7 @@ abstract @UsesObjectEquals class CharacterData {
         return toUpperCase(ch);
     }
 
-    char[] toUpperCaseCharArray(int ch) {
+    char @Nullable [] toUpperCaseCharArray(int ch) {
         return null;
     }
 
