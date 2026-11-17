@@ -91,8 +91,8 @@ each selected file with `--patch-module`. The current exceptions batch contains
 `StackTraceElement`, `Throwable`, `Exception`, `RuntimeException`, and `Error`.
 The stack also checks eight related exception files and eight core interfaces,
 five object/value foundations, seven primitive wrappers, and three arithmetic
-files, four public text APIs, four text helpers and six Unicode sources (50 files
-in total). See the
+files, four public text APIs, four text helpers, six Unicode sources and sixteen runtime/bounds exceptions
+(66 files in total). See the
 [file inventory, PR stack, and completion milestones](doc/nullness/java-lang.md)
 for the remaining work and the precise validation status.
 Logs go under CF's `checker/build/jdk-typecheck/`. Nullness checking uses
@@ -109,7 +109,7 @@ To check CF-owned callers of package-private JDK APIs, the same script accepts
 additional module source roots via `JDK_EXTRA_SOURCE_ROOTS` (colon-separated,
 after the JDK shared-source root). CI uses a separate invocation for
 `java/lang/TextHelperContracts.java` and `java/lang/UnicodeHelperContracts.java` from
-`checker/tests/jdk-source/java.base/` in CF. The 50 JDK source checks leave this
+`checker/tests/jdk-source/java.base/` in CF. The 66 JDK source checks leave this
 variable unset. No caller fixture is placed in the JDK source checkout.
 
 ## Pull request merge conflicts

@@ -80,26 +80,32 @@ than silently moving a blocked file out of the denominator.
    `codex/nullness-java-lang-text-helpers` targets the text branch; four helpers
    and a coordinated builder follow-up pass in the cumulative 44-file local check.
 
-9. `codex/nullness-java-lang-unicode` targets the helper branch; six Unicode sources
+9. [PR #16](https://github.com/aosen-xiong/jdk/pull/16):
+   `codex/nullness-java-lang-unicode` targets the helper branch; six Unicode sources
    and two coordinated text-helper follow-ups pass in the cumulative 50-file local check.
+
+10. `codex/nullness-java-lang-runtime-exceptions` targets Unicode; sixteen more
+    runtime/bounds exception files pass without source edits or suppressions.
 
 CI checkpoint (2026-11-17): the fork's Actions page explicitly says workflows
 are not running due to the scale of GitHub Actions usage and require maintainer
 re-enablement. REST reports Actions enabled and the workflow active, but manual
 dispatch returns HTTP 422, "Actions has been disabled for this repository."
 Re-enabling through the repository/workflow APIs did not clear the restriction.
-Hosted checks on #9 through #15 remain unverified; the Unicode layer has no
+Hosted checks on #9 through #16 remain unverified; the runtime layer has no
 claimed hosted result either. The existing PR #7 result remains green. Re-enable
 workflows on the fork's Actions page, then run CI for each exact stack head.
 M1/M2/M3 remain open pending hosted checks and review/merge.
 
-The current branch enrolls **50/126** shared implementation files. All 50 pass
-the cumulative local source check with no errors or warnings (run.pDu1Dc). Thirteen source files have nullness suppressions: StackTraceElement,
+The current branch enrolls **66/126** shared implementation files. The 50-file
+parent check (run.pDu1Dc) and new 16-file check (run.uOpoTi) both pass with no
+errors or warnings. Source content and checker artifacts are unchanged between
+these runs; the CI manifest checks all 66. Thirteen source files have nullness suppressions: StackTraceElement,
 Enum, Boolean, Integer, Long, String, StringBuilder, StringBuffer,
 AbstractStringBuilder, Character, CharacterName, StringLatin1 and StringUTF16.
-The other 37 do not. The generated-record consumer has a separate known
+The other 53 do not. The generated-record consumer has a separate known
 checker-bug suppression. Private caller fixtures are counted separately from JDK
-coverage. The other 76 shared files remain future milestones.
+coverage. The other 60 shared files remain future milestones.
 
 ## Exact shared-source inventory
 
@@ -470,6 +476,43 @@ The cumulative 50-file run passes with no errors or warnings. M3's shared-source
 annotation work is complete locally; hosted validation/review and M7 generated coverage
 remain open. The next shared-source milestone is M4's 41 remaining exception/error
 files and five annotation declarations, in related API groups.
+
+## Runtime and bounds exceptions (M4a.1)
+
+`codex/nullness-java-lang-runtime-exceptions` builds on Unicode (#16). The
+sixteen files below already have complete nullness opt-in and appropriate
+annotations. Documentation/body review, source checking and caller controls
+justify enrollment without manufacturing Java source edits.
+
+- ArithmeticException, ArrayStoreException, ClassCastException,
+  IllegalMonitorStateException, IllegalThreadStateException,
+  NegativeArraySizeException and NumberFormatException: retain nullable message
+  inputs and inherited optional message/cause results.
+- IllegalArgumentException, IllegalCallerException, IllegalStateException,
+  LayerInstantiationException, SecurityException and UnsupportedOperationException:
+  retain nullable message/cause overloads. All six explicitly permit absent cause;
+  IllegalCallerException/LayerInstantiationException also explicitly permit null
+  messages. For subclasses whose local message text is silent, direct superclass
+  delegation supports the existing optional-message convention as secondary
+  implementation evidence, not an invented explicit local promise.
+- IndexOutOfBoundsException, ArrayIndexOutOfBoundsException and
+  StringIndexOutOfBoundsException: retain optional message constructors and
+  primitive index overloads. Do not strengthen getMessage based on a particular
+  constructor. NumberFormatException's internal factories keep nonnull results
+  and input preconditions; forInputString's null policy is unspecified locally
+  and retained as an internal assumption, with guarded parse callers.
+
+All sixteen complete source files pass with no suppressions. The prior fifty
+sources and frozen checker binaries are unchanged; no additional whole-set run
+was needed for this enrollment-only layer. CI runs the cumulative 66-file list.
+CF's RuntimeExceptionNullness checks nullable message inputs across all sixteen,
+twelve message/cause and cause-only overload calls, four primitive-index
+constructors, guarded optional results and five deliberately invalid calls.
+Both JSpecify and ordinary nullness/purity profiles match all five diagnostics.
+The matching CF branch is pinned; no fixture or harness is added to JDK.
+
+M4 now has six checked/reflection exceptions, thirteen linkage errors, six
+VM/thread-death errors and five annotation declarations remaining (30 files).
 
 ## Package completion and upstream delivery
 
