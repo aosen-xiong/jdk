@@ -184,7 +184,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: aosen-xiong/checker-framework
-          ref: 46c24c668f959a6aa2b69bd38fc0fec6e26f9939 # codex/nullness-java-lang-values
+          ref: 00879d52606a8a56716cfe17e232c956aae49932 # codex/nullness-java-lang-wrappers
           path: checker-framework
           persist-credentials: false
       - name: Check out the checker's bundled JDK contracts
@@ -245,7 +245,14 @@ jobs:
             java/lang/Enum.java \
             java/lang/Record.java \
             java/lang/Number.java \
-            java/lang/Void.java
+            java/lang/Void.java \
+            java/lang/Boolean.java \
+            java/lang/Byte.java \
+            java/lang/Short.java \
+            java/lang/Integer.java \
+            java/lang/Long.java \
+            java/lang/Float.java \
+            java/lang/Double.java
       - name: Upload type-checking logs
         if: always()
         uses: actions/upload-artifact@v4
