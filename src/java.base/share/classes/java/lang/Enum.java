@@ -234,7 +234,9 @@ public abstract class Enum<E extends Enum<E>>
      * @return the Class object corresponding to this enum constant's
      *     enum type
      */
-    @SuppressWarnings("unchecked")
+    // An enum constant's class extends Enum or its declaring enum class (JLS 8.9, 8.9.1),
+    // so getSuperclass() cannot return null here.
+    @SuppressWarnings({"unchecked", "nullness:return.type.incompatible"})
     public final Class<@Tainted E> getDeclaringClass() {
         Class<?> clazz = getClass();
         Class<?> zuper = clazz.getSuperclass();

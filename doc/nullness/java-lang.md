@@ -27,7 +27,8 @@ child and review the resulting diff. Refresh the matching CF branch and pin
 when it changes, then rerun CI before considering that new head complete.
 No PR is automatically merged or sent upstream by this roadmap.
 
-CI also runs on pushes to the two new study branches. This provides a check for
+CI also runs on pushes to branches matching `codex/nullness-java-lang-*` and
+supports manual dispatch for an explicitly selected branch. This provides a check for
 stack layers even when GitHub does not queue a pull-request event; the workflow
 uses the same branch concurrency group for push and pull-request runs. The
 checked-out JDK head and pinned CF revision are recorded in either case.
@@ -61,6 +62,9 @@ than silently moving a blocked file out of the denominator.
    `codex/nullness-java-lang-interfaces` targets the exception-causes branch;
    all eight interfaces have passed local source/consumer checks, with no Java
    source changes needed. Hosted CI is pending.
+4. `codex/nullness-java-lang-values` targets the interfaces branch; five more
+   source files and their consumer contracts are reviewed. All 26 cumulative
+   source checks pass locally. Hosted CI remains unverified.
 
 CI checkpoint (2026-11-17): GitHub reports Actions enabled and this workflow
 active, but has not queued a hosted run for #9 or #10 after PR creation and
@@ -68,9 +72,12 @@ branch pushes. Workflow syntax validates locally; the trigger issue is
 unresolved. Neither new layer has a claimed hosted CI result, and M1 remains
 open pending those checks and review/merge.
 
-The current branch enrolls **21/126** shared implementation files. Twenty have
-no nullness suppressions; StackTraceElement retains the documented native-array
-postcondition suppression from PR #7. The other 105 are not yet verified here.
+The current branch enrolls **26/126** shared implementation files; all 26
+passed the cumulative local source check under the frozen profile.
+StackTraceElement retains its native-array suppression, and Enum adds one
+language-invariant suppression. The other 24 source files have no nullness
+suppressions. A generated-record consumer has a separate
+known checker-bug suppression. The other 100 files remain future milestones.
 
 ## Exact shared-source inventory
 
@@ -167,6 +174,58 @@ suppressions. CF's `CoreInterfaceNullness` fixture matches six expected errors
 in JSpecify and ordinary nullness/purity modes, alongside valid nullable append
 inputs and guarded nullable elements. The preceding 13 source files are
 unchanged from the validated parent; CI checks all 21 together.
+
+## Object and value foundations (M2a)
+
+New layer: `codex/nullness-java-lang-values`, based on
+`codex/nullness-java-lang-interfaces` (#10). Scope: Object, Enum, Record, Number,
+and Void. Existing qualifiers remain intact; the only JDK source edit is one
+method-scoped suppression and its invariant explanation in Enum.
+
+| File | Documentation oracle and decision |
+| --- | --- |
+| `Object` | equals explicitly accepts null and returns false; retain Nullable plus the existing conditional nonnull postcondition. getClass, clone and toString return concrete nonnull results on normal return. Native behavior is trusted. wait/notify have no reference parameters/results. |
+| `Enum` | Name/class/result contracts are nonnull; equals accepts null; compareTo and valueOf reject null. EnumDesc.of explicitly rejects null class/name, and describeConstable uses empty Optional rather than null. Preserve these contracts and all nested scopes. |
+| `Record` | Preserve nullable equals input and nonnull toString. Nullability of individual record components belongs to each record declaration. A compiler-generated equals consumer exposes the checker issue below. |
+| `Number` | Conversions have primitive results and no reference arguments. Concrete byte/short conversion bodies pass with existing annotations. |
+| `Void` | TYPE denotes the nonnull Class object for void. No additional nullable position or executable body change is warranted. |
+
+Enum.getDeclaringClass has one `nullness:return.type.incompatible` false
+positive: Class.getSuperclass is nullable in general. [JLS 17 §§8.9 and
+8.9.1](https://docs.oracle.com/javase/specs/jls/se17/html/jls-8.html#jls-8.9)
+establish that an enum constant's class extends Enum or its declaring enum
+class, so its superclass cannot be null. Keep the public nonnull result and
+suppress only this return diagnostic on that method. Removing only the key in
+an isolated full-source checkout restores exactly one diagnostic. No executable
+syntax changed, as confirmed by an annotation-normalized AST comparison.
+
+CF fixtures ObjectValueNullness and RecordValueNullness pass under JSpecify
+and ordinary nullness/purity modes with five and three expected invalid-caller
+diagnostics respectively. The record workaround below is isolated from those
+negative controls and passes unused-suppression auditing. The original checker
+JARs remain pinned; a tentative checker implementation change was set aside,
+not included or used to claim passing validation.
+
+## Known checker issue: generated record equality
+
+With the frozen c12ce38daa checker implementation and JDK 17.0.14,
+`record Item(@Nullable String name) {}` generates an `equals(Object)` whose
+argument is incorrectly treated as nonnull. `item.equals(null)` produces
+`nullness:argument.type.incompatible` in both JSpecify and ordinary nullness
+modes. Calling through a `Record` reference is accepted. `Record.equals` already
+has the documented nullable argument; changing the JDK declaration cannot
+repair this generated-member discrepancy.
+
+The original failing caller and both logs are retained in the study evidence.
+Following the requested bug-first workflow, the failure was documented before
+adding a diagnostic-specific suppression around the single generated-equals
+caller in its own helper method.
+The direct Record contract and invalid-consumer controls remain unsuppressed.
+Removing only the helper suppression restores the false positive in a scratch
+fixture. Both JSpecify and ordinary nullness/purity profiles pass with it present.
+Recheck and remove the suppression after a checker fix; do not treat the
+suppressed caller as independently verified. No checker implementation fix is
+included in this stack layer.
 
 ## Package completion and upstream delivery
 

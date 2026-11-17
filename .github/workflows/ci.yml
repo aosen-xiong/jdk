@@ -4,11 +4,11 @@ on:
   schedule:
     - cron: '0 7 * * *' # Runs daily at 2:00 AM EST
   pull_request:
+  workflow_dispatch:
   push:
     branches:
       - master
-      - codex/nullness-java-lang-exception-causes
-      - codex/nullness-java-lang-interfaces
+      - codex/nullness-java-lang-*
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
@@ -184,7 +184,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: aosen-xiong/checker-framework
-          ref: 4a232630a8d131abd445189506b9487b24b83ff4 # codex/nullness-java-lang-interfaces
+          ref: 46c24c668f959a6aa2b69bd38fc0fec6e26f9939 # codex/nullness-java-lang-values
           path: checker-framework
           persist-credentials: false
       - name: Check out the checker's bundled JDK contracts
@@ -240,7 +240,12 @@ jobs:
             java/lang/Comparable.java \
             java/lang/Iterable.java \
             java/lang/Readable.java \
-            java/lang/Runnable.java
+            java/lang/Runnable.java \
+            java/lang/Object.java \
+            java/lang/Enum.java \
+            java/lang/Record.java \
+            java/lang/Number.java \
+            java/lang/Void.java
       - name: Upload type-checking logs
         if: always()
         uses: actions/upload-artifact@v4
