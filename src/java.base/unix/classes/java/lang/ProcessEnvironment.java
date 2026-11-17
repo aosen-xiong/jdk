@@ -54,11 +54,15 @@
 
 package java.lang;
 
+import org.checkerframework.framework.qual.AnnotatedFor;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import org.checkerframework.dataflow.qual.Pure;
 import java.io.*;
 import java.util.*;
 
 
+@AnnotatedFor("nullness")
 final class ProcessEnvironment
 {
     private static final HashMap<Variable,Value> theEnvironment;
@@ -82,7 +86,7 @@ final class ProcessEnvironment
     }
 
     /* Only for use by System.getenv(String) */
-    static String getenv(String name) {
+    static @Nullable String getenv(String name) {
         return theUnmodifiableEnvironment.get(name);
     }
 
@@ -142,7 +146,7 @@ final class ProcessEnvironment
             return str;
         }
 
-        public boolean equals(Object o) {
+        public boolean equals(@Nullable Object o) {
             return o instanceof ExternalData
                 && arrayEquals(getBytes(), ((ExternalData) o).getBytes());
         }
@@ -180,7 +184,7 @@ final class ProcessEnvironment
             return arrayCompare(getBytes(), variable.getBytes());
         }
 
-        public boolean equals(Object o) {
+        public boolean equals(@Nullable Object o) {
             return o instanceof Variable && super.equals(o);
         }
     }
@@ -213,7 +217,7 @@ final class ProcessEnvironment
             return arrayCompare(getBytes(), value.getBytes());
         }
 
-        public boolean equals(Object o) {
+        public boolean equals(@Nullable Object o) {
             return o instanceof Value && super.equals(o);
         }
     }
@@ -223,7 +227,7 @@ final class ProcessEnvironment
         extends AbstractMap<String,String>
     {
         private Map<Variable,Value> m;
-        private static String toString(Value v) {
+        private static @Nullable String toString(@Nullable Value v) {
             return v == null ? null : v.toString();
         }
         public StringEnvironment(Map<Variable,Value> m) {this.m = m;}
@@ -240,14 +244,14 @@ final class ProcessEnvironment
         public boolean containsValue(Object value) {
             return m.containsValue(Value.valueOfQueryOnly(value));
         }
-        public String get(Object key) {
+        public @Nullable String get(Object key) {
             return toString(m.get(Variable.valueOfQueryOnly(key)));
         }
-        public String put(String key, String value) {
+        public @Nullable String put(String key, String value) {
             return toString(m.put(Variable.valueOf(key),
                                   Value.valueOf(value)));
         }
-        public String remove(Object key) {
+        public @Nullable String remove(Object key) {
             return toString(m.remove(Variable.valueOfQueryOnly(key)));
         }
         public Set<String> keySet() {
@@ -298,7 +302,7 @@ final class ProcessEnvironment
         }
     }
 
-    static byte[] toEnvironmentBlock(Map<String,String> map, int[]envc) {
+    static byte @Nullable [] toEnvironmentBlock(@Nullable Map<String,String> map, int[]envc) {
         return map == null ? null :
             ((StringEnvironment)map).toEnvironmentBlock(envc);
     }
@@ -315,7 +319,7 @@ final class ProcessEnvironment
             return e.setValue(Value.valueOf(newValue)).toString();
         }
         public String toString() {return getKey() + "=" + getValue();}
-        public boolean equals(Object o) {
+        public boolean equals(@Nullable Object o) {
             return o instanceof StringEntry
                 && e.equals(((StringEntry)o).e);
         }
@@ -345,9 +349,11 @@ final class ProcessEnvironment
             if (o instanceof StringEntry)
                 return ((StringEntry)o).e;
             return new Map.Entry<Variable,Value>() {
+                @SuppressWarnings("nullness:argument.type.incompatible") // Environment contract: querying a foreign entry with a null payload may throw NPE.
                 public Variable getKey() {
                     return Variable.valueOfQueryOnly(((Map.Entry)o).getKey());
                 }
+                @SuppressWarnings("nullness:argument.type.incompatible") // Environment contract: querying a foreign entry with a null payload may throw NPE.
                 public Value getValue() {
                     return Value.valueOfQueryOnly(((Map.Entry)o).getValue());
                 }
@@ -360,7 +366,7 @@ final class ProcessEnvironment
         public boolean contains(Object o) { return s.contains(vvEntry(o)); }
         public boolean remove(Object o)   { return s.remove(vvEntry(o)); }
         @Pure
-        public boolean equals(Object o) {
+        public boolean equals(@Nullable Object o) {
             return o instanceof StringEntrySet
                 && s.equals(((StringEntrySet) o).s);
         }
@@ -392,7 +398,7 @@ final class ProcessEnvironment
         public boolean remove(Object o) {
             return c.remove(Value.valueOfQueryOnly(o));
         }
-        public boolean equals(Object o) {
+        public boolean equals(@Nullable Object o) {
             return o instanceof StringValues
                 && c.equals(((StringValues)o).c);
         }
