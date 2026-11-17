@@ -24,6 +24,10 @@
  */
 package java.lang;
 
+import org.checkerframework.framework.qual.AnnotatedFor;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+@AnnotatedFor("nullness")
 final class LiveStackFrameInfo extends StackFrameInfo implements LiveStackFrame {
     private static Object[] EMPTY_ARRAY = new Object[0];
 
@@ -36,23 +40,23 @@ final class LiveStackFrameInfo extends StackFrameInfo implements LiveStackFrame 
     }
 
     // These fields are initialized by the VM if ExtendedOption.LOCALS_AND_OPERANDS is set
-    private Object[] monitors = EMPTY_ARRAY;
-    private Object[] locals = EMPTY_ARRAY;
-    private Object[] operands = EMPTY_ARRAY;
+    private @Nullable Object[] monitors = EMPTY_ARRAY;
+    private @Nullable Object[] locals = EMPTY_ARRAY;
+    private @Nullable Object[] operands = EMPTY_ARRAY;
     private int mode = 0;
 
     @Override
-    public Object[] getMonitors() {
+    public @Nullable Object[] getMonitors() {
         return monitors;
     }
 
     @Override
-    public Object[] getLocals() {
+    public @Nullable Object[] getLocals() {
         return locals;
     }
 
     @Override
-    public Object[] getStack() {
+    public @Nullable Object[] getStack() {
         return operands;
     }
 
