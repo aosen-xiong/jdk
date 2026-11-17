@@ -90,7 +90,8 @@ The script accepts module-relative `.java` paths or package names and checks
 each selected file with `--patch-module`. The current exceptions batch contains
 `StackTraceElement`, `Throwable`, `Exception`, `RuntimeException`, and `Error`.
 The stack also checks eight related exception files and eight core interfaces
-five object/value foundations, and seven primitive wrappers (33 files in total). See the
+five object/value foundations, seven primitive wrappers, and three arithmetic
+files (36 files in total). See the
 [file inventory, PR stack, and completion milestones](doc/nullness/java-lang.md)
 for the remaining work and the precise validation status.
 Logs go under CF's `checker/build/jdk-typecheck/`. Nullness checking uses

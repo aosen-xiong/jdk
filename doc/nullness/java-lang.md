@@ -67,24 +67,27 @@ than silently moving a blocked file out of the denominator.
    source files and their consumer contracts are reviewed. All 26 cumulative
    source checks pass locally. Hosted CI remains unverified.
 
-5. `codex/nullness-java-lang-wrappers` targets the values branch; seven
-   wrapper files pass individually, with cumulative validation recorded below.
+5. [PR #12](https://github.com/aosen-xiong/jdk/pull/12):
+   `codex/nullness-java-lang-wrappers` targets the values branch; seven
+   wrapper files pass with the cumulative 33-file local check.
+6. `codex/nullness-java-lang-arithmetic` targets the wrappers branch; the
+   final three M2 files pass individually with no new suppressions.
 
 CI checkpoint (2026-11-17): the fork's Actions page explicitly says workflows
 are not running due to the scale of GitHub Actions usage and require maintainer
 re-enablement. REST reports Actions enabled and the workflow active, but manual
 dispatch returns HTTP 422, "Actions has been disabled for this repository."
 Re-enabling through the repository/workflow APIs did not clear the restriction.
-Hosted checks on #9, #10 and #11 have not started; the wrapper layer has no
+Hosted checks on #9, #10, #11 and #12 have not started; the arithmetic layer has no
 claimed hosted result either. The existing PR #7 result remains green. Re-enable
 workflows on the fork's Actions page, then run CI for each exact stack head.
 M1/M2 remain open pending hosted checks and review/merge.
 
-The current branch enrolls **33/126** shared implementation files. All 33 pass
-the cumulative local run under the frozen profile, with no errors or warnings. Five source files retain nullness suppressions: StackTraceElement,
-Enum, Boolean, Integer and Long. The other 28 have no nullness suppressions.
+The current branch enrolls **36/126** shared implementation files. All 36 pass
+the cumulative local source check with no errors or warnings. Five source files retain nullness suppressions: StackTraceElement,
+Enum, Boolean, Integer and Long. The other 31 have no nullness suppressions.
 The generated-record consumer has a separate known checker-bug suppression.
-The other 93 shared files remain future milestones.
+The other 90 shared files remain future milestones.
 
 ## Exact shared-source inventory
 
@@ -273,6 +276,35 @@ calls plus descriptor consumers). These fixtures exercise JSpecify and ordinary
 nullness/purity profiles. Tests and the runner remain entirely in CF.
 No initialization, purity, native implementation, or mathematical accuracy proof
 is claimed by these source checks.
+
+## Arithmetic (M2c)
+
+`codex/nullness-java-lang-arithmetic` builds on the primitive wrappers (#12).
+The scope is Math, StrictMath and FdLibm. The only source change is an explicit
+class-level AnnotatedFor("nullness") and import on FdLibm, following the
+whole-file annotation policy. Math and StrictMath already have appropriate
+opt-ins. No nullable qualifier, suppression, or executable change is added.
+
+The class/method Javadoc describes primitive mathematical operations; a syntax
+inventory confirms all 175 method declarations across these three files have
+primitive parameters and primitive results. Math/StrictMath's random() docs
+promise a reused generator, and their holder fields initialize with new Random.
+FdLibm's coefficient arrays are initialized by primitive-array literals. These
+internal nonnull defaults are supported by implementation evidence. Native
+StrictMath operations and numerical accuracy remain outside nullness checking.
+
+All three complete source files pass individually. FdLibm includes four nested
+algorithm classes: Exp, Cbrt, Hypot and Pow. A scratch control injects one null
+dereference into each of those and the enclosing class, requiring five separate
+diagnostics to confirm scope coverage. The original bodies remain unchanged,
+as checked by annotation-normalized AST comparison.
+
+CF's ArithmeticNullness exercises primitive and guarded boxed callers,
+including all four public StrictMath entry points to FdLibm, and rejects four
+unsafe nullable unboxings. Both JSpecify and ordinary nullness/purity consumer profiles match those four
+expected errors. All 36 cumulative source invocations pass with no warnings or new suppressions. M2's 15 files are now enrolled;
+its hosted CI/review gate remains open, and 90 shared files plus the separately
+inventoried platform/generated sources remain before package completion.
 
 ## Package completion and upstream delivery
 
