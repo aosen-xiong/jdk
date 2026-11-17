@@ -27,6 +27,7 @@
 package java.lang;
 
 import org.checkerframework.checker.interning.qual.UsesObjectEquals;
+import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.tainting.qual.Untainted;
 import org.checkerframework.dataflow.qual.TerminatesExecution;
@@ -62,7 +63,7 @@ import jdk.internal.reflect.Reflection;
 public @UsesObjectEquals class Runtime {
     private static final Runtime currentRuntime = new Runtime();
 
-    private static Version version;
+    private static @Nullable Version version;
 
     /**
      * Returns the runtime object associated with the current Java application.
@@ -594,6 +595,7 @@ public @UsesObjectEquals class Runtime {
      * @see     ProcessBuilder
      * @since 1.3
      */
+    @SuppressWarnings("nullness:argument.type.incompatible") // JDK annotation gap: ProcessBuilder.environment accepts null to inherit the environment.
     public Process exec(@Untainted String[] cmdarray, @Untainted String @Nullable [] envp, @Nullable File dir)
         throws IOException {
         return new ProcessBuilder(cmdarray)
@@ -749,7 +751,7 @@ public @UsesObjectEquals class Runtime {
         load0(Reflection.getCallerClass(), filename);
     }
 
-    void load0(Class<?> fromClass, String filename) {
+    void load0(@Nullable Class<?> fromClass, String filename) {
         @SuppressWarnings("removal")
         SecurityManager security = System.getSecurityManager();
         if (security != null) {
@@ -813,7 +815,7 @@ public @UsesObjectEquals class Runtime {
         loadLibrary0(Reflection.getCallerClass(), libname);
     }
 
-    void loadLibrary0(Class<?> fromClass, String libname) {
+    void loadLibrary0(@Nullable Class<?> fromClass, String libname) {
         @SuppressWarnings("removal")
         SecurityManager security = System.getSecurityManager();
         if (security != null) {
@@ -1033,6 +1035,7 @@ public @UsesObjectEquals class Runtime {
                                                    + s + "'");
 
             // $VNUM is a dot-separated list of integers of arbitrary length
+            @SuppressWarnings("nullness:dereference.of.nullable") // Pattern invariant: VNUM participates in every successful match.
             String[] split = m.group(VersionPattern.VNUM_GROUP).split("\\.");
             Integer[] version = new Integer[split.length];
             for (int i = 0; i < split.length; i++) {
@@ -1418,7 +1421,8 @@ public @UsesObjectEquals class Runtime {
          *
          */
         @Override
-        public boolean equals(Object obj) {
+        @SuppressWarnings({"nullness:dereference.of.nullable", "nullness:contracts.conditional.postcondition.not.satisfied"}) // Analysis limitation: the boolean local loses equalsIgnoreOptional's non-null fact.
+        public boolean equals(@Nullable Object obj) {
             boolean ret = equalsIgnoreOptional(obj);
             if (!ret)
                 return false;
@@ -1442,7 +1446,8 @@ public @UsesObjectEquals class Runtime {
          *          ignoring the optional build information
          *
          */
-        public boolean equalsIgnoreOptional(Object obj) {
+        @EnsuresNonNullIf(expression = "#1", result = true)
+        public boolean equalsIgnoreOptional(@Nullable Object obj) {
             if (this == obj)
                 return true;
             return (obj instanceof Version that)

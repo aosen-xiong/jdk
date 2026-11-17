@@ -26,6 +26,7 @@
 package java.lang;
 
 import org.checkerframework.checker.interning.qual.UsesObjectEquals;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.framework.qual.AnnotatedFor;
 
 import java.lang.module.ModuleDescriptor;
@@ -323,6 +324,7 @@ import sun.security.util.SecurityConstants;
  */
 @AnnotatedFor({"interning", "nullness"})
 @Deprecated(since="17", forRemoval=true)
+@SuppressWarnings("nullness:argument.type.incompatible") // VM phase invariant: the static initializer runs after the boot layer is established.
 public @UsesObjectEquals class SecurityManager {
 
     /*
@@ -452,7 +454,7 @@ public @UsesObjectEquals class SecurityManager {
      * @since      1.2
      */
     @SuppressWarnings("removal")
-    public void checkPermission(Permission perm, Object context) {
+    public void checkPermission(Permission perm, @Nullable Object context) {
         if (context instanceof AccessControlContext) {
             ((AccessControlContext)context).checkPermission(perm);
         } else {
@@ -490,6 +492,7 @@ public @UsesObjectEquals class SecurityManager {
 
     private static ThreadGroup rootGroup = getRootGroup();
 
+    @SuppressWarnings("nullness:dereference.of.nullable") // Lifecycle invariant: the current thread is alive and has a group.
     private static ThreadGroup getRootGroup() {
         ThreadGroup root =  Thread.currentThread().getThreadGroup();
         while (root.getParent() != null) {
@@ -791,7 +794,7 @@ public @UsesObjectEquals class SecurityManager {
      * @see        java.lang.SecurityManager#getSecurityContext()
      * @see        java.security.AccessControlContext#checkPermission(java.security.Permission)
      */
-    public void checkRead(String file, Object context) {
+    public void checkRead(String file, @Nullable Object context) {
         checkPermission(
             new FilePermission(file, SecurityConstants.FILE_READ_ACTION),
             context);
@@ -964,7 +967,7 @@ public @UsesObjectEquals class SecurityManager {
      * @see        java.lang.SecurityManager#getSecurityContext()
      * @see        java.security.AccessControlContext#checkPermission(java.security.Permission)
      */
-    public void checkConnect(String host, int port, Object context) {
+    public void checkConnect(String host, int port, @Nullable Object context) {
         if (host == null) {
             throw new NullPointerException("host can't be null");
         }
@@ -1204,14 +1207,14 @@ public @UsesObjectEquals class SecurityManager {
      * the cache.
      */
     private static boolean packageAccessValid = false;
-    private static String[] packageAccess;
+    private static String @Nullable [] packageAccess;
     private static final Object packageAccessLock = new Object();
 
     private static boolean packageDefinitionValid = false;
-    private static String[] packageDefinition;
+    private static String @Nullable [] packageDefinition;
     private static final Object packageDefinitionLock = new Object();
 
-    private static String[] getPackages(String p) {
+    private static String[] getPackages(@Nullable String p) {
         String packages[] = null;
         if (p != null && !p.isEmpty()) {
             java.util.StringTokenizer tok =
@@ -1244,6 +1247,7 @@ public @UsesObjectEquals class SecurityManager {
     /**
      * Record the non-exported packages of the modules in the given layer
      */
+    @SuppressWarnings("nullness:type.arguments.not.inferred") // Module graph invariant: layer members are named and have descriptors.
     static void addNonExportedPackages(ModuleLayer layer) {
         Set<String> bootModules = ModuleLoaderMap.bootModules();
         Set<String> platformModules = ModuleLoaderMap.platformModules();
@@ -1328,6 +1332,7 @@ public @UsesObjectEquals class SecurityManager {
      * @see        java.security.Security#getProperty getProperty
      * @see        #checkPermission(Permission) checkPermission
      */
+    @SuppressWarnings("nullness:iterating.over.nullable") // Cache invariant: the valid flag is set only after initialization under packageAccessLock.
     public void checkPackageAccess(String pkg) {
         Objects.requireNonNull(pkg, "package name can't be null");
 
@@ -1347,8 +1352,8 @@ public @UsesObjectEquals class SecurityManager {
                 @SuppressWarnings("removal")
                 String tmpPropertyStr =
                     AccessController.doPrivileged(
-                        new PrivilegedAction<>() {
-                            public String run() {
+                        new PrivilegedAction<@Nullable String>() {
+                            public @Nullable String run() {
                                 return Security.getProperty("package.access");
                             }
                         }
@@ -1428,6 +1433,7 @@ public @UsesObjectEquals class SecurityManager {
      * @see        java.security.Security#getProperty getProperty
      * @see        #checkPermission(Permission) checkPermission
      */
+    @SuppressWarnings("nullness:iterating.over.nullable") // Cache invariant: the valid flag is set only after initialization under packageDefinitionLock.
     public void checkPackageDefinition(String pkg) {
         Objects.requireNonNull(pkg, "package name can't be null");
 
@@ -1447,8 +1453,8 @@ public @UsesObjectEquals class SecurityManager {
                 @SuppressWarnings("removal")
                 String tmpPropertyStr =
                     AccessController.doPrivileged(
-                        new PrivilegedAction<>() {
-                            public String run() {
+                        new PrivilegedAction<@Nullable String>() {
+                            public @Nullable String run() {
                                 return java.security.Security.getProperty(
                                     "package.definition");
                             }
@@ -1546,7 +1552,7 @@ public @UsesObjectEquals class SecurityManager {
      * @since   1.1
      * @see     java.lang.ThreadGroup
      */
-    public ThreadGroup getThreadGroup() {
+    public @Nullable ThreadGroup getThreadGroup() {
         return Thread.currentThread().getThreadGroup();
     }
 

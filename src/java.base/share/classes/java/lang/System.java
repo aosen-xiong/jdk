@@ -142,6 +142,7 @@ public final @UsesObjectEquals class System {
      * @see Console#reader()
      */
     @CFComment("This field can be null. The Checker Framework conservatively annotates it as @NonNull, forbidding programs that set it to null.")
+    @SuppressWarnings("nullness:assignment.type.incompatible") // VM initialization: setIn0 establishes the stream in initPhase1.
     public static final @MustCall({}) InputStream in = null;
 
     /**
@@ -175,6 +176,7 @@ public final @UsesObjectEquals class System {
      * @see     Charset#defaultCharset()
      */
     @CFComment("This field can be null. The Checker Framework conservatively annotates it as @NonNull, forbidding programs that set it to null.")
+    @SuppressWarnings("nullness:assignment.type.incompatible") // VM initialization: setOut0 establishes the stream in initPhase1.
     public static final @MustCall({}) PrintStream out = null;
 
     /**
@@ -196,6 +198,7 @@ public final @UsesObjectEquals class System {
      * @see     Charset#defaultCharset()
      */
     @CFComment("This field can be null. The Checker Framework conservatively annotates it as @NonNull, forbidding programs that set it to null.")
+    @SuppressWarnings("nullness:assignment.type.incompatible") // VM initialization: setErr0 establishes the stream in initPhase1.
     public static final @MustCall({}) PrintStream err = null;
 
     // indicates if a security manager is possible
@@ -205,7 +208,7 @@ public final @UsesObjectEquals class System {
 
     // current security manager
     @SuppressWarnings("removal")
-    private static volatile SecurityManager security;   // read by VM
+    private static volatile @Nullable SecurityManager security;   // read by VM
 
     // return true if a security manager is allowed
     private static boolean allowSecurityManager() {
@@ -287,7 +290,7 @@ public final @UsesObjectEquals class System {
         setErr0(err);
     }
 
-    private static volatile Console cons;
+    private static volatile @Nullable Console cons;
 
     /**
      * Returns the unique {@link java.io.Console Console} object associated
@@ -360,7 +363,7 @@ public final @UsesObjectEquals class System {
     // Remember initial System.err. setSecurityManager() warning goes here
     private static volatile @Stable PrintStream initialErrStream;
 
-    private static URL codeSource(Class<?> clazz) {
+    private static @Nullable URL codeSource(Class<?> clazz) {
         PrivilegedAction<ProtectionDomain> pa = clazz::getProtectionDomain;
         @SuppressWarnings("removal")
         CodeSource cs = AccessController.doPrivileged(pa).getCodeSource();
@@ -434,7 +437,7 @@ public final @UsesObjectEquals class System {
         }
     }
 
-    private static void implSetSecurityManager(@SuppressWarnings("removal") SecurityManager sm) {
+    private static void implSetSecurityManager(@SuppressWarnings("removal") @Nullable SecurityManager sm) {
         if (security == null) {
             // ensure image reader is initialized
             Object.class.getResource("java/lang/ANY");
@@ -456,7 +459,7 @@ public final @UsesObjectEquals class System {
 
     @SuppressWarnings("removal")
     private static synchronized
-    void setSecurityManager0(final SecurityManager s) {
+    void setSecurityManager0(final @Nullable SecurityManager s) {
         SecurityManager sm = getSecurityManager();
         if (sm != null) {
             // ask the currently installed security manager if we
@@ -473,8 +476,8 @@ public final @UsesObjectEquals class System {
             // calls the installed security manager's checkPermission method
             // which will loop infinitely if there is a non-system class
             // (in this case: the new security manager class) on the stack).
-            AccessController.doPrivileged(new PrivilegedAction<>() {
-                public Object run() {
+            AccessController.doPrivileged(new PrivilegedAction<@Nullable Object>() {
+                public @Nullable Object run() {
                     s.getClass().getProtectionDomain().implies
                         (SecurityConstants.ALL_PERMISSION);
                     return null;
@@ -1357,7 +1360,7 @@ public final @UsesObjectEquals class System {
          *
          * @throws NullPointerException if {@code level} is {@code null}.
          */
-        public default void log(Level level, String msg) {
+        public default void log(Level level, @Nullable String msg) {
             log(level, (ResourceBundle) null, msg, (Object[]) null);
         }
 
@@ -1378,7 +1381,7 @@ public final @UsesObjectEquals class System {
          * @throws NullPointerException if {@code level} is {@code null},
          *         or {@code msgSupplier} is {@code null}.
          */
-        public default void log(Level level, Supplier<String> msgSupplier) {
+        public default void log(Level level, Supplier<@Nullable String> msgSupplier) {
             Objects.requireNonNull(msgSupplier);
             if (isLoggable(Objects.requireNonNull(level))) {
                 log(level, (ResourceBundle) null, msgSupplier.get(), (Object[]) null);
@@ -1427,7 +1430,7 @@ public final @UsesObjectEquals class System {
          *
          * @throws NullPointerException if {@code level} is {@code null}.
          */
-        public default void log(Level level, String msg, Throwable thrown) {
+        public default void log(Level level, @Nullable String msg, @Nullable Throwable thrown) {
             this.log(level, null, msg, thrown);
         }
 
@@ -1450,8 +1453,8 @@ public final @UsesObjectEquals class System {
          * @throws NullPointerException if {@code level} is {@code null}, or
          *                               {@code msgSupplier} is {@code null}.
          */
-        public default void log(Level level, Supplier<String> msgSupplier,
-                Throwable thrown) {
+        public default void log(Level level, Supplier<@Nullable String> msgSupplier,
+                @Nullable Throwable thrown) {
             Objects.requireNonNull(msgSupplier);
             if (isLoggable(Objects.requireNonNull(level))) {
                 this.log(level, null, msgSupplier.get(), thrown);
@@ -1476,7 +1479,7 @@ public final @UsesObjectEquals class System {
          *
          * @throws NullPointerException if {@code level} is {@code null}.
          */
-        public default void log(Level level, String format, Object... params) {
+        public default void log(Level level, @Nullable String format, @Nullable Object @Nullable ... params) {
             this.log(level, null, format, params);
         }
 
@@ -1497,8 +1500,8 @@ public final @UsesObjectEquals class System {
          *
          * @throws NullPointerException if {@code level} is {@code null}.
          */
-        public void log(Level level, ResourceBundle bundle, String msg,
-                Throwable thrown);
+        public void log(Level level, @Nullable ResourceBundle bundle, @Nullable String msg,
+                @Nullable Throwable thrown);
 
         /**
          * Logs a message with resource bundle and an optional list of
@@ -1519,8 +1522,8 @@ public final @UsesObjectEquals class System {
          *
          * @throws NullPointerException if {@code level} is {@code null}.
          */
-        public void log(Level level, ResourceBundle bundle, String format,
-                Object... params);
+        public void log(Level level, @Nullable ResourceBundle bundle, @Nullable String format,
+                @Nullable Object @Nullable ... params);
     }
 
     /**
@@ -1636,11 +1639,11 @@ public final @UsesObjectEquals class System {
             this(checkPermission());
         }
 
-        private LoggerFinder(Void unused) {
+        private LoggerFinder(@Nullable Void unused) {
             // nothing to do.
         }
 
-        private static Void checkPermission() {
+        private static @Nullable Void checkPermission() {
             @SuppressWarnings("removal")
             final SecurityManager sm = System.getSecurityManager();
             if (sm != null) {
@@ -1707,7 +1710,7 @@ public final @UsesObjectEquals class System {
          *         {@code checkPermission} method doesn't allow the
          *         {@code RuntimePermission("loggerFinder")}.
          */
-        public Logger getLocalizedLogger(String name, ResourceBundle bundle,
+        public Logger getLocalizedLogger(String name, @Nullable ResourceBundle bundle,
                                          Module module) {
             return new LocalizedLoggerWrapper<>(getLogger(name, module), bundle);
         }
@@ -1734,7 +1737,7 @@ public final @UsesObjectEquals class System {
         }
 
 
-        private static volatile LoggerFinder service;
+        private static volatile @Nullable LoggerFinder service;
         @SuppressWarnings("removal")
         static LoggerFinder accessProvider() {
             // We do not need to synchronize: LoggerFinderLoader will
@@ -2033,7 +2036,7 @@ public final @UsesObjectEquals class System {
     /**
      * Create PrintStream for stdout/err based on encoding.
      */
-    private static PrintStream newPrintStream(FileOutputStream fos, String enc) {
+    private static PrintStream newPrintStream(FileOutputStream fos, @Nullable String enc) {
        if (enc != null) {
             try {
                 return new PrintStream(new BufferedOutputStream(fos, 128), true, enc);
@@ -2052,7 +2055,7 @@ public final @UsesObjectEquals class System {
      */
     private static void logInitException(boolean printToStderr,
                                          boolean printStackTrace,
-                                         String msg,
+                                         @Nullable String msg,
                                          Throwable e) {
         if (VM.initLevel() < 1) {
             throw new InternalError("system classes not initialized");
@@ -2104,6 +2107,7 @@ public final @UsesObjectEquals class System {
     /**
      * Initialize the system class.  Called after thread initialization.
      */
+    @SuppressWarnings({"nullness:assignment.type.incompatible", "nullness:dereference.of.nullable"}) // VM invariants: line.separator is supplied and the live main thread has a group.
     private static void initPhase1() {
 
         // register the shared secrets - do this first, since SystemProps.initProperties
@@ -2169,7 +2173,7 @@ public final @UsesObjectEquals class System {
     }
 
     // @see #initPhase2()
-    static ModuleLayer bootLayer;
+    static @Nullable ModuleLayer bootLayer;
 
     /*
      * Invoked by VM.  Phase 2 module system initialization.
@@ -2286,29 +2290,29 @@ public final @UsesObjectEquals class System {
             public List<Method> getDeclaredPublicMethods(Class<?> klass, String name, Class<?>... parameterTypes) {
                 return klass.getDeclaredPublicMethods(name, parameterTypes);
             }
-            public jdk.internal.reflect.ConstantPool getConstantPool(Class<?> klass) {
+            public jdk.internal.reflect.@Nullable ConstantPool getConstantPool(Class<?> klass) {
                 return klass.getConstantPool();
             }
-            public boolean casAnnotationType(Class<?> klass, AnnotationType oldType, AnnotationType newType) {
+            public boolean casAnnotationType(Class<?> klass, @Nullable AnnotationType oldType, AnnotationType newType) {
                 return klass.casAnnotationType(oldType, newType);
             }
-            public AnnotationType getAnnotationType(Class<?> klass) {
+            public @Nullable AnnotationType getAnnotationType(Class<?> klass) {
                 return klass.getAnnotationType();
             }
-            public Map<Class<? extends Annotation>, Annotation> getDeclaredAnnotationMap(Class<?> klass) {
+            public Map<Class<? extends @Nullable Annotation>, Annotation> getDeclaredAnnotationMap(Class<?> klass) {
                 return klass.getDeclaredAnnotationMap();
             }
-            public byte[] getRawClassAnnotations(Class<?> klass) {
+            public byte @Nullable [] getRawClassAnnotations(Class<?> klass) {
                 return klass.getRawAnnotations();
             }
-            public byte[] getRawClassTypeAnnotations(Class<?> klass) {
+            public byte @Nullable [] getRawClassTypeAnnotations(Class<?> klass) {
                 return klass.getRawTypeAnnotations();
             }
-            public byte[] getRawExecutableTypeAnnotations(Executable executable) {
+            public byte @Nullable [] getRawExecutableTypeAnnotations(Executable executable) {
                 return Class.getExecutableTypeAnnotationBytes(executable);
             }
             public <E extends Enum<E>>
-            E[] getEnumConstantsShared(Class<E> klass) {
+            E @Nullable [] getEnumConstantsShared(Class<E> klass) {
                 return klass.getEnumConstantsShared();
             }
             public void blockedOn(Interruptible b) {
@@ -2327,14 +2331,14 @@ public final @UsesObjectEquals class System {
             public ConcurrentHashMap<?, ?> createOrGetClassLoaderValueMap(ClassLoader cl) {
                 return cl.createOrGetClassLoaderValueMap();
             }
-            public Class<?> defineClass(ClassLoader loader, String name, byte[] b, ProtectionDomain pd, String source) {
+            public Class<?> defineClass(@Nullable ClassLoader loader, @Nullable String name, byte[] b, @Nullable ProtectionDomain pd, @Nullable String source) {
                 return ClassLoader.defineClass1(loader, name, b, 0, b.length, pd, source);
             }
-            public Class<?> defineClass(ClassLoader loader, Class<?> lookup, String name, byte[] b, ProtectionDomain pd,
-                                        boolean initialize, int flags, Object classData) {
+            public Class<?> defineClass(@Nullable ClassLoader loader, Class<?> lookup, @Nullable String name, byte[] b, @Nullable ProtectionDomain pd,
+                                        boolean initialize, int flags, @Nullable Object classData) {
                 return ClassLoader.defineClass0(loader, lookup, name, b, 0, b.length, pd, initialize, flags, classData);
             }
-            public Class<?> findBootstrapClassOrNull(String name) {
+            public @Nullable Class<?> findBootstrapClassOrNull(String name) {
                 return ClassLoader.findBootstrapClassOrNull(name);
             }
             public Package definePackage(ClassLoader cl, String name, Module module) {
@@ -2351,12 +2355,12 @@ public final @UsesObjectEquals class System {
             public void invalidatePackageAccessCache() {
                 SecurityManager.invalidatePackageAccessCache();
             }
-            public Module defineModule(ClassLoader loader,
+            public Module defineModule(@Nullable ClassLoader loader,
                                        ModuleDescriptor descriptor,
-                                       URI uri) {
+                                       @Nullable URI uri) {
                 return new Module(null, loader, descriptor, uri);
             }
-            public Module defineUnnamedModule(ClassLoader loader) {
+            public Module defineUnnamedModule(@Nullable ClassLoader loader) {
                 return new Module(loader);
             }
             public void addReads(Module m1, Module m2) {
@@ -2462,12 +2466,12 @@ public final @UsesObjectEquals class System {
                 return String.join(prefix, suffix, delimiter, elements, size);
             }
 
-            public Object classData(Class<?> c) {
+            public @Nullable Object classData(Class<?> c) {
                 return c.getClassData();
             }
 
             @Override
-            public long findNative(ClassLoader loader, String entry) {
+            public long findNative(@Nullable ClassLoader loader, String entry) {
                 return ClassLoader.findNative(loader, entry);
             }
 
