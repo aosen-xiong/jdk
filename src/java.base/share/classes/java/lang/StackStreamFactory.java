@@ -24,6 +24,11 @@
  */
 package java.lang;
 
+import org.checkerframework.framework.qual.AnnotatedFor;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
+
 import org.checkerframework.checker.nonempty.qual.EnsuresNonEmptyIf;
 import org.checkerframework.dataflow.qual.Pure;
 import jdk.internal.reflect.MethodAccessor;
@@ -60,6 +65,7 @@ import static java.lang.StackStreamFactory.WalkerState.*;
  * 2. StackWalker::getCallerClass
  * 3. AccessControlContext getting ProtectionDomain
  */
+@AnnotatedFor("nullness")
 final class StackStreamFactory {
     private StackStreamFactory() {}
 
@@ -126,7 +132,7 @@ final class StackStreamFactory {
         protected final int maxDepth;
         protected final long mode;
         protected int depth;    // traversed stack depth
-        protected FrameBuffer<? extends T> frameBuffer;
+        protected @MonotonicNonNull FrameBuffer<? extends T> frameBuffer;
         protected long anchor;
 
         // buffers to fill in stack frame information
@@ -169,6 +175,7 @@ final class StackStreamFactory {
          * Initialize FrameBuffer.  Subclass should implement this method to
          * create its custom frame buffers.
          */
+         @EnsuresNonNull("frameBuffer")
          protected abstract void initFrameBuffer();
 
         /**
@@ -186,6 +193,7 @@ final class StackStreamFactory {
          *
          * Subclass may override this method if the minimum batch size is different.
          */
+        @SuppressWarnings("nullness:dereference.of.nullable") // Lifecycle: depth is positive only after the frame buffer has been initialized.
         protected int getNextBatchSize() {
             int lastBatchSize = depth == 0 ? 0 : frameBuffer.curBatchFrameCount();
             int nextBatchSize = batchSize(lastBatchSize);
@@ -258,7 +266,8 @@ final class StackStreamFactory {
          * or {@code null} if no more frame. If advanceToNextBatch is true,
          * it will only fetch the next batch.
          */
-        final Class<?> peekFrame() {
+        @SuppressWarnings("nullness:dereference.of.nullable") // VM callback protocol: traversal starts after initFrameBuffer.
+        final @Nullable Class<?> peekFrame() {
             while (frameBuffer.isActive() && depth < maxDepth) {
                 if (frameBuffer.isEmpty()) {
                     // fetch another batch of stack frames
@@ -290,7 +299,8 @@ final class StackStreamFactory {
          * 2. reuse or expand the allocated buffers
          * 3. create specialized StackFrame objects
          */
-        private Object doStackWalk(long anchor, int skipFrames, int batchSize,
+        @SuppressWarnings("nullness:dereference.of.nullable") // VM callback protocol: beginStackWalk initializes the buffer before calling native code.
+        private @Nullable Object doStackWalk(long anchor, int skipFrames, int batchSize,
                                                 int bufStartIndex, int bufEndIndex) {
             checkState(NEW);
 
@@ -311,6 +321,7 @@ final class StackStreamFactory {
         /*
          * Get next batch of stack frames.
          */
+        @SuppressWarnings("nullness:dereference.of.nullable") // VM callback protocol: batches are fetched only during initialized traversal.
         private int getNextBatch() {
             int nextBatchSize = Math.min(maxDepth - depth, getNextBatchSize());
             if (!frameBuffer.isActive() || nextBatchSize <= 0) {
@@ -334,7 +345,8 @@ final class StackStreamFactory {
          *
          * @see #tryNextFrame
          */
-        final Class<?> nextFrame() {
+        @SuppressWarnings("nullness:dereference.of.nullable") // VM callback protocol: frame consumption starts after initFrameBuffer.
+        final @Nullable Class<?> nextFrame() {
             if (!hasNext()) {
                 return null;
             }
@@ -382,6 +394,7 @@ final class StackStreamFactory {
          * @params batchSize number of elements of the frame  buffers for this batch
          * @return number of frames fetched in this batch
          */
+        @SuppressWarnings("nullness:dereference.of.nullable") // VM callback protocol: later batches reuse the initialized frame buffer.
         private int fetchStackFrames(int batchSize) {
             int startIndex = frameBuffer.startIndex();
             frameBuffer.resize(startIndex, batchSize);
@@ -416,7 +429,7 @@ final class StackStreamFactory {
          */
         private native R callStackWalk(long mode, int skipframes,
                                        int batchSize, int startIndex,
-                                       T[] frames);
+                                       @Nullable T[] frames);
 
         /**
          * Fetch the next batch of stack frames.
@@ -432,7 +445,7 @@ final class StackStreamFactory {
          */
         private native int fetchStackFrames(long mode, long anchor,
                                             int batchSize, int startIndex,
-                                            T[] frames);
+                                            @Nullable T[] frames);
     }
 
     /*
@@ -449,7 +462,7 @@ final class StackStreamFactory {
         private static final int CHARACTERISTICS = Spliterator.ORDERED | Spliterator.IMMUTABLE;
 
         final class StackFrameBuffer extends FrameBuffer<StackFrameInfo> {
-            private StackFrameInfo[] stackFrames;
+            private @Nullable StackFrameInfo[] stackFrames;
             StackFrameBuffer(int initialBatchSize) {
                 super(initialBatchSize);
 
@@ -460,7 +473,7 @@ final class StackStreamFactory {
             }
 
             @Override
-            StackFrameInfo[] frames() {
+            @Nullable StackFrameInfo[] frames() {
                 return stackFrames;
             }
 
@@ -474,7 +487,7 @@ final class StackStreamFactory {
 
                 int size = startIndex+elements;
                 if (stackFrames.length < size) {
-                    StackFrameInfo[] newFrames = new StackFrameInfo[size];
+                    @Nullable StackFrameInfo[] newFrames = new StackFrameInfo[size];
                     // copy initial magic...
                     System.arraycopy(stackFrames, 0, newFrames, 0, startIndex);
                     stackFrames = newFrames;
@@ -486,6 +499,7 @@ final class StackStreamFactory {
             }
 
             @Override
+            @SuppressWarnings("nullness:return.type.incompatible") // Buffer invariant: the current payload range is populated; reserved slots are excluded.
             StackFrameInfo nextStackFrame() {
                 if (isEmpty()) {
                     throw new NoSuchElementException("origin=" + origin + " fence=" + fence);
@@ -497,6 +511,7 @@ final class StackStreamFactory {
             }
 
             @Override
+            @SuppressWarnings("nullness:dereference.of.nullable") // Buffer invariant: callers select a populated payload slot.
             final Class<?> at(int index) {
                 return stackFrames[index].declaringClass();
             }
@@ -519,7 +534,8 @@ final class StackStreamFactory {
          * Returns next StackFrame object in the current batch of stack frames;
          * or null if no more stack frame.
          */
-        StackFrame nextStackFrame() {
+        @SuppressWarnings("nullness:dereference.of.nullable") // VM callback protocol: frame consumption starts after initFrameBuffer.
+        @Nullable StackFrame nextStackFrame() {
             if (!hasNext()) {
                 return null;
             }
@@ -563,7 +579,7 @@ final class StackStreamFactory {
         // ------- Implementation of Spliterator
 
         @Override
-        public Spliterator<StackFrame> trySplit() {
+        public @Nullable Spliterator<StackFrame> trySplit() {
             return null;   // ordered stream and do not allow to split
         }
 
@@ -589,6 +605,7 @@ final class StackStreamFactory {
         }
 
         @Override
+        @SuppressWarnings({"nullness:dereference.of.nullable", "nullness:argument.type.incompatible"}) // Traversal protocol: the buffer is initialized, and hasNext implies the next frame exists.
         public boolean tryAdvance(Consumer<? super StackFrame> action) {
             checkState(OPEN);
 
@@ -617,23 +634,24 @@ final class StackStreamFactory {
             stackWalkImplClasses.add(CallerClassFinder.class);
         }
 
-        private Class<?> caller;
+        private @Nullable Class<?> caller;
 
         CallerClassFinder(StackWalker walker) {
             super(walker, FILL_CLASS_REFS_ONLY|GET_CALLER_CLASS);
         }
 
         static final class ClassBuffer extends FrameBuffer<Class<?>> {
-            Class<?>[] classes;      // caller class for fast path
+            @Nullable Class<?>[] classes;      // caller class for fast path
             ClassBuffer(int batchSize) {
                 super(batchSize);
                 classes = new Class<?>[batchSize];
             }
 
             @Override
-            Class<?>[] frames() { return classes;}
+            @Nullable Class<?>[] frames() { return classes;}
 
             @Override
+            @SuppressWarnings("nullness:return.type.incompatible") // Native buffer invariant: callers select a class slot filled for the current batch.
             final Class<?> at(int index) { return classes[index];}
 
 
@@ -661,7 +679,7 @@ final class StackStreamFactory {
                 if (classes.length < size) {
                     // copy the elements in classes array to the newly allocated one.
                     // classes[0] is a Thread object
-                    Class<?>[] prev = classes;
+                    @Nullable Class<?>[] prev = classes;
                     classes = new Class<?>[size];
                     System.arraycopy(prev, 0, classes, 0, startIndex);
                 }
@@ -669,6 +687,7 @@ final class StackStreamFactory {
             }
         }
 
+        @SuppressWarnings("nullness:return.type.incompatible") // Native callback: consumeFrames throws unless it finds and stores the caller.
         Class<?> findCaller() {
             walk();
             return caller;
@@ -678,7 +697,7 @@ final class StackStreamFactory {
         protected Integer consumeFrames() {
             checkState(OPEN);
             int n = 0;
-            Class<?>[] frames = new Class<?>[2];
+            @Nullable Class<?>[] frames = new Class<?>[2];
             // skip the API calling this getCallerClass method
             // 0: StackWalker::getCallerClass
             // 1: caller-sensitive method
@@ -716,7 +735,7 @@ final class StackStreamFactory {
         }
         // VM will fill in all method info and live stack info directly in StackFrameInfo
         final class LiveStackFrameBuffer extends FrameBuffer<LiveStackFrameInfo> {
-            private LiveStackFrameInfo[] stackFrames;
+            private @Nullable LiveStackFrameInfo[] stackFrames;
             LiveStackFrameBuffer(int initialBatchSize) {
                 super(initialBatchSize);
                 this.stackFrames = new LiveStackFrameInfo[initialBatchSize];
@@ -726,7 +745,7 @@ final class StackStreamFactory {
             }
 
             @Override
-            LiveStackFrameInfo[] frames() {
+            @Nullable LiveStackFrameInfo[] frames() {
                 return stackFrames;
             }
 
@@ -740,7 +759,7 @@ final class StackStreamFactory {
 
                 int size = startIndex + elements;
                 if (stackFrames.length < size) {
-                    LiveStackFrameInfo[] newFrames = new LiveStackFrameInfo[size];
+                    @Nullable LiveStackFrameInfo[] newFrames = new LiveStackFrameInfo[size];
                     // copy initial magic...
                     System.arraycopy(stackFrames, 0, newFrames, 0, startIndex);
                     stackFrames = newFrames;
@@ -754,6 +773,7 @@ final class StackStreamFactory {
             }
 
             @Override
+            @SuppressWarnings("nullness:return.type.incompatible") // Buffer invariant: the current payload range is populated; reserved slots are excluded.
             LiveStackFrameInfo nextStackFrame() {
                 if (isEmpty()) {
                     throw new NoSuchElementException("origin=" + origin + " fence=" + fence);
@@ -765,6 +785,7 @@ final class StackStreamFactory {
             }
 
             @Override
+            @SuppressWarnings("nullness:dereference.of.nullable") // Buffer invariant: callers select a populated payload slot.
             final Class<?> at(int index) {
                 return stackFrames[index].declaringClass();
             }
@@ -815,7 +836,7 @@ final class StackStreamFactory {
          * @return An array of frames that may be used to store frame objects
          * when walking the stack. Must not be null.
          */
-        abstract F[] frames(); // must not return null
+        abstract @Nullable F[] frames(); // must not return null
 
         /**
          * Resizes the buffers for VM to fill in the next batch of stack frames.
