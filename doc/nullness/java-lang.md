@@ -144,14 +144,18 @@ The current VersionProps layer, `codex/nullness-java-lang-version-props`, target
 #30. Its template has passed local checks; CI must validate the configured
 output from the actual native build.
 
-CI checkpoint (2026-11-17): the fork's Actions page explicitly says workflows
-are not running due to the scale of GitHub Actions usage and require maintainer
-re-enablement. REST reports Actions enabled and the workflow active, but manual
-dispatch returns HTTP 422, "Actions has been disabled for this repository."
-Re-enabling through the repository/workflow APIs did not clear the restriction.
-Hosted checks on #9 through #30 remain unverified; this VersionProps layer
-has no claimed hosted result either. The existing PR #7 result remains green. Re-enable
-workflows on the fork's Actions page, then run CI for each exact stack head.
+CI checkpoint (2026-11-17): Actions is re-enabled. Run
+[44113969402](https://github.com/aosen-xiong/jdk/actions/runs/44113969402)
+at head `c550af9288685fb1c630185be3a82023e53e8772` passed the native JDK
+build and both 136-file platform nullness jobs, including configured VersionProps
+and private callers. The whole workflow failed: JDK 17 JUnit dependency downloads
+received Maven HTTP 429, and JDK 21/25/27 JUnit tests reported three deprecation
+warnings in RuntimeVersionNullness. The matching CF branch now suppresses only
+those deprecation warnings at the two affected test methods. All eight intended
+nullness failures remain in both local study profiles; a JDK 21 binary-context
+comparison removes only the three warnings. No JDK source or checker fix is
+part of this CI correction. The updated CF pin requires a fresh hosted run.
+Earlier stack heads still need their own checks and review before merging.
 M1/M2/M3/M4/M5 remain open pending hosted checks and review/merge.
 
 The current branch enrolls **126/126** shared Java sources, **6/6** platform
@@ -162,9 +166,9 @@ Across physical variants these are 138 distinct source units, with 36 files
 using nullness suppressions and 102 without. Templates and generated copies are
 paired, not counted twice. **VersionProps is an additional seventh generated
 member**: its annotation source/template and direct callers now pass locally,
-while its real configured output remains unverified. CI selects 136 sources per
-platform once the native build supplies that output. Do not report 139 fully
-verified physical implementation units until that gate passes.
+and its real configured output passed in both hosted 136-file platform checks
+at the exact head recorded above. This establishes 139 distinct source units
+under the study profile; it does not resolve the recorded source-contract issues.
 The prior shared-only checkpoint was run.NbeZAd on #27. Thirty-two shared files have
 nullness suppressions: StackTraceElement, Enum, Boolean, Integer, Long, String,
 StringBuilder, StringBuffer, AbstractStringBuilder, Character, CharacterName,

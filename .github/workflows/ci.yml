@@ -225,7 +225,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: aosen-xiong/checker-framework
-          ref: e8fa72969e13ab46fa42e252cb8a84e035dd4e93 # codex/nullness-java-lang-version-props
+          ref: 6b2fac4f7f2cc47a9b9dd8b7518d21a8f67aef24 # codex/nullness-java-lang-version-props
           path: checker-framework
           persist-credentials: false
       - name: Check out the checker's bundled JDK contracts
