@@ -81,8 +81,10 @@ polymorphic conditional issue. These are disclosed limitations, not silent opt-o
 The constructors, empty-instance cast and private presence predicates were reviewed
 against source documentation and implementation. No executable behavior changed.
 Group 2: traversal source/caller checks, all eleven removal controls, and the
-cumulative 148-file Unix regression pass locally. Groups 3–25: unattempted
-(108 files). Exact-head hosted CI remains pending.
+cumulative 148-file Unix regression pass locally. Group 3: both comparison files
+and their affected callers pass locally; see the final checkpoint below for the
+exact regression snapshots. Groups 4–25 remain unattempted
+(106 files). Exact-head hosted CI remains pending.
 package-info.java reviewed: existing
 KeyFor lower-bound default retained; no general package nullness policy inferred.
 Full JSpecify mode remains pinned to CF c12ce38daa implementation; initialization,
@@ -208,3 +210,87 @@ group 4. `Comparators.NullComparator` stores an optional delegate and accepts nu
 when all nonnull elements compare equal; its field/constructor annotations need
 review in group 3. These are observed annotation gaps, not reproduced checker
 bugs or completed coverage of those files.
+
+
+## Comparison contract review (group 3)
+
+The comparison layer targets the traversal branch (PR #34). Both `Comparator`
+and `Comparators` are selected; only `Comparators` needs source changes. Public
+`Comparator` contracts already distinguish strict operands, nullable-friendly
+comparators, optional null-ordering delegates, and key extractors. They remain
+unchanged. `Comparators` receives whole-file nullness opt-in.
+
+`nullsFirst` and `nullsLast` explicitly allow a null delegate. Accordingly, the
+private delegate field and constructor parameter become nullable. The helper
+checks both operands before invoking a present delegate. Its stored comparator,
+constructor wildcard lower bound, existing cast, and secondary comparator lower
+bound therefore use `@NonNull T`. These four qualifiers narrow type-variable
+uses; ordinary concrete reference types keep the existing nonnull default. The
+secondary comparator is invoked only through the same null-guarding wrapper.
+This refines the internal override with a weaker caller precondition, preserving
+the public `Comparator` contract. Executable code is unchanged.
+
+### Checker findings
+
+Two reduced cases are retained in the matching Checker Framework branch:
+
+- **NULL-0045, reproduced checker crash:** a candidate implementation of
+  `Comparator<@Nullable T>` crashes with `StructuralEqualityComparer: unexpected
+  combination` for `NULL` and `TYPEVAR`, through `visitNull_Typevar` and conditional
+  checking. The complete source failure repeats in a fresh run; a standalone
+  example reproduces in both JSpecify and ordinary nullness modes without a JDK
+  source patch. Plain javac succeeds. Its root cause is unconfirmed. The crashing
+  candidate is rejected, and its CF test is explicitly skipped until fixed; it is
+  not counted as a passing test or a suppressed crash.
+- **NULL-0046, reproduced suspected conditional/wildcard defect:** the initial
+  representation reports `conditional.type.incompatible` when choosing between
+  `other` and `real.thenComparing(other)`. Both alternatives accept nonnull `T`,
+  as required by the constructor. A standalone example reports the same single
+  diagnostic in both profiles; equivalent separate returns pass. An initial narrow
+  suppression was documented and validated by removal, then retired: recording
+  the secondary comparator's nonnull input domain also makes the conditional
+  check succeed. The final JDK source needs no suppression or expression rewrite.
+  The reduced diagnostic fixture preserves the narrower experiment separately.
+  Its relationship to the crash is not established.
+
+The CF-owned `ComparatorNullness` fixture exercises operand domains, reverse and
+null ordering, comparator chaining, nullable extracted keys, and primitive key
+extractors. It expects 23 invalid-use diagnostics in each profile. The reduced
+conditional fixture adds two unsafe-use controls. `ComparisonHelperContracts`
+checks that the concrete wrapper accepts strict delegates while comparing nullable
+operands, including a missing primary delegate. Tests and reproducers remain
+in CF; no tests or harness files are added to this JDK repository.
+
+The syntax audit confirms annotation-only edits, no lost other-checker
+annotations and no scope opt-outs. The final source uses no nullness suppression.
+The final source and affected-caller validation are recorded below; exact-head
+hosted validation remains pending.
+
+The comparison workflow pins [CF 6281829](https://github.com/aosen-xiong/checker-framework/commit/628182975650b61bd275d89bb2f71b4594c93278).
+Its [caller contracts](https://github.com/aosen-xiong/checker-framework/blob/628182975650b61bd275d89bb2f71b4594c93278/checker/tests/nullness/ComparatorNullness.java),
+[conditional controls](https://github.com/aosen-xiong/checker-framework/blob/628182975650b61bd275d89bb2f71b4594c93278/checker/tests/nullness/ComparatorConditional.java),
+and [skipped crash reproducer](https://github.com/aosen-xiong/checker-framework/blob/628182975650b61bd275d89bb2f71b4594c93278/checker/tests/nullness/ComparatorConditionalCrash.java)
+are reviewable independently of the JDK annotations. The checker implementation
+remains c12ce38daa; these are test-only additions. Run the skipped reproducer
+explicitly with the JDK 17 checker wrapper and `-processor nullness
+-Amode=jspecify -proc:only` to reproduce the crash; omit the mode flag for the
+ordinary-profile reproduction. The successful javac control uses `-proc:none`.
+
+Final comparison checkpoint: the earlier complete 150-file Unix regression
+(`run.N0OyoS`, `run.sOCuHM`, `run.Ar2Pq1`) passed with stable 143 physical-source
+hashes while the first representation still had its single conditional suppression.
+After the final secondary-delegate refinement removed that suppression,
+`run.LfnIhX` verified all 14 covered java.util files plus the concrete helper
+caller, with no errors, warnings, crashes, or skipped targets. Public comparator
+controls were replayed in both profiles and matched all 23 expected diagnostics.
+The reduced conditional fixture separately matches its two negative controls.
+The private helper is referenced only by `Comparator` and itself in the shared
+JDK sources; the public `Comparator` signatures did not change.
+
+These are distinct source snapshots: the earlier 150-file result is not a claim
+of a full final-snapshot rerun. The fork's CI checks the complete final set and
+builds the native JDK. Local checks generated fresh CharacterData and reused
+provenance-checked VersionProps from the prior java.lang CI. Direct java.util
+coverage is 14/120 files; 106 remain. Source annotation delta: two Nullable uses,
+four NonNull type-variable uses, one whole-file opt-in, and zero new nullness
+suppression keys. Comparator.java is unchanged.
