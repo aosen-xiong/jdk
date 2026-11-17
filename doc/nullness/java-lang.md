@@ -57,9 +57,16 @@ than silently moving a blocked file out of the denominator.
 2. [PR #9](https://github.com/aosen-xiong/jdk/pull/9):
    `codex/nullness-java-lang-exception-causes` targets `codex/nullness-java-lang`;
    eight more files have passed local checks. Hosted CI is pending.
-3. `codex/nullness-java-lang-interfaces` targets the exception-causes branch;
+3. [PR #10](https://github.com/aosen-xiong/jdk/pull/10):
+   `codex/nullness-java-lang-interfaces` targets the exception-causes branch;
    all eight interfaces have passed local source/consumer checks, with no Java
    source changes needed. Hosted CI is pending.
+
+CI checkpoint (2026-11-17): GitHub reports Actions enabled and this workflow
+active, but has not queued a hosted run for #9 or #10 after PR creation and
+branch pushes. Workflow syntax validates locally; the trigger issue is
+unresolved. Neither new layer has a claimed hosted CI result, and M1 remains
+open pending those checks and review/merge.
 
 The current branch enrolls **21/126** shared implementation files. Twenty have
 no nullness suppressions; StackTraceElement retains the documented native-array
