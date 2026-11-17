@@ -25,6 +25,9 @@
 
 package java.lang;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 /**
  * Thrown to indicate that an {@code invokedynamic} instruction or a dynamic
  * constant failed to resolve its bootstrap method and arguments,
@@ -39,6 +42,7 @@ package java.lang;
  * @author John Rose, JSR 292 EG
  * @since 1.7
  */
+@AnnotatedFor("nullness")
 public class BootstrapMethodError extends LinkageError {
     @java.io.Serial
     private static final long serialVersionUID = 292L;
@@ -56,7 +60,7 @@ public class BootstrapMethodError extends LinkageError {
      *
      * @param s the detail message.
      */
-    public BootstrapMethodError(String s) {
+    public BootstrapMethodError(@Nullable String s) {
         super(s);
     }
 
@@ -67,7 +71,7 @@ public class BootstrapMethodError extends LinkageError {
      * @param s the detail message.
      * @param cause the cause, may be {@code null}.
      */
-    public BootstrapMethodError(String s, Throwable cause) {
+    public BootstrapMethodError(@Nullable String s, @Nullable Throwable cause) {
         super(s, cause);
     }
 
@@ -77,7 +81,7 @@ public class BootstrapMethodError extends LinkageError {
      *
      * @param cause the cause, may be {@code null}.
      */
-    public BootstrapMethodError(Throwable cause) {
+    public BootstrapMethodError(@Nullable Throwable cause) {
         // cf. Throwable(Throwable cause) constructor.
         super(cause == null ? null : cause.toString());
         initCause(cause);
