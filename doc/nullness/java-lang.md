@@ -70,24 +70,28 @@ than silently moving a blocked file out of the denominator.
 5. [PR #12](https://github.com/aosen-xiong/jdk/pull/12):
    `codex/nullness-java-lang-wrappers` targets the values branch; seven
    wrapper files pass with the cumulative 33-file local check.
-6. `codex/nullness-java-lang-arithmetic` targets the wrappers branch; the
-   final three M2 files pass individually with no new suppressions.
+6. [PR #13](https://github.com/aosen-xiong/jdk/pull/13):
+   `codex/nullness-java-lang-arithmetic` targets the wrappers branch; the
+   final three M2 files pass in the cumulative 36-file run with no new suppressions.
+7. `codex/nullness-java-lang-text` targets the arithmetic branch; four public
+   text files pass in the cumulative 40-file local check.
 
 CI checkpoint (2026-11-17): the fork's Actions page explicitly says workflows
 are not running due to the scale of GitHub Actions usage and require maintainer
 re-enablement. REST reports Actions enabled and the workflow active, but manual
 dispatch returns HTTP 422, "Actions has been disabled for this repository."
 Re-enabling through the repository/workflow APIs did not clear the restriction.
-Hosted checks on #9, #10, #11 and #12 have not started; the arithmetic layer has no
+Hosted checks on #9 through #13 remain unverified; the text layer has no
 claimed hosted result either. The existing PR #7 result remains green. Re-enable
 workflows on the fork's Actions page, then run CI for each exact stack head.
 M1/M2 remain open pending hosted checks and review/merge.
 
-The current branch enrolls **36/126** shared implementation files. All 36 pass
-the cumulative local source check with no errors or warnings. Five source files retain nullness suppressions: StackTraceElement,
-Enum, Boolean, Integer and Long. The other 31 have no nullness suppressions.
+The current branch enrolls **40/126** shared implementation files. All 40 pass
+the cumulative local source check with no errors or warnings. Eight
+source files have nullness suppressions: StackTraceElement, Enum, Boolean,
+Integer, Long, String, StringBuilder and StringBuffer. The other 32 do not.
 The generated-record consumer has a separate known checker-bug suppression.
-The other 90 shared files remain future milestones.
+The other 86 shared files remain future milestones.
 
 ## Exact shared-source inventory
 
@@ -305,6 +309,57 @@ unsafe nullable unboxings. Both JSpecify and ordinary nullness/purity consumer p
 expected errors. All 36 cumulative source invocations pass with no warnings or new suppressions. M2's 15 files are now enrolled;
 its hosted CI/review gate remains open, and 90 shared files plus the separately
 inventoried platform/generated sources remain before package completion.
+
+## Public text APIs (M3a)
+
+`codex/nullness-java-lang-text` builds on arithmetic (#13), covering String,
+AbstractStringBuilder, StringBuilder and StringBuffer. Their class documentation
+explicitly rejects null arguments unless a method says otherwise. This supplies
+the default public precondition; exceptional null-tolerant methods are reviewed
+against that policy and inherited Appendable/CharSequence contracts.
+
+| Position | Evidence and decision |
+| --- | --- |
+| `String.resolveConstantDesc` lookup | Documented ignored, returning this; add Nullable on the concrete Lookup argument. Removing this annotation alone restores exactly one otherwise-valid caller error. |
+| `AbstractStringBuilder.append(AbstractStringBuilder)` and its StringBuffer override | The internal forwarding path implements the documented null-to-"null" StringBuffer append behavior and explicitly checks null. Add Nullable to both parameters. |
+| `StringBuffer.toStringCache` | Field documentation says it is cleared on mutation; 27 explicit null writes confirm its optional state. Add Nullable to the field; public toString stays nonnull. |
+| Internal designated `String.join` elements and Iterable join buffer | The capacity array contains null spare slots. Annotate nullable element types in the helper parameter and array creation. Correct the private comment to require nonnull elements only in [0,size), which is the range the helper reads. The public join still accepts nullable elements and returns a nonnull String. |
+| Equality, valueOf, append/insert, join and formatting | Preserve documented nullable object/sequence inputs, nullable join/format elements and nullable locale. Delimiters, array/Iterable references, constructors, replacement strings and comparison inputs retain nonnull preconditions. The formatting varargs array reference retains the class-policy default; element nullness is separate. |
+| transform | Existing R carries the callback result's nullness; nullable-result consumer tests pass without adding a bound or weakening nonnull function inputs. |
+| Void marker parameters and rangeCheck result | Already nullable through the frozen CF qualifier's DefaultFor(Void.class); no redundant annotation is added. |
+
+Six new suppression annotations contain nine diagnostic-key occurrences:
+
+- String.split: `return.type.incompatible` and
+  `toarray.nullable.elements.not.newarray`. The result array and copied subList
+  both have resultSize elements, so toArray cannot append a null sentinel.
+- Internal String.join: `dereference.of.nullable` at three reads. Callers fill
+  every slot in [0,size) with nonnull String.valueOf results; the checker does
+  not express this initialized-prefix invariant. Null spare capacity is honestly
+  represented rather than hidden with an assignment suppression.
+- String.newStringNoRepl/getBytesNoRepl: `throwing.nullable`. Coding helpers wrap
+  failures in IAE with a nonnull coding cause, but Throwable.getCause remains
+  nullable in general. This trusts the expected coding-provider protocol;
+  arbitrary provider exceptions are not proven to have a cause.
+- StringBuilder/StringBuffer.readObject: `argument.type.incompatible` and
+  `dereference.of.nullable` in each hook. Their documented serialized forms and
+  writeObject bodies supply a nonnull char array. This is a trusted format
+  boundary: malformed or substituted streams can violate it and are not proven
+  null-safe by these suppressions.
+
+These findings were documented before suppressions. No new checker implementation
+bug is established by them and no checker fix is included. Each key is removed
+alone in the full-source control checkout; the intended diagnostic returns,
+including all three prefix reads and the toArray warning (which fails under
+Werror). The checker and all other options stay frozen. Existing annotations
+for other checkers and executable syntax are unchanged by AST comparison.
+
+All four files pass individually with unused-suppression auditing. CF's
+TextContractNullness and TextModernNullness match 11 and four deliberate invalid
+caller diagnostics in both JSpecify and ordinary nullness/purity modes. Valid
+nullable contents, generic results and ignored lookups are accepted. All 40 cumulative
+source invocations pass without warnings. M3 still has four
+text helpers and six Unicode shared files; generated Unicode outputs remain M7.
 
 ## Package completion and upstream delivery
 

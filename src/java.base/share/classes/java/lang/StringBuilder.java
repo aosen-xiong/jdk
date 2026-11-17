@@ -504,6 +504,8 @@ public final class StringBuilder
      * @throws ClassNotFoundException if a serialized class cannot be loaded
      */
     @java.io.Serial
+    // The serialized form written by writeObject contains a nonnull backing char array.
+    @SuppressWarnings({"nullness:argument.type.incompatible", "nullness:dereference.of.nullable"})
     private void readObject(java.io.ObjectInputStream s)
         throws IOException, ClassNotFoundException {
         s.defaultReadObject();

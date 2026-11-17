@@ -184,7 +184,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: aosen-xiong/checker-framework
-          ref: df91c89b009c40e14503d9e56d424d4890e82e64 # codex/nullness-java-lang-arithmetic
+          ref: 336e97bd29bc36daa1b636b3dd2848ed8d65b138 # codex/nullness-java-lang-text
           path: checker-framework
           persist-credentials: false
       - name: Check out the checker's bundled JDK contracts
@@ -255,7 +255,11 @@ jobs:
             java/lang/Double.java \
             java/lang/Math.java \
             java/lang/StrictMath.java \
-            java/lang/FdLibm.java
+            java/lang/FdLibm.java \
+            java/lang/String.java \
+            java/lang/AbstractStringBuilder.java \
+            java/lang/StringBuilder.java \
+            java/lang/StringBuffer.java
       - name: Upload type-checking logs
         if: always()
         uses: actions/upload-artifact@v4
