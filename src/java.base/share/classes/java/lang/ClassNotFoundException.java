@@ -104,7 +104,7 @@ public class ClassNotFoundException extends ReflectiveOperationException {
      * @return the {@code Exception} that was raised while loading a class
      * @since 1.2
      */
-    public Throwable getException() {
+    public @Nullable Throwable getException() {
         return super.getCause();
     }
 
