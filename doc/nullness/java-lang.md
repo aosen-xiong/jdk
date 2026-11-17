@@ -136,17 +136,26 @@ than silently moving a blocked file out of the denominator.
     `codex/nullness-java-lang-windows` targets Unix and adds three Windows sources;
     its complete 129-file Windows-context gate passes locally.
 
-The current Unicode layer, `codex/nullness-java-lang-generated`, targets #29
-and adds the six generated CharacterData classes through their templates.
+23. [PR #30](https://github.com/aosen-xiong/jdk/pull/30):
+    `codex/nullness-java-lang-generated` targets Windows and checks six generated
+    Unicode classes, with separate 135-file Unix and Windows gates passing.
 
-CI checkpoint (2026-11-17): the fork's Actions page explicitly says workflows
-are not running due to the scale of GitHub Actions usage and require maintainer
-re-enablement. REST reports Actions enabled and the workflow active, but manual
-dispatch returns HTTP 422, "Actions has been disabled for this repository."
-Re-enabling through the repository/workflow APIs did not clear the restriction.
-Hosted checks on #9 through #29 remain unverified; this generated layer
-has no claimed hosted result either. The existing PR #7 result remains green. Re-enable
-workflows on the fork's Actions page, then run CI for each exact stack head.
+The current VersionProps layer, `codex/nullness-java-lang-version-props`, targets
+#30. Its template has passed local checks; CI must validate the configured
+output from the actual native build.
+
+CI checkpoint (2026-11-17): Actions is re-enabled. Run
+[44113969402](https://github.com/aosen-xiong/jdk/actions/runs/44113969402)
+at head `c550af9288685fb1c630185be3a82023e53e8772` passed the native JDK
+build and both 136-file platform nullness jobs, including configured VersionProps
+and private callers. The whole workflow failed: JDK 17 JUnit dependency downloads
+received Maven HTTP 429, and JDK 21/25/27 JUnit tests reported three deprecation
+warnings in RuntimeVersionNullness. The matching CF branch now suppresses only
+those deprecation warnings at the two affected test methods. All eight intended
+nullness failures remain in both local study profiles; a JDK 21 binary-context
+comparison removes only the three warnings. No JDK source or checker fix is
+part of this CI correction. The updated CF pin requires a fresh hosted run.
+Earlier stack heads still need their own checks and review before merging.
 M1/M2/M3/M4/M5 remain open pending hosted checks and review/merge.
 
 The current branch enrolls **126/126** shared Java sources, **6/6** platform
@@ -156,7 +165,10 @@ All targets are visited with stable input hashes and zero errors/warnings/crashe
 Across physical variants these are 138 distinct source units, with 36 files
 using nullness suppressions and 102 without. Templates and generated copies are
 paired, not counted twice. **VersionProps is an additional seventh generated
-member**; its separate follow-up and actual configured-output CI gate remain.
+member**: its annotation source/template and direct callers now pass locally,
+and its real configured output passed in both hosted 136-file platform checks
+at the exact head recorded above. This establishes 139 distinct source units
+under the study profile; it does not resolve the recorded source-contract issues.
 The prior shared-only checkpoint was run.NbeZAd on #27. Thirty-two shared files have
 nullness suppressions: StackTraceElement, Enum, Boolean, Integer, Long, String,
 StringBuilder, StringBuffer, AbstractStringBuilder, Character, CharacterName,
@@ -1221,6 +1233,58 @@ contract review and broader integration. Class/Module null callers, Redirect
 equality, released monitor slots and Windows environment inheritance conflicts
 remain explicitly recorded; suppressions do not repair those source contracts.
 No local native build was run. Hosted and native Windows results are unverified.
+
+## Generated version properties (M7c2)
+
+VersionProps is the final additional member found by the package's source and
+generation-recipe inventory. Its authoritative template gains one whole-file
+nullness opt-in. No qualifier or nullness suppression is needed, and no executable
+code changes. The template contains 143 original non-comment source lines.
+
+The documentation/implementation review covers non-null build-provided string
+fields, version-number lists, non-null Optional containers and the initialized
+system-property map. Empty strings represent absent metadata. The jlink plugin
+guards replacement values against null; VM reads and bytecode rewriting remain
+trusted boundaries. Temporary array filling remains outside the frozen first-pass
+array-initialization guarantees. Optional contents are not promised present.
+
+All 17 distinct build placeholders (18 occurrences) are inside string literals.
+An exact .java copy of the template therefore permits a local syntax/nullness
+check without inventing configured version values. That template check passes,
+as do Runtime, the new VersionProps private caller and the existing runtime helper
+in separate Unix and Windows contexts. Six invalid caller cases reject null map
+or parsing inputs, null version-list elements and unchecked optional contents.
+The AST audit preserves behavior and the pre-existing unused suppression.
+**These are template checks, not a claimed configured build output or native run.**
+
+The same-name CF branch pins
+`e8fa72969e13ab46fa42e252cb8a84e035dd4e93`; it contains the caller fixture and
+inherits the existing uniform runner. No test or new script is added to JDK.
+The existing native Linux CI job now checks out the exact PR head and uploads
+VersionProps.java from its successful build, together with source revision and
+template/output hashes. The nullness jobs depend on that build, verify the
+artifact's provenance, append its root through JDK_EXTRA_SOURCE_ROOTS, and check
+136 explicit sources plus ten private caller fixtures per platform context.
+Unicode generation still uses the same CF runner option. A native build failure
+blocks those downstream jobs; a skipped job is not a passing source check.
+
+Remaining completion gates are explicit:
+
+| Gate | Status |
+| --- | --- |
+| Shared source inventory (126) and platform variants (6) | Reviewed and locally checked. |
+| Unicode template/output pairs (6) | Generated and checked locally in both complete 135-file contexts. |
+| VersionProps template | Reviewed and checked locally with direct consumers; no new suppression. |
+| Actual configured VersionProps output and 136-file CI set | Awaiting hosted native build and downstream checks. |
+| Defaults, opt-ins and suppression inventory | Reviewed; 141 diagnostic-specific source keys across 36 files, with previous removal evidence and current unused-suppression checks. |
+| Public consumer controls | All 29 fixtures match expected diagnostics in both profiles; broader CF suites await hosted CI. |
+| Source-contract conflicts | Class/Module null callers, Redirect equality, released monitor slots and Windows environment inheritance remain open for upstream review. |
+| Native platform behavior | Linux build awaits CI; native Windows build/execution is not provided by this workflow. |
+| Upstream submission/merge | Not performed; requires maturity review and a later request. |
+
+The annotation-source inventory is covered, but the package is not yet ready to
+be called fully validated or upstream-ready. Hosted results remain unverified;
+no local native JDK build was run. Subpackages remain separate studies.
 
 ## Package completion and upstream delivery
 
