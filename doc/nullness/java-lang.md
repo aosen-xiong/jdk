@@ -96,27 +96,33 @@ than silently moving a blocked file out of the denominator.
     `codex/nullness-java-lang-linkage-errors` targets checked exceptions; thirteen
     linkage errors pass in the complete 85-file local regression.
 
-13. `codex/nullness-java-lang-vm-errors` targets linkage; five existing VM error
+13. [PR #20](https://github.com/aosen-xiong/jdk/pull/20):
+    `codex/nullness-java-lang-vm-errors` targets linkage; five existing VM error
     classes pass, and ThreadDeath receives its missing whole-file opt-in.
+
+14. `codex/nullness-java-lang-annotations` targets VM errors; all five annotation
+    declarations pass, completing M4 source work locally.
 
 CI checkpoint (2026-11-17): the fork's Actions page explicitly says workflows
 are not running due to the scale of GitHub Actions usage and require maintainer
 re-enablement. REST reports Actions enabled and the workflow active, but manual
 dispatch returns HTTP 422, "Actions has been disabled for this repository."
 Re-enabling through the repository/workflow APIs did not clear the restriction.
-Hosted checks on #9 through #19 remain unverified; the VM layer has no
+Hosted checks on #9 through #20 remain unverified; the annotation layer has no
 claimed hosted result either. The existing PR #7 result remains green. Re-enable
 workflows on the fork's Actions page, then run CI for each exact stack head.
-M1/M2/M3 remain open pending hosted checks and review/merge.
+M1/M2/M3/M4 remain open pending hosted checks and review/merge.
 
-The current branch enrolls **91/126** shared Java source files. The 85-file
-parent regression passes; five existing VM error classes pass separately, with
-ThreadDeath also passing in the publication checkout. Thirteen files have
-nullness suppressions: StackTraceElement, Enum, Boolean, Integer, Long, String,
-StringBuilder, StringBuffer, AbstractStringBuilder, Character, CharacterName,
-StringLatin1 and StringUTF16. The other 78 do not. The generated-record caller
-has a separate known checker-bug suppression. Private callers do not inflate JDK
-coverage. The other 35 shared files remain future milestones.
+The current branch enrolls **96/126** shared Java source files. The complete
+85-file run.FRA9xI and the eleven subsequent VM/annotation declaration checks
+all pass with no errors or warnings. Only three opt-in markers were added after
+the 85-file checkpoint; its source contents and contracts remain unchanged.
+CI runs all 96. Thirteen files have nullness suppressions: StackTraceElement,
+Enum, Boolean, Integer, Long, String, StringBuilder, StringBuffer,
+AbstractStringBuilder, Character, CharacterName, StringLatin1 and StringUTF16.
+The other 83 do not. The generated-record caller has a separate known checker-bug
+suppression. Private callers do not inflate JDK coverage. The other 30 shared
+files remain in M5/M6, with platform/generated coverage separately in M7.
 
 ## Exact shared-source inventory
 
@@ -591,6 +597,32 @@ profiles match those three diagnostics. This does not test VM resource exhaustio
 thread termination, concurrency or native creation of errors. The previous 85
 source contents are unchanged, and CI runs all 91. All 41 M4 exception/error
 files are then covered locally; its five annotation declarations remain.
+
+## Annotation declarations (M4b)
+
+`codex/nullness-java-lang-annotations` builds on VM errors (#20). Deprecated,
+FunctionalInterface, Override, SafeVarargs and SuppressWarnings all pass their
+complete declaration checks. Only FunctionalInterface and SafeVarargs change:
+add whole-declaration nullness opt-in, one source per commit. Both AST audits
+preserve executable/declaration syntax and existing meta-annotations. No nullable
+qualifier, suppression, retention/target change or executable body is introduced.
+
+Deprecated.since returns its nonnull version String (default empty), and
+SuppressWarnings.value returns a nonnull array of nonnull warning names.
+Their documented values and [JLS17 9.7.1's element-value rules](https://docs.oracle.com/javase/specs/jls/se17/html/jls-9.html#jls-9.7.1)
+support these defaults. forRemoval is primitive. The three marker declarations
+have no declared methods; checking them is declaration coverage, not execution
+coverage. Malformed proxy/manual implementations are not proved safe by the
+annotation syntax rule.
+
+The CF-owned AnnotationElementNullness fixture accepts dereferencing ordinary
+String/array/component results and rejects two nullable annotation receivers.
+Both profiles match those two errors. The five source checks pass, with no
+additional suppression. The prior 91 checked source contents are unchanged;
+CI now runs 96. M4's 46 shared files are complete locally, while hosted validation
+and review remain open. M5 next covers Class, PublicMethods, ClassValue,
+WeakPairMap, ClassLoader, AssertionStatusDirectives, Package, NamedPackage,
+Module and ModuleLayer. M6/M7 remain as inventoried above.
 
 ## Package completion and upstream delivery
 
