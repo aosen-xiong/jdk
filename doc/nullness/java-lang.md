@@ -112,26 +112,34 @@ than silently moving a blocked file out of the denominator.
     `codex/nullness-java-lang-loading-modules` targets reflection foundations;
     six loading/module sources and coordinated follow-ups pass the 106-file local gate.
 
+17. [PR #24](https://github.com/aosen-xiong/jdk/pull/24):
+    `codex/nullness-java-lang-system-runtime` targets loading/modules; five
+    runtime/security files pass the 111-file local gate.
+
+The current thread layer, `codex/nullness-java-lang-threads`, targets #24.
+It adds four reviewed thread sources and a coordinated System bridge follow-up.
+
 CI checkpoint (2026-11-17): the fork's Actions page explicitly says workflows
 are not running due to the scale of GitHub Actions usage and require maintainer
 re-enablement. REST reports Actions enabled and the workflow active, but manual
 dispatch returns HTTP 422, "Actions has been disabled for this repository."
 Re-enabling through the repository/workflow APIs did not clear the restriction.
-Hosted checks on #9 through #23 remain unverified; this system/runtime layer
+Hosted checks on #9 through #24 remain unverified; this thread layer
 has no claimed hosted result either. The existing PR #7 result remains green. Re-enable
 workflows on the fork's Actions page, then run CI for each exact stack head.
 M1/M2/M3/M4/M5 remain open pending hosted checks and review/merge.
 
-The current branch enrolls **111/126** shared Java source files. All 111 pass
-in cumulative run.EFcrDp with no errors or warnings under the frozen profile;
-source hashes and checker visitation are verified. Twenty-three files have
+The current branch enrolls **115/126** shared Java source files. All 115 pass
+in cumulative run.eZ9GkI with no errors or warnings under the frozen profile;
+source hashes and checker visitation are verified. Twenty-seven files have
 nullness suppressions: StackTraceElement, Enum, Boolean, Integer, Long, String,
 StringBuilder, StringBuffer, AbstractStringBuilder, Character, CharacterName,
 StringLatin1, StringUTF16, Class, PublicMethods, ClassValue, WeakPairMap,
-ClassLoader, Module, ModuleLayer, System, Runtime and SecurityManager. The other
+ClassLoader, Module, ModuleLayer, System, Runtime, SecurityManager, Thread,
+ThreadGroup, ThreadLocal and InheritableThreadLocal. The other
 88 do not. Caller reproducer expectations/suppressions are counted separately.
-Private callers do not inflate JDK coverage. The remaining fifteen shared files
-are M6b/M6c/M6d; platform/generated coverage is separately in M7. The pinned
+Private callers do not inflate JDK coverage. The remaining eleven shared files
+are M6c/M6d; platform/generated coverage is separately in M7. The pinned
 Class/Module null-caller source defect remains unresolved for upstream readiness.
 
 ## Exact shared-source inventory
@@ -831,7 +839,7 @@ to carry qualifiers. Other-checker annotations are preserved.
 Detailed original/qualifier/final sources, exact commands and removal controls
 are retained in the CF study's system-runtime-study directory and personal cases
 NULL-0025/26/27. The JavaLangAccess interface remains unchecked; its Thread reset
-and constructor bridges require a coordinated M6b follow-up. No claim of complete
+and constructor bridges are completed in the M6b follow-up below. No claim of complete
 annotation coverage for jdk.internal.access is made. Hosted CI/native builds
 remain unverified.
 
@@ -839,6 +847,71 @@ Next milestones: M6b adds four thread/thread-local files (115/126), M6c adds six
 process/shutdown files (121/126), and M6d adds five stack-walking files (126/126).
 M7 then handles platform/generated sources and integration; these five source
 checks do not finish java.lang or close the hosted-CI/review gate.
+
+
+## Threads and thread-local state (M6b)
+
+Layer `codex/nullness-java-lang-threads` follows the system/runtime branch (#24).
+The four complete shared-source files already opted into nullness, with no
+nested opt-outs. This layer also aligns System's blocker-reset and optional
+target/access-context constructor bridges. Each changed Java source has its own
+commit; CF owns all caller fixtures. No runtime behavior is changed. The syntax
+audit permits only annotations/imports/comments, explicit Object bounds, and
+spelling Thread's existing Boolean privileged-action type argument explicitly.
+
+| File | Oracle and annotation decisions |
+| --- | --- |
+| `Thread` | Class policy rejects null unless a constructor or method explicitly permits it. Add the missing nullable group/target positions on the five-argument constructor and nullable optional/cleared state. Keep non-null names and public stack trace arrays/elements. Native dumpThreads can return null inner traces, so annotate that dimension separately. Current-thread/start/exit assumptions remain scoped boundaries. |
+| `ThreadGroup` | A root has no parent; public explicit-parent construction rejects null. Preserve the existing nullable name contract, whose null policy is unspecified by Javadoc. parentOf(null) returns false by implementation. Both internal array references and unused elements are nullable; enumeration preserves caller component nullness with PolyNull. Populated-prefix/count and snapshot facts remain explicit suppressed assumptions. |
+| `ThreadLocal` | The documented default initialValue is null. Preserve the existing exact-nullable type-argument restriction, which rejects plain ThreadLocal<String>; use a CF implicit-lower-bound default and explicit nullable upper bound instead of an unsupported type-parameter annotation. Supplier/nested scopes restore ordinary implicit lower bounds. Keep get/set/childValue as T; mark lazy maps, absent entries and stored/cleared values nullable. |
+| `InheritableThreadLocal` | Inherits the same default-null type restriction and returns parentValue unchanged. Its per-thread map is optional. Three receiver errors stem from an observed source/bundled-annotation interaction, with scoped workarounds. |
+| `System` follow-up | The existing JavaLangAccess implementation forwards nullable blocker resets and optional thread target/access context. JavaLangAccess itself and NIO remain outside this source coverage. |
+
+ThreadLocal's factory/non-null subclass exception is an existing CF modeling
+limitation: a subclass must override initialValue with the promised T, and the
+factory's final SuppliedThreadLocal does so. This does not make unsafe direct
+non-null construction valid. Public controls verify nullable values, initialized
+non-null values, nullable suppliers' results, and rejection of unsafe construction.
+
+Findings were recorded before suppressions. The two generic forwarding errors
+and three inherited receiver errors disappear in a diagnostic-only run without
+bundled JDK stubs. A smaller ordinary generic class passes; the suspected merge
+defect remains project-dependent (NULL-0028), not a claimed general defaulting
+bug. The source gate keeps bundled contracts and its frozen profile. A failed
+legacy-stub reduction produces caught parser AssertionError warnings (NULL-0029);
+those runs fail and are retained separately, never counted as passing checks.
+No checker implementation change or parser-warning suppression is included.
+
+Other suppressions cover Reference.refersTo's documented null input missing
+from its signature, live-thread/group and uncaught-dispatch lifecycle,
+Thread-subclass ancestry, ThreadGroup's populated prefixes, and ThreadLocal's
+caller-established stale-slot index. Native thread exit order is secondary
+evidence for lifecycle assumptions, not a native/concurrency proof. Nullness
+qualifiers are kept accurate at these boundaries; there is no blanket suppression.
+
+The four new files comprise 1,441 original non-comment source lines. Across the
+five edited sources the syntax inventory records 70 net additional Nullable
+sites, two PolyNull helper parameters, five DefaultQualifier annotations, no new
+opt-in and no new postcondition. Thirty-two declaration scopes contain 44 new
+nullness suppression keys (20 new SuppressWarnings annotations and 12 extended
+existing annotations). The 44 individual removal checks restore only their
+intended diagnostic keys. Existing unrelated checker annotations are preserved.
+
+Validation: all 115 cumulative source targets pass with unchanged hashes,
+verified visitation, no errors/warnings/crashes or truncation. Public CF controls
+match 23 deliberate errors in each of JSpecify and ordinary nullness modes;
+the package-private helper fixture passes the shared source runner. Caller tests
+do not inflate the 115-file denominator. Frozen checker implementation c12ce38daa,
+source compiler JDK17.0.14 and original bundled JDK 0af1a5ad1f9 remain unchanged.
+Initialization, KeyFor, purity, native lifecycle and concurrency are outside proof.
+Hosted checks and the native build remain unverified.
+
+Next: M6c processes/shutdown adds six shared files, reaching 121/126; M6d stack
+walking adds five, reaching 126/126. M7 still requires the six platform variants,
+six Unicode generation inputs/outputs, cross-module/package integration, a
+suppression audit and hosted native build results. The Class/Module null-caller
+source defect is still unresolved for upstream readiness. No automatic merge
+or upstream submission is part of this layer.
 
 ## Package completion and upstream delivery
 
