@@ -40,7 +40,7 @@ checked-out JDK head and pinned CF revision are recorded in either case.
 | M0: exception foundations | 5 | 5/126 | PR #7; successful fork CI, pending review/merge. |
 | [M1: exception follow-up and core interfaces](https://github.com/aosen-xiong/jdk/milestone/1) | 16 | 21/126 | Two dependent PRs; nullable diagnostics, nullable append inputs, generic element propagation and override contracts. |
 | [M2: everyday object/value and numeric APIs](https://github.com/aosen-xiong/jdk/milestone/2) | 15 | 36/126 | Three PR groups below; nullable parsing/property inputs, equality, enum bounds, and wrapper consumers. |
-| [M3: strings and Unicode](https://github.com/aosen-xiong/jdk/milestone/3) | 14 | 50/126 | Three PR groups; distinguish nullable objects/sequences, nonnull arrays/elements, and internal caches. Establish generated Unicode context before its helper checks. |
+| [M3: strings and Unicode](https://github.com/aosen-xiong/jdk/milestone/3) | 14 | 50/126 | Three PR groups; distinguish nullable objects/sequences, nonnull arrays/elements, and internal caches. Review the generated recipes and record binary dependency provenance; generated-source checking remains M7. |
 | [M4: remaining exceptions and annotation types](https://github.com/aosen-xiong/jdk/milestone/4) | 46 | 96/126 | Split the 41 exception/error files by ancestry (runtime, bounds, reflective/checked, linkage, VM); annotation declarations form their own PR. |
 | [M5: class loading, reflection helpers and modules](https://github.com/aosen-xiong/jdk/milestone/5) | 10 | 106/126 | Two PR groups; nullable lookups, lazy state, class-loader boundaries, and module consumers. |
 | [M6: runtime, threads, processes and stack walking](https://github.com/aosen-xiong/jdk/milestone/6) | 20 | 126/126 | Four PR groups; temporal state, callbacks, native effects, and platform dependencies. |
@@ -76,26 +76,30 @@ than silently moving a blocked file out of the denominator.
 7. [PR #14](https://github.com/aosen-xiong/jdk/pull/14):
    `codex/nullness-java-lang-text` targets the arithmetic branch; four public
    text files pass in the cumulative 40-file local check.
-8. `codex/nullness-java-lang-text-helpers` targets the text branch; four helpers
+8. [PR #15](https://github.com/aosen-xiong/jdk/pull/15):
+   `codex/nullness-java-lang-text-helpers` targets the text branch; four helpers
    and a coordinated builder follow-up pass in the cumulative 44-file local check.
+
+9. `codex/nullness-java-lang-unicode` targets the helper branch; six Unicode sources
+   and two coordinated text-helper follow-ups pass in the cumulative 50-file local check.
 
 CI checkpoint (2026-11-17): the fork's Actions page explicitly says workflows
 are not running due to the scale of GitHub Actions usage and require maintainer
 re-enablement. REST reports Actions enabled and the workflow active, but manual
 dispatch returns HTTP 422, "Actions has been disabled for this repository."
 Re-enabling through the repository/workflow APIs did not clear the restriction.
-Hosted checks on #9 through #14 remain unverified; the helper layer has no
+Hosted checks on #9 through #15 remain unverified; the Unicode layer has no
 claimed hosted result either. The existing PR #7 result remains green. Re-enable
 workflows on the fork's Actions page, then run CI for each exact stack head.
-M1/M2 remain open pending hosted checks and review/merge.
+M1/M2/M3 remain open pending hosted checks and review/merge.
 
-The current branch enrolls **44/126** shared implementation files. All 44 pass
-the cumulative local source check with no errors or warnings (run.ewYrSH).
-Nine sources have nullness suppressions: StackTraceElement, Enum, Boolean,
-Integer, Long, String, StringBuilder, StringBuffer and AbstractStringBuilder.
-The other 35 do not. The generated-record consumer has a separate known
-checker-bug suppression. The private-helper caller fixture is counted separately
-from JDK coverage. The other 82 shared files remain future milestones.
+The current branch enrolls **50/126** shared implementation files. All 50 pass
+the cumulative local source check with no errors or warnings (run.pDu1Dc). Thirteen source files have nullness suppressions: StackTraceElement,
+Enum, Boolean, Integer, Long, String, StringBuilder, StringBuffer,
+AbstractStringBuilder, Character, CharacterName, StringLatin1 and StringUTF16.
+The other 37 do not. The generated-record consumer has a separate known
+checker-bug suppression. Private caller fixtures are counted separately from JDK
+coverage. The other 76 shared files remain future milestones.
 
 ## Exact shared-source inventory
 
@@ -408,6 +412,64 @@ All five changed sources pass individually and their annotation-normalized AST
 audits preserve executable syntax and other checker annotations. The cumulative
 44-file source run passes with no errors or warnings. M3 has six shared
 Unicode files remaining; generated Unicode templates/outputs are still M7.
+
+## Unicode shared sources (M3c)
+
+`codex/nullness-java-lang-unicode` builds on the text-helper layer (#15).
+Character, CharacterData, CharacterDataPrivateUse, CharacterDataUndefined,
+CharacterName and ConditionalSpecialCasing are now opted in and individually
+checked, including Character's nested block/script/cache classes and the
+conditional-casing Entry class. The two text helpers receive coordinated local
+suppression follow-ups. Each changed source has a separate review commit; use
+the combined head for regression because the new return contracts affect callers.
+
+| Position | Contract evidence and decision |
+| --- | --- |
+| Character.getName | Javadoc explicitly permits null for unassigned codepoints; add Nullable to String result. Retain existing Nullable UnicodeBlock.of results and equals inputs. |
+| Character.UnicodeBlock.blocks | Its literal includes 54 null gaps. Annotate component nullness, keeping the array itself nonnull. |
+| CharacterCache.archivedCache | Optional CDS archive; annotate array reference only, preserving the initialized nonnull cache. |
+| CharacterData.toUpperCaseCharArray | Base implementation returns null for planes without a mapping override; annotate array reference. Keep CharacterData.of's singleton result nonnull. |
+| CharacterName | The SoftReference cache itself is initially absent; mark its reference nullable. getName can have no table entry; mark the String result nullable. getInstance still returns a nonnull cache object. |
+| ConditionalSpecialCasing | Absent mapping means a nullable char-array reference from lookUpTable and toLowerCaseCharArray. Null Entry.lang means a language-independent rule: annotate field, constructor parameter and getter. Mapping arrays, String and Locale arguments remain nonnull. |
+| Primitive-only data subclasses | Full-file opt-in; no new nullable positions or suppressions. |
+
+The six files add eleven Nullable positions, two new opt-ins and three extended
+opt-in lists. Other checker annotations and executable syntax are preserved in
+all eight changed files by annotation-normalized AST audits.
+
+Four suppression keys were documented before adding them, and individually
+removed in a scratch checkout to restore exactly one diagnostic each:
+
+- Character.toUpperCaseCharArray: one return diagnostic. Its BMP assertion selects
+  the generated Latin1/00 implementations, whose templates return a concrete
+  array. Preserve its narrower documented result and the base nullable result.
+- CharacterName's anonymous resource action: one return diagnostic. The build's
+  Gendata.gmk installs the required uniName.dat resource at that exact module path.
+  Missing/corrupt images remain outside this trusted packaging boundary.
+- StringLatin1/StringUTF16: one local mapLen-initializer dereference diagnostic
+  each. The preceding ERROR result guarantees a conditional mapping for the
+  same String/index/Locale lookup. The helper's generally nullable result remains
+  accurately annotated; no method-wide suppression is needed.
+
+These are range/dispatch, packaging and relational limitations; no new checker
+implementation bug or crash is claimed. The study assumes assertions enabled.
+Generated CharacterData bodies remain binary dependencies from the recorded JDK17
+image in this shared-source profile. Their matching source recipes were reviewed
+in make/modules/java.base/gensrc/GensrcCharacterData.gmk, but the six templates and
+outputs are still M7 coverage. No native build was run locally.
+
+CF's UnicodeNullness matches ten deliberate invalid calls in both JSpecify and
+ordinary nullness/purity modes. Before the new getName qualifier, its unsafe
+caller was incorrectly accepted (nine diagnostics); afterwards all ten appear.
+UnicodeHelperContracts passes through the shared script's additional-source-root
+interface. Removing Entry's nullable language parameter alone rejects exactly
+one valid private caller. Both fixtures remain in CF, with the matching branch
+pinned by this layer's CI.
+
+The cumulative 50-file run passes with no errors or warnings. M3's shared-source
+annotation work is complete locally; hosted validation/review and M7 generated coverage
+remain open. The next shared-source milestone is M4's 41 remaining exception/error
+files and five annotation declarations, in related API groups.
 
 ## Package completion and upstream delivery
 
