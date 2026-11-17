@@ -100,7 +100,8 @@ than silently moving a blocked file out of the denominator.
     `codex/nullness-java-lang-vm-errors` targets linkage; five existing VM error
     classes pass, and ThreadDeath receives its missing whole-file opt-in.
 
-14. `codex/nullness-java-lang-annotations` targets VM errors; all five annotation
+14. [PR #21](https://github.com/aosen-xiong/jdk/pull/21):
+    `codex/nullness-java-lang-annotations` targets VM errors; all five annotation
     declarations pass, completing M4 source work locally.
 
 CI checkpoint (2026-11-17): the fork's Actions page explicitly says workflows
@@ -108,21 +109,22 @@ are not running due to the scale of GitHub Actions usage and require maintainer
 re-enablement. REST reports Actions enabled and the workflow active, but manual
 dispatch returns HTTP 422, "Actions has been disabled for this repository."
 Re-enabling through the repository/workflow APIs did not clear the restriction.
-Hosted checks on #9 through #20 remain unverified; the annotation layer has no
+Hosted checks on #9 through #21 remain unverified; the reflection layer has no
 claimed hosted result either. The existing PR #7 result remains green. Re-enable
 workflows on the fork's Actions page, then run CI for each exact stack head.
 M1/M2/M3/M4 remain open pending hosted checks and review/merge.
 
-The current branch enrolls **96/126** shared Java source files. The complete
-85-file run.FRA9xI and the eleven subsequent VM/annotation declaration checks
-all pass with no errors or warnings. Only three opt-in markers were added after
-the 85-file checkpoint; its source contents and contracts remain unchanged.
-CI runs all 96. Thirteen files have nullness suppressions: StackTraceElement,
-Enum, Boolean, Integer, Long, String, StringBuilder, StringBuffer,
-AbstractStringBuilder, Character, CharacterName, StringLatin1 and StringUTF16.
-The other 83 do not. The generated-record caller has a separate known checker-bug
-suppression. Private callers do not inflate JDK coverage. The other 30 shared
-files remain in M5/M6, with platform/generated coverage separately in M7.
+The current branch enrolls **100/126** shared Java source files. All 100 pass
+in cumulative run.QKgSf6 with no errors or warnings under the frozen profile;
+source hashes and checker visitation are verified. Seventeen files have nullness
+suppressions: StackTraceElement, Enum, Boolean, Integer, Long, String,
+StringBuilder, StringBuffer, AbstractStringBuilder, Character, CharacterName,
+StringLatin1, StringUTF16, Class, PublicMethods, ClassValue and WeakPairMap.
+The other 83 do not. The generated-record and polymorphic-lambda caller fixtures
+have separate known/suspected checker-bug suppressions. Private callers do not
+inflate JDK coverage. The other 26 shared files remain in M5b/M6, with
+platform/generated coverage separately in M7. The pinned Class null-caller
+source defect is disclosed below and remains unresolved for upstream readiness.
 
 ## Exact shared-source inventory
 
@@ -623,6 +625,76 @@ CI now runs 96. M4's 46 shared files are complete locally, while hosted validati
 and review remain open. M5 next covers Class, PublicMethods, ClassValue,
 WeakPairMap, ClassLoader, AssertionStatusDirectives, Package, NamedPackage,
 Module and ModuleLayer. M6/M7 remain as inventoried above.
+
+## Reflection metadata and cache helpers (M5a)
+
+`codex/nullness-java-lang-reflection-foundations` builds on the annotation layer
+([PR #21](https://github.com/aosen-xiong/jdk/pull/21)). It covers Class,
+PublicMethods, ClassValue and WeakPairMap; each changed source has its own commit.
+Contracts were derived first from the pinned public/inherited Javadoc and then
+from private helper comments, callers and the matching HotSpot native sources.
+No executable JDK behavior or checker implementation changes are included.
+
+| Source | Contract decisions and boundaries |
+| --- | --- |
+| Class | Nullable results for module lookup, record-component arrays, annotated superclass and permitted-subclass arrays. Elements remain nonnull. Model absent native metadata and lazy caches, preserving successful allocation and enum-value guarantees. Explicit unconstrained Class token bounds use Nullable Object; this does not make Class objects nullable. |
+| PublicMethods | Nullable linked-list tails, filtered results and list/list merges; Object.equals admits null. The single-Method merge still promises a nonempty result. |
+| ClassValue | Sparse cache components and absent probes are nullable. Bare T propagates the client's chosen nullness through compute/get; erased backing storage can hold null. match establishes a nonnull entry on true, and castEntry preserves reference nullness with PolyNull. |
+| WeakPairMap | Documented keys/stored values are nonnull; absent/previous values and collected weak-key results are nullable. Nullable mapping results preserve the existing PolyNull relation. Explicit NonNull Object generic bounds preserve erasure. |
+
+Class's inherited isAnnotationPresent parameter bound remains unchanged.
+Unspecified public null parameter-array/element behavior retains the existing
+assumptions; getMethod's explicitly documented null array remains accepted.
+No general package null policy was invented from defensive checks. Native
+getConstantPool, raw annotation bytes and executable type-annotation bytes admit
+absence even when unchecked dependency contracts would hide a missing qualifier.
+
+The annotation-normalized AST audit preserves executable syntax and declarations,
+with only redundant Object generic bounds normalized in WeakPairMap. Existing
+other-checker annotations remain intact. Added sites are 157 Nullable, 23 NonNull,
+2 PolyNull, 4 EnsuresNonNullIf and 2 RequiresNonNull; the existing native isArray
+conditional contract gains two reviewed expressions. Two new whole-file opt-ins
+and one existing opt-in extension cover the helpers. These are CF contracts in
+JSpecify mode, not a portable JSpecify-only annotation vocabulary.
+
+Thirteen new diagnostic-key occurrences occupy eleven suppression locations
+(seven new annotations, four extensions). Each limitation was recorded before
+suppression, and removing each key independently restores its intended errors:
+
+- WeakPairMap lambda forwarding reproduces a suspected checker polymorphic
+  inference defect in a small test without a patched JDK. Direct forwarding
+  passes; equivalent lambda forwarding reports one return incompatibility.
+  Preserve the API and suppress that diagnostic. A separate argument key covers
+  the two weak keys kept alive by the enclosing reachability fences.
+- PublicMethods' nonempty-list invariant needs one return key (three errors).
+  ClassValue's erased T storage needs one return key and one local inference key.
+- Class has two array-loop alias diagnostics, allocation/Unsafe non-returning
+  dependency gaps, a heterogeneous native tuple slot, paired class-loader
+  assertion maps, and Method.invoke's missing nullable static-receiver contract.
+  The reviewed contracts remain precise; each diagnostic has a specific scope.
+- **Pinned JDK source defect:** Class.isOpenToCaller can pass a null caller module
+  to Module.isOpen for an unconditionally open package. This is not a checker
+  false positive. A copied-branch runtime probe reproduces the NPE; no JNI
+  end-to-end test or rebuilt JDK was run. Its suppression is explicitly labeled
+  as a source defect, and the path remains unresolved for upstream readiness.
+
+Eight additional contract-removal controls validate the new conditional facts
+and getter preconditions; none relies on a postcondition suppression. CF owns
+ReflectionClassNullness (eight deliberate invalid calls), ClassValueNullness
+(three), and PolymorphicLambdaForwarding (two); both JSpecify and ordinary
+nullness/purity profiles match exactly. The old Class source misses all four
+unsafe uses of the newly documented nullable results. Private helper callers
+pass through the same typecheck-jdk.sh interface and ten scratch negative callers
+are rejected. No tests or new runner are added to this JDK repository.
+
+All four individual source checks pass with unused-suppression auditing.
+Cumulative run.QKgSf6 passes all 100 explicit source targets with matching source
+hashes, zero errors/warnings, no crashes and no truncation. Raw baselines, contracts, source hashes,
+caller checks, AST audits and twenty-one removal controls are retained under the
+matching CF checkout's checker/build/jdk-typecheck/reflection-foundations-study.
+Personal evidence cases NULL-0017 through NULL-0022 retain the reproduced issues
+and scoped controls; no general rule assumes arbitrary native or cache safety.
+The six loading/package/module files remain in M5b; M6/M7 are unchanged.
 
 ## Package completion and upstream delivery
 
