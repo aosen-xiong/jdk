@@ -184,7 +184,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: aosen-xiong/checker-framework
-          ref: 6ab298d8ef7bf6567b96f421aed0089f7c876db5 # codex/nullness-java-lang-linkage-errors
+          ref: 100197f955e196b98a2845c3e32f07195bac49fa # codex/nullness-java-lang-vm-errors
           path: checker-framework
           persist-credentials: false
       - name: Check out the checker's bundled JDK contracts
@@ -304,7 +304,13 @@ jobs:
             java/lang/NoSuchMethodError.java \
             java/lang/UnsatisfiedLinkError.java \
             java/lang/UnsupportedClassVersionError.java \
-            java/lang/VerifyError.java
+            java/lang/VerifyError.java \
+            java/lang/VirtualMachineError.java \
+            java/lang/InternalError.java \
+            java/lang/OutOfMemoryError.java \
+            java/lang/StackOverflowError.java \
+            java/lang/UnknownError.java \
+            java/lang/ThreadDeath.java
       - name: Check package-private helper callers from CF
         working-directory: checker-framework
         env:

@@ -92,27 +92,31 @@ than silently moving a blocked file out of the denominator.
     `codex/nullness-java-lang-checked-exceptions` targets the runtime branch; six
     checked/reflection source bodies pass with their existing annotations.
 
-12. `codex/nullness-java-lang-linkage-errors` targets checked exceptions; thirteen
+12. [PR #19](https://github.com/aosen-xiong/jdk/pull/19):
+    `codex/nullness-java-lang-linkage-errors` targets checked exceptions; thirteen
     linkage errors pass in the complete 85-file local regression.
+
+13. `codex/nullness-java-lang-vm-errors` targets linkage; five existing VM error
+    classes pass, and ThreadDeath receives its missing whole-file opt-in.
 
 CI checkpoint (2026-11-17): the fork's Actions page explicitly says workflows
 are not running due to the scale of GitHub Actions usage and require maintainer
 re-enablement. REST reports Actions enabled and the workflow active, but manual
 dispatch returns HTTP 422, "Actions has been disabled for this repository."
 Re-enabling through the repository/workflow APIs did not clear the restriction.
-Hosted checks on #9 through #18 remain unverified; the linkage layer has no
+Hosted checks on #9 through #19 remain unverified; the VM layer has no
 claimed hosted result either. The existing PR #7 result remains green. Re-enable
 workflows on the fork's Actions page, then run CI for each exact stack head.
 M1/M2/M3 remain open pending hosted checks and review/merge.
 
-The current branch enrolls **85/126** shared implementation files. The prior
-72-file coverage and thirteen new source checks pass together in the cumulative
-85-file run.FRA9xI with no errors or warnings. Thirteen source files have nullness suppressions:
-StackTraceElement, Enum, Boolean, Integer, Long, String, StringBuilder,
-StringBuffer, AbstractStringBuilder, Character, CharacterName, StringLatin1 and
-StringUTF16. The other 72 do not. The generated-record consumer has a separate
-known checker-bug suppression. Private callers are counted separately from JDK
-coverage. The other 41 shared files remain future milestones.
+The current branch enrolls **91/126** shared Java source files. The 85-file
+parent regression passes; five existing VM error classes pass separately, with
+ThreadDeath also passing in the publication checkout. Thirteen files have
+nullness suppressions: StackTraceElement, Enum, Boolean, Integer, Long, String,
+StringBuilder, StringBuffer, AbstractStringBuilder, Character, CharacterName,
+StringLatin1 and StringUTF16. The other 78 do not. The generated-record caller
+has a separate known checker-bug suppression. Private callers do not inflate JDK
+coverage. The other 35 shared files remain future milestones.
 
 ## Exact shared-source inventory
 
@@ -567,6 +571,26 @@ case, not a checker defect. Tests remain in the matching CF branch.
 
 All thirteen files pass individually and in the complete 85-file regression. M4 then has six VM/thread-death errors and five annotation declarations
 remaining. Hosted CI and native build results remain unverified for this layer.
+
+## VM and thread-death errors (M4a.4)
+
+`codex/nullness-java-lang-vm-errors` builds on linkage (#19). It enrolls
+VirtualMachineError, InternalError, OutOfMemoryError, StackOverflowError,
+UnknownError and ThreadDeath. Only ThreadDeath changes: add whole-file nullness
+opt-in. It has a no-argument constructor and no new nullable contract. The other
+five preserve existing Nullable messages; VirtualMachineError/InternalError
+also preserve explicitly permitted nullable cause overloads. Locally silent
+message text follows the documented superclass convention and direct delegation
+as implementation evidence. No suppressions or executable changes are added.
+
+The five unchanged sources pass; ThreadDeath passed its isolated preflight and
+its annotation-normalized AST audit and its publication-checkout check.
+CF's VmErrorNullness exercises abstract-base constructor delegation, concrete
+nullable messages/causes, guarded accessors and three unsafe dereferences. Both
+profiles match those three diagnostics. This does not test VM resource exhaustion,
+thread termination, concurrency or native creation of errors. The previous 85
+source contents are unchanged, and CI runs all 91. All 41 M4 exception/error
+files are then covered locally; its five annotation declarations remain.
 
 ## Package completion and upstream delivery
 
