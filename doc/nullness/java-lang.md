@@ -124,22 +124,28 @@ than silently moving a blocked file out of the denominator.
     `codex/nullness-java-lang-processes` targets threads; six process/shutdown
     sources pass the 121-file local gate, with one Runtime suppression retired.
 
-The current stack-walking layer, `codex/nullness-java-lang-stack-walking`,
-targets #26 and completes the 126-file shared-source inventory locally.
+20. [PR #27](https://github.com/aosen-xiong/jdk/pull/27):
+    `codex/nullness-java-lang-stack-walking` targets processes and completes
+    the 126-file shared-source inventory locally.
+
+The current Unix layer, `codex/nullness-java-lang-unix`, targets #27.
+It adds the three Unix implementations and follows up on ProcessBuilder.
 
 CI checkpoint (2026-11-17): the fork's Actions page explicitly says workflows
 are not running due to the scale of GitHub Actions usage and require maintainer
 re-enablement. REST reports Actions enabled and the workflow active, but manual
 dispatch returns HTTP 422, "Actions has been disabled for this repository."
 Re-enabling through the repository/workflow APIs did not clear the restriction.
-Hosted checks on #9 through #26 remain unverified; this stack-walking layer
+Hosted checks on #9 through #27 remain unverified; this Unix layer
 has no claimed hosted result either. The existing PR #7 result remains green. Re-enable
 workflows on the fork's Actions page, then run CI for each exact stack head.
 M1/M2/M3/M4/M5 remain open pending hosted checks and review/merge.
 
-The current branch enrolls **126/126** shared Java source files. All 126 pass
-in cumulative run.NbeZAd with no errors or warnings under the frozen profile;
-source hashes and checker visitation are verified. Thirty-two files have
+The current branch enrolls **126/126** shared Java source files plus **3/6**
+platform variants. All 129 selected sources pass in cumulative run.Z6LDcm
+with the full shared root followed by Unix classes; source hashes and checker
+visitation are verified, with no errors or warnings. The prior shared-only
+checkpoint was run.NbeZAd on #27. Thirty-two shared files have
 nullness suppressions: StackTraceElement, Enum, Boolean, Integer, Long, String,
 StringBuilder, StringBuffer, AbstractStringBuilder, Character, CharacterName,
 StringLatin1, StringUTF16, Class, PublicMethods, ClassValue, WeakPairMap,
@@ -1055,6 +1061,54 @@ ProcessImpl and Terminator; six CharacterData template/output pairs; matching
 platform/generated compilation contexts; cross-module/package integration;
 source/default/suppression review; and exact-head hosted CF/native results.
 The shared 126-file denominator does not include or conceal those items.
+
+## Unix process and termination implementations (M7a)
+
+The Unix layer follows stack walking (#27). It adds whole-file opt-ins and
+contracts in the Unix variants of Terminator, ProcessEnvironment and ProcessImpl.
+The shared ProcessBuilder follow-up has its own commit. The same-name CF branch
+owns the new UnixProcessHelperContracts fixture; no tests or runner are added here.
+
+The existing source runner now receives the full shared root followed by the
+Unix classes root. This is an explicit compilation-context change from M6's
+shared-only checks. All 126 shared files are rerun with the three Unix files;
+Windows classes are never mixed into this invocation. The source checker still
+uses the same frozen JSpecify profile, artifact hashes and JDK17 compiler.
+
+| File | Contract decisions and retained boundaries |
+| --- | --- |
+| Unix Terminator | The termination handler starts null; no suppression is needed. Signal delivery and shutdown remain native/lifecycle boundaries. |
+| Unix ProcessEnvironment | Missing values and previous map values are nullable; equality accepts null. Null environment maps produce a null native block. Environment keys/values remain non-null. Two accessor suppressions cover intentional NPE rejection of foreign entries with null payloads, as the environment contract permits. |
+| Unix ProcessImpl | Environment, directory and redirect-array defaults are nullable, as are forwarded native env/dir buffers. PolyNull preserves toCString's input/result relation. Drain helpers represent no data or asynchronous closure; deferred stream state starts null. Four keys cover redirect-factory dispatch, wrapped exception cause, paired close state and an inherited java.io field contract gap. |
+| Shared ProcessBuilder | The old argument suppression becomes unused when Unix start contracts are visible and is removed. Preserving a nullable directory exposes a missing nullable contract on ProcessStartEvent.directory; one private-start-method assignment key documents that separate dependency gap. |
+
+All new suppressions were documented before being added. None establishes a
+new Checker Framework implementation bug. The redirect dispatch relies on the
+pinned factory implementation: DISCARD's Javadoc permits null, although this
+revision constructs and returns a non-null File. No general Redirect.file or
+Throwable.getCause contract is strengthened. Foreign-entry rejection is not
+claimed to be null-safe for invalid inputs. No runtime guards or casts change.
+
+The three new sources total 1003 original non-comment source lines and add
+26 Nullable sites (including one explicit Void qualifier already supplied by
+the checker default), two PolyNull sites and three opt-ins. Seven new diagnostic
+keys in seven source scopes are audited individually; one old key is retired.
+Each removal restores one error except the redirect key, which restores three.
+The 129-file set has 34 files with nullness suppressions and 95 without.
+
+Validation includes the entire 129-file source gate, all nine package-private
+helper fixtures, seven invalid caller controls, a private PolyNull positive/
+negative comparison, and three independent optional-start-parameter removals.
+The public process consumer fixture matches 20 deliberate errors in both
+JSpecify and ordinary nullness profiles. Input hashes, complete visitation and
+zero warnings/crashes/truncation are verified. The AST audit preserves executable
+syntax and other-checker qualifiers. The profile does not prove native startup,
+concurrency, initialization, map keys, purity or temporary-array fill completeness.
+
+M7b remains the three Windows variants, M7c the six CharacterData template/output
+pairs, and M7d integration/default/suppression review and exact-head hosted
+CF/native results. The shared inventory remains 126; variants and generated
+outputs have their own counts. Hosted/native results are still unverified.
 
 ## Package completion and upstream delivery
 

@@ -1089,6 +1089,7 @@ public final class ProcessBuilder
      * @return the new Process
      * @throws IOException if an I/O error occurs
      */
+    @SuppressWarnings("nullness:assignment.type.incompatible") // JDK annotation gap: ProcessStartEvent.directory permits the default working directory.
     private Process start(Redirect @Nullable [] redirects) throws IOException {
         // Must convert to array first -- a malicious user-supplied
         // list might try to circumvent the security check.
@@ -1115,7 +1116,6 @@ public final class ProcessBuilder
         }
 
         try {
-            @SuppressWarnings("nullness:argument.type.incompatible") // JDK annotation gap: null environment, directory, and redirects select defaults.
             Process process = ProcessImpl.start(cmdarray,
                                      environment,
                                      dir,

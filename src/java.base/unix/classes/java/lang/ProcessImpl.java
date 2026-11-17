@@ -25,6 +25,10 @@
 
 package java.lang;
 
+import org.checkerframework.framework.qual.AnnotatedFor;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.nullness.qual.PolyNull;
+
 import java.lang.ProcessBuilder.Redirect;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -60,6 +64,7 @@ import sun.security.action.GetPropertyAction;
  * @author Volker Simonis (ported to AIX)
  * @since   1.5
  */
+@AnnotatedFor("nullness")
 final class ProcessImpl extends Process {
     private static final JavaIOFileDescriptorAccess fdAccess
         = SharedSecrets.getJavaIOFileDescriptorAccess();
@@ -144,7 +149,7 @@ final class ProcessImpl extends Process {
     private static final LaunchMechanism launchMechanism = platform.launchMechanism();
     private static final byte[] helperpath = toCString(StaticProperty.javaHome() + "/lib/jspawnhelper");
 
-    private static byte[] toCString(String s) {
+    private static byte @PolyNull [] toCString(@PolyNull String s) {
         if (s == null)
             return null;
         byte[] bytes = s.getBytes();
@@ -157,10 +162,11 @@ final class ProcessImpl extends Process {
     }
 
     // Only for use by ProcessBuilder.start()
+    @SuppressWarnings("nullness:argument.type.incompatible") // Redirect invariant: remaining factory instances have a non-null file.
     static Process start(String[] cmdarray,
-                         java.util.Map<String,String> environment,
-                         String dir,
-                         ProcessBuilder.Redirect[] redirects,
+                         java.util.@Nullable Map<String,String> environment,
+                         @Nullable String dir,
+                         ProcessBuilder.Redirect @Nullable [] redirects,
                          boolean redirectErrorStream)
             throws IOException
     {
@@ -295,17 +301,17 @@ final class ProcessImpl extends Process {
     private native int forkAndExec(int mode, byte[] helperpath,
                                    byte[] prog,
                                    byte[] argBlock, int argc,
-                                   byte[] envBlock, int envc,
-                                   byte[] dir,
+                                   byte @Nullable [] envBlock, int envc,
+                                   byte @Nullable [] dir,
                                    int[] fds,
                                    boolean redirectErrorStream)
         throws IOException;
 
-    @SuppressWarnings("removal")
+    @SuppressWarnings({"removal", "nullness:throwing.nullable"}) // doPrivileged wraps the checked exception thrown by initStreams.
     private ProcessImpl(final byte[] prog,
                 final byte[] argBlock, final int argc,
-                final byte[] envBlock, final int envc,
-                final byte[] dir,
+                final byte @Nullable [] envBlock, final int envc,
+                final byte @Nullable [] dir,
                 final int[] fds,
                 final boolean forceNullOutputStream,
                 final boolean redirectErrorStream)
@@ -322,7 +328,7 @@ final class ProcessImpl extends Process {
         processHandle = ProcessHandleImpl.getInternal(pid);
 
         try {
-            AccessController.doPrivileged((PrivilegedExceptionAction<Void>) () -> {
+            AccessController.doPrivileged((PrivilegedExceptionAction<@Nullable Void>) () -> {
                 initStreams(fds, forceNullOutputStream);
                 return null;
             });
@@ -577,7 +583,7 @@ final class ProcessImpl extends Process {
         ProcessPipeInputStream(int fd) {
             super(new PipeInputStream(newFileDescriptor(fd)));
         }
-        private static byte[] drainInputStream(InputStream in)
+        private static byte @Nullable [] drainInputStream(InputStream in)
                 throws IOException {
             int n = 0;
             int j;
@@ -659,7 +665,7 @@ final class ProcessImpl extends Process {
         private Object lock = new Object();     // For the following fields
         private boolean closePending = false;
         private int useCount = 0;
-        private InputStream streamToClose;
+        private @Nullable InputStream streamToClose;
 
         private void raise() {
             synchronized (lock) {
@@ -667,6 +673,7 @@ final class ProcessImpl extends Process {
             }
         }
 
+        @SuppressWarnings("nullness:dereference.of.nullable") // Lifecycle invariant: closePending implies streamToClose was assigned under lock.
         private void lower() throws IOException {
             synchronized (lock) {
                 useCount--;
@@ -776,7 +783,7 @@ final class ProcessImpl extends Process {
             super(new PipeInputStream(newFileDescriptor(fd)));
         }
 
-        private InputStream drainInputStream(InputStream in)
+        private @Nullable InputStream drainInputStream(InputStream in)
                 throws IOException {
             int n = 0;
             int j;
@@ -801,6 +808,7 @@ final class ProcessImpl extends Process {
         }
 
         /** Called by the process reaper thread when the process exits. */
+        @SuppressWarnings("nullness:assignment.type.incompatible") // JDK annotation gap: inherited in permits null after close.
         synchronized void processExited() {
             try {
                 InputStream in = this.in;
