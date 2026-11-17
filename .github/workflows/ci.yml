@@ -184,7 +184,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: aosen-xiong/checker-framework
-          ref: f56ca10ba18c0f979938bd44ad7c9299f8698023 # codex/nullness-java-lang-unicode
+          ref: 838c47e78a4e0afbd423367b4509facfb6aae04b # codex/nullness-java-lang-runtime-exceptions
           path: checker-framework
           persist-credentials: false
       - name: Check out the checker's bundled JDK contracts
@@ -269,7 +269,23 @@ jobs:
             java/lang/CharacterDataPrivateUse.java \
             java/lang/CharacterDataUndefined.java \
             java/lang/CharacterName.java \
-            java/lang/ConditionalSpecialCasing.java
+            java/lang/ConditionalSpecialCasing.java \
+            java/lang/ArithmeticException.java \
+            java/lang/ArrayStoreException.java \
+            java/lang/ClassCastException.java \
+            java/lang/IllegalArgumentException.java \
+            java/lang/IllegalCallerException.java \
+            java/lang/IllegalMonitorStateException.java \
+            java/lang/IllegalStateException.java \
+            java/lang/IllegalThreadStateException.java \
+            java/lang/LayerInstantiationException.java \
+            java/lang/NegativeArraySizeException.java \
+            java/lang/SecurityException.java \
+            java/lang/UnsupportedOperationException.java \
+            java/lang/NumberFormatException.java \
+            java/lang/IndexOutOfBoundsException.java \
+            java/lang/ArrayIndexOutOfBoundsException.java \
+            java/lang/StringIndexOutOfBoundsException.java
       - name: Check package-private helper callers from CF
         working-directory: checker-framework
         env:
