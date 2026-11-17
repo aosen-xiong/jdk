@@ -24,6 +24,10 @@
  */
 package java.util;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.framework.qual.AnnotatedFor;
+
 import java.io.Serializable;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
@@ -34,6 +38,7 @@ import java.util.function.ToLongFunction;
 /**
  * Package private supporting class for {@link Comparator}.
  */
+@AnnotatedFor("nullness")
 class Comparators {
     private Comparators() {
         throw new AssertionError("no instances");
@@ -67,12 +72,12 @@ class Comparators {
         private final boolean nullFirst;
         // if null, non-null Ts are considered equal
         @SuppressWarnings("serial") // Not statically typed as Serializable
-        private final Comparator<T> real;
+        private final @Nullable Comparator<@NonNull T> real;
 
         @SuppressWarnings("unchecked")
-        NullComparator(boolean nullFirst, Comparator<? super T> real) {
+        NullComparator(boolean nullFirst, @Nullable Comparator<? super @NonNull T> real) {
             this.nullFirst = nullFirst;
-            this.real = (Comparator<T>) real;
+            this.real = (Comparator<@NonNull T>) real;
         }
 
         @Override
@@ -87,7 +92,7 @@ class Comparators {
         }
 
         @Override
-        public Comparator<T> thenComparing(Comparator<? super T> other) {
+        public Comparator<T> thenComparing(Comparator<? super @NonNull T> other) {
             Objects.requireNonNull(other);
             return new NullComparator<>(nullFirst, real == null ? other : real.thenComparing(other));
         }
