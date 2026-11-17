@@ -44,7 +44,7 @@ checked-out JDK head and pinned CF revision are recorded in either case.
 | [M4: remaining exceptions and annotation types](https://github.com/aosen-xiong/jdk/milestone/4) | 46 | 96/126 | Split the 41 exception/error files by ancestry (runtime, bounds, reflective/checked, linkage, VM); annotation declarations form their own PR. |
 | [M5: class loading, reflection helpers and modules](https://github.com/aosen-xiong/jdk/milestone/5) | 10 | 106/126 | Two PR groups; nullable lookups, lazy state, class-loader boundaries, and module consumers. |
 | [M6: runtime, threads, processes and stack walking](https://github.com/aosen-xiong/jdk/milestone/6) | 20 | 126/126 | Four PR groups; temporal state, callbacks, native effects, and platform dependencies. |
-| [M7: platform/generated coverage and integration](https://github.com/aosen-xiong/jdk/milestone/7) | separate denominator | package closure | Check the six platform variants and six Unicode templates/generated outputs in matching build contexts; package-wide and cross-module regression review. |
+| [M7: platform/generated coverage and integration](https://github.com/aosen-xiong/jdk/milestone/7) | separate denominator | package closure | Check the six platform variants, six Unicode templates and VersionProps template/output in matching contexts; package-wide and cross-module regression review. |
 
 These are scope targets, not completion claims or date estimates. M2 and M3
 prioritize widely used APIs before the remaining simple exception subclasses.
@@ -132,24 +132,31 @@ than silently moving a blocked file out of the denominator.
     `codex/nullness-java-lang-unix` targets stack walking; all 126 shared
     plus three Unix sources pass in their explicit platform context.
 
-The current Windows layer, `codex/nullness-java-lang-windows`, targets #28
-and adds the three Windows implementations.
+22. [PR #29](https://github.com/aosen-xiong/jdk/pull/29):
+    `codex/nullness-java-lang-windows` targets Unix and adds three Windows sources;
+    its complete 129-file Windows-context gate passes locally.
+
+The current Unicode layer, `codex/nullness-java-lang-generated`, targets #29
+and adds the six generated CharacterData classes through their templates.
 
 CI checkpoint (2026-11-17): the fork's Actions page explicitly says workflows
 are not running due to the scale of GitHub Actions usage and require maintainer
 re-enablement. REST reports Actions enabled and the workflow active, but manual
 dispatch returns HTTP 422, "Actions has been disabled for this repository."
 Re-enabling through the repository/workflow APIs did not clear the restriction.
-Hosted checks on #9 through #28 remain unverified; this Windows layer
+Hosted checks on #9 through #29 remain unverified; this generated layer
 has no claimed hosted result either. The existing PR #7 result remains green. Re-enable
 workflows on the fork's Actions page, then run CI for each exact stack head.
 M1/M2/M3/M4/M5 remain open pending hosted checks and review/merge.
 
-The current branch enrolls **126/126** shared Java source files plus **6/6**
-platform variants. Each platform context selects 129 files: Unix passed in
-run.Z6LDcm and Windows in run.GgZYyh. Unix inputs still match their
-verified hashes; Windows hashes and visitation are verified, with no errors
-or warnings. These are 132 distinct physical source files, not 258 unique files.
+The current branch enrolls **126/126** shared Java sources, **6/6** platform
+variants, and **6/6** Unicode template/output pairs. Each platform context checks
+135 files: Unix in `run.WUHCwm` and Windows in `run.Zkjv0h`.
+All targets are visited with stable input hashes and zero errors/warnings/crashes.
+Across physical variants these are 138 distinct source units, with 36 files
+using nullness suppressions and 102 without. Templates and generated copies are
+paired, not counted twice. **VersionProps is an additional seventh generated
+member**; its separate follow-up and actual configured-output CI gate remain.
 The prior shared-only checkpoint was run.NbeZAd on #27. Thirty-two shared files have
 nullness suppressions: StackTraceElement, Enum, Boolean, Integer, Long, String,
 StringBuilder, StringBuffer, AbstractStringBuilder, Character, CharacterName,
@@ -204,8 +211,11 @@ Unix and Windows builds and retain the generated roots and module arguments.
 The six `make/data/characterdata/CharacterData{00,01,02,03,0E,Latin1}.java.template`
 inputs produce package members absent from the shared-source inventory. Review
 the templates and check their generated Java outputs; preserve generation so
-annotations survive a rebuild. Inventory any other generated package members
-from the configured builds before closing M7. Generated copies do not inflate
+annotations survive a rebuild. `src/java.base/share/classes/java/lang/VersionProps.java.template` also produces
+a package member via `GensrcMisc.gmk`. It is a separate seventh generated member;
+M7c2 must check its actual configured output. The direct source/template and build
+recipe inventory found no other generated classes in this package (subpackages
+remain excluded). Confirm this against configured build outputs before closure. Generated copies do not inflate
 the 126-file shared-source denominator.
 
 A full native build passing does not mean those bodies received nullness checking.
@@ -1128,8 +1138,8 @@ CI uses a two-entry platform matrix with the same 129-file manifest and existing
 CF script. Each job selects its platform source root and matching helper fixture;
 Unix and Windows roots are never combined. Distinct artifact names retain both
 logs, fail-fast is disabled, and each job has a 45-minute limit for its checker
-build and source/caller checks. Both source jobs run on Linux; native Windows
-behavior remains the responsibility of the existing native build jobs.
+build and source/caller checks. Both source jobs run on Linux. The existing native build job also targets Linux;
+this workflow does not establish native Windows execution or build success.
 
 | File | Annotation decisions and retained boundaries |
 | --- | --- |
@@ -1167,6 +1177,50 @@ No Windows subprocess or native JDK build was run locally.
 Remaining M7c: the six CharacterData template/output pairs and matching generated
 source context. M7d: integration/default/suppression review, unresolved source
 contracts and exact-head hosted CF/native results. Hosted results are unverified.
+
+## Generated Unicode classes (M7c1)
+
+This layer adds one whole-file nullness opt-in to each authoritative CharacterData
+template: Latin1, 00, 01, 02, 03 and 0E. Each template has its own annotation
+commit. No extra qualifier, postcondition or suppression is needed. Generated
+singleton references, primitive tables and mapping arrays are non-null under the
+existing initialization assumptions; non-BMP classes retain the nullable
+CharacterData uppercase-mapping default. Latin1 and 00 strengthen that result
+to non-null. The generated original sources contain 4,225 non-comment lines,
+including tables; this is distinct from template size.
+
+The matching CF branch pins runner/caller commit
+`3c3b624177252e3bc951d6c3e342541a8278d8c6`. The same existing script accepts
+`JDK_GENERATE_CHARACTER_DATA=1`: it compiles the selected JDK's Java generator,
+uses its pinned Unicode inputs and GensrcCharacterData arguments, writes fresh
+outputs, rejects shadow copies, and saves input/output hashes and command/status
+logs. This Java-only generation succeeds locally. It is not a native JDK build.
+Normal invocations with the option unset retain their original behavior.
+
+The two 135-file source gates pass with the shared root, exactly one platform
+root, then the fresh generated root. All nine private helper fixtures pass per
+platform. The 29 public caller fixtures match exact expected diagnostic lines
+and keys in both JSpecify and ordinary nullness profiles; the Unicode fixture
+also passes with Windows sources. Four invalid private nullable-result callers
+are rejected. Removing Character's existing BMP-return suppression still gives
+exactly one error: generated bodies do not eliminate the range/dispatch invariant.
+
+AST review preserves executable syntax and all four Latin1 intrinsic annotations.
+The complete 132-file ordinary-source audit finds explicit top-level nullness
+opt-ins throughout, no opt-outs, and 141 source suppression-key entries across
+36 files. It preserves other-checker qualifiers and executable syntax, accounting
+for explicit Object bounds and four previously reviewed PrivilegedAction diamond
+expansions. The five ThreadLocal-family default sites preserve their documented
+generic model; package-info's existing KeyFor lower-bound default is unchanged.
+Earlier per-key controls remain recorded; the generated-context cumulative runs
+also enable unused-suppression warnings. No new checker defect or crash is found.
+
+M7c2 is VersionProps: review/check its template and check its real configured
+output from native CI. M7d retains exact-head hosted CF/native results, source
+contract review and broader integration. Class/Module null callers, Redirect
+equality, released monitor slots and Windows environment inheritance conflicts
+remain explicitly recorded; suppressions do not repair those source contracts.
+No local native build was run. Hosted and native Windows results are unverified.
 
 ## Package completion and upstream delivery
 

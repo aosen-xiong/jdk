@@ -192,7 +192,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: aosen-xiong/checker-framework
-          ref: 9787346e67dcf46fd02de1706ae65b4f625a16e2 # codex/nullness-java-lang-windows
+          ref: 3c3b624177252e3bc951d6c3e342541a8278d8c6 # codex/nullness-java-lang-generated
           path: checker-framework
           persist-credentials: false
       - name: Check out the checker's bundled JDK contracts
@@ -222,10 +222,11 @@ jobs:
         with:
           distribution: temurin
           java-version: '17.0.14+7'
-      - name: Type-check the cumulative java.lang set with platform sources
+      - name: Type-check java.lang with platform and generated sources
         working-directory: checker-framework
         env:
           JDK_SRC: ${{ github.workspace }}/jdk
+          JDK_GENERATE_CHARACTER_DATA: '1'
           JDK_EXTRA_SOURCE_ROOTS: ${{ github.workspace }}/jdk/src/java.base/${{ matrix.platform }}/classes
         run: |
           checker/bin-devel/typecheck-jdk.sh nullness java.base \
@@ -357,11 +358,18 @@ jobs:
             java/lang/LiveStackFrameInfo.java \
             java/lang/Terminator.java \
             java/lang/ProcessEnvironment.java \
-            java/lang/ProcessImpl.java
+            java/lang/ProcessImpl.java \
+            java/lang/CharacterDataLatin1.java \
+            java/lang/CharacterData00.java \
+            java/lang/CharacterData01.java \
+            java/lang/CharacterData02.java \
+            java/lang/CharacterData03.java \
+            java/lang/CharacterData0E.java
       - name: Check package-private helper callers from CF
         working-directory: checker-framework
         env:
           JDK_SRC: ${{ github.workspace }}/jdk
+          JDK_GENERATE_CHARACTER_DATA: '1'
           JDK_EXTRA_SOURCE_ROOTS: ${{ github.workspace }}/jdk/src/java.base/${{ matrix.platform }}/classes:${{ github.workspace }}/checker-framework/checker/tests/jdk-source/java.base
         run: checker/bin-devel/typecheck-jdk.sh nullness java.base java/lang/TextHelperContracts.java java/lang/UnicodeHelperContracts.java java/lang/ReflectionHelperContracts.java java/lang/LoadingHelperContracts.java java/lang/SystemRuntimeHelperContracts.java java/lang/ThreadHelperContracts.java java/lang/ProcessHelperContracts.java java/lang/StackWalkingHelperContracts.java java/lang/${{ matrix.helper }}.java
       - name: Upload type-checking logs
