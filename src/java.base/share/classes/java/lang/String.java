@@ -786,6 +786,8 @@ public final class String
         }
     }
 
+    // Coding failures from the delegate are wrapped in IAE with a nonnull coding cause.
+    @SuppressWarnings("nullness:throwing.nullable")
     static String newStringNoRepl(byte[] src, Charset cs) throws CharacterCodingException {
         try {
             return newStringNoRepl1(src, cs);
@@ -956,6 +958,8 @@ public final class String
     /*
      * Throws CCE, instead of replacing, if unmappable.
      */
+    // Coding failures from the delegate are wrapped in IAE with a nonnull coding cause.
+    @SuppressWarnings("nullness:throwing.nullable")
     static byte[] getBytesNoRepl(String s, Charset cs) throws CharacterCodingException {
         try {
             return getBytesNoRepl1(s, cs);
@@ -3249,6 +3253,9 @@ public final class String
      */
     @SideEffectFree
     @StaticallyExecutable
+    // result.length equals the subList size, so toArray cannot append a null sentinel.
+    @SuppressWarnings({"nullness:return.type.incompatible",
+                       "nullness:toarray.nullable.elements.not.newarray"})
     public String @MinLen(1) [] split(@Regex String regex, int limit) {
         /* fastpath if the regex is a
          * (1) one-char String and this character is not one of the
@@ -3394,12 +3401,14 @@ public final class String
      * @param prefix the non-null prefix
      * @param suffix the non-null suffix
      * @param delimiter the non-null delimiter
-     * @param elements the non-null array of non-null elements
+     * @param elements the non-null array whose first size elements are non-null
      * @param size the number of elements in the array (<= elements.length)
      * @return the joined string
      */
     @ForceInline
-    static String join(String prefix, String suffix, String delimiter, String[] elements, int size) {
+    // Callers initialize every element in [0, size); spare capacity may remain null.
+    @SuppressWarnings("nullness:dereference.of.nullable")
+    static String join(String prefix, String suffix, String delimiter, @Nullable String[] elements, int size) {
         int icoder = prefix.coder() | suffix.coder();
         long len = (long) prefix.length() + suffix.length();
         if (size > 1) { // when there are more than one element, size - 1 delimiters will be emitted
@@ -3479,7 +3488,7 @@ public final class String
         Objects.requireNonNull(delimiter);
         Objects.requireNonNull(elements);
         var delim = delimiter.toString();
-        var elems = new String[8];
+        var elems = new @Nullable String[8];
         int size = 0;
         for (CharSequence cs: elements) {
             if (size >= elems.length) {
@@ -4869,7 +4878,7 @@ public final class String
      * @since 12
      */
     @Override
-    public String resolveConstantDesc(MethodHandles.Lookup lookup) {
+    public String resolveConstantDesc(MethodHandles.@Nullable Lookup lookup) {
         return this;
     }
 
