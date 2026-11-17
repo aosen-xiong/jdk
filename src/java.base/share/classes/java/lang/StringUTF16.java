@@ -884,6 +884,8 @@ final class StringUTF16 {
                     lowerCharArray = Character.toChars(lowerChar);
                 }
                 /* Grow result if needed */
+                // The preceding ERROR result implies a mapping for this same lookup.
+                @SuppressWarnings("nullness:dereference.of.nullable")
                 int mapLen = lowerCharArray.length;
                 if (mapLen > srcCount) {
                     byte[] result2 = newBytesFor((result.length >> 1) + mapLen - srcCount);
