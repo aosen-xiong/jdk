@@ -9,6 +9,7 @@ on:
     branches:
       - master
       - codex/nullness-java-lang-*
+      - codex/nullness-java-util-*
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
@@ -225,7 +226,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: aosen-xiong/checker-framework
-          ref: 6b2fac4f7f2cc47a9b9dd8b7518d21a8f67aef24 # codex/nullness-java-lang-version-props
+          ref: 502a5630341673eb659cedf265fc7576478b3d36 # codex/nullness-java-util-core
           path: checker-framework
           persist-credentials: false
       - name: Check out the checker's bundled JDK contracts
@@ -400,6 +401,20 @@ jobs:
             java/lang/CharacterData03.java \
             java/lang/CharacterData0E.java \
             java/lang/VersionProps.java
+      - name: Type-check enrolled java.util files (Unix only)
+        if: matrix.platform == 'unix'
+        working-directory: checker-framework
+        env:
+          JDK_SRC: ${{ github.workspace }}/jdk
+          JDK_GENERATE_CHARACTER_DATA: '1'
+          JDK_EXTRA_SOURCE_ROOTS: ${{ github.workspace }}/jdk/src/java.base/unix/classes:${{ github.workspace }}/jdk-configured-java.base
+        run: |
+          checker/bin-devel/typecheck-jdk.sh nullness java.base \
+            java/util/Objects.java \
+            java/util/Optional.java \
+            java/util/OptionalInt.java \
+            java/util/OptionalLong.java \
+            java/util/OptionalDouble.java
       - name: Check package-private helper callers from CF
         working-directory: checker-framework
         env:

@@ -149,7 +149,7 @@ public final @UsesObjectEquals class Objects {
     * @see List#hashCode
     */
     @Pure
-    public static int hash(@GuardSatisfied @Nullable @UnknownSignedness Object... values) {
+    public static int hash(@GuardSatisfied @Nullable @UnknownSignedness Object @Nullable ... values) {
         return Arrays.hashCode(values);
     }
 
@@ -207,6 +207,8 @@ public final @UsesObjectEquals class Objects {
      * @see Comparator
      */
     @Pure
+    // Null operands are delegated to the comparator, whose documented policy may reject them.
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public static <T> int compare(@GuardSatisfied @Nullable @UnknownSignedness T a, @GuardSatisfied @Nullable @UnknownSignedness T b, @GuardSatisfied Comparator<? super T> c) {
         return (a == b) ? 0 :  c.compare(a, b);
     }
