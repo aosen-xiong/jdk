@@ -1220,7 +1220,7 @@ public final class Long extends Number
         private LongCache() {}
 
         static final Long[] cache;
-        static Long[] archivedCache;
+        static Long @Nullable [] archivedCache;
 
         static {
             int size = -(-128) + 127 + 1;
@@ -1673,6 +1673,8 @@ public final class Long extends Number
      */
     @SideEffectFree
     @StaticallyExecutable
+    // A null name deliberately triggers the caught NPE, which selects the default value.
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public static @PolyNull Long getLong(@Nullable String nm, @PolyNull Long val) {
         String v = null;
         try {
@@ -2129,7 +2131,7 @@ public final class Long extends Number
      * @since 12
      */
     @Override
-    public Long resolveConstantDesc(MethodHandles.Lookup lookup) {
+    public Long resolveConstantDesc(MethodHandles.@Nullable Lookup lookup) {
         return this;
     }
 
