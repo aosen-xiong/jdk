@@ -87,8 +87,9 @@ exact regression snapshots. Groups 4–25 remain unattempted
 (106 files). Exact-head hosted CI remains pending.
 package-info.java reviewed: existing
 KeyFor lower-bound default retained; no general package nullness policy inferred.
-Full JSpecify mode remains pinned to CF c12ce38daa implementation; initialization,
-KeyFor, purity and native execution are outside the proof scope. Checker defects
+The original checks below use CF c12ce38daa; the comparison tip now uses the
+checker revision in the refresh checkpoint. Initialization, KeyFor, purity and
+native execution remain outside the local source-check proof scope. Checker defects
 are documented first and then narrowly suppressed with removal controls.
 
 Conditional Optional callbacks are an explicit review boundary: existing nonnull
@@ -266,12 +267,12 @@ annotations and no scope opt-outs. The final source uses no nullness suppression
 The final source and affected-caller validation are recorded below; exact-head
 hosted validation remains pending.
 
-The comparison workflow pins [CF 6281829](https://github.com/aosen-xiong/checker-framework/commit/628182975650b61bd275d89bb2f71b4594c93278).
+The original comparison workflow pinned [CF 6281829](https://github.com/aosen-xiong/checker-framework/commit/628182975650b61bd275d89bb2f71b4594c93278).
 Its [caller contracts](https://github.com/aosen-xiong/checker-framework/blob/628182975650b61bd275d89bb2f71b4594c93278/checker/tests/nullness/ComparatorNullness.java),
 [conditional controls](https://github.com/aosen-xiong/checker-framework/blob/628182975650b61bd275d89bb2f71b4594c93278/checker/tests/nullness/ComparatorConditional.java),
 and [skipped crash reproducer](https://github.com/aosen-xiong/checker-framework/blob/628182975650b61bd275d89bb2f71b4594c93278/checker/tests/nullness/ComparatorConditionalCrash.java)
-are reviewable independently of the JDK annotations. The checker implementation
-remains c12ce38daa; these are test-only additions. Run the skipped reproducer
+are reviewable independently of the JDK annotations. At that checkpoint, the
+checker implementation remained c12ce38daa; those were test-only additions. Run the skipped reproducer
 explicitly with the JDK 17 checker wrapper and `-processor nullness
 -Amode=jspecify -proc:only` to reproduce the crash; omit the mode flag for the
 ordinary-profile reproduction. The successful javac control uses `-proc:none`.
@@ -294,3 +295,45 @@ provenance-checked VersionProps from the prior java.lang CI. Direct java.util
 coverage is 14/120 files; 106 remain. Source annotation delta: two Nullable uses,
 four NonNull type-variable uses, one whole-file opt-in, and zero new nullness
 suppression keys. Comparator.java is unchanged.
+
+
+## Checker refresh, 2026-11-19
+
+The comparison PR's matching CF branch now merges EISOP master
+`6ac6f7813440db1cd42b9a83aeccd102180930d4`, including the generated-record-method
+fix in [EISOP CF #2636](https://github.com/eisop/checker-framework/pull/2636).
+The checker was rebuilt with JDK 21 and the same bundled JDK source revision
+`0af1a5ad1f994431fc6e08540000c4ae1ab13153`. Source checks still use JDK 17.0.14,
+CF annotations, and the existing JSpecify mode. The runner and qualifier JAR are
+unchanged; the rebuilt checker JAR is a new artifact. Positive and negative mode
+probes confirm the expected opt-in/defaulting behavior and location diagnostics.
+
+The previous record-equals workaround now triggers `unneeded.suppression`.
+`RecordValueNullness.generatedEquals` therefore calls `item.equals(null)` without
+a suppression. The nullable component dereference and two invalid EnumDesc calls
+remain negative controls. No JDK annotation or executable source changes are
+required for this checker fix; tests stay in CF.
+
+The original comparison head `d22796cf5aaa2c5f8f4c32cd5d6a2a6f18ab08e1` passed
+all hosted checks, including the native build and both source-check matrix legs.
+Those results belong to the previous checker. Targeted upgrade validation and
+new full CI results are tracked separately below.
+
+The upgraded workflow pins [CF 95a0ac01388d9465288d965dd0cfe0af2bbd117c](https://github.com/aosen-xiong/checker-framework/commit/95a0ac01388d9465288d965dd0cfe0af2bbd117c),
+which includes current EISOP master plus the study runner and fixtures. The
+[record caller](https://github.com/aosen-xiong/checker-framework/blob/95a0ac01388d9465288d965dd0cfe0af2bbd117c/checker/tests/nullness/RecordValueNullness.java)
+now exercises generated equality directly without a workaround.
+
+Upgrade validation: `RecordValueNullness`, `ObjectValueNullness`,
+`ComparatorNullness`, and `ComparatorConditional` match respectively 3, 5, 23,
+and 2 intended invalid-use diagnostics in each of JSpecify and ordinary nullness
+profiles. No unexpected warning or crash occurs in those fixtures. Source run
+`run.5mT0nQ` checks Object, Record, Comparator, Comparators, and the concrete
+comparison helper caller successfully. The unrelated NULL-0045 comparator crash
+still reproduces in both profiles; its skipped reproducer remains open. The
+NULL-0046 reduced fixture still needs its narrow suppression, while the final
+JDK comparator implementation remains suppression-free.
+
+The full upgraded Unix/Windows source checks and native JDK build run in CI.
+The previous 150-file local runs and prior green CI are retained as historical
+results and are not relabeled as checks of this new checker artifact.

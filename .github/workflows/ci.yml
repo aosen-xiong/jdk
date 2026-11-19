@@ -226,7 +226,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: aosen-xiong/checker-framework
-          ref: 628182975650b61bd275d89bb2f71b4594c93278 # codex/nullness-java-util-comparison
+          ref: 95a0ac01388d9465288d965dd0cfe0af2bbd117c # codex/nullness-java-util-comparison; EISOP master 6ac6f78134
           path: checker-framework
           persist-credentials: false
       - name: Check out the checker's bundled JDK contracts
