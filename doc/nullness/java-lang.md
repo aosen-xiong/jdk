@@ -313,7 +313,17 @@ negative controls and passes unused-suppression auditing. The original checker
 JARs remain pinned; a tentative checker implementation change was set aside,
 not included or used to claim passing validation.
 
-## Known checker issue: generated record equality
+## Historical checker issue: generated record equality
+
+Update, 2026-11-19: the comparison stack tip ([PR #36](https://github.com/aosen-xiong/jdk/pull/36))
+now incorporates EISOP master `6ac6f7813440db1cd42b9a83aeccd102180930d4`, including
+[the generated-record-method fix, #2636](https://github.com/eisop/checker-framework/pull/2636)
+(commit `e35d62ecfd989b90a395b5b5e9e2efb5016195af`). The rebuilt checker reports
+the old caller suppression as unused. The suppression is removed in that tip's
+matching CF branch, preserving the direct generated-equals call and the three
+negative controls. Validation details and the exact new pin are in the
+[java.util upgrade checkpoint](java-util.md#checker-refresh-2026-11-19).
+Earlier stack layers retain their original checker pins and historical results.
 
 With the frozen c12ce38daa checker implementation and JDK 17.0.14,
 `record Item(@Nullable String name) {}` generates an `equals(Object)` whose

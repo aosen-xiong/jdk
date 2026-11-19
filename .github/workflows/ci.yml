@@ -226,7 +226,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: aosen-xiong/checker-framework
-          ref: a4e96ede63249afe193cc461ec66935537a68b54 # codex/nullness-java-util-traversal
+          ref: 95a0ac01388d9465288d965dd0cfe0af2bbd117c # codex/nullness-java-util-comparison; EISOP master 6ac6f78134
           path: checker-framework
           persist-credentials: false
       - name: Check out the checker's bundled JDK contracts
@@ -421,7 +421,9 @@ jobs:
             java/util/PrimitiveIterator.java \
             java/util/Spliterator.java \
             java/util/Spliterators.java \
-            java/util/Tripwire.java
+            java/util/Tripwire.java \
+            java/util/Comparator.java \
+            java/util/Comparators.java
       - name: Check package-private helper callers from CF
         working-directory: checker-framework
         env:
@@ -429,6 +431,14 @@ jobs:
           JDK_GENERATE_CHARACTER_DATA: '1'
           JDK_EXTRA_SOURCE_ROOTS: ${{ github.workspace }}/jdk/src/java.base/${{ matrix.platform }}/classes:${{ github.workspace }}/jdk-configured-java.base:${{ github.workspace }}/checker-framework/checker/tests/jdk-source/java.base
         run: checker/bin-devel/typecheck-jdk.sh nullness java.base java/lang/TextHelperContracts.java java/lang/UnicodeHelperContracts.java java/lang/ReflectionHelperContracts.java java/lang/LoadingHelperContracts.java java/lang/SystemRuntimeHelperContracts.java java/lang/ThreadHelperContracts.java java/lang/ProcessHelperContracts.java java/lang/StackWalkingHelperContracts.java java/lang/VersionPropsHelperContracts.java java/lang/${{ matrix.helper }}.java
+      - name: Type-check java.util comparison helper callers
+        if: matrix.platform == 'unix'
+        working-directory: checker-framework
+        env:
+          JDK_SRC: ${{ github.workspace }}/jdk
+          JDK_GENERATE_CHARACTER_DATA: '1'
+          JDK_EXTRA_SOURCE_ROOTS: ${{ github.workspace }}/jdk/src/java.base/unix/classes:${{ github.workspace }}/jdk-configured-java.base:${{ github.workspace }}/checker-framework/checker/tests/jdk-source/java.base
+        run: checker/bin-devel/typecheck-jdk.sh nullness java.base java/util/ComparisonHelperContracts.java
       - name: Upload type-checking logs
         if: always()
         uses: actions/upload-artifact@v4
