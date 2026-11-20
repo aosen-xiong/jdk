@@ -352,6 +352,8 @@ public interface Collection<E> extends Iterable<E> {
     "methods, because the most useful type for toArray is not expressible",
     "in the surface syntax that the nullness annotations support."})
     @SideEffectFree
+    // Link array and receiver element nullness in the Checker Framework.
+    @SuppressWarnings("nullness:jspecify.unrecognized.location.receiver")
     @PolyNull @PolySigned Object[] toArray(Collection<@PolyNull @PolySigned E> this);
 
     /**
@@ -443,7 +445,10 @@ public interface Collection<E> extends Iterable<E> {
      * @throws NullPointerException if the generator function is null
      * @since 11
      */
-    default <T> T[] toArray(IntFunction<T[]> generator) {
+    // The receiver qualifier links element nullness for CF. The generator supplies a
+    // zero-length array, so the array overload writes no trailing null sentinel.
+    @SuppressWarnings({"nullness:jspecify.unrecognized.location.receiver", "nullness:return.type.incompatible"})
+    default <T> @PolyNull T[] toArray(Collection<@PolyNull E> this, IntFunction<T[]> generator) {
         return toArray(generator.apply(0));
     }
 

@@ -1085,7 +1085,9 @@ public class Collections {
         public @PolyNull @PolySigned Object[] toArray(Collections.UnmodifiableCollection<@PolyNull @PolySigned E> this)                  {return c.toArray();}
         @SideEffectFree
         public <T> @Nullable T[] toArray(@PolyNull T[] a)              {return c.toArray(a);}
-        public <T> T[] toArray(IntFunction<T[]> f) {return c.toArray(f);}
+        // Match the element-nullness contract of Collection.toArray(IntFunction).
+        @SuppressWarnings("nullness:jspecify.unrecognized.location.receiver")
+        public <T> @PolyNull T[] toArray(UnmodifiableCollection<@PolyNull E> this, IntFunction<T[]> f) {return c.toArray(f);}
         public String toString()                   {return c.toString();}
 
         @SideEffectFree
@@ -2176,7 +2178,9 @@ public class Collections {
         public <T> @Nullable T[] toArray(@PolyNull T[] a) {
             synchronized (mutex) {return c.toArray(a);}
         }
-        public <T> T[] toArray(IntFunction<T[]> f) {
+        // Match the element-nullness contract of Collection.toArray(IntFunction).
+        @SuppressWarnings("nullness:jspecify.unrecognized.location.receiver")
+        public <T> @PolyNull T[] toArray(SynchronizedCollection<@PolyNull E> this, IntFunction<T[]> f) {
             synchronized (mutex) {return c.toArray(f);}
         }
 
@@ -3268,7 +3272,9 @@ public class Collections {
         public @PolyNull @PolySigned Object[] toArray(Collections.CheckedCollection<@PolyNull @PolySigned E> this)                  { return c.toArray(); }
         @SideEffectFree
         public <T> @Nullable T[] toArray(@PolyNull T[] a)              { return c.toArray(a); }
-        public <T> T[] toArray(IntFunction<T[]> f) { return c.toArray(f); }
+        // Match the element-nullness contract of Collection.toArray(IntFunction).
+        @SuppressWarnings("nullness:jspecify.unrecognized.location.receiver")
+        public <T> @PolyNull T[] toArray(CheckedCollection<@PolyNull E> this, IntFunction<T[]> f) { return c.toArray(f); }
         public String toString()                   { return c.toString(); }
         public boolean remove(@UnknownSignedness Object o)            { return c.remove(o); }
         public void clear()                        {        c.clear(); }
@@ -6021,7 +6027,9 @@ public class Collections {
         public @PolyNull @PolySigned Object[] toArray(Collections.AsLIFOQueue<@PolyNull @PolySigned E> this)                   { return q.toArray(); }
         @SideEffectFree
         public <T> @Nullable T[] toArray(@PolyNull T[] a)               { return q.toArray(a); }
-        public <T> T[] toArray(IntFunction<T[]> f)  { return q.toArray(f); }
+        // Match the element-nullness contract of Collection.toArray(IntFunction).
+        @SuppressWarnings("nullness:jspecify.unrecognized.location.receiver")
+        public <T> @PolyNull T[] toArray(AsLIFOQueue<@PolyNull E> this, IntFunction<T[]> f)  { return q.toArray(f); }
         public String toString()                    { return q.toString(); }
         @Pure
         public boolean containsAll(Collection<? extends @UnknownSignedness Object> c) { return q.containsAll(c); }

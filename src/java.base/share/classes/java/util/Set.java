@@ -198,6 +198,8 @@ public interface Set<E> extends Collection<E> {
      * @return an array containing all the elements in this set
      */
     @SideEffectFree
+    // Link array and receiver element nullness in the Checker Framework.
+    @SuppressWarnings("nullness:jspecify.unrecognized.location.receiver")
     @PolyNull @PolySigned Object[] toArray(Set<@PolyNull @PolySigned E> this);
 
     /**
