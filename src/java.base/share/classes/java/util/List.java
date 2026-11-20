@@ -228,6 +228,8 @@ public interface List<E> extends Collection<E> {
      * @see Arrays#asList(Object[])
      */
     @SideEffectFree
+    // Link array and receiver element nullness in the Checker Framework.
+    @SuppressWarnings("nullness:jspecify.unrecognized.location.receiver")
     @PolyNull @PolySigned Object[] toArray(List<@PolyNull @PolySigned E> this);
 
     /**
@@ -540,9 +542,11 @@ public interface List<E> extends Collection<E> {
      *         contract
      * @since 1.8
      */
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    // Arrays.sort accepts null for natural order, and the values written back are
+    // elements of this list after sorting, although the temporary array erases E.
+    @SuppressWarnings({"unchecked", "rawtypes", "nullness:argument.type.incompatible"})
     default void sort(@Nullable Comparator<? super E> c) {
-        Object[] a = this.toArray();
+        @Nullable Object[] a = this.toArray();
         Arrays.sort(a, (Comparator) c);
         ListIterator<E> i = this.listIterator();
         for (Object e : a) {
