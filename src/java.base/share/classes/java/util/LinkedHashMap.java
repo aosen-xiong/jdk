@@ -204,8 +204,8 @@ public class LinkedHashMap<K,V>
      * HashMap.Node subclass for normal LinkedHashMap entries.
      */
     static class Entry<K,V> extends HashMap.Node<K,V> {
-        Entry<K,V> before, after;
-        Entry(int hash, K key, V value, Node<K,V> next) {
+        @Nullable Entry<K,V> before, after;
+        Entry(int hash, K key, V value, @Nullable Node<K,V> next) {
             super(hash, key, value, next);
         }
     }
@@ -216,12 +216,12 @@ public class LinkedHashMap<K,V>
     /**
      * The head (eldest) of the doubly linked list.
      */
-    transient LinkedHashMap.Entry<K,V> head;
+    transient LinkedHashMap.@Nullable Entry<K,V> head;
 
     /**
      * The tail (youngest) of the doubly linked list.
      */
-    transient LinkedHashMap.Entry<K,V> tail;
+    transient LinkedHashMap.@Nullable Entry<K,V> tail;
 
     /**
      * The iteration ordering method for this linked hash map: {@code true}
@@ -267,14 +267,14 @@ public class LinkedHashMap<K,V>
         head = tail = null;
     }
 
-    Node<K,V> newNode(int hash, K key, V value, Node<K,V> e) {
+    Node<K,V> newNode(int hash, K key, V value, @Nullable Node<K,V> e) {
         LinkedHashMap.Entry<K,V> p =
             new LinkedHashMap.Entry<>(hash, key, value, e);
         linkNodeLast(p);
         return p;
     }
 
-    Node<K,V> replacementNode(Node<K,V> p, Node<K,V> next) {
+    Node<K,V> replacementNode(Node<K,V> p, @Nullable Node<K,V> next) {
         LinkedHashMap.Entry<K,V> q = (LinkedHashMap.Entry<K,V>)p;
         LinkedHashMap.Entry<K,V> t =
             new LinkedHashMap.Entry<>(q.hash, q.key, q.value, next);
@@ -282,13 +282,13 @@ public class LinkedHashMap<K,V>
         return t;
     }
 
-    TreeNode<K,V> newTreeNode(int hash, K key, V value, Node<K,V> next) {
+    TreeNode<K,V> newTreeNode(int hash, K key, V value, @Nullable Node<K,V> next) {
         TreeNode<K,V> p = new TreeNode<>(hash, key, value, next);
         linkNodeLast(p);
         return p;
     }
 
-    TreeNode<K,V> replacementTreeNode(Node<K,V> p, Node<K,V> next) {
+    TreeNode<K,V> replacementTreeNode(Node<K,V> p, @Nullable Node<K,V> next) {
         LinkedHashMap.Entry<K,V> q = (LinkedHashMap.Entry<K,V>)p;
         TreeNode<K,V> t = new TreeNode<>(q.hash, q.key, q.value, next);
         transferLinks(q, t);
@@ -555,21 +555,25 @@ public class LinkedHashMap<K,V>
         return ks;
     }
 
+    // The copied elements come from the corresponding map view (EISOP issue 2656).
+    @SuppressWarnings("nullness:jspecify.unrecognized.location.receiver")
     @Override
-    final <T> T[] keysToArray(T[] a) {
-        Object[] r = a;
+    final <T> @PolyNull T[] keysToArray(LinkedHashMap<@PolyNull K,V> this, @PolyNull T[] a) {
+        @Nullable Object[] r = a;
         int idx = 0;
-        for (LinkedHashMap.Entry<K,V> e = head; e != null; e = e.after) {
+        for (LinkedHashMap.Entry<? extends @PolyNull K,V> e = head; e != null; e = e.after) {
             r[idx++] = e.key;
         }
         return a;
     }
 
+    // The copied elements come from the corresponding map view (EISOP issue 2656).
+    @SuppressWarnings("nullness:jspecify.unrecognized.location.receiver")
     @Override
-    final <T> T[] valuesToArray(T[] a) {
-        Object[] r = a;
+    final <T> @PolyNull T[] valuesToArray(LinkedHashMap<K,@PolyNull V> this, @PolyNull T[] a) {
+        @Nullable Object[] r = a;
         int idx = 0;
-        for (LinkedHashMap.Entry<K,V> e = head; e != null; e = e.after) {
+        for (LinkedHashMap.Entry<K,? extends @PolyNull V> e = head; e != null; e = e.after) {
             r[idx++] = e.value;
         }
         return a;
@@ -596,7 +600,9 @@ public class LinkedHashMap<K,V>
                                             Spliterator.DISTINCT);
         }
 
-        public Object[] toArray() {
+        // The enclosing key or value may be null. The public view preserves its element type.
+        @SuppressWarnings("nullness:override.return.invalid")
+        public @Nullable Object[] toArray() {
             return keysToArray(new Object[size]);
         }
 
@@ -659,7 +665,9 @@ public class LinkedHashMap<K,V>
                                             Spliterator.ORDERED);
         }
 
-        public Object[] toArray() {
+        // The enclosing key or value may be null. The public view preserves its element type.
+        @SuppressWarnings("nullness:override.return.invalid")
+        public @Nullable Object[] toArray() {
             return valuesToArray(new Object[size]);
         }
 
@@ -770,8 +778,8 @@ public class LinkedHashMap<K,V>
     // Iterators
 
     abstract class LinkedHashIterator {
-        LinkedHashMap.Entry<K,V> next;
-        LinkedHashMap.Entry<K,V> current;
+        LinkedHashMap.@Nullable Entry<K,V> next;
+        LinkedHashMap.@Nullable Entry<K,V> current;
         int expectedModCount;
 
         LinkedHashIterator() {
