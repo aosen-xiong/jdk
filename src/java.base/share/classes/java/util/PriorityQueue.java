@@ -121,7 +121,7 @@ public class PriorityQueue<E extends @NonNull Object> extends AbstractQueue<E>
      * heap and each descendant d of n, n <= d.  The element with the
      * lowest value is in queue[0], assuming the queue is nonempty.
      */
-    transient Object[] queue; // non-private to simplify nested class access
+    transient @Nullable Object[] queue; // non-private to simplify nested class access
 
     /**
      * The number of elements in the priority queue.
@@ -133,7 +133,7 @@ public class PriorityQueue<E extends @NonNull Object> extends AbstractQueue<E>
      * natural ordering.
      */
     @SuppressWarnings("serial") // Conditionally serializable
-    private final Comparator<? super E> comparator;
+    private final @Nullable Comparator<? super E> comparator;
 
     /**
      * The number of times this priority queue has been
@@ -268,7 +268,7 @@ public class PriorityQueue<E extends @NonNull Object> extends AbstractQueue<E>
     }
 
     /** Ensures that queue[0] exists, helping peek() and poll(). */
-    private static Object[] ensureNonEmpty(Object[] es) {
+    private static @Nullable Object[] ensureNonEmpty(@Nullable Object[] es) {
         return (es.length > 0) ? es : new Object[1];
     }
 
@@ -282,7 +282,7 @@ public class PriorityQueue<E extends @NonNull Object> extends AbstractQueue<E>
     }
 
     private void initElementsFromCollection(Collection<? extends E> c) {
-        Object[] es = c.toArray();
+        @Nullable Object[] es = c.toArray();
         int len = es.length;
         if (c.getClass() != ArrayList.class)
             es = Arrays.copyOf(es, len, Object[].class);
@@ -361,7 +361,7 @@ public class PriorityQueue<E extends @NonNull Object> extends AbstractQueue<E>
 
     private int indexOf(@GuardSatisfied @Nullable @UnknownSignedness Object o) {
         if (o != null) {
-            final Object[] es = queue;
+            final @Nullable Object[] es = queue;
             for (int i = 0, n = size; i < n; i++)
                 if (o.equals(es[i]))
                     return i;
@@ -396,7 +396,7 @@ public class PriorityQueue<E extends @NonNull Object> extends AbstractQueue<E>
      * @param o element to be removed from this queue, if present
      */
     void removeEq(@GuardSatisfied @CanShrink PriorityQueue<E> this, @GuardSatisfied @Nullable @UnknownSignedness Object o) {
-        final Object[] es = queue;
+        final @Nullable Object[] es = queue;
         for (int i = 0, n = size; i < n; i++) {
             if (o == es[i]) {
                 removeAt(i);
@@ -433,6 +433,8 @@ public class PriorityQueue<E extends @NonNull Object> extends AbstractQueue<E>
      * @return an array containing all of the elements in this queue
      */
     @SideEffectFree
+    // Only the occupied nonnull prefix is copied.
+    @SuppressWarnings("nullness:return.type.incompatible")
     public @PolySigned Object[] toArray(PriorityQueue<@PolySigned E> this) {
         return Arrays.copyOf(queue, size);
     }
@@ -474,6 +476,8 @@ public class PriorityQueue<E extends @NonNull Object> extends AbstractQueue<E>
      * @throws NullPointerException if the specified array is null
      */
     @SideEffectFree
+    // An oversized caller array receives the documented trailing null.
+    @SuppressWarnings("nullness:assignment.type.incompatible")
     public <T> @Nullable T[] toArray(@PolyNull T[] a) {
         final int size = this.size;
         if (a.length < size)
@@ -521,13 +525,13 @@ public class PriorityQueue<E extends @NonNull Object> extends AbstractQueue<E>
          * We expect that most iterations, even those involving removals,
          * will not need to store elements in this field.
          */
-        private ArrayDeque<E> forgetMeNot;
+        private @Nullable ArrayDeque<E> forgetMeNot;
 
         /**
          * Element returned by the most recent call to next iff that
          * element was drawn from the forgetMeNot list.
          */
-        private E lastRetElt;
+        private @Nullable E lastRetElt;
 
         /**
          * The modCount value that the iterator believes that the backing
@@ -545,6 +549,8 @@ public class PriorityQueue<E extends @NonNull Object> extends AbstractQueue<E>
                 (forgetMeNot != null && !forgetMeNot.isEmpty());
         }
 
+        // This index is in the occupied range and contains an element of type E.
+        @SuppressWarnings("nullness:return.type.incompatible")
         public E next(@NonEmpty Itr this) {
             if (expectedModCount != modCount)
                 throw new ConcurrentModificationException();
@@ -593,14 +599,16 @@ public class PriorityQueue<E extends @NonNull Object> extends AbstractQueue<E>
      */
     public void clear(@GuardSatisfied @CanShrink PriorityQueue<E> this) {
         modCount++;
-        final Object[] es = queue;
+        final @Nullable Object[] es = queue;
         for (int i = 0, n = size; i < n; i++)
             es[i] = null;
         size = 0;
     }
 
+    // The last occupied heap entry becomes the replacement root.
+    @SuppressWarnings("nullness:type.arguments.not.inferred")
     public @Nullable E poll(@GuardSatisfied @CanShrink PriorityQueue<E> this) {
-        final Object[] es;
+        final @Nullable Object[] es;
         final E result;
 
         if ((result = (E) ((es = queue)[0])) != null) {
@@ -631,9 +639,11 @@ public class PriorityQueue<E extends @NonNull Object> extends AbstractQueue<E>
      * position before i. This fact is used by iterator.remove so as to
      * avoid missing traversing elements.
      */
-    E removeAt(@GuardSatisfied @NonEmpty @CanShrink PriorityQueue<E> this, int i) {
+    // The replacement comes from the last occupied heap entry.
+    @SuppressWarnings("nullness:argument.type.incompatible")
+    @Nullable E removeAt(@GuardSatisfied @NonEmpty @CanShrink PriorityQueue<E> this, int i) {
         // assert i >= 0 && i < size;
-        final Object[] es = queue;
+        final @Nullable Object[] es = queue;
         modCount++;
         int s = --size;
         if (s == i) // removed last element
@@ -670,7 +680,9 @@ public class PriorityQueue<E extends @NonNull Object> extends AbstractQueue<E>
             siftUpComparable(k, x, queue);
     }
 
-    private static <T> void siftUpComparable(int k, T x, Object[] es) {
+    // The compared indices lie in the occupied, nonnull part of the heap.
+    @SuppressWarnings("nullness:argument.type.incompatible")
+    private static <T extends @NonNull Object> void siftUpComparable(int k, T x, @Nullable Object[] es) {
         Comparable<? super T> key = (Comparable<? super T>) x;
         while (k > 0) {
             int parent = (k - 1) >>> 1;
@@ -683,8 +695,10 @@ public class PriorityQueue<E extends @NonNull Object> extends AbstractQueue<E>
         es[k] = key;
     }
 
-    private static <T> void siftUpUsingComparator(
-        int k, T x, Object[] es, Comparator<? super T> cmp) {
+    // The compared indices lie in the occupied, nonnull part of the heap.
+    @SuppressWarnings("nullness:argument.type.incompatible")
+    private static <T extends @NonNull Object> void siftUpUsingComparator(
+        int k, T x, @Nullable Object[] es, Comparator<? super T> cmp) {
         while (k > 0) {
             int parent = (k - 1) >>> 1;
             Object e = es[parent];
@@ -711,7 +725,9 @@ public class PriorityQueue<E extends @NonNull Object> extends AbstractQueue<E>
             siftDownComparable(k, x, queue, size);
     }
 
-    private static <T> void siftDownComparable(int k, T x, Object[] es, int n) {
+    // The compared indices lie in the occupied, nonnull part of the heap.
+    @SuppressWarnings({"nullness:dereference.of.nullable", "nullness:argument.type.incompatible"})
+    private static <T extends @NonNull Object> void siftDownComparable(int k, T x, @Nullable Object[] es, int n) {
         // assert n > 0;
         Comparable<? super T> key = (Comparable<? super T>)x;
         int half = n >>> 1;           // loop while a non-leaf
@@ -730,8 +746,10 @@ public class PriorityQueue<E extends @NonNull Object> extends AbstractQueue<E>
         es[k] = key;
     }
 
-    private static <T> void siftDownUsingComparator(
-        int k, T x, Object[] es, int n, Comparator<? super T> cmp) {
+    // The compared indices lie in the occupied, nonnull part of the heap.
+    @SuppressWarnings("nullness:argument.type.incompatible")
+    private static <T extends @NonNull Object> void siftDownUsingComparator(
+        int k, T x, @Nullable Object[] es, int n, Comparator<? super T> cmp) {
         // assert n > 0;
         int half = n >>> 1;
         while (k < half) {
@@ -753,8 +771,10 @@ public class PriorityQueue<E extends @NonNull Object> extends AbstractQueue<E>
      * assuming nothing about the order of the elements prior to the call.
      * This classic algorithm due to Floyd (1964) is known to be O(size).
      */
+    // Each sift starts with a nonnull entry in the active heap.
+    @SuppressWarnings("nullness:type.arguments.not.inferred")
     private void heapify() {
-        final Object[] es = queue;
+        final @Nullable Object[] es = queue;
         int n = size, i = (n >>> 1) - 1;
         final Comparator<? super E> cmp;
         if ((cmp = comparator) == null)
@@ -798,7 +818,7 @@ public class PriorityQueue<E extends @NonNull Object> extends AbstractQueue<E>
         s.writeInt(Math.max(2, size + 1));
 
         // Write out all elements in the "proper order".
-        final Object[] es = queue;
+        final @Nullable Object[] es = queue;
         for (int i = 0, n = size; i < n; i++)
             s.writeObject(es[i]);
     }
@@ -822,7 +842,7 @@ public class PriorityQueue<E extends @NonNull Object> extends AbstractQueue<E>
         s.readInt();
 
         SharedSecrets.getJavaObjectInputStreamAccess().checkArray(s, Object[].class, size);
-        final Object[] es = queue = new Object[Math.max(size, 1)];
+        final @Nullable Object[] es = queue = new Object[Math.max(size, 1)];
 
         // Read in all elements.
         for (int i = 0, n = size; i < n; i++)
@@ -872,7 +892,7 @@ public class PriorityQueue<E extends @NonNull Object> extends AbstractQueue<E>
             return hi;
         }
 
-        public PriorityQueueSpliterator trySplit() {
+        public @Nullable PriorityQueueSpliterator trySplit() {
             int hi = getFence(), lo = index, mid = (lo + hi) >>> 1;
             return (lo >= mid) ? null :
                 new PriorityQueueSpliterator(lo, index = mid, expectedModCount);
@@ -882,7 +902,7 @@ public class PriorityQueue<E extends @NonNull Object> extends AbstractQueue<E>
             if (action == null)
                 throw new NullPointerException();
             if (fence < 0) { fence = size; expectedModCount = modCount; }
-            final Object[] es = queue;
+            final @Nullable Object[] es = queue;
             int i, hi; E e;
             for (i = index, index = hi = fence; i < hi; i++) {
                 if ((e = (E) es[i]) == null)
@@ -956,9 +976,11 @@ public class PriorityQueue<E extends @NonNull Object> extends AbstractQueue<E>
     }
 
     /** Implementation of bulk remove methods. */
+    // This index is in the occupied range and contains an element of type E.
+    @SuppressWarnings("nullness:argument.type.incompatible")
     private boolean bulkRemove(Predicate<? super E> filter) {
         final int expectedModCount = ++modCount;
-        final Object[] es = queue;
+        final @Nullable Object[] es = queue;
         final int end = size;
         int i;
         // Optimize for initial run of survivors
@@ -993,10 +1015,12 @@ public class PriorityQueue<E extends @NonNull Object> extends AbstractQueue<E>
     /**
      * @throws NullPointerException {@inheritDoc}
      */
+    // This index is in the occupied range and contains an element of type E.
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public void forEach(Consumer<? super E> action) {
         Objects.requireNonNull(action);
         final int expectedModCount = modCount;
-        final Object[] es = queue;
+        final @Nullable Object[] es = queue;
         for (int i = 0, n = size; i < n; i++)
             action.accept((E) es[i]);
         if (expectedModCount != modCount)
