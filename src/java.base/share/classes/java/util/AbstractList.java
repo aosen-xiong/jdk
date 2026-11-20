@@ -684,7 +684,7 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
         private int fence; // -1 until used; then one past last index
 
         // The following fields are valid if covering an AbstractList
-        private final AbstractList<E> alist;
+        private final @Nullable AbstractList<E> alist;
         private int expectedModCount; // initialized when fence set
 
         RandomAccessSpliterator(List<E> list) {
@@ -721,7 +721,7 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
             return hi;
         }
 
-        public Spliterator<E> trySplit() {
+        public @Nullable Spliterator<E> trySplit() {
             int hi = getFence(), lo = index, mid = (lo + hi) >>> 1;
             return (lo >= mid) ? null : // divide range in half unless too small
                     new RandomAccessSpliterator<>(this, lo, index = mid);
@@ -768,7 +768,7 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
             }
         }
 
-        static void checkAbstractListModCount(AbstractList<?> alist, int expectedModCount) {
+        static void checkAbstractListModCount(@Nullable AbstractList<?> alist, int expectedModCount) {
             if (alist != null && alist.modCount != expectedModCount) {
                 throw new ConcurrentModificationException();
             }
@@ -777,7 +777,7 @@ public abstract class AbstractList<E> extends AbstractCollection<E> implements L
 
     private static class SubList<E> extends AbstractList<E> {
         private final AbstractList<E> root;
-        private final SubList<E> parent;
+        private final @Nullable SubList<E> parent;
         private final int offset;
         protected int size;
 

@@ -352,8 +352,8 @@ public abstract class AbstractMap<K,V> implements Map<K,V> {
      * }
      *}</pre>
      */
-    transient Set<K>        keySet;
-    transient Collection<V> values;
+    transient @Nullable Set<K>        keySet;
+    transient @Nullable Collection<V> values;
 
     /**
      * {@inheritDoc}
@@ -516,6 +516,8 @@ public abstract class AbstractMap<K,V> implements Map<K,V> {
      * @return {@code true} if the specified object is equal to this map
      */
     @Pure
+    // Comparison probes the other map with our key and catches optional null rejection.
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public boolean equals(@GuardSatisfied AbstractMap<K, V> this, @GuardSatisfied @Nullable Object o) {
         if (o == this)
             return true;
@@ -624,7 +626,7 @@ public abstract class AbstractMap<K,V> implements Map<K,V> {
      *
      * NB: Do not replace with Object.equals until JDK-8015417 is resolved.
      */
-    private static boolean eq(Object o1, Object o2) {
+    private static boolean eq(@Nullable Object o1, @Nullable Object o2) {
         return o1 == null ? o2 == null : o1.equals(o2);
     }
 
