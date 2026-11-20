@@ -110,12 +110,12 @@ public class LinkedList<E>
     /**
      * Pointer to first node.
      */
-    transient Node<E> first;
+    transient @Nullable Node<E> first;
 
     /**
      * Pointer to last node.
      */
-    transient Node<E> last;
+    transient @Nullable Node<E> last;
 
     /*
     void dataStructureInvariants() {
@@ -193,6 +193,8 @@ public class LinkedList<E>
     /**
      * Unlinks non-null first node f.
      */
+    // Clearing the removed node releases its payload after its last live use.
+    @SuppressWarnings("nullness:assignment.type.incompatible")
     private E unlinkFirst(Node<E> f) {
         // assert f == first && f != null;
         final E element = f.item;
@@ -212,6 +214,8 @@ public class LinkedList<E>
     /**
      * Unlinks non-null last node l.
      */
+    // Clearing the removed node releases its payload after its last live use.
+    @SuppressWarnings("nullness:assignment.type.incompatible")
     private E unlinkLast(Node<E> l) {
         // assert l == last && l != null;
         final E element = l.item;
@@ -231,6 +235,8 @@ public class LinkedList<E>
     /**
      * Unlinks non-null node x.
      */
+    // Clearing the removed node releases its payload after its last live use.
+    @SuppressWarnings("nullness:assignment.type.incompatible")
     E unlink(Node<E> x) {
         // assert x != null;
         final E element = x.item;
@@ -433,10 +439,12 @@ public class LinkedList<E>
      * @throws IndexOutOfBoundsException {@inheritDoc}
      * @throws NullPointerException if the specified collection is null
      */
+    // A nonempty input array sets pred to the last inserted node before relinking succ.
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public boolean addAll(@GuardSatisfied LinkedList<E> this, @NonNegative int index, Collection<? extends E> c) {
         checkPositionIndex(index);
 
-        Object[] a = c.toArray();
+        @Nullable Object[] a = c.toArray();
         int numNew = a.length;
         if (numNew == 0)
             return false;
@@ -452,6 +460,8 @@ public class LinkedList<E>
 
         for (Object o : a) {
             @SuppressWarnings("unchecked") E e = (E) o;
+            // The array contains precisely the elements of the input Collection<? extends E>.
+            @SuppressWarnings("nullness:type.arguments.not.inferred")
             Node<E> newNode = new Node<>(pred, e, null);
             if (pred == null)
                 first = newNode;
@@ -476,6 +486,8 @@ public class LinkedList<E>
      * Removes all of the elements from this list.
      * The list will be empty after this call returns.
      */
+    // Clearing the removed node releases its payload after its last live use.
+    @SuppressWarnings("nullness:assignment.type.incompatible")
     public void clear(@GuardSatisfied @CanShrink LinkedList<E> this) {
         // Clearing all of the links between nodes is "unnecessary", but:
         // - helps a generational GC if the discarded nodes inhabit
@@ -595,6 +607,8 @@ public class LinkedList<E>
     /**
      * Returns the (non-null) Node at the specified element index.
      */
+    // A checked index is reachable from either end along the occupied nodes.
+    @SuppressWarnings({"nullness:dereference.of.nullable", "nullness:return.type.incompatible"})
     Node<E> node(@NonNegative int index) {
         // assert isElementIndex(index);
 
@@ -906,8 +920,8 @@ public class LinkedList<E>
     }
 
     private class ListItr implements ListIterator<E> {
-        private Node<E> lastReturned;
-        private Node<E> next;
+        private @Nullable Node<E> lastReturned;
+        private @Nullable Node<E> next;
         private int nextIndex;
         private int expectedModCount = modCount;
 
@@ -923,6 +937,8 @@ public class LinkedList<E>
             return nextIndex < size;
         }
 
+        // The modification count and cursor bounds establish an available list node.
+        @SuppressWarnings("nullness:dereference.of.nullable")
         public E next(@NonEmpty ListItr this) {
             checkForComodification();
             if (!hasNext())
@@ -938,6 +954,8 @@ public class LinkedList<E>
             return nextIndex > 0;
         }
 
+        // The modification count and cursor bounds establish an available list node.
+        @SuppressWarnings("nullness:dereference.of.nullable")
         public E previous() {
             checkForComodification();
             if (!hasPrevious())
@@ -989,6 +1007,8 @@ public class LinkedList<E>
             expectedModCount++;
         }
 
+        // The modification count and cursor bounds establish an available list node.
+        @SuppressWarnings("nullness:dereference.of.nullable")
         public void forEachRemaining(Consumer<? super E> action) {
             Objects.requireNonNull(action);
             while (modCount == expectedModCount && nextIndex < size) {
@@ -1008,10 +1028,10 @@ public class LinkedList<E>
 
     private static class Node<E> {
         E item;
-        Node<E> next;
-        Node<E> prev;
+        @Nullable Node<E> next;
+        @Nullable Node<E> prev;
 
-        Node(Node<E> prev, E element, Node<E> next) {
+        Node(@Nullable Node<E> prev, E element, @Nullable Node<E> next) {
             this.item = element;
             this.next = next;
             this.prev = prev;
@@ -1089,10 +1109,12 @@ public class LinkedList<E>
      *         in proper sequence
      */
     @SideEffectFree
+    // The receiver transfers element nullness to the returned array (EISOP issue 2656).
+    @SuppressWarnings("nullness:jspecify.unrecognized.location.receiver")
     public @PolyNull @PolySigned Object[] toArray(LinkedList<@PolyNull @PolySigned E> this) {
-        Object[] result = new Object[size];
+        @PolyNull Object[] result = new Object[size];
         int i = 0;
-        for (Node<E> x = first; x != null; x = x.next)
+        for (Node<? extends @PolyNull E> x = first; x != null; x = x.next)
             result[i++] = x.item;
         return result;
     }
@@ -1136,13 +1158,14 @@ public class LinkedList<E>
      * @throws NullPointerException if the specified array is null
      */
     @SideEffectFree
-    @SuppressWarnings("unchecked")
+    // An oversized caller array receives the documented trailing null. An array class always has a component type.
+    @SuppressWarnings({"unchecked", "nullness:assignment.type.incompatible", "nullness:argument.type.incompatible"})
     public <T> @Nullable T[] toArray(@PolyNull T[] a) {
         if (a.length < size)
-            a = (T[])java.lang.reflect.Array.newInstance(
+            a = (@PolyNull T[])java.lang.reflect.Array.newInstance(
                                 a.getClass().getComponentType(), size);
         int i = 0;
-        Object[] result = a;
+        @Nullable Object[] result = a;
         for (Node<E> x = first; x != null; x = x.next)
             result[i++] = x.item;
 
@@ -1181,7 +1204,8 @@ public class LinkedList<E>
      * Reconstitutes this {@code LinkedList} instance from a stream
      * (that is, deserializes it).
      */
-    @SuppressWarnings("unchecked")
+    // The stream reconstructs the element sequence written by writeObject.
+    @SuppressWarnings({"unchecked", "nullness:argument.type.incompatible"})
     @java.io.Serial
     private void readObject(java.io.ObjectInputStream s)
         throws java.io.IOException, ClassNotFoundException {
@@ -1223,7 +1247,7 @@ public class LinkedList<E>
         static final int BATCH_UNIT = 1 << 10;  // batch array size increment
         static final int MAX_BATCH = 1 << 25;  // max batch array size;
         final LinkedList<E> list; // null OK unless traversed
-        Node<E> current;      // current node; null until initialized
+        @Nullable Node<E> current;      // current node; null until initialized
         int est;              // size estimate; -1 until first needed
         int expectedModCount; // initialized when est set
         int batch;            // batch size for splits
@@ -1251,7 +1275,9 @@ public class LinkedList<E>
 
         public long estimateSize() { return (long) getEst(); }
 
-        public Spliterator<E> trySplit() {
+        // The split exposes only the prefix filled with elements of type E.
+        @SuppressWarnings("nullness:return.type.incompatible")
+        public @Nullable Spliterator<E> trySplit() {
             Node<E> p;
             int s = getEst();
             if (s > 1 && (p = current) != null) {
@@ -1260,7 +1286,7 @@ public class LinkedList<E>
                     n = s;
                 if (n > MAX_BATCH)
                     n = MAX_BATCH;
-                Object[] a = new Object[n];
+                @Nullable Object[] a = new Object[n];
                 int j = 0;
                 do { a[j++] = p.item; } while ((p = p.next) != null && j < n);
                 current = p;
