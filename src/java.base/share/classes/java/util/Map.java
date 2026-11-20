@@ -1380,8 +1380,6 @@ public interface Map<K, V> {
         // This operation forwards its K. Maps that reject null may throw here.
         @SuppressWarnings("nullness:argument.type.incompatible")
         V oldValue = get(key);
-        // A null remapping result requests removal and is tested immediately below.
-        @SuppressWarnings("nullness:conditional.type.incompatible")
         V newValue = (oldValue == null) ? value :
                    remappingFunction.apply(oldValue, value);
         if (newValue == null) {

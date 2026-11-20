@@ -418,8 +418,6 @@ public final @NonNull class Optional<T> {
      *         function is {@code null}
      */
     @OptionalEliminator
-    // CF limitation: the equivalent separate returns preserve the wildcard supplier qualifier.
-    @SuppressWarnings("nullness:conditional.type.incompatible")
     public @PolyNull T orElseGet(Supplier<? extends @PolyNull T> supplier) {
         return value != null ? value : supplier.get();
     }
