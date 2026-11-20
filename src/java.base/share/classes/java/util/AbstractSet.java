@@ -92,6 +92,8 @@ public abstract class AbstractSet<E> extends AbstractCollection<E> implements Se
      * @return {@code true} if the specified object is equal to this set
      */
     @Pure
+    // Equality probes the elements of an arbitrary set and catches optional null rejection.
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public boolean equals(@GuardSatisfied AbstractSet<E> this, @GuardSatisfied @Nullable Object o) {
         if (o == this)
             return true;
@@ -174,6 +176,8 @@ public abstract class AbstractSet<E> extends AbstractCollection<E> implements Se
      * @see #remove(Object)
      * @see #contains(Object)
      */
+    // The argument collection may reject a null query as specified by removeAll.
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public boolean removeAll(@GuardSatisfied AbstractSet<E> this, Collection<? extends @UnknownSignedness Object> c) {
         Objects.requireNonNull(c);
         boolean modified = false;
