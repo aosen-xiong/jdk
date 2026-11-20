@@ -317,6 +317,8 @@ public class HashSet<E>
      * Reconstitute the {@code HashSet} instance from a stream (that is,
      * deserialize it).
      */
+    // The stream reconstructs the element sequence written by writeObject.
+    @SuppressWarnings("nullness:argument.type.incompatible")
     @java.io.Serial
     private void readObject(java.io.ObjectInputStream s)
         throws java.io.IOException, ClassNotFoundException {
@@ -385,8 +387,10 @@ public class HashSet<E>
         return new HashMap.KeySpliterator<>(map, 0, -1, 0, 0);
     }
 
+    // The no-argument conversion copies this set’s elements (EISOP issue 2656).
+    @SuppressWarnings("nullness:jspecify.unrecognized.location.receiver")
     @Override
-    public Object[] toArray() {
+    public @PolyNull Object[] toArray(HashSet<@PolyNull E> this) {
         return map.keysToArray(new Object[map.size()]);
     }
 
