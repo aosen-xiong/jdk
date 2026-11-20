@@ -71,9 +71,8 @@ The groups partition all 120 files without duplicates.
 
 ## Current checkpoint
 
-The fork has enrolled 31 of 120 direct sources through group 6. Group 7 starts
-with ArrayList, LinkedList, ArrayDeque and PriorityQueue. The package milestone
-remains open until all 120 sources and the final regression set pass.
+The Unix source manifest covers **35 of 120** direct sources through group 7. Group 8 covers HashMap, LinkedHashMap, HashSet, LinkedHashSet. The package completion milestone remains 120.
+
 
 The post-M2 checker refresh includes [EISOP master 8ba63c3](https://github.com/eisop/checker-framework/commit/8ba63c39765b88d0f3c104bad9c444179c2042f3).
 The original [Comparator crash](https://github.com/eisop/checker-framework/issues/2655)
@@ -512,3 +511,38 @@ changed sources. The earlier conditional-removal discrepancy originates in
 [EISOP JDK commit d792ac4](https://github.com/eisop/jdk/commit/d792ac4e84be3f9bb3aade9da27ef896f880d915).
 
 [Caller fixture on the matching Checker Framework branch](https://github.com/aosen-xiong/checker-framework/blob/7d6de84cdec51f5c13f602e363d753e7857a5476/checker/tests/jdk-source/java.base/java/util/AbstractCollectionContracts.java)
+
+## Group 7. Lists and queues
+
+ArrayList and LinkedList permit null elements. ArrayDeque and PriorityQueue reject
+them. For all four, an empty queue operation or an exhausted split can still signal
+absence. These JDK 17 contracts determine the public types. The representation
+invariants below explain the additional implementation annotations.
+
+| File | Contract and implementation evidence |
+| --- | --- |
+| ArrayList | Only indices below size hold list elements. Growth creates unused slots and removal clears them. The no-argument array conversion copies the live range. An oversized caller array receives a null sentinel. A root sublist has no parent. A spliterator can decline to split. |
+| LinkedList | Endpoint and iterator links can be absent. Unlinking clears the removed node. A valid occupied node holds E, including null when E permits it. The array conversion copies live nodes and the split exposes only its initialized prefix. The list's iterator bounds govern cursor availability. |
+| ArrayDeque | Unoccupied circular-buffer cells are null; all occupied cells are nonnull. Direct element lookup can see a vacant slot. Its checked counterpart throws when it encounters one. The no-argument array result contains only occupied cells. |
+| PriorityQueue | The occupied heap prefix is nonnull and spare cells are nullable. A null comparator selects natural ordering. An iterator's recovery queue, last returned element and removeAt's moved-entry result can be absent. |
+
+The removal controls disable each new diagnostic-specific suppression individually.
+They cover live-prefix and cursor reasoning, null sentinels, erased stream data,
+reflection and receiver locations. The no-argument conversions for the two
+null-permitting lists retain the receiver relationship used for Collection.
+The queue implementations can promise nonnull result elements unconditionally.
+All tests for this group live on the paired Checker Framework branch.
+
+### A consumed queue can still appear nonempty in JSpecify mode
+
+Starting with a one-element ArrayDeque, check that it is nonempty, call
+pollFirst once, then call pollFirst again and dereference the result. The
+stock JDK 17 runtime throws NullPointerException. JSpecify mode accepts the
+dereference and ordinary nullness mode reports dereference.of.nullable.
+Limiting the source isEmpty postcondition to peek methods or removing the
+whole nullness postcondition leaves the JSpecify result unchanged. The same
+happens for a peek after consuming the element. The public poll and peek
+returns remain nullable. The source check alone cannot establish safety of
+this caller under the selected profile.
+
+[Caller fixture on the matching Checker Framework branch](https://github.com/aosen-xiong/checker-framework/blob/306e2c21e275f5ca5d592e5cd593128c7a8f8e93/checker/tests/jdk-source/java.base/java/util/ListQueueContracts.java)
