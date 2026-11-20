@@ -83,9 +83,9 @@ against source documentation and implementation. No executable behavior changed.
 Group 2: traversal source/caller checks, all eleven removal controls, and the
 cumulative 148-file Unix regression pass locally. Group 3: both comparison files
 and their affected callers pass locally. Group 4 covers the eight collection
-interfaces. Group 5 adds Map, SortedMap and NavigableMap, bringing direct Unix
-source coverage to 25/120. The next six abstract implementations complete the
-planned 31-file scope for the collection-contracts milestone.
+interfaces. Group 5 adds the map interfaces, and group 6 adds their abstract
+collection counterparts. The Unix manifest covers all 31 files planned through
+the collection-contracts milestone. Groups 7–25 cover the remaining 89 files.
 package-info.java reviewed: existing
 KeyFor lower-bound default retained; no general package nullness policy inferred.
 The original checks below use CF c12ce38daa; the comparison tip now uses the
@@ -450,3 +450,47 @@ This predates the annotation stack. The annotation PR preserves the executable b
 and [OpenJDK 17 implementation](https://github.com/openjdk/jdk17u/blob/master/src/java.base/share/classes/java/util/Map.java).
 
 [Caller fixture on the matching Checker Framework branch](https://github.com/aosen-xiong/checker-framework/blob/ce50cf3e282b77b8a97cbd73d9de9a9c701579ba/checker/tests/jdk-source/java.base/java/util/MapInterfaceContracts.java)
+
+## Group 6. Abstract collection implementations
+
+These six files finish the planned 31-file Unix scope of the collection-contracts
+milestone. They all already opt into nullness checking. Four needed changes.
+
+| Source | Contract checked against JDK 17 |
+| --- | --- |
+| AbstractCollection | No-argument toArray returns precisely the iterator's elements. Its temporary and growing arrays can contain nulls until the initialized prefix is returned. The typed overload writes a null sentinel into an oversized caller array. Every runtime array class has a component type. removeAll and retainAll may encounter a collection that rejects null. |
+| AbstractList | RandomAccessSpliterator only stores an AbstractList for matching list implementations. Its split result is nullable when subdivision is impossible. Outermost SubList has no parent. |
+| AbstractSequentialList | Iterator-based access preserves E. Invalid positions use exceptions. |
+| AbstractSet | Equality accepts an arbitrary set and catches null rejection. Bulk removal may propagate the argument collection's rejection of an element. |
+| AbstractMap | keySet and values are lazy caches and clone clears both. Their public accessors return initialized views. The internal entry equality helper accepts null on either side. Equality catches optional null-key rejection by the other map. |
+| AbstractQueue | The default remove and element throw on an empty queue. Inherited poll and peek may signal absence with null. The LIFO adapter overrides the head operations and can wrap a deque whose element type permits null. A class-wide nonnull element bound rejected a valid adapter view in a caller probe, so the existing generic domain is retained. |
+
+The private finishToArray helper accepts and returns potentially nullable array
+components. The public no-argument override preserves the polymorphic element
+contract. Its suppression for returned elements is confined to the override,
+where the documented initialization of the prefix guarantees the result. The
+reflective allocation, sentinel write, receiver location and bulk-query
+exceptions are audited independently. Nine new source suppression keys across
+three files each restore the intended diagnostic(s) when removed. The fourth
+changed file, AbstractList, needs no suppression.
+
+Seven invalid caller uses exercise nullable array/list elements, inability to
+split, both uninitialized map caches, nullable entry values and an empty queue.
+Positive callers exercise array conversions, initialized public views, guarded
+access, iteration and throwing queue operations. Both checker modes use the
+same patched sources. The existing CF runner checks the enrolled files and
+caller fixtures on Unix.
+
+Five qualifier-removal checks independently recover the original diagnostics
+on the absent spliterator backing list, exhausted split, root sublist parent
+and both cloned map-view caches. Source checks of HashMap, LinkedHashMap,
+TreeMap, EnumMap, IdentityHashMap and WeakHashMap produced no new diagnostics
+relative to the parent. Two existing HashMap cache-reset errors disappeared.
+These six concrete classes are comparison subjects for later groups.
+
+A JDK 17 disassembly check across both PRs found the same method descriptors
+and executable instructions in all 18 class files emitted from the five
+changed sources. The earlier conditional-removal discrepancy originates in
+[EISOP JDK commit d792ac4](https://github.com/eisop/jdk/commit/d792ac4e84be3f9bb3aade9da27ef896f880d915).
+
+[Caller fixture on the matching Checker Framework branch](https://github.com/aosen-xiong/checker-framework/blob/7d6de84cdec51f5c13f602e363d753e7857a5476/checker/tests/jdk-source/java.base/java/util/AbstractCollectionContracts.java)
