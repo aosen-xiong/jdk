@@ -17,7 +17,8 @@ a source file need not be changed just to join coverage. Tests and the shared ru
 belong in the matching CF branch, not this repository. Do not merge or submit
 upstream automatically. Review inherited and individual source Javadoc first.
 
-Milestones:
+The completion milestone is all **120 direct source files** and the separate package
+documentation review. M1 through M3 are intermediate review checkpoints.
 
 - [M1: core utilities](https://github.com/aosen-xiong/jdk/milestone/8) — group 1, 5 files.
 - [M2: collection contracts](https://github.com/aosen-xiong/jdk/milestone/9) — groups 2–6, cumulative 31 files.
@@ -32,8 +33,8 @@ The first group uses paired branch `codex/nullness-java-util-core`, stacked on
 [java.lang VersionProps, PR #31](https://github.com/aosen-xiong/jdk/pull/31).
 The core layer is [PR #33](https://github.com/aosen-xiong/jdk/pull/33). The traversal
 layer uses paired branch `codex/nullness-java-util-traversal` and targets that core
-branch. Each subsequent group targets the preceding java.util branch. Hosted
-validation is pending; local results below do not replace exact-head CI.
+branch. Each subsequent group targets the preceding java.util branch. The six groups through M2 passed fork CI on their respective revisions.
+Each new layer runs the same checks on its own revision.
 
 ## Exact inventory and proposed PR groups
 
@@ -69,6 +70,23 @@ The groups partition all 120 files without duplicates.
 | 25 | Remaining collection/input exceptions | 4 | `ConcurrentModificationException`, `EmptyStackException`, `InputMismatchException`, `NoSuchElementException` |
 
 ## Current checkpoint
+
+The fork has enrolled 31 of 120 direct sources through group 6. Group 7 starts
+with ArrayList, LinkedList, ArrayDeque and PriorityQueue. The package milestone
+remains open until all 120 sources and the final regression set pass.
+
+The post-M2 checker refresh includes [EISOP master 8ba63c3](https://github.com/eisop/checker-framework/commit/8ba63c39765b88d0f3c104bad9c444179c2042f3).
+The original [Comparator crash](https://github.com/eisop/checker-framework/issues/2655)
+reproducer now completes in both checker modes. The comparator wildcard fixture
+still rejects a null argument to a strict comparator and a strict secondary
+comparator for nullable inputs. The optional-supplier fixture still rejects
+dereferencing a nullable supplier result. Both fixtures now run without the
+old conditional suppression. The same suppression became unnecessary in
+Optional.orElseGet and Map.merge. The checker reports it as unused before
+removal and checks both JDK files cleanly after removal. The receiver-location
+exception for Collection.toArray is a separate [contract question](https://github.com/eisop/checker-framework/issues/2656).
+
+## Historical group checkpoints
 
 Group 1: all five source files pass the pinned JSpecify profile locally. Public
 caller controls pass in both JSpecify and ordinary nullness profiles (21 intended
