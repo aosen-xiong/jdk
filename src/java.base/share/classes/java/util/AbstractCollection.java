@@ -161,10 +161,12 @@ public abstract class AbstractCollection<E> implements Collection<E> {
      * }</pre>
      */
     @SideEffectFree
+    // The receiver determines element nullness. Only the prefix filled by the iterator escapes.
+    @SuppressWarnings({"nullness:jspecify.unrecognized.location.receiver", "nullness:return.type.incompatible"})
     public @PolyNull @PolySigned Object[] toArray(AbstractCollection<@PolyNull @PolySigned E> this) {
         // Estimate size of array; be prepared to see more or fewer elements
-        Object[] r = new Object[size()];
-        Iterator<E> it = iterator();
+        @Nullable Object[] r = new Object[size()];
+        Iterator<@PolyNull E> it = iterator();
         for (int i = 0; i < r.length; i++) {
             if (! it.hasNext()) // fewer elements than expected
                 return Arrays.copyOf(r, i);
@@ -202,11 +204,14 @@ public abstract class AbstractCollection<E> implements Collection<E> {
      * @throws NullPointerException {@inheritDoc}
      */
     @SideEffectFree
-    @SuppressWarnings("unchecked")
+    // The API requires a trailing null when the caller supplies an oversized array.
+    @SuppressWarnings({"unchecked", "nullness:assignment.type.incompatible"})
     public <T> @Nullable T [] toArray(@PolyNull T [] a) {
         // Estimate size of array; be prepared to see more or fewer elements
         int size = size();
-        T[] r = a.length >= size ? a :
+        // The runtime class of an array always has a component type.
+        @SuppressWarnings("nullness:argument.type.incompatible")
+        @Nullable T[] r = a.length >= size ? a :
                   (T[])java.lang.reflect.Array
                   .newInstance(a.getClass().getComponentType(), size);
         Iterator<E> it = iterator();
@@ -242,7 +247,7 @@ public abstract class AbstractCollection<E> implements Collection<E> {
      *         further elements returned by the iterator, trimmed to size
      */
     @SuppressWarnings("unchecked")
-    private static <T> T[] finishToArray(T[] r, Iterator<?> it) {
+    private static <T> @Nullable T[] finishToArray(@Nullable T[] r, Iterator<?> it) {
         int len = r.length;
         int i = len;
         while (it.hasNext()) {
@@ -387,6 +392,8 @@ public abstract class AbstractCollection<E> implements Collection<E> {
      * @see #remove(Object)
      * @see #contains(Object)
      */
+    // The other collection may reject a null element, as the bulk operation permits.
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public boolean removeAll(@GuardSatisfied @CanShrink AbstractCollection<E> this, Collection<? extends @UnknownSignedness Object> c) {
         Objects.requireNonNull(c);
         boolean modified = false;
@@ -422,6 +429,8 @@ public abstract class AbstractCollection<E> implements Collection<E> {
      * @see #remove(Object)
      * @see #contains(Object)
      */
+    // The other collection may reject a null element, as the bulk operation permits.
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public boolean retainAll(@GuardSatisfied @CanShrink AbstractCollection<E> this, Collection<? extends @UnknownSignedness Object> c) {
         Objects.requireNonNull(c);
         boolean modified = false;
