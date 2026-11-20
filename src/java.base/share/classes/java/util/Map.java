@@ -875,6 +875,8 @@ public interface Map<K, V> {
      */
     @EnsuresKeyFor(value={"#1"}, map={"this"})
     default @Nullable V putIfAbsent(K key, V value) {
+        // This operation forwards its K. Maps that reject null may throw here.
+        @SuppressWarnings("nullness:argument.type.incompatible")
         V v = get(key);
         if (v == null) {
             v = put(key, value);
@@ -971,6 +973,8 @@ public interface Map<K, V> {
      * @since 1.8
      */
     default boolean replace(K key, V oldValue, V newValue) {
+        // This operation forwards its K. Maps that reject null may throw here.
+        @SuppressWarnings("nullness:argument.type.incompatible")
         Object curValue = get(key);
         if (!Objects.equals(curValue, oldValue) ||
             (curValue == null && !containsKey(key))) {
@@ -1018,6 +1022,8 @@ public interface Map<K, V> {
      *         or value prevents it from being stored in this map
      * @since 1.8
      */
+    // Forwarding a K to the erased lookup preserves this map's null-key policy.
+    @SuppressWarnings("nullness:argument.type.incompatible")
     default @Nullable V replace(K key, V value) {
         V curValue;
         if (((curValue = get(key)) != null) || containsKey(key)) {
@@ -1100,6 +1106,8 @@ public interface Map<K, V> {
      *         (<a href="{@docRoot}/java.base/java/util/Collection.html#optional-restrictions">optional</a>)
      * @since 1.8
      */
+    // Forwarding a K to the erased lookup preserves this map's null-key policy.
+    @SuppressWarnings("nullness:argument.type.incompatible")
     default @PolyNull V computeIfAbsent(K key,
             Function<? super K, ? extends @PolyNull V> mappingFunction) {
         Objects.requireNonNull(mappingFunction);
@@ -1177,6 +1185,8 @@ public interface Map<K, V> {
      *         (<a href="{@docRoot}/java.base/java/util/Collection.html#optional-restrictions">optional</a>)
      * @since 1.8
      */
+    // Forwarding a K to the erased lookup preserves this map's null-key policy.
+    @SuppressWarnings("nullness:argument.type.incompatible")
     default @Nullable V computeIfPresent(K key,
             BiFunction<? super K, ? super @NonNull V, ? extends @Nullable V> remappingFunction) {
         Objects.requireNonNull(remappingFunction);
@@ -1266,6 +1276,8 @@ public interface Map<K, V> {
     default @Nullable V compute(K key,
             BiFunction<? super K, ? super @Nullable V, ? extends @Nullable V> remappingFunction) {
         Objects.requireNonNull(remappingFunction);
+        // This operation forwards its K. Maps that reject null may throw here.
+        @SuppressWarnings("nullness:argument.type.incompatible")
         V oldValue = get(key);
 
         V newValue = remappingFunction.apply(key, oldValue);
@@ -1365,7 +1377,11 @@ public interface Map<K, V> {
             BiFunction<? super @NonNull V, ? super @NonNull V, ? extends @Nullable V> remappingFunction) {
         Objects.requireNonNull(remappingFunction);
         Objects.requireNonNull(value);
+        // This operation forwards its K. Maps that reject null may throw here.
+        @SuppressWarnings("nullness:argument.type.incompatible")
         V oldValue = get(key);
+        // A null remapping result requests removal and is tested immediately below.
+        @SuppressWarnings("nullness:conditional.type.incompatible")
         V newValue = (oldValue == null) ? value :
                    remappingFunction.apply(oldValue, value);
         if (newValue == null) {

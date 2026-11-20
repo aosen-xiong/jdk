@@ -83,8 +83,9 @@ against source documentation and implementation. No executable behavior changed.
 Group 2: traversal source/caller checks, all eleven removal controls, and the
 cumulative 148-file Unix regression pass locally. Group 3: both comparison files
 and their affected callers pass locally. Group 4 covers the eight collection
-interfaces. Direct Unix source coverage is 22/120. Groups 5–25 contain the
-remaining 98 files. Group 5 starts with Map, SortedMap and NavigableMap.
+interfaces. Group 5 adds Map, SortedMap and NavigableMap, bringing direct Unix
+source coverage to 25/120. The next six abstract implementations complete the
+planned 31-file scope for the collection-contracts milestone.
 package-info.java reviewed: existing
 KeyFor lower-bound default retained; no general package nullness policy inferred.
 The original checks below use CF c12ce38daa; the comparison tip now uses the
@@ -403,3 +404,49 @@ test expectations. On the parent signatures, four existing diagnostics remained
 and all eight unsafe array uses passed. Generic array allocation with a nonnull
 element collection and a guarded nullable element both passed on the new signatures.
 [CF caller fixture](https://github.com/aosen-xiong/checker-framework/blob/dcee2774c697693ce8616cdc2246b860df9f2ec7/checker/tests/jdk-source/java.base/java/util/CollectionInterfaceContracts.java)
+
+## Group 5. Map interfaces
+
+All three files already declare nullness coverage. The JDK 17 contracts distinguish
+absence, an explicitly stored null, and a null callback result that declines or removes
+a mapping. SortedMap.comparator returns null for natural order. Its extremal key methods
+throw on an empty map. NavigableMap's neighbor keys and entries, and its polling methods,
+can return null on absence. The existing sorted and navigable declarations cover those
+cases. The Map factory and Entry.copyOf declarations reject null inputs as documented.
+
+The Map default methods forward a key of type K to an erased Object lookup. The
+conservative lookup signature allows implementations to reject null. Seven narrow
+argument suppressions preserve that public policy. In merge, the remapper may return
+null to request deletion. The implementation checks that result before insertion.
+The eighth suppression covers its conditional expression. Removing each suppression
+separately restores one diagnostic on the stated expression. The ten caller controls
+cover lookups, remapping, ordered views and immutable factories in ordinary nullness
+and JSpecify mode. The corresponding safe uses pass in each mode.
+
+Two limits matter when interpreting lookup results:
+
+- On a Map with nonnull values, JSpecify mode enables the checker's assumeKeyFor
+  option. It accepts an unguarded dereference of get on a missing key. Ordinary
+  nullness mode flags the same use. Neither result changes the API's nullable return.
+- A Map with nonnull values may legally receive a null fallback in getOrDefault.
+  The existing V fallback type rejects this caller. A scratch contract tying the
+  receiver's V, fallback and result to a single PolyNull also rejected the legal
+  guarded caller due to the invariant receiver. The study retains the conservative
+  signature. Inferring results from the fallback alone would miss a stored null.
+
+### Existing fork discrepancy in conditional removal
+
+The inherited JDK source assigns the key itself to curValue in Map.remove(key, value).
+Its own implementation specification compares the stored value. A minimal AbstractMap
+backed by a HashMap exercised the default method with `"k"` mapped to `"v"`.
+
+| Call on a fresh map | Stock OpenJDK 17 | Stock runtime patched with the fork's Map class |
+| --- | --- | --- |
+| `remove("k", "v")` | true, entry removed | false, entry retained |
+| `remove("k", "k")` | false, entry retained | true, entry removed |
+
+This predates the annotation stack. The annotation PR preserves the executable body.
+[Parent source](https://github.com/aosen-xiong/jdk/blob/94e3491d847342e79ca2f4c1232c20d95e171dd7/src/java.base/share/classes/java/util/Map.java#L920-L930)
+and [OpenJDK 17 implementation](https://github.com/openjdk/jdk17u/blob/master/src/java.base/share/classes/java/util/Map.java).
+
+[Caller fixture on the matching Checker Framework branch](https://github.com/aosen-xiong/checker-framework/blob/ce50cf3e282b77b8a97cbd73d9de9a9c701579ba/checker/tests/jdk-source/java.base/java/util/MapInterfaceContracts.java)

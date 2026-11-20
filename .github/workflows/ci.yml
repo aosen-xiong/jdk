@@ -226,7 +226,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: aosen-xiong/checker-framework
-          ref: dcee2774c697693ce8616cdc2246b860df9f2ec7 # codex/nullness-java-util-collection-interfaces; EISOP master 6ac6f78134
+          ref: ce50cf3e282b77b8a97cbd73d9de9a9c701579ba # codex/nullness-java-util-map-interfaces; EISOP master 6ac6f78134
           path: checker-framework
           persist-credentials: false
       - name: Check out the checker's bundled JDK contracts
@@ -431,7 +431,10 @@ jobs:
             java/util/NavigableSet.java \
             java/util/Queue.java \
             java/util/Deque.java \
-            java/util/RandomAccess.java
+            java/util/RandomAccess.java \
+            java/util/Map.java \
+            java/util/SortedMap.java \
+            java/util/NavigableMap.java
       - name: Check package-private helper callers from CF
         working-directory: checker-framework
         env:
@@ -449,7 +452,8 @@ jobs:
         run: |
           checker/bin-devel/typecheck-jdk.sh nullness java.base \
             java/util/ComparisonHelperContracts.java \
-            java/util/CollectionInterfaceContracts.java
+            java/util/CollectionInterfaceContracts.java \
+            java/util/MapInterfaceContracts.java
       - name: Upload type-checking logs
         if: always()
         uses: actions/upload-artifact@v4
