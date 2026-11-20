@@ -226,7 +226,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: aosen-xiong/checker-framework
-          ref: 306e2c21e275f5ca5d592e5cd593128c7a8f8e93 # codex/nullness-java-util-lists-queues; EISOP master 8ba63c3976
+          ref: 5fc8fa691a217c67e062d30ac7ef7aa8e86688f1 # codex/nullness-java-util-hash-collections; EISOP master 8ba63c3976
           path: checker-framework
           persist-credentials: false
       - name: Check out the checker's bundled JDK contracts
@@ -444,7 +444,11 @@ jobs:
             java/util/ArrayList.java \
             java/util/LinkedList.java \
             java/util/ArrayDeque.java \
-            java/util/PriorityQueue.java
+            java/util/PriorityQueue.java \
+            java/util/HashMap.java \
+            java/util/LinkedHashMap.java \
+            java/util/HashSet.java \
+            java/util/LinkedHashSet.java
       - name: Check package-private helper callers from CF
         working-directory: checker-framework
         env:
@@ -465,7 +469,8 @@ jobs:
             java/util/CollectionInterfaceContracts.java \
             java/util/MapInterfaceContracts.java \
             java/util/AbstractCollectionContracts.java \
-            java/util/ListQueueContracts.java
+            java/util/ListQueueContracts.java \
+            java/util/HashCollectionContracts.java
       - name: Upload type-checking logs
         if: always()
         uses: actions/upload-artifact@v4

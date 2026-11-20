@@ -71,7 +71,7 @@ The groups partition all 120 files without duplicates.
 
 ## Current checkpoint
 
-The Unix source manifest covers **35 of 120** direct sources through group 7. Group 8 covers HashMap, LinkedHashMap, HashSet, LinkedHashSet. The package completion milestone remains 120.
+The Unix source manifest covers **39 of 120** direct sources through group 8. Group 9 covers TreeMap, TreeSet, WeakHashMap, IdentityHashMap. The package completion milestone remains 120.
 
 
 The post-M2 checker refresh includes [EISOP master 8ba63c3](https://github.com/eisop/checker-framework/commit/8ba63c39765b88d0f3c104bad9c444179c2042f3).
@@ -546,3 +546,36 @@ returns remain nullable. The source check alone cannot establish safety of
 this caller under the selected profile.
 
 [Caller fixture on the matching Checker Framework branch](https://github.com/aosen-xiong/checker-framework/blob/306e2c21e275f5ca5d592e5cd593128c7a8f8e93/checker/tests/jdk-source/java.base/java/util/ListQueueContracts.java)
+
+## Group 8. Hash collections
+
+| File | Documentation and representation |
+| --- | --- |
+| HashMap | The map permits null keys and values. Lookup and conditional removal can find no node. An absent computeIfPresent does not call the remapper and can return null even when the remapper always produces a value. A null remapping result requests removal. Bucket arrays are initialized lazily, bucket slots can be empty and tree links can be absent. |
+| LinkedHashMap | HashMap's null policy also applies to the ordered views. The first and last entries, iterator cursors, and the links of a detached entry may be absent. The public key and value views contain the elements of their map. |
+| HashSet | Null elements are permitted. The no-argument array conversion copies exactly the backing map's keys. An oversized caller array in the typed overload can contain a trailing null. |
+| LinkedHashSet | The documented ordering adds no null restriction. It inherits the array conversion from HashSet and needs no source edit. |
+
+The fixture checks absent computeIfPresent, nullable plain and linked sets, and
+all four concrete key/value views. Read-only traversal in the map's array
+helpers uses wildcard types to preserve the relationship with the enclosing
+receiver. The shared receiver-location exception is checked at each helper.
+The public Set and Collection views retain precise array contracts.
+
+The member classes that implement the concrete key/value views present a
+separate boundary. A trial qualified the enclosing map receiver with PolyNull.
+The checker rejected the receiver override, yet accepted all four unsafe array
+dereferences through the concrete member types. The study uses nullable array
+components in these internal overrides and documents the return-override
+diagnostic. This catches nullable elements. A caller using one of those
+internal types with nonnull elements needs a guard. The ordinary public
+keySet() and values() callers with nonnull elements still pass in both modes.
+
+Private serialization rebuilds the map or set from its erased element stream.
+Further narrow suppressions cover the bucket capacity, occupied tree root,
+nonempty tree-to-list conversion, cached comparable class, and the runtime
+array component for reflective allocation. Each new key has an independent
+removal control. The three changed sources emitted 24 classes with identical
+descriptors and executable instructions on JDK 17.
+
+[Caller fixture on the matching Checker Framework branch](https://github.com/aosen-xiong/checker-framework/blob/5fc8fa691a217c67e062d30ac7ef7aa8e86688f1/checker/tests/jdk-source/java.base/java/util/HashCollectionContracts.java)
