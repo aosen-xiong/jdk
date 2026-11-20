@@ -82,9 +82,9 @@ The constructors, empty-instance cast and private presence predicates were revie
 against source documentation and implementation. No executable behavior changed.
 Group 2: traversal source/caller checks, all eleven removal controls, and the
 cumulative 148-file Unix regression pass locally. Group 3: both comparison files
-and their affected callers pass locally; see the final checkpoint below for the
-exact regression snapshots. Groups 4–25 remain unattempted
-(106 files). Exact-head hosted CI remains pending.
+and their affected callers pass locally. Group 4 covers the eight collection
+interfaces. Direct Unix source coverage is 22/120. Groups 5–25 contain the
+remaining 98 files. Group 5 starts with Map, SortedMap and NavigableMap.
 package-info.java reviewed: existing
 KeyFor lower-bound default retained; no general package nullness policy inferred.
 The original checks below use CF c12ce38daa; the comparison tip now uses the
@@ -337,3 +337,69 @@ JDK comparator implementation remains suppression-free.
 The full upgraded Unix/Windows source checks and native JDK build run in CI.
 The previous 150-file local runs and prior green CI are retained as historical
 results and are not relabeled as checks of this new checker artifact.
+
+## Group 4. Collection interfaces
+
+The JDK 17 Javadoc for `Collection.toArray(IntFunction)` requires the generator
+to create an array of the requested length. The method copies the receiver's
+elements, including any nulls. The generator selects the runtime array type.
+A collection containing a single null previously passed the checker and threw
+`NullPointerException` at `names.toArray(String[]::new)[0].length()`.
+[Upstream annotation question and executable example](https://github.com/eisop/checker-framework/issues/2656)
+
+The study uses this CF contract for the generator overload.
+
+```java
+default <T> @PolyNull T[] toArray(Collection<@PolyNull E> this, IntFunction<T[]> generator)
+```
+
+`@PolyNull` applies to the returned array's elements. The method has two
+diagnostic-specific suppressions. JSpecify excludes a type argument on an
+explicit receiver from its recognized locations. The default implementation
+also delegates to the array overload, whose return allows the trailing null of
+an oversized destination. A conforming generator supplies length zero here, so
+that extra slot cannot occur. Removing either key restores its own diagnostic.
+The pre-existing no-argument declarations in Collection, List and Set retain
+their polymorphic contracts with the receiver-location exception alone.
+[JSpecify annotation locations](https://jspecify.dev/docs/spec/#recognized-locations-for-type-use-annotations)
+
+| Source | Evidence and decision |
+| --- | --- |
+| Collection | Both array-returning contracts above preserve the receiver's element nullness. The caller-supplied array overload retains its oversized-array contract. |
+| List | The sort Javadoc permits a null comparator for natural order. Its temporary array may store null elements. Arrays.sort currently requires a nonnull comparator. ListIterator.set cannot recover E from the erased temporary array after sorting. Both calls use the argument diagnostic exception. Revisit the former in group 12. |
+| Set | The inherited element semantics also apply to its redeclared no-argument toArray. |
+| SortedSet | Its default spliterator returns the set's comparator. Natural ordering returns null, so its anonymous getComparator override needs a nullable result. |
+| NavigableSet | Neighbor queries and polling can return null when no element qualifies. Existing declarations cover these results. |
+| Queue and Deque | Peek and poll return null on absence. Element and getFirst throw on an empty receiver and preserve the element type on success. |
+| RandomAccess | Marker interface with no member contracts. |
+
+The eight interfaces already opt into nullness checking. Four needed source
+changes. Six new method/diagnostic combinations across Collection, List and Set
+were removed individually in scratch copies. The four receiver locations each
+produced one diagnostic, the default delegation produced one, and List.sort
+produced two argument diagnostics. Reverting the List temporary component and
+SortedSet comparator qualifiers separately restored the original diagnostics.
+The four changed interfaces and the Collections wrapper changes below produced
+64 class files with identical JVM method descriptors and instructions before and
+after annotation.
+
+Four overrides in Collections forward this overload to a backing collection or
+deque. The unmodifiable, synchronized, checked and LIFO wrappers preserve the
+element contract of their backing view. Checking the entire file against only
+the changed interfaces exposed eight new errors at those four overrides. Giving
+each override the same element relationship and just the receiver-location
+exception cleared all eight. Each wrapper's exception has its own removal control.
+The rest of Collections has 204 pre-existing errors and two warnings on both
+snapshots. It remains outside the enrolled set until its full group 11 review.
+
+The CF caller fixture exercises nullable, nonnull and guarded array elements,
+assignment to a nonnull-component array, inherited List and Set calls, all
+four concrete overrides, natural ordering, and the absence contracts of
+NavigableSet, Queue and Deque. The JDK workflow uses the existing CF source
+runner on Unix with unused suppressions treated as errors.
+
+Both checker modes produced the same 12 intended diagnostics after removing the
+test expectations. On the parent signatures, four existing diagnostics remained
+and all eight unsafe array uses passed. Generic array allocation with a nonnull
+element collection and a guarded nullable element both passed on the new signatures.
+[CF caller fixture](https://github.com/aosen-xiong/checker-framework/blob/dcee2774c697693ce8616cdc2246b860df9f2ec7/checker/tests/jdk-source/java.base/java/util/CollectionInterfaceContracts.java)
