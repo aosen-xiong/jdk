@@ -157,7 +157,7 @@ public class ArrayList<E> extends AbstractList<E>
      * empty ArrayList with elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA
      * will be expanded to DEFAULT_CAPACITY when the first element is added.
      */
-    transient Object[] elementData; // non-private to simplify nested class access
+    transient @Nullable Object[] elementData; // non-private to simplify nested class access
 
     /**
      * The size of the ArrayList (the number of elements it contains).
@@ -203,7 +203,7 @@ public class ArrayList<E> extends AbstractList<E>
      */
     @SideEffectFree
     public @PolyNonEmpty ArrayList(@PolyNonEmpty Collection<? extends E> c) {
-        Object[] a = c.toArray();
+        @Nullable Object[] a = c.toArray();
         if ((size = a.length) != 0) {
             if (c.getClass() == ArrayList.class) {
                 elementData = a;
@@ -253,7 +253,7 @@ public class ArrayList<E> extends AbstractList<E>
      * @param minCapacity the desired minimum capacity
      * @throws OutOfMemoryError if minCapacity is less than zero
      */
-    private Object[] grow(int minCapacity) {
+    private @Nullable Object[] grow(int minCapacity) {
         int oldCapacity = elementData.length;
         if (oldCapacity > 0 || elementData != DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {
             int newCapacity = ArraysSupport.newLength(oldCapacity,
@@ -265,7 +265,7 @@ public class ArrayList<E> extends AbstractList<E>
         }
     }
 
-    private Object[] grow() {
+    private @Nullable Object[] grow() {
         return grow(size + 1);
     }
 
@@ -318,7 +318,7 @@ public class ArrayList<E> extends AbstractList<E>
     }
 
     int indexOfRange(@GuardSatisfied @Nullable @UnknownSignedness Object o, int start, int end) {
-        Object[] es = elementData;
+        @Nullable Object[] es = elementData;
         if (o == null) {
             for (int i = start; i < end; i++) {
                 if (es[i] == null) {
@@ -348,7 +348,7 @@ public class ArrayList<E> extends AbstractList<E>
     }
 
     int lastIndexOfRange(@GuardSatisfied @Nullable @UnknownSignedness Object o, int start, int end) {
-        Object[] es = elementData;
+        @Nullable Object[] es = elementData;
         if (o == null) {
             for (int i = end - 1; i >= start; i--) {
                 if (es[i] == null) {
@@ -399,6 +399,8 @@ public class ArrayList<E> extends AbstractList<E>
      *         proper sequence
      */
     @SideEffectFree
+    // The receiver transfers element nullness to the returned array (EISOP issue 2656). Only the live elements are copied.
+    @SuppressWarnings({"nullness:jspecify.unrecognized.location.receiver", "nullness:return.type.incompatible"})
     public @PolyNull @PolySigned Object[] toArray(ArrayList<@PolyNull @PolySigned E> this) {
         return Arrays.copyOf(elementData, size);
     }
@@ -428,7 +430,8 @@ public class ArrayList<E> extends AbstractList<E>
      * @throws NullPointerException if the specified array is null
      */
     @SideEffectFree
-    @SuppressWarnings("unchecked")
+    // An oversized caller array receives the documented trailing null.
+    @SuppressWarnings({"unchecked", "nullness:assignment.type.incompatible"})
     public <T> @Nullable T[] toArray(@PolyNull T[] a) {
         if (a.length < size)
             // Make a new array of a's runtime type, but my contents:
@@ -441,13 +444,15 @@ public class ArrayList<E> extends AbstractList<E>
 
     // Positional Access Operations
 
-    @SuppressWarnings("unchecked")
+    // This index is in the occupied range and contains an element of type E.
+    @SuppressWarnings({"unchecked", "nullness:return.type.incompatible"})
     E elementData(@NonNegative int index) {
         return (E) elementData[index];
     }
 
-    @SuppressWarnings("unchecked")
-    static <E> E elementAt(Object[] es, int index) {
+    // This index is in the occupied range and contains an element of type E.
+    @SuppressWarnings({"unchecked", "nullness:return.type.incompatible"})
+    static <E> E elementAt(@Nullable Object[] es, int index) {
         return (E) es[index];
     }
 
@@ -485,7 +490,7 @@ public class ArrayList<E> extends AbstractList<E>
      * bytecode size under 35 (the -XX:MaxInlineSize default value),
      * which helps when add(E) is called in a C1-compiled loop.
      */
-    private void add(E e, Object[] elementData, int s) {
+    private void add(E e, @Nullable Object[] elementData, int s) {
         if (s == elementData.length)
             elementData = grow();
         elementData[s] = e;
@@ -518,7 +523,7 @@ public class ArrayList<E> extends AbstractList<E>
         rangeCheckForAdd(index);
         modCount++;
         final int s;
-        Object[] elementData;
+        @Nullable Object[] elementData;
         if ((s = size) == (elementData = this.elementData).length)
             elementData = grow();
         System.arraycopy(elementData, index,
@@ -537,9 +542,11 @@ public class ArrayList<E> extends AbstractList<E>
      * @return the element that was removed from the list
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
+    // This index is in the occupied range and contains an element of type E.
+    @SuppressWarnings("nullness:return.type.incompatible")
     public E remove(@GuardSatisfied @CanShrink ArrayList<E> this, @NonNegative int index) {
         Objects.checkIndex(index, size);
-        final Object[] es = elementData;
+        final @Nullable Object[] es = elementData;
 
         @SuppressWarnings("unchecked") E oldValue = (E) es[index];
         fastRemove(es, index);
@@ -573,7 +580,7 @@ public class ArrayList<E> extends AbstractList<E>
     }
 
     boolean equalsRange(List<?> other, int from, int to) {
-        final Object[] es = elementData;
+        final @Nullable Object[] es = elementData;
         if (to > es.length) {
             throw new ConcurrentModificationException();
         }
@@ -591,8 +598,8 @@ public class ArrayList<E> extends AbstractList<E>
         final int s = size;
         boolean equal;
         if (equal = (s == other.size)) {
-            final Object[] otherEs = other.elementData;
-            final Object[] es = elementData;
+            final @Nullable Object[] otherEs = other.elementData;
+            final @Nullable Object[] es = elementData;
             if (s > es.length || s > otherEs.length) {
                 throw new ConcurrentModificationException();
             }
@@ -624,7 +631,7 @@ public class ArrayList<E> extends AbstractList<E>
     }
 
     int hashCodeRange(int from, int to) {
-        final Object[] es = elementData;
+        final @Nullable Object[] es = elementData;
         if (to > es.length) {
             throw new ConcurrentModificationException();
         }
@@ -650,7 +657,7 @@ public class ArrayList<E> extends AbstractList<E>
      * @return {@code true} if this list contained the specified element
      */
     public boolean remove(@GuardSatisfied @CanShrink ArrayList<E> this, @GuardSatisfied @Nullable @UnknownSignedness Object o) {
-        final Object[] es = elementData;
+        final @Nullable Object[] es = elementData;
         final int size = this.size;
         int i = 0;
         found: {
@@ -673,7 +680,7 @@ public class ArrayList<E> extends AbstractList<E>
      * Private remove method that skips bounds checking and does not
      * return the value removed.
      */
-    private void fastRemove(Object[] es, int i) {
+    private void fastRemove(@Nullable Object[] es, int i) {
         modCount++;
         final int newSize;
         if ((newSize = size - 1) > i)
@@ -687,7 +694,7 @@ public class ArrayList<E> extends AbstractList<E>
      */
     public void clear(@GuardSatisfied @CanShrink ArrayList<E> this) {
         modCount++;
-        final Object[] es = elementData;
+        final @Nullable Object[] es = elementData;
         for (int to = size, i = size = 0; i < to; i++)
             es[i] = null;
     }
@@ -706,12 +713,12 @@ public class ArrayList<E> extends AbstractList<E>
      * @throws NullPointerException if the specified collection is null
      */
     public boolean addAll(@GuardSatisfied ArrayList<E> this, Collection<? extends E> c) {
-        Object[] a = c.toArray();
+        @Nullable Object[] a = c.toArray();
         modCount++;
         int numNew = a.length;
         if (numNew == 0)
             return false;
-        Object[] elementData;
+        @Nullable Object[] elementData;
         final int s;
         if (numNew > (elementData = this.elementData).length - (s = size))
             elementData = grow(s + numNew);
@@ -738,12 +745,12 @@ public class ArrayList<E> extends AbstractList<E>
     public boolean addAll(@GuardSatisfied ArrayList<E> this, @NonNegative int index, Collection<? extends E> c) {
         rangeCheckForAdd(index);
 
-        Object[] a = c.toArray();
+        @Nullable Object[] a = c.toArray();
         modCount++;
         int numNew = a.length;
         if (numNew == 0)
             return false;
-        Object[] elementData;
+        @Nullable Object[] elementData;
         final int s;
         if (numNew > (elementData = this.elementData).length - (s = size))
             elementData = grow(s + numNew);
@@ -781,7 +788,7 @@ public class ArrayList<E> extends AbstractList<E>
     }
 
     /** Erases the gap from lo to hi, by sliding down following elements. */
-    private void shiftTailOverGap(Object[] es, int lo, int hi) {
+    private void shiftTailOverGap(@Nullable Object[] es, int lo, int hi) {
         System.arraycopy(es, hi, es, lo, size - hi);
         for (int to = size, i = (size -= hi - lo); i < to; i++)
             es[i] = null;
@@ -850,10 +857,12 @@ public class ArrayList<E> extends AbstractList<E>
         return batchRemove(c, true, 0, size);
     }
 
+    // The supplied collection may reject a null list element during bulk removal.
+    @SuppressWarnings("nullness:argument.type.incompatible")
     boolean batchRemove(Collection<?> c, boolean complement,
                         final int from, final int end) {
         Objects.requireNonNull(c);
-        final Object[] es = elementData;
+        final @Nullable Object[] es = elementData;
         int r;
         // Optimize for initial run of survivors
         for (r = from;; r++) {
@@ -931,7 +940,7 @@ public class ArrayList<E> extends AbstractList<E>
         if (size > 0) {
             // like clone(), allocate array based upon size not capacity
             SharedSecrets.getJavaObjectInputStreamAccess().checkArray(s, Object[].class, size);
-            Object[] elements = new Object[size];
+            @Nullable Object[] elements = new Object[size];
 
             // Read in all elements in the proper order.
             for (int i = 0; i < size; i++) {
@@ -1004,13 +1013,14 @@ public class ArrayList<E> extends AbstractList<E>
             return cursor != size;
         }
 
-        @SuppressWarnings("unchecked")
+        // This index is in the occupied range and contains an element of type E.
+        @SuppressWarnings({"unchecked", "nullness:return.type.incompatible"})
         public E next(@NonEmpty Itr this) {
             checkForComodification();
             int i = cursor;
             if (i >= size)
                 throw new NoSuchElementException();
-            Object[] elementData = ArrayList.this.elementData;
+            @Nullable Object[] elementData = ArrayList.this.elementData;
             if (i >= elementData.length)
                 throw new ConcurrentModificationException();
             cursor = i + 1;
@@ -1039,7 +1049,7 @@ public class ArrayList<E> extends AbstractList<E>
             final int size = ArrayList.this.size;
             int i = cursor;
             if (i < size) {
-                final Object[] es = elementData;
+                final @Nullable Object[] es = elementData;
                 if (i >= es.length)
                     throw new ConcurrentModificationException();
                 for (; i < size && modCount == expectedModCount; i++)
@@ -1078,13 +1088,14 @@ public class ArrayList<E> extends AbstractList<E>
             return cursor - 1;
         }
 
-        @SuppressWarnings("unchecked")
+        // This index is in the occupied range and contains an element of type E.
+        @SuppressWarnings({"unchecked", "nullness:return.type.incompatible"})
         public E previous() {
             checkForComodification();
             int i = cursor - 1;
             if (i < 0)
                 throw new NoSuchElementException();
-            Object[] elementData = ArrayList.this.elementData;
+            @Nullable Object[] elementData = ArrayList.this.elementData;
             if (i >= elementData.length)
                 throw new ConcurrentModificationException();
             cursor = i;
@@ -1154,7 +1165,7 @@ public class ArrayList<E> extends AbstractList<E>
 
     private static class SubList<E> extends AbstractList<E> implements RandomAccess {
         private final ArrayList<E> root;
-        private final SubList<E> parent;
+        private final @Nullable SubList<E> parent;
         private final int offset;
         private int size;
 
@@ -1267,13 +1278,16 @@ public class ArrayList<E> extends AbstractList<E>
             return modified;
         }
 
+        // The receiver transfers element nullness to the returned array (EISOP issue 2656). Only the live elements are copied.
+        @SuppressWarnings({"nullness:jspecify.unrecognized.location.receiver", "nullness:return.type.incompatible"})
         public @PolyNull @PolySigned Object[] toArray(SubList<@PolyNull @PolySigned E> this) {
             checkForComodification();
             return Arrays.copyOfRange(root.elementData, offset, offset + size);
         }
 
-        @SuppressWarnings("unchecked")
-        public <T> @Nullable T[] toArray(T[] a) {
+        // An oversized caller array receives the documented trailing null.
+        @SuppressWarnings({"unchecked", "nullness:assignment.type.incompatible"})
+        public <T> @Nullable T[] toArray(@PolyNull T[] a) {
             checkForComodification();
             if (a.length < size)
                 return (T[]) Arrays.copyOfRange(
@@ -1341,13 +1355,14 @@ public class ArrayList<E> extends AbstractList<E>
                     return cursor != SubList.this.size;
                 }
 
-                @SuppressWarnings("unchecked")
+                // This index is in the occupied range and contains an element of type E.
+                @SuppressWarnings({"unchecked", "nullness:return.type.incompatible"})
                 public E next(/*@NonEmpty ListIterator<E> this*/) {
                     checkForComodification();
                     int i = cursor;
                     if (i >= SubList.this.size)
                         throw new NoSuchElementException();
-                    Object[] elementData = root.elementData;
+                    @Nullable Object[] elementData = root.elementData;
                     if (offset + i >= elementData.length)
                         throw new ConcurrentModificationException();
                     cursor = i + 1;
@@ -1358,13 +1373,14 @@ public class ArrayList<E> extends AbstractList<E>
                     return cursor != 0;
                 }
 
-                @SuppressWarnings("unchecked")
+                // This index is in the occupied range and contains an element of type E.
+                @SuppressWarnings({"unchecked", "nullness:return.type.incompatible"})
                 public E previous() {
                     checkForComodification();
                     int i = cursor - 1;
                     if (i < 0)
                         throw new NoSuchElementException();
-                    Object[] elementData = root.elementData;
+                    @Nullable Object[] elementData = root.elementData;
                     if (offset + i >= elementData.length)
                         throw new ConcurrentModificationException();
                     cursor = i;
@@ -1376,7 +1392,7 @@ public class ArrayList<E> extends AbstractList<E>
                     final int size = SubList.this.size;
                     int i = cursor;
                     if (i < size) {
-                        final Object[] es = root.elementData;
+                        final @Nullable Object[] es = root.elementData;
                         if (offset + i >= es.length)
                             throw new ConcurrentModificationException();
                         for (; i < size && root.modCount == expectedModCount; i++)
@@ -1491,13 +1507,15 @@ public class ArrayList<E> extends AbstractList<E>
                     return hi;
                 }
 
-                public ArrayList<E>.ArrayListSpliterator trySplit() {
+                public ArrayList<E>.@Nullable ArrayListSpliterator trySplit() {
                     int hi = getFence(), lo = index, mid = (lo + hi) >>> 1;
                     // ArrayListSpliterator can be used here as the source is already bound
                     return (lo >= mid) ? null : // divide range in half unless too small
                         root.new ArrayListSpliterator(lo, index = mid, expectedModCount);
                 }
 
+                // This index is in the occupied range and contains an element of type E.
+                @SuppressWarnings("nullness:argument.type.incompatible")
                 public boolean tryAdvance(Consumer<? super E> action) {
                     Objects.requireNonNull(action);
                     int hi = getFence(), i = index;
@@ -1512,11 +1530,13 @@ public class ArrayList<E> extends AbstractList<E>
                     return false;
                 }
 
+                // This index is in the occupied range and contains an element of type E.
+                @SuppressWarnings("nullness:argument.type.incompatible")
                 public void forEachRemaining(Consumer<? super E> action) {
                     Objects.requireNonNull(action);
                     int i, hi, mc; // hoist accesses and checks from loop
                     ArrayList<E> lst = root;
-                    Object[] a;
+                    @Nullable Object[] a;
                     if ((a = lst.elementData) != null) {
                         if ((hi = fence) < 0) {
                             mc = modCount;
@@ -1554,7 +1574,7 @@ public class ArrayList<E> extends AbstractList<E>
     public void forEach(Consumer<? super E> action) {
         Objects.requireNonNull(action);
         final int expectedModCount = modCount;
-        final Object[] es = elementData;
+        final @Nullable Object[] es = elementData;
         final int size = this.size;
         for (int i = 0; modCount == expectedModCount && i < size; i++)
             action.accept(elementAt(es, i));
@@ -1636,12 +1656,14 @@ public class ArrayList<E> extends AbstractList<E>
             return hi;
         }
 
-        public ArrayListSpliterator trySplit() {
+        public @Nullable ArrayListSpliterator trySplit() {
             int hi = getFence(), lo = index, mid = (lo + hi) >>> 1;
             return (lo >= mid) ? null : // divide range in half unless too small
                 new ArrayListSpliterator(lo, index = mid, expectedModCount);
         }
 
+        // This index is in the occupied range and contains an element of type E.
+        @SuppressWarnings("nullness:argument.type.incompatible")
         public boolean tryAdvance(Consumer<? super E> action) {
             if (action == null)
                 throw new NullPointerException();
@@ -1657,9 +1679,11 @@ public class ArrayList<E> extends AbstractList<E>
             return false;
         }
 
+        // This index is in the occupied range and contains an element of type E.
+        @SuppressWarnings("nullness:argument.type.incompatible")
         public void forEachRemaining(Consumer<? super E> action) {
             int i, hi, mc; // hoist accesses and checks from loop
-            Object[] a;
+            @Nullable Object[] a;
             if (action == null)
                 throw new NullPointerException();
             if ((a = elementData) != null) {
@@ -1717,7 +1741,7 @@ public class ArrayList<E> extends AbstractList<E>
     boolean removeIf(@CanShrink ArrayList<E> this, Predicate<? super E> filter, int i, final int end) {
         Objects.requireNonNull(filter);
         int expectedModCount = modCount;
-        final Object[] es = elementData;
+        final @Nullable Object[] es = elementData;
         // Optimize for initial run of survivors
         for (; i < end && !filter.test(elementAt(es, i)); i++)
             ;
@@ -1758,7 +1782,7 @@ public class ArrayList<E> extends AbstractList<E>
     private void replaceAllRange(UnaryOperator<E> operator, int i, int end) {
         Objects.requireNonNull(operator);
         final int expectedModCount = modCount;
-        final Object[] es = elementData;
+        final @Nullable Object[] es = elementData;
         for (; modCount == expectedModCount && i < end; i++)
             es[i] = operator.apply(elementAt(es, i));
         if (modCount != expectedModCount)
@@ -1766,7 +1790,8 @@ public class ArrayList<E> extends AbstractList<E>
     }
 
     @Override
-    @SuppressWarnings("unchecked")
+    // Arrays.sort accepts null to select natural ordering.
+    @SuppressWarnings({"unchecked", "nullness:argument.type.incompatible"})
     public void sort(@Nullable Comparator<? super E> c) {
         final int expectedModCount = modCount;
         Arrays.sort((E[]) elementData, 0, size, c);
